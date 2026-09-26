@@ -413,11 +413,12 @@ function rebuildAxes(ctx) {
   const axes = new THREE.Group();
   axes.position.copy(origin);
 
-  const sliceLen = Math.max(g, (n - 1) * g) + g * 1.2;
-  // User unit length on x/y = cube face = PLANE_SIZE; draw past 2 on x, past 1 on y
+  const sliceUnit = g; // 1 s-unit = 1 slice gap
+  const sliceLen = sliceUnit * 22; // s-axis to 22 units (was ~11 ticks, looked cramped)
+  // User unit on x/y = cube face = PLANE_SIZE; x drawn to ~2.25, y matches x
   const unit = PLANE_SIZE;
-  const yLen = unit * 1.35;
   const xLen = unit * 2.25;
+  const yLen = xLen;
   const xDir = new THREE.Vector3(0, 0, USER_X_SIGN); // −Z
 
   axes.add(makeAxisLine(new THREE.Vector3(sliceLen, 0, 0), 0xff6b4a));
@@ -428,19 +429,30 @@ function rebuildAxes(ctx) {
   axes.add(makeAxisArrow(new THREE.Vector3(0, 1, 0), yLen, 0x6bcf8e));
   axes.add(makeAxisArrow(xDir, xLen, 0x6aa8ff));
 
-  for (let i = 0; i < n; i++) {
-    const sx = i * g;
-    const tick = new THREE.Line(
-      new THREE.BufferGeometry().setFromPoints([
-        new THREE.Vector3(sx, 0, 0),
-        new THREE.Vector3(sx, 0.12, 0),
-      ]),
-      new THREE.LineBasicMaterial({ color: 0xffb090, transparent: true, opacity: 0.85, depthWrite: false })
+  // Slice ticks every unit 0..22 (major feel); emphasize existing layer indices 0..n-1
+  for (let i = 0; i <= 22; i++) {
+    const sx = i * sliceUnit;
+    const isLayer = i < n;
+    const tickH = isLayer ? 0.14 : 0.08;
+    axes.add(
+      new THREE.Line(
+        new THREE.BufferGeometry().setFromPoints([
+          new THREE.Vector3(sx, 0, 0),
+          new THREE.Vector3(sx, tickH, 0),
+        ]),
+        new THREE.LineBasicMaterial({
+          color: isLayer ? 0xffb090 : 0x885544,
+          transparent: true,
+          opacity: isLayer ? 0.9 : 0.45,
+          depthWrite: false,
+        })
+      )
     );
-    axes.add(tick);
-    const num = makeAxisText(String(i), 0.22, 0.18, "#ffc8b0");
-    num.position.set(sx, 0.28, 0.02 * USER_X_SIGN);
-    axes.add(num);
+    if (i % 2 === 0 || isLayer) {
+      const num = makeAxisText(String(i), isLayer ? 0.22 : 0.16, isLayer ? 0.18 : 0.14, isLayer ? "#ffc8b0" : "#a07060");
+      num.position.set(sx, tickH + 0.16, 0.02 * USER_X_SIGN);
+      axes.add(num);
+    }
   }
 
   // y ticks: 0 at origin, 1 at cube top
@@ -477,7 +489,7 @@ function rebuildAxes(ctx) {
     axes.add(xl);
   }
 
-  const sliceLbl = makeAxisText("slice", 0.55, 0.2, "#ff9a7a");
+  const sliceLbl = makeAxisText("s", 0.28, 0.22, "#ff9a7a");
   sliceLbl.position.set(sliceLen + 0.35, 0.15, 0.02 * USER_X_SIGN);
   axes.add(sliceLbl);
 
