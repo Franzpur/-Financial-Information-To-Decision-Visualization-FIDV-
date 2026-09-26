@@ -4,6 +4,8 @@ import { COLORS, state, passesFilter, companyById } from "./state.js";
 
 const PLANE_SIZE = 4.2;
 const GAP = 0.55;
+/** How far a focused slice slides +X out of the stack (book-from-shelf). */
+const PULL_OUT = PLANE_SIZE * 0.7;
 const N_LAYERS = () => state.layers.length;
 
 export function createScene(viewport, hooks = {}) {
@@ -23,6 +25,11 @@ export function createScene(viewport, hooks = {}) {
   controls.enableDamping = true;
   controls.enablePan = true;
   controls.screenSpacePanning = true;
+  controls.rotateSpeed = 0.9;
+  controls.panSpeed = 1.35;
+  controls.zoomSpeed = 1.15;
+  controls.minDistance = 2.8;
+  controls.maxDistance = 48;
   controls.mouseButtons = {
     LEFT: THREE.MOUSE.ROTATE,
     MIDDLE: THREE.MOUSE.DOLLY,
@@ -52,15 +59,17 @@ export function createScene(viewport, hooks = {}) {
     meshes: [],
     byId: new Map(),
     boxHelper: null,
+    axesGroup: null,
     keys: new Set(),
     raycaster: new THREE.Raycaster(),
     pointer: new THREE.Vector2(),
     pointerState: { x: 0, y: 0, btn: -1 },
-    dimTargets: new Map(), // object uuid -> target opacity
+    dimTargets: new Map(),
     hooks,
   };
 
   buildCube(ctx);
+  goCornerView(ctx, false);
   wireInput(ctx, viewport);
   resize(ctx, viewport);
   window.addEventListener("resize", () => resize(ctx, viewport));
@@ -69,6 +78,7 @@ export function createScene(viewport, hooks = {}) {
     requestAnimationFrame(tick);
     applyKeyboard(ctx);
     lerpVisibility(ctx);
+    lerpPullOut(ctx);
     controls.update();
     renderer.render(scene, camera);
   }
@@ -79,8 +89,9 @@ export function createScene(viewport, hooks = {}) {
     applyVisibility: () => queueVisibilityTargets(ctx),
     layoutPlanes: () => layoutPlanes(ctx),
     resetCamera: () => resetCamera(ctx),
+    goCornerView: () => goCornerView(ctx, true),
     selectCompany: (id) => selectCompany(ctx, id),
-    framingDistance: () => framingDistance(ctx),
+    framingDistance: () => framingDistance(),
   };
 }
 
@@ -209,6 +220,9 @@ function buildCube(ctx) {
   state.layers.forEach((L, i) => {
     const g = new THREE.Group();
     g.userData.layer = i;
+    g.userData.pull = 0;
+    g.userData.targetPull = 0;
+    g.userData.baseX = 0;
 
     const plane = new THREE.Mesh(
       new THREE.PlaneGeometry(PLANE_SIZE, PLANE_SIZE),
@@ -344,7 +358,10 @@ function buildCube(ctx) {
 
 function layoutPlanes(ctx) {
   ctx.planeGroups.forEach((g, i) => {
-    g.position.set(layerXNow(i), 0, 0);
+    const pull = g.userData.pull ?? 0;
+    g.position.set(layerXNow(i) + pull, 0, 0);
+    g.userData.baseX = layerXNow(i);
+    g.userData.targetPull = state.focusLayer === i ? PULL_OUT : 0;
   });
   if (ctx.boxHelper) {
     ctx.root.remove(ctx.boxHelper);
@@ -356,18 +373,148 @@ function layoutPlanes(ctx) {
     ctx.root.add(helper);
     ctx.boxHelper = helper;
   }
+  rebuildAxes(ctx);
+}
+
+/** Origin at cube bottom-left-front; +X = slice axis (1 unit = 1 slice gap). */
+function rebuildAxes(ctx) {
+  if (ctx.axesGroup) {
+    ctx.root.remove(ctx.axesGroup);
+    ctx.axesGroup.traverse((o) => {
+      if (o.geometry) o.geometry.dispose?.();
+      if (o.material) {
+        if (o.material.map) o.material.map.dispose?.();
+        o.material.dispose?.();
+      }
+    });
+    ctx.axesGroup = null;
+  }
+
+  const n = N_LAYERS();
+  const g = gapNow();
+  const halfStack = ((n - 1) * g) / 2;
+  const origin = new THREE.Vector3(-halfStack, -PLANE_SIZE / 2, -PLANE_SIZE / 2);
+  const axes = new THREE.Group();
+  axes.position.copy(origin);
+
+  const sliceLen = Math.max(g, (n - 1) * g);
+  const refLen = PLANE_SIZE;
+
+  axes.add(makeAxisLine(new THREE.Vector3(sliceLen, 0, 0), 0xff6b4a)); // slice / +X
+  axes.add(makeAxisLine(new THREE.Vector3(0, refLen, 0), 0x6bcf8e)); // +Y ref
+  axes.add(makeAxisLine(new THREE.Vector3(0, 0, refLen), 0x6aa8ff)); // +Z ref
+
+  axes.add(makeAxisArrow(new THREE.Vector3(1, 0, 0), sliceLen, 0xff6b4a));
+  axes.add(makeAxisArrow(new THREE.Vector3(0, 1, 0), refLen, 0x6bcf8e));
+  axes.add(makeAxisArrow(new THREE.Vector3(0, 0, 1), refLen, 0x6aa8ff));
+
+  // Slice unit ticks: 0 .. n-1 at each slice
+  for (let i = 0; i < n; i++) {
+    const x = i * g;
+    const tick = new THREE.Line(
+      new THREE.BufferGeometry().setFromPoints([
+        new THREE.Vector3(x, 0, 0),
+        new THREE.Vector3(x, 0.12, 0),
+      ]),
+      new THREE.LineBasicMaterial({ color: 0xffb090, transparent: true, opacity: 0.85, depthWrite: false })
+    );
+    axes.add(tick);
+    const num = makeAxisText(String(i), 0.22, 0.18, "#ffc8b0");
+    num.position.set(x, 0.28, 0.02);
+    axes.add(num);
+  }
+
+  const sliceLbl = makeAxisText("slice", 0.55, 0.2, "#ff9a7a");
+  sliceLbl.position.set(sliceLen + 0.35, 0.15, 0.02);
+  axes.add(sliceLbl);
+
+  // Origin marker
+  const originDot = new THREE.Mesh(
+    new THREE.SphereGeometry(0.04, 12, 10),
+    new THREE.MeshBasicMaterial({ color: 0xffffff })
+  );
+  axes.add(originDot);
+
+  ctx.axesGroup = axes;
+  ctx.root.add(axes);
+}
+
+function makeAxisLine(to, color) {
+  return new THREE.Line(
+    new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, 0, 0), to]),
+    new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.9, depthWrite: false })
+  );
+}
+
+function makeAxisArrow(dir, length, color) {
+  const cone = new THREE.Mesh(
+    new THREE.ConeGeometry(0.06, 0.16, 10),
+    new THREE.MeshBasicMaterial({ color, depthWrite: false })
+  );
+  cone.position.copy(dir.clone().multiplyScalar(length));
+  cone.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir.clone().normalize());
+  return cone;
+}
+
+function makeAxisText(text, w, h, fill) {
+  const canvas = document.createElement("canvas");
+  canvas.width = 256;
+  canvas.height = 96;
+  const ctx2d = canvas.getContext("2d");
+  ctx2d.clearRect(0, 0, canvas.width, canvas.height);
+  ctx2d.font = "600 48px ui-sans-serif, system-ui, sans-serif";
+  ctx2d.textAlign = "center";
+  ctx2d.textBaseline = "middle";
+  ctx2d.fillStyle = fill;
+  ctx2d.fillText(text, 128, 48);
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  const mesh = new THREE.Mesh(
+    new THREE.PlaneGeometry(w, h),
+    new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false, side: THREE.DoubleSide })
+  );
+  mesh.renderOrder = 12;
+  return mesh;
+}
+
+function lerpPullOut(ctx) {
+  const k = 0.14;
+  ctx.planeGroups.forEach((g, i) => {
+    const target = state.focusLayer === i ? PULL_OUT : 0;
+    g.userData.targetPull = target;
+    const cur = g.userData.pull ?? 0;
+    const next = cur + (target - cur) * k;
+    g.userData.pull = Math.abs(next - target) < 0.002 ? target : next;
+    const base = g.userData.baseX ?? layerXNow(i);
+    g.position.x = base + g.userData.pull;
+  });
 }
 
 function framingDistance() {
   return Math.max(7.2, Math.hypot(stackWidth(), PLANE_SIZE) * 1.15);
 }
 
+/** Upper-right three-face view of the cube. */
+function goCornerView(ctx, animate) {
+  const d = framingDistance();
+  const target = new THREE.Vector3(0, 0, 0);
+  // From cube's upper-right front-ish corner — readable three faces
+  const pos = new THREE.Vector3(d * 1.02, d * 0.68, d * 0.78);
+  ctx.controls.target.copy(target);
+  if (animate) {
+    ctx.camera.position.lerp(pos, 1);
+  }
+  ctx.camera.position.copy(pos);
+  ctx.controls.update();
+}
+
 function resetCamera(ctx) {
   state.focusLayer = null;
   state.selectedId = null;
-  const d = framingDistance();
-  ctx.camera.position.set(d * 0.88, d * 0.52, d * 0.88);
-  ctx.controls.target.set(0, 0, 0);
+  ctx.planeGroups.forEach((g) => {
+    g.userData.targetPull = 0;
+  });
+  goCornerView(ctx, false);
   queueVisibilityTargets(ctx);
   ctx.hooks.onReset?.();
 }
@@ -430,6 +577,7 @@ function queueVisibilityTargets(ctx) {
     const dim = state.focusLayer != null && i !== state.focusLayer;
     // Focused slice draws after dimmed neighbors so its points stay visible
     g.renderOrder = dim ? 0 : 2;
+    g.userData.targetPull = state.focusLayer === i ? PULL_OUT : 0;
     g.children.forEach((ch) => {
       if (!ch.material || ch.material.opacity == null) return;
       const base = ch.userData.baseOpacity ?? 1;
@@ -478,20 +626,26 @@ function lerpVisibility(ctx) {
 
 function applyKeyboard(ctx) {
   const { keys, camera, controls, root } = ctx;
-  const yawSpeed = 0.03;
+  const yawSpeed = 0.035;
   if (keys.has("q")) root.rotation.y += yawSpeed;
   if (keys.has("e")) root.rotation.y -= yawSpeed;
 
-  const panSpeed = 0.08;
+  const fast = keys.has("shift");
+  const panSpeed = fast ? 0.22 : 0.12;
   const right = new THREE.Vector3();
   const up = new THREE.Vector3();
+  const forward = new THREE.Vector3();
   right.setFromMatrixColumn(camera.matrix, 0);
   up.setFromMatrixColumn(camera.matrix, 1);
+  forward.setFromMatrixColumn(camera.matrix, 2);
   const delta = new THREE.Vector3();
   if (keys.has("a") || keys.has("arrowleft")) delta.addScaledVector(right, -panSpeed);
   if (keys.has("d") || keys.has("arrowright")) delta.addScaledVector(right, panSpeed);
   if (keys.has("w") || keys.has("arrowup")) delta.addScaledVector(up, panSpeed);
   if (keys.has("s") || keys.has("arrowdown")) delta.addScaledVector(up, -panSpeed);
+  // R / F — dolly along view (toward / away from target)
+  if (keys.has("r")) delta.addScaledVector(forward, -panSpeed);
+  if (keys.has("f")) delta.addScaledVector(forward, panSpeed);
   if (delta.lengthSq() > 0) {
     camera.position.add(delta);
     controls.target.add(delta);
@@ -503,8 +657,9 @@ function wireInput(ctx, viewport) {
 
   window.addEventListener("keydown", (e) => {
     const k = e.key.toLowerCase();
-    if (["q", "e", "w", "a", "s", "d"].includes(k)) e.preventDefault();
-    ctx.keys.add(k);
+    if (["q", "e", "w", "a", "s", "d", "r", "f", "v"].includes(k)) e.preventDefault();
+    if (e.key === "Shift") ctx.keys.add("shift");
+    else ctx.keys.add(k);
     if (e.key === "[" || e.key === "]") {
       e.preventDefault();
       const step = e.key === "]" ? 1 : -1;
@@ -514,6 +669,10 @@ function wireInput(ctx, viewport) {
       queueVisibilityTargets(ctx);
       ctx.hooks.onFocusChange?.();
     }
+    if (k === "v") {
+      goCornerView(ctx, false);
+      ctx.hooks.onCornerView?.();
+    }
     if (e.key === "Escape") {
       state.focusLayer = null;
       state.selectedId = null;
@@ -522,7 +681,10 @@ function wireInput(ctx, viewport) {
       ctx.hooks.onClear?.();
     }
   });
-  window.addEventListener("keyup", (e) => ctx.keys.delete(e.key.toLowerCase()));
+  window.addEventListener("keyup", (e) => {
+    if (e.key === "Shift") ctx.keys.delete("shift");
+    else ctx.keys.delete(e.key.toLowerCase());
+  });
 
   el.addEventListener("pointerdown", (e) => {
     ctx.pointerState.x = e.clientX;

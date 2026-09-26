@@ -144,6 +144,10 @@ export function createUI(sceneApi) {
     writeHash();
   });
 
+  document.getElementById("cornerView").addEventListener("click", () => {
+    sceneApi.goCornerView();
+  });
+
   document.getElementById("explode").addEventListener("click", () => {
     state.exploded = !state.exploded;
     sceneApi.layoutPlanes();
