@@ -4,7 +4,7 @@
 格式：`U=`用户简令 · `A=`我方简应 · 够后续接续即可。
 
 ---
-> **主仓已迁至 FIDV**（本文件随仓）。本机克隆：`/Volumes/DATA/ANA_RSLT/_fidv_push`（或工作区根）。原 `ANA_RSLT` 仅作数据邻接盘；开发以本仓为准。
+> **主仓已迁至 FIDV**（本文件随仓）。本机克隆：`/Volumes/DATA/ANA_RSLT/FIDV`（或工作区根）。原 `ANA_RSLT` 仅作数据邻接盘；开发以本仓为准。
 
 ---
 
