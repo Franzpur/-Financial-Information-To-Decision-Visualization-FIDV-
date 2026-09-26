@@ -35,3 +35,7 @@ Open http://127.0.0.1:8787/
 | `GET /api/bundle` | Bootstrap payload for the SPA |
 
 Ring positions (`revScore`, `ring`, `x`, `y`) are computed server-side so the browser never embeds the company table.
+
+## Legacy
+
+The previous single-file page is kept as `../ai-chain-cube.html` and backups `../ai-chain-cube.backup-*.html`. Prefer this package going forward.

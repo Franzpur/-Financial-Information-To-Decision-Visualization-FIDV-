@@ -7,13 +7,16 @@ To standardly visualize statistics to fit human perception, so managers can make
 | Path | Description |
 |------|-------------|
 | [`ai-chain/`](./ai-chain/) | AI industry-chain **3D slice cube** — SQLite API + modular web UI (power → models) |
+| [`WORKLOG.md`](./WORKLOG.md) | Session continuity log (asks / responses / conventions) |
 
 ### Run the AI chain cube
 
 ```bash
-cd ai-chain
-./Open-AI-Chain.command
-# or: python3 scripts/seed.py && python3 server/app.py
+./Open-AI-Cube.command
+# or
+cd ai-chain && ./Open-AI-Chain.command
+# or
+cd ai-chain && python3 scripts/seed.py && python3 server/app.py
 ```
 
 Then open http://127.0.0.1:8787/
