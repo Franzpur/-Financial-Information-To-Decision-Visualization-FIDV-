@@ -4,7 +4,7 @@ import { COLORS, state, passesFilter, companyById } from "./state.js";
 
 const PLANE_SIZE = 4.2;
 const GAP = 0.55;
-/** How far a focused slice slides +X out of the stack (book-from-shelf). */
+/** How far a focused slice slides along blue/+x (flat pull, book-from-shelf). */
 const PULL_OUT = PLANE_SIZE * 0.7;
 const N_LAYERS = () => state.layers.length;
 
@@ -223,6 +223,7 @@ function buildCube(ctx) {
     g.userData.pull = 0;
     g.userData.targetPull = 0;
     g.userData.baseX = 0;
+    g.userData.baseZ = 0;
 
     const plane = new THREE.Mesh(
       new THREE.PlaneGeometry(PLANE_SIZE, PLANE_SIZE),
@@ -359,8 +360,10 @@ function buildCube(ctx) {
 function layoutPlanes(ctx) {
   ctx.planeGroups.forEach((g, i) => {
     const pull = g.userData.pull ?? 0;
-    g.position.set(layerXNow(i) + pull, 0, 0);
     g.userData.baseX = layerXNow(i);
+    g.userData.baseZ = 0;
+    // Pull along blue axis (user-named x), not along slice
+    g.position.set(g.userData.baseX, 0, g.userData.baseZ + pull);
     g.userData.targetPull = state.focusLayer === i ? PULL_OUT : 0;
   });
   if (ctx.boxHelper) {
@@ -376,7 +379,10 @@ function layoutPlanes(ctx) {
   rebuildAxes(ctx);
 }
 
-/** Origin at cube bottom-left-front; +X = slice axis (1 unit = 1 slice gap). */
+/**
+ * Origin at cube bottom-left-front.
+ * Orange = slice (1 unit = 1 gap). Green = y. Blue = x (pull-out axis).
+ */
 function rebuildAxes(ctx) {
   if (ctx.axesGroup) {
     ctx.root.remove(ctx.axesGroup);
@@ -400,15 +406,15 @@ function rebuildAxes(ctx) {
   const sliceLen = Math.max(g, (n - 1) * g);
   const refLen = PLANE_SIZE;
 
-  axes.add(makeAxisLine(new THREE.Vector3(sliceLen, 0, 0), 0xff6b4a)); // slice / +X
-  axes.add(makeAxisLine(new THREE.Vector3(0, refLen, 0), 0x6bcf8e)); // +Y ref
-  axes.add(makeAxisLine(new THREE.Vector3(0, 0, refLen), 0x6aa8ff)); // +Z ref
+  // Three.js: +X slice, +Y up (user y), +Z depth (user x)
+  axes.add(makeAxisLine(new THREE.Vector3(sliceLen, 0, 0), 0xff6b4a));
+  axes.add(makeAxisLine(new THREE.Vector3(0, refLen, 0), 0x6bcf8e));
+  axes.add(makeAxisLine(new THREE.Vector3(0, 0, refLen), 0x6aa8ff));
 
   axes.add(makeAxisArrow(new THREE.Vector3(1, 0, 0), sliceLen, 0xff6b4a));
   axes.add(makeAxisArrow(new THREE.Vector3(0, 1, 0), refLen, 0x6bcf8e));
   axes.add(makeAxisArrow(new THREE.Vector3(0, 0, 1), refLen, 0x6aa8ff));
 
-  // Slice unit ticks: 0 .. n-1 at each slice
   for (let i = 0; i < n; i++) {
     const x = i * g;
     const tick = new THREE.Line(
@@ -428,7 +434,14 @@ function rebuildAxes(ctx) {
   sliceLbl.position.set(sliceLen + 0.35, 0.15, 0.02);
   axes.add(sliceLbl);
 
-  // Origin marker
+  const yLbl = makeAxisText("y", 0.28, 0.22, "#8eefb0");
+  yLbl.position.set(0.05, refLen + 0.28, 0.02);
+  axes.add(yLbl);
+
+  const xLbl = makeAxisText("x", 0.28, 0.22, "#9ec0ff");
+  xLbl.position.set(0.05, 0.15, refLen + 0.28);
+  axes.add(xLbl);
+
   const originDot = new THREE.Mesh(
     new THREE.SphereGeometry(0.04, 12, 10),
     new THREE.MeshBasicMaterial({ color: 0xffffff })
@@ -485,8 +498,10 @@ function lerpPullOut(ctx) {
     const cur = g.userData.pull ?? 0;
     const next = cur + (target - cur) * k;
     g.userData.pull = Math.abs(next - target) < 0.002 ? target : next;
-    const base = g.userData.baseX ?? layerXNow(i);
-    g.position.x = base + g.userData.pull;
+    const baseX = g.userData.baseX ?? layerXNow(i);
+    const baseZ = g.userData.baseZ ?? 0;
+    // Flat pull along user-x (blue / Three.js +Z)
+    g.position.set(baseX, 0, baseZ + g.userData.pull);
   });
 }
 
