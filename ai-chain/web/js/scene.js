@@ -9,7 +9,8 @@ const N_LAYERS = () => state.layers.length;
 export function createScene(viewport, hooks = {}) {
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(0x0b0d10);
-  scene.fog = new THREE.Fog(0x0b0d10, 12, 28);
+  // Soft distant fog only — old near=12 made points vanish when zooming out
+  scene.fog = new THREE.Fog(0x0b0d10, 40, 90);
 
   const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 200);
   camera.position.set(8.2, 4.8, 8.2);
@@ -215,21 +216,29 @@ function buildCube(ctx) {
         color: COLORS.PLANE,
         transparent: true,
         opacity: 0.3,
+        depthWrite: false, // do not occlude company points behind/through the glass
         side: THREE.DoubleSide,
         roughness: 0.9,
         metalness: 0,
       })
     );
     plane.rotation.y = Math.PI / 2;
+    plane.renderOrder = 0;
     plane.userData.isSlicePlane = true;
     plane.userData.baseOpacity = 0.3;
     g.add(plane);
 
     const edges = new THREE.LineSegments(
       new THREE.EdgesGeometry(new THREE.PlaneGeometry(PLANE_SIZE, PLANE_SIZE)),
-      new THREE.LineBasicMaterial({ color: COLORS.EDGE, transparent: true, opacity: 0.7 })
+      new THREE.LineBasicMaterial({
+        color: COLORS.EDGE,
+        transparent: true,
+        opacity: 0.7,
+        depthWrite: false,
+      })
     );
     edges.rotation.y = Math.PI / 2;
+    edges.renderOrder = 0;
     edges.userData.baseOpacity = 0.65;
     g.add(edges);
 
@@ -252,8 +261,10 @@ function buildCube(ctx) {
           color: r === 10 ? 0xd4e8ff : 0x8eb6d8,
           transparent: true,
           opacity: r === 10 ? 0.85 : 0.42 + r * 0.028,
+          depthWrite: false,
         })
       );
+      ringLine.renderOrder = 1;
       ringLine.userData.isRingGuide = true;
       ringLine.userData.baseOpacity = r === 10 ? 0.85 : 0.42 + r * 0.028;
       g.add(ringLine);
@@ -284,13 +295,17 @@ function buildCube(ctx) {
         metalness: 0.05,
         emissive: color,
         emissiveIntensity: isUS ? 1.35 : 1.25,
-        transparent: true,
+        // Opaque by default so points win depth tests against glass slices
+        transparent: false,
+        depthWrite: true,
         opacity: 1,
       })
     );
     mesh.userData.companyId = c.id;
+    mesh.renderOrder = 5;
     const spread = PLANE_SIZE * 0.38;
-    mesh.position.set(0.03 + r, c.y * spread, c.x * spread);
+    // Sit clearly in front of the YZ wall so neighboring slices can't cover the point
+    mesh.position.set(0.055 + r, c.y * spread, c.x * spread);
     ctx.planeGroups[c.layer].add(mesh);
     ctx.meshes.push(mesh);
     ctx.byId.set(c.id, mesh);
@@ -298,18 +313,25 @@ function buildCube(ctx) {
     if (isSupply) {
       const ring = new THREE.Mesh(
         new THREE.TorusGeometry(r * 1.6, 0.005, 8, 20),
-        new THREE.MeshBasicMaterial({ color: COLORS.SUPPLY })
+        new THREE.MeshBasicMaterial({
+          color: COLORS.SUPPLY,
+          depthWrite: false,
+          transparent: true,
+          opacity: 1,
+        })
       );
       ring.rotation.y = Math.PI / 2;
       ring.position.copy(mesh.position);
+      ring.renderOrder = 6;
       ring.userData.companyId = c.id;
       ctx.planeGroups[c.layer].add(ring);
       mesh.userData.ring = ring;
     }
 
     const label = makeSliceTextPlane(makeCompanyLabelTexture(shortName(c), isUS), 0.72, 0.14);
-    label.position.set(0.045, mesh.position.y + r + 0.12, mesh.position.z);
+    label.position.set(0.07, mesh.position.y + r + 0.12, mesh.position.z);
     label.visible = false;
+    label.renderOrder = 7;
     label.userData.isCompanyLabel = true;
     label.userData.baseOpacity = 1;
     ctx.planeGroups[c.layer].add(label);
@@ -384,17 +406,22 @@ function queueVisibilityTargets(ctx) {
     mesh.userData.targetEmissive = targetEmissive;
     mesh.userData.targetOpacity = targetOpacity;
     mesh.userData.targetScale = targetScale;
+    mesh.renderOrder = onFocus ? 8 : 4;
+    if (mesh.userData.ring) mesh.userData.ring.renderOrder = onFocus ? 9 : 4;
+    if (mesh.userData.label) mesh.userData.label.renderOrder = onFocus ? 10 : 4;
   });
 
   ctx.planeGroups.forEach((g, i) => {
     const dim = state.focusLayer != null && i !== state.focusLayer;
+    // Focused slice draws after dimmed neighbors so its points stay visible
+    g.renderOrder = dim ? 0 : 2;
     g.children.forEach((ch) => {
       if (!ch.material || ch.material.opacity == null) return;
       const base = ch.userData.baseOpacity ?? 1;
-      if (ch.userData.isSlicePlane) ch.userData.targetOpacity = dim ? 0.08 : base;
-      else if (ch.userData.isRingGuide) ch.userData.targetOpacity = dim ? base * 0.1 : base;
-      else if (ch.isLineSegments && !ch.userData.isRingGuide) ch.userData.targetOpacity = dim ? 0.15 : base;
-      else if (ch.userData.isDomainLabel) ch.userData.targetOpacity = dim ? 0.18 : base;
+      if (ch.userData.isSlicePlane) ch.userData.targetOpacity = dim ? 0.05 : base;
+      else if (ch.userData.isRingGuide) ch.userData.targetOpacity = dim ? base * 0.08 : base;
+      else if (ch.isLineSegments && !ch.userData.isRingGuide) ch.userData.targetOpacity = dim ? 0.12 : base;
+      else if (ch.userData.isDomainLabel) ch.userData.targetOpacity = dim ? 0.15 : base;
     });
   });
 }
@@ -409,6 +436,10 @@ function lerpVisibility(ctx) {
     }
     if (mesh.userData.targetOpacity != null) {
       mat.opacity += (mesh.userData.targetOpacity - mat.opacity) * k;
+      // Dimmed points stay transparent; focused points stay opaque (correct depth)
+      const translucent = mat.opacity < 0.98;
+      mat.transparent = translucent;
+      mat.depthWrite = !translucent;
     }
     if (mesh.userData.targetScale != null) {
       const s = mesh.scale.x + (mesh.userData.targetScale - mesh.scale.x) * k;
