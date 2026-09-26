@@ -27,7 +27,7 @@ export function createScene(viewport, hooks = {}) {
   viewport.insertBefore(renderer.domElement, viewport.firstChild);
 
   const controls = new OrbitControls(camera, renderer.domElement);
-  controls.enableDamping = true;
+  controls.enableDamping = false;
   controls.enablePan = true;
   controls.screenSpacePanning = true;
   controls.rotateSpeed = 0.9;
