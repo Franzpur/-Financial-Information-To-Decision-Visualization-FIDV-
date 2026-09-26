@@ -400,14 +400,29 @@ function queueVisibilityTargets(ctx) {
     }
     const selected = c.id === state.selectedId;
     const hovered = c.id === state.hoverId;
-    const targetEmissive = selected ? 2.2 : hovered ? 1.9 : onFocus ? (c.country === "US" ? 1.35 : 1.25) : 0.35;
-    const targetOpacity = onFocus ? 1 : 0.22;
-    const targetScale = selected ? 1.4 : hovered ? 1.25 : onFocus ? 1 : 0.7;
+    // Off-focus: crush emissive + opacity (must use transparent materials or glow stays lit)
+    const targetEmissive = selected ? 2.2 : hovered ? 1.9 : onFocus ? (c.country === "US" ? 1.35 : 1.25) : 0.06;
+    const targetOpacity = onFocus ? 1 : 0.1;
+    const targetScale = selected ? 1.4 : hovered ? 1.25 : onFocus ? 1 : 0.55;
     mesh.userData.targetEmissive = targetEmissive;
     mesh.userData.targetOpacity = targetOpacity;
     mesh.userData.targetScale = targetScale;
+    // Focused opaque for depth; dimmed must be transparent or opacity is ignored
+    const mat = mesh.material;
+    if (onFocus) {
+      mat.transparent = false;
+      mat.depthWrite = true;
+      mat.opacity = Math.max(mat.opacity, 0.99);
+    } else {
+      mat.transparent = true;
+      mat.depthWrite = false;
+    }
     mesh.renderOrder = onFocus ? 8 : 4;
-    if (mesh.userData.ring) mesh.userData.ring.renderOrder = onFocus ? 9 : 4;
+    if (mesh.userData.ring) {
+      mesh.userData.ring.renderOrder = onFocus ? 9 : 4;
+      mesh.userData.ring.material.transparent = true;
+      mesh.userData.ring.material.opacity = onFocus ? 1 : 0.12;
+    }
     if (mesh.userData.label) mesh.userData.label.renderOrder = onFocus ? 10 : 4;
   });
 
@@ -427,7 +442,7 @@ function queueVisibilityTargets(ctx) {
 }
 
 function lerpVisibility(ctx) {
-  const k = 0.14;
+  const k = 0.18;
   ctx.meshes.forEach((mesh) => {
     if (!mesh.visible) return;
     const mat = mesh.material;
@@ -435,11 +450,18 @@ function lerpVisibility(ctx) {
       mat.emissiveIntensity += (mesh.userData.targetEmissive - mat.emissiveIntensity) * k;
     }
     if (mesh.userData.targetOpacity != null) {
+      // Opacity only affects drawing when transparent === true
+      const dimming = mesh.userData.targetOpacity < 0.99;
+      if (dimming) {
+        mat.transparent = true;
+        mat.depthWrite = false;
+      }
       mat.opacity += (mesh.userData.targetOpacity - mat.opacity) * k;
-      // Dimmed points stay transparent; focused points stay opaque (correct depth)
-      const translucent = mat.opacity < 0.98;
-      mat.transparent = translucent;
-      mat.depthWrite = !translucent;
+      if (!dimming && mat.opacity > 0.98) {
+        mat.opacity = 1;
+        mat.transparent = false;
+        mat.depthWrite = true;
+      }
     }
     if (mesh.userData.targetScale != null) {
       const s = mesh.scale.x + (mesh.userData.targetScale - mesh.scale.x) * k;
