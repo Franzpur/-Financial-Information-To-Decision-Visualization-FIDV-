@@ -20,10 +20,10 @@ const N_LAYERS = () => state.layers.length;
 export function createScene(viewport, hooks = {}) {
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(0x0b0d10);
-  // Soft distant fog only — old near=12 made points vanish when zooming out
-  scene.fog = new THREE.Fog(0x0b0d10, 40, 90);
+  // Far fog so deep wheel-zoom still has atmosphere without eating the cube early
+  scene.fog = new THREE.Fog(0x0b0d10, 55, 380);
 
-  const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 200);
+  const camera = new THREE.PerspectiveCamera(42, 1, 0.05, 600);
   camera.position.set(8.2, 4.8, 8.2);
 
   const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -34,11 +34,14 @@ export function createScene(viewport, hooks = {}) {
   controls.enableDamping = false;
   controls.enablePan = true;
   controls.screenSpacePanning = true;
-  controls.rotateSpeed = 0.9;
+  // Base yaw feel; tick() scales by orbit radius so far views don't feel sluggish vs Q/E
+  controls.rotateSpeed = 2.4;
   controls.panSpeed = 1.35;
-  controls.zoomSpeed = 1.15;
-  controls.minDistance = 2.8;
-  controls.maxDistance = 48;
+  controls.zoomSpeed = 2.6;
+  // Match R/F reach: allow near contact and very distant framing
+  controls.minDistance = 0.35;
+  controls.maxDistance = 320;
+  controls.enableZoom = false; // custom wheel below — full exponential range
   controls.mouseButtons = {
     LEFT: THREE.MOUSE.ROTATE,
     MIDDLE: THREE.MOUSE.DOLLY,
@@ -74,6 +77,7 @@ export function createScene(viewport, hooks = {}) {
     pointer: new THREE.Vector2(),
     pointerState: { x: 0, y: 0, btn: -1 },
     dimTargets: new Map(),
+    baseRotateSpeed: 2.4,
     hooks,
   };
 
@@ -85,6 +89,14 @@ export function createScene(viewport, hooks = {}) {
 
   function tick() {
     requestAnimationFrame(tick);
+    // Farther orbit radius → higher angular speed so on-screen spin matches Q/E better
+    const dist = camera.position.distanceTo(controls.target);
+    const ref = Math.max(6, framingDistance());
+    controls.rotateSpeed = THREE.MathUtils.clamp(
+      ctx.baseRotateSpeed * (dist / ref),
+      1.4,
+      7.5
+    );
     applyKeyboard(ctx);
     lerpVisibility(ctx);
     lerpPullOut(ctx);
@@ -726,18 +738,23 @@ function applyKeyboard(ctx) {
   const panSpeed = fast ? 0.22 : 0.12;
   const right = new THREE.Vector3();
   const up = new THREE.Vector3();
-  const forward = new THREE.Vector3();
   right.setFromMatrixColumn(camera.matrix, 0);
   up.setFromMatrixColumn(camera.matrix, 1);
-  forward.setFromMatrixColumn(camera.matrix, 2);
   const delta = new THREE.Vector3();
   if (keys.has("a") || keys.has("arrowleft")) delta.addScaledVector(right, -panSpeed);
   if (keys.has("d") || keys.has("arrowright")) delta.addScaledVector(right, panSpeed);
   if (keys.has("w") || keys.has("arrowup")) delta.addScaledVector(up, panSpeed);
   if (keys.has("s") || keys.has("arrowdown")) delta.addScaledVector(up, -panSpeed);
-  // R / F — dolly along view (toward / away from target)
-  if (keys.has("r")) delta.addScaledVector(forward, -panSpeed);
-  if (keys.has("f")) delta.addScaledVector(forward, panSpeed);
+  // R / F — dolly toward / away from orbit target (same axis as wheel, scale with distance)
+  if (keys.has("r") || keys.has("f")) {
+    const offset = camera.position.clone().sub(controls.target);
+    const dist = Math.max(offset.length(), 0.35);
+    const dir = offset.multiplyScalar(1 / dist);
+    const step = (keys.has("r") ? -1 : 1) * panSpeed * Math.max(dist, 1.2) * 0.085;
+    let newDist = dist + step;
+    newDist = Math.min(controls.maxDistance, Math.max(controls.minDistance, newDist));
+    camera.position.copy(controls.target).addScaledVector(dir, newDist);
+  }
   if (delta.lengthSq() > 0) {
     camera.position.add(delta);
     controls.target.add(delta);
@@ -746,6 +763,24 @@ function applyKeyboard(ctx) {
 
 function wireInput(ctx, viewport) {
   const el = ctx.renderer.domElement;
+
+  // Wheel: exponential dolly toward target — wide min/max like R/F reach
+  el.addEventListener(
+    "wheel",
+    (e) => {
+      e.preventDefault();
+      const { camera, controls } = ctx;
+      const offset = new THREE.Vector3().subVectors(camera.position, controls.target);
+      const dist = offset.length();
+      if (dist < 1e-6) return;
+      const zoomFactor = Math.exp(e.deltaY * 0.00135);
+      let newDist = dist * zoomFactor;
+      newDist = Math.min(controls.maxDistance, Math.max(controls.minDistance, newDist));
+      offset.setLength(newDist);
+      camera.position.copy(controls.target).add(offset);
+    },
+    { passive: false }
+  );
 
   window.addEventListener("keydown", (e) => {
     const k = e.key.toLowerCase();
