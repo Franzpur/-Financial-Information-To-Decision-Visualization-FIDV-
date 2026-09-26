@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>AI Industry Chain — 3D Slice Cube</title>
+<link rel="stylesheet" href="/css/app.css?v=3" />
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+  }
+}
+</script>
+</head>
+<body>
+<div id="bootError" hidden></div>
+<div id="loading" class="loading">
+  <div class="loading-card">
+    <div class="spinner" aria-hidden="true"></div>
+    <p>Loading industry chain…</p>
+  </div>
+</div>
+
+<div id="app" hidden>
+  <aside class="left">
+    <h1>AI industry chain cube</h1>
+    <p class="lede">Power (left) → models (right). Each slice is a vertical wall; orbit for depth. Selecting a slice no longer jumps the camera.</p>
+    <div class="legend">
+      <div class="sw"><span class="dot us"></span> US company</div>
+      <div class="sw"><span class="dot intl"></span> Non-US company</div>
+      <div class="sw"><span class="dot supply"></span> Alphabet supplier</div>
+    </div>
+    <h2>Slices <span class="hint-inline">click · [ ]</span></h2>
+    <div class="layers" id="layerList"></div>
+    <p class="note">Revenue is min–max scaled 0–100 within each slice. Outer ring = 0–9.9; near-center ring = 90–99.9; <strong>100 = exact center</strong>. Sphere size marks Alphabet supplier weight when available.</p>
+  </aside>
+
+  <div id="viewport">
+    <button type="button" id="helpToggle" class="help-toggle" title="Toggle controls help (?)">?</button>
+    <div id="navHint" class="nav-hint">
+      <strong>Controls</strong><br />
+      Left-drag orbit · Right-drag / Shift+left pan · Scroll zoom<br />
+      <kbd>Q</kbd>/<kbd>E</kbd> yaw · <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> pan · <kbd>[</kbd>/<kbd>]</kbd> slice · <kbd>Esc</kbd> clear · <kbd>?</kbd> help
+    </div>
+    <div id="statusBar" class="status-bar">All slices · 0 companies</div>
+    <div id="hoverTip" class="hover-tip" hidden></div>
+    <div class="hud">
+      <button class="chip active" data-filter="all">All</button>
+      <button class="chip" data-filter="us">US only</button>
+      <button class="chip" data-filter="intl">Non-US only</button>
+      <button class="chip" data-filter="supply">Alphabet suppliers</button>
+      <button class="chip" id="resetCam">Reset view</button>
+      <button class="chip" id="explode">Explode / compact</button>
+    </div>
+  </div>
+
+  <aside class="right">
+    <h2>Search</h2>
+    <input id="search" type="search" placeholder="e.g. NVIDIA, Constellation, OpenAI" autocomplete="off" />
+    <div id="results"></div>
+    <h2>Detail</h2>
+    <div id="detail">
+      <p>Click a point, pick a slice, or search. View position stays put when you change slices.</p>
+    </div>
+    <p class="note">Data: <code>GOOGL_SUPPLY.xlsx</code> (gold rings) or public industry map. Served from SQLite via <code>/api/bundle</code>.</p>
+  </aside>
+</div>
+
+<script type="module" src="/js/main.js"></script>
+</body>
+</html>

@@ -1,2 +1,19 @@
 # Financial Information To Decision Visualization (FIDV)
-To standardly visualize statistics to fit human perception. So that managers could make a relatively easy decision. 
+
+To standardly visualize statistics to fit human perception, so managers can make decisions more easily.
+
+## Modules
+
+| Path | Description |
+|------|-------------|
+| [`ai-chain/`](./ai-chain/) | AI industry-chain **3D slice cube** — SQLite API + modular web UI (power → models) |
+
+### Run the AI chain cube
+
+```bash
+cd ai-chain
+./Open-AI-Chain.command
+# or: python3 scripts/seed.py && python3 server/app.py
+```
+
+Then open http://127.0.0.1:8787/
