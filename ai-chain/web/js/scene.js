@@ -449,13 +449,14 @@ function rebuildAxes(ctx) {
       )
     );
     if (i % 2 === 0 || isLayer) {
-      const num = makeAxisText(String(i), isLayer ? 0.22 : 0.16, isLayer ? 0.18 : 0.14, isLayer ? "#ffc8b0" : "#a07060");
-      num.position.set(sx, tickH + 0.16, 0.02 * USER_X_SIGN);
+      // Lock to s/y plane (Three.js XY) — never billboard toward camera
+      const num = makeSyPlaneLabel(String(i), isLayer ? 0.26 : 0.2, isLayer ? 0.2 : 0.16, isLayer ? "#ffc8b0" : "#a07060");
+      num.position.set(sx, tickH + 0.18, 0);
       axes.add(num);
     }
   }
 
-  // y ticks: 0 at origin, 1 at cube top
+  // y ticks: 0 at origin, 1 at cube top (also on s/y plane)
   for (const yu of [0, 1]) {
     const yy = yu * unit;
     axes.add(
@@ -467,8 +468,8 @@ function rebuildAxes(ctx) {
         new THREE.LineBasicMaterial({ color: 0x8eefb0, transparent: true, opacity: 0.9, depthWrite: false })
       )
     );
-    const yl = makeAxisText(String(yu), 0.2, 0.16, "#8eefb0");
-    yl.position.set(0.32, yy, 0.02 * USER_X_SIGN);
+    const yl = makeSyPlaneLabel(String(yu), 0.2, 0.16, "#8eefb0");
+    yl.position.set(0.32, yy, 0);
     axes.add(yl);
   }
 
@@ -484,21 +485,22 @@ function rebuildAxes(ctx) {
         new THREE.LineBasicMaterial({ color: 0x9ec0ff, transparent: true, opacity: 0.9, depthWrite: false })
       )
     );
-    const xl = makeAxisText(String(xu), 0.2, 0.16, "#9ec0ff");
-    xl.position.set(0.05, 0.32, xz);
+    // x-axis numerals sit in the x/y plane (Three.js YZ)
+    const xl = makeXyPlaneLabel(String(xu), 0.2, 0.16, "#9ec0ff");
+    xl.position.set(0, 0.32, xz);
     axes.add(xl);
   }
 
-  const sliceLbl = makeAxisText("s", 0.28, 0.22, "#ff9a7a");
-  sliceLbl.position.set(sliceLen + 0.35, 0.15, 0.02 * USER_X_SIGN);
+  const sliceLbl = makeSyPlaneLabel("s", 0.32, 0.26, "#ff9a7a");
+  sliceLbl.position.set(sliceLen + 0.4, 0.22, 0);
   axes.add(sliceLbl);
 
-  const yLbl = makeAxisText("y", 0.28, 0.22, "#8eefb0");
-  yLbl.position.set(0.05, yLen + 0.28, 0.02 * USER_X_SIGN);
+  const yLbl = makeSyPlaneLabel("y", 0.28, 0.22, "#8eefb0");
+  yLbl.position.set(0.08, yLen + 0.28, 0);
   axes.add(yLbl);
 
-  const xLbl = makeAxisText("x", 0.28, 0.22, "#9ec0ff");
-  xLbl.position.set(0.05, 0.15, USER_X_SIGN * (xLen + 0.28));
+  const xLbl = makeXyPlaneLabel("x", 0.28, 0.22, "#9ec0ff");
+  xLbl.position.set(0, 0.22, USER_X_SIGN * (xLen + 0.28));
   axes.add(xLbl);
 
   const originDot = new THREE.Mesh(
@@ -546,6 +548,22 @@ function makeAxisText(text, w, h, fill) {
     new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false, side: THREE.DoubleSide })
   );
   mesh.renderOrder = 12;
+  return mesh;
+}
+
+/** Label locked in the s/y plane (Three.js XY). Does not face the camera. */
+function makeSyPlaneLabel(text, w, h, fill) {
+  const mesh = makeAxisText(text, w, h, fill);
+  mesh.rotation.set(0, 0, 0); // PlaneGeometry default = XY = s/y
+  mesh.userData.axisPlane = "sy";
+  return mesh;
+}
+
+/** Label locked in the x/y plane (Three.js YZ). */
+function makeXyPlaneLabel(text, w, h, fill) {
+  const mesh = makeAxisText(text, w, h, fill);
+  mesh.rotation.set(0, Math.PI / 2, 0); // XY → YZ
+  mesh.userData.axisPlane = "xy";
   return mesh;
 }
 
