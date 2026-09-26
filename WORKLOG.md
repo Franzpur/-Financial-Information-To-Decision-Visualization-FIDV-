@@ -78,7 +78,7 @@ https://github.com/Franzpur/-Financial-Information-To-Decision-Visualization-FID
 | 项 | 约定 |
 |----|------|
 | 层序 | 0 Power → … → 10 Models（OpenAI/Anthropic 端）共 11 |
-| 颜色 | US `#3cf0ff`；非美 `#ff3b4a`；SUPPLY 金环 |
+| 颜色 | US `#3cf0ff`；非美 `#ffb020`（荧光橙黄）；SUPPLY 金环 |
 | 营收环 | 层内 min-max→0–100；0–9.9 最外；90–99.9 近心；**100=圆心** |
 | 标签 | 贴 YZ 切片平面，不 billboard |
 | 焦点 | 选切片：他环/他层变暗；**相机不瞬移**；`Esc` 清除 |

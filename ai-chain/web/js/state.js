@@ -2,7 +2,7 @@
 
 export const COLORS = {
   US: 0x3cf0ff,
-  INTL: 0xff3b4a,
+  INTL: 0xffb020,
   SUPPLY: 0xe8d44a,
   PLANE: 0x1a2330,
   EDGE: 0x3a4658,

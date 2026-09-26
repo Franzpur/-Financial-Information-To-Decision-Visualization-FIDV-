@@ -169,7 +169,7 @@ function makeCompanyLabelTexture(text, isUS) {
   ctx2d.strokeStyle = "rgba(8, 12, 18, 0.92)";
   ctx2d.strokeText(text, x, y);
   ctx2d.lineWidth = 2.5;
-  ctx2d.strokeStyle = isUS ? "rgba(60, 240, 255, 0.45)" : "rgba(255, 59, 74, 0.45)";
+  ctx2d.strokeStyle = isUS ? "rgba(60, 240, 255, 0.45)" : "rgba(255, 176, 32, 0.55)";
   ctx2d.strokeText(text, x, y);
   ctx2d.fillStyle = "rgba(245, 252, 255, 0.98)";
   ctx2d.fillText(text, x, y);
@@ -294,7 +294,7 @@ function buildCube(ctx) {
         roughness: 0.22,
         metalness: 0.05,
         emissive: color,
-        emissiveIntensity: isUS ? 1.35 : 1.25,
+        emissiveIntensity: isUS ? 1.35 : 1.4,
         // Opaque by default so points win depth tests against glass slices
         transparent: false,
         depthWrite: true,
