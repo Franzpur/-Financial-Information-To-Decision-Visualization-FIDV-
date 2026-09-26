@@ -4,8 +4,13 @@ import { COLORS, state, passesFilter, companyById } from "./state.js";
 
 const PLANE_SIZE = 4.2;
 const GAP = 0.55;
-/** How far a focused slice slides along blue/+x (flat pull, book-from-shelf). */
+/** How far a focused slice slides along user-+x (flat pull). */
 const PULL_OUT = PLANE_SIZE * 0.7;
+/**
+ * User axes: orange=slice (Three +X), green=y (Three +Y), blue=x (Three −Z).
+ * Origin sits on the −slice, −y, −x corner → Three (−halfStack, −half, +half).
+ */
+const USER_X_SIGN = -1; // Three.js Z *= USER_X_SIGN for +user-x
 const N_LAYERS = () => state.layers.length;
 
 export function createScene(viewport, hooks = {}) {
@@ -362,8 +367,8 @@ function layoutPlanes(ctx) {
     const pull = g.userData.pull ?? 0;
     g.userData.baseX = layerXNow(i);
     g.userData.baseZ = 0;
-    // Pull along blue axis (user-named x), not along slice
-    g.position.set(g.userData.baseX, 0, g.userData.baseZ + pull);
+    // Pull along flipped user-x (Three.js −Z)
+    g.position.set(g.userData.baseX, 0, g.userData.baseZ + USER_X_SIGN * pull);
     g.userData.targetPull = state.focusLayer === i ? PULL_OUT : 0;
   });
   if (ctx.boxHelper) {
@@ -380,8 +385,8 @@ function layoutPlanes(ctx) {
 }
 
 /**
- * Origin at cube bottom-left-front.
- * Orange = slice (1 unit = 1 gap). Green = y. Blue = x (pull-out axis).
+ * Origin at cube bottom-left on the flipped-x side.
+ * Orange = slice. Green = y. Blue = x (Three.js −Z from this origin).
  */
 function rebuildAxes(ctx) {
   if (ctx.axesGroup) {
@@ -399,47 +404,48 @@ function rebuildAxes(ctx) {
   const n = N_LAYERS();
   const g = gapNow();
   const halfStack = ((n - 1) * g) / 2;
-  const origin = new THREE.Vector3(-halfStack, -PLANE_SIZE / 2, -PLANE_SIZE / 2);
+  // Opposite Z corner vs previous: origin at +Z face, user-+x points toward −Z
+  const origin = new THREE.Vector3(-halfStack, -PLANE_SIZE / 2, PLANE_SIZE / 2);
   const axes = new THREE.Group();
   axes.position.copy(origin);
 
   const sliceLen = Math.max(g, (n - 1) * g);
   const refLen = PLANE_SIZE;
+  const xDir = new THREE.Vector3(0, 0, USER_X_SIGN); // −Z
 
-  // Three.js: +X slice, +Y up (user y), +Z depth (user x)
   axes.add(makeAxisLine(new THREE.Vector3(sliceLen, 0, 0), 0xff6b4a));
   axes.add(makeAxisLine(new THREE.Vector3(0, refLen, 0), 0x6bcf8e));
-  axes.add(makeAxisLine(new THREE.Vector3(0, 0, refLen), 0x6aa8ff));
+  axes.add(makeAxisLine(xDir.clone().multiplyScalar(refLen), 0x6aa8ff));
 
   axes.add(makeAxisArrow(new THREE.Vector3(1, 0, 0), sliceLen, 0xff6b4a));
   axes.add(makeAxisArrow(new THREE.Vector3(0, 1, 0), refLen, 0x6bcf8e));
-  axes.add(makeAxisArrow(new THREE.Vector3(0, 0, 1), refLen, 0x6aa8ff));
+  axes.add(makeAxisArrow(xDir, refLen, 0x6aa8ff));
 
   for (let i = 0; i < n; i++) {
-    const x = i * g;
+    const sx = i * g;
     const tick = new THREE.Line(
       new THREE.BufferGeometry().setFromPoints([
-        new THREE.Vector3(x, 0, 0),
-        new THREE.Vector3(x, 0.12, 0),
+        new THREE.Vector3(sx, 0, 0),
+        new THREE.Vector3(sx, 0.12, 0),
       ]),
       new THREE.LineBasicMaterial({ color: 0xffb090, transparent: true, opacity: 0.85, depthWrite: false })
     );
     axes.add(tick);
     const num = makeAxisText(String(i), 0.22, 0.18, "#ffc8b0");
-    num.position.set(x, 0.28, 0.02);
+    num.position.set(sx, 0.28, 0.02 * USER_X_SIGN);
     axes.add(num);
   }
 
   const sliceLbl = makeAxisText("slice", 0.55, 0.2, "#ff9a7a");
-  sliceLbl.position.set(sliceLen + 0.35, 0.15, 0.02);
+  sliceLbl.position.set(sliceLen + 0.35, 0.15, 0.02 * USER_X_SIGN);
   axes.add(sliceLbl);
 
   const yLbl = makeAxisText("y", 0.28, 0.22, "#8eefb0");
-  yLbl.position.set(0.05, refLen + 0.28, 0.02);
+  yLbl.position.set(0.05, refLen + 0.28, 0.02 * USER_X_SIGN);
   axes.add(yLbl);
 
   const xLbl = makeAxisText("x", 0.28, 0.22, "#9ec0ff");
-  xLbl.position.set(0.05, 0.15, refLen + 0.28);
+  xLbl.position.set(0.05, 0.15, USER_X_SIGN * (refLen + 0.28));
   axes.add(xLbl);
 
   const originDot = new THREE.Mesh(
@@ -500,8 +506,8 @@ function lerpPullOut(ctx) {
     g.userData.pull = Math.abs(next - target) < 0.002 ? target : next;
     const baseX = g.userData.baseX ?? layerXNow(i);
     const baseZ = g.userData.baseZ ?? 0;
-    // Flat pull along user-x (blue / Three.js +Z)
-    g.position.set(baseX, 0, baseZ + g.userData.pull);
+    // Flat pull along flipped user-+x (Three.js Z * USER_X_SIGN)
+    g.position.set(baseX, 0, baseZ + USER_X_SIGN * g.userData.pull);
   });
 }
 
@@ -509,12 +515,12 @@ function framingDistance() {
   return Math.max(7.2, Math.hypot(stackWidth(), PLANE_SIZE) * 1.15);
 }
 
-/** Upper-right three-face view of the cube. */
+/** Upper-right three-face view, mirrored to the flipped-x side. */
 function goCornerView(ctx, animate) {
   const d = framingDistance();
   const target = new THREE.Vector3(0, 0, 0);
-  // From cube's upper-right front-ish corner — readable three faces
-  const pos = new THREE.Vector3(d * 1.02, d * 0.68, d * 0.78);
+  // Mirrored to flipped-x side: camera sits along −user-x / outside the origin face
+  const pos = new THREE.Vector3(d * 1.02, d * 0.68, USER_X_SIGN * d * 0.78);
   ctx.controls.target.copy(target);
   if (animate) {
     ctx.camera.position.lerp(pos, 1);
