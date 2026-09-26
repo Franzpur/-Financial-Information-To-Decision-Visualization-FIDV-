@@ -4,11 +4,15 @@ import { COLORS, state, passesFilter, companyById } from "./state.js";
 
 const PLANE_SIZE = 4.2;
 const GAP = 0.55;
-/** How far a focused slice slides along user-+x (flat pull). */
-const PULL_OUT = PLANE_SIZE * 0.7;
+/**
+ * One user-x unit = cube depth = PLANE_SIZE (Three.js).
+ * Pull moves a slice fully from user-x [0,1] into [1,2].
+ */
+const PULL_OUT = PLANE_SIZE;
 /**
  * User axes: orange=slice (Three +X), green=y (Three +Y), blue=x (Three −Z).
  * Origin sits on the −slice, −y, −x corner → Three (−halfStack, −half, +half).
+ * Cube face spans user-x∈[0,1] and user-y∈[0,1].
  */
 const USER_X_SIGN = -1; // Three.js Z *= USER_X_SIGN for +user-x
 const N_LAYERS = () => state.layers.length;
@@ -410,8 +414,10 @@ function rebuildAxes(ctx) {
   axes.position.copy(origin);
 
   const sliceLen = Math.max(g, (n - 1) * g) + g * 1.2;
-  const yLen = PLANE_SIZE * 1.65;
-  const xLen = PLANE_SIZE * 1.65;
+  // User unit length on x/y = cube face = PLANE_SIZE; draw past 2 on x, past 1 on y
+  const unit = PLANE_SIZE;
+  const yLen = unit * 1.35;
+  const xLen = unit * 2.25;
   const xDir = new THREE.Vector3(0, 0, USER_X_SIGN); // −Z
 
   axes.add(makeAxisLine(new THREE.Vector3(sliceLen, 0, 0), 0xff6b4a));
@@ -435,6 +441,40 @@ function rebuildAxes(ctx) {
     const num = makeAxisText(String(i), 0.22, 0.18, "#ffc8b0");
     num.position.set(sx, 0.28, 0.02 * USER_X_SIGN);
     axes.add(num);
+  }
+
+  // y ticks: 0 at origin, 1 at cube top
+  for (const yu of [0, 1]) {
+    const yy = yu * unit;
+    axes.add(
+      new THREE.Line(
+        new THREE.BufferGeometry().setFromPoints([
+          new THREE.Vector3(0, yy, 0),
+          new THREE.Vector3(0.14, yy, 0),
+        ]),
+        new THREE.LineBasicMaterial({ color: 0x8eefb0, transparent: true, opacity: 0.9, depthWrite: false })
+      )
+    );
+    const yl = makeAxisText(String(yu), 0.2, 0.16, "#8eefb0");
+    yl.position.set(0.32, yy, 0.02 * USER_X_SIGN);
+    axes.add(yl);
+  }
+
+  // x ticks: 0 (origin face), 1 (far face / cube), 2 (pulled-out far edge)
+  for (const xu of [0, 1, 2]) {
+    const xz = USER_X_SIGN * xu * unit;
+    axes.add(
+      new THREE.Line(
+        new THREE.BufferGeometry().setFromPoints([
+          new THREE.Vector3(0, 0, xz),
+          new THREE.Vector3(0, 0.14, xz),
+        ]),
+        new THREE.LineBasicMaterial({ color: 0x9ec0ff, transparent: true, opacity: 0.9, depthWrite: false })
+      )
+    );
+    const xl = makeAxisText(String(xu), 0.2, 0.16, "#9ec0ff");
+    xl.position.set(0.05, 0.32, xz);
+    axes.add(xl);
   }
 
   const sliceLbl = makeAxisText("slice", 0.55, 0.2, "#ff9a7a");
