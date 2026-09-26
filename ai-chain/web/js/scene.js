@@ -409,17 +409,18 @@ function rebuildAxes(ctx) {
   const axes = new THREE.Group();
   axes.position.copy(origin);
 
-  const sliceLen = Math.max(g, (n - 1) * g);
-  const refLen = PLANE_SIZE;
+  const sliceLen = Math.max(g, (n - 1) * g) + g * 1.2;
+  const yLen = PLANE_SIZE * 1.65;
+  const xLen = PLANE_SIZE * 1.65;
   const xDir = new THREE.Vector3(0, 0, USER_X_SIGN); // −Z
 
   axes.add(makeAxisLine(new THREE.Vector3(sliceLen, 0, 0), 0xff6b4a));
-  axes.add(makeAxisLine(new THREE.Vector3(0, refLen, 0), 0x6bcf8e));
-  axes.add(makeAxisLine(xDir.clone().multiplyScalar(refLen), 0x6aa8ff));
+  axes.add(makeAxisLine(new THREE.Vector3(0, yLen, 0), 0x6bcf8e));
+  axes.add(makeAxisLine(xDir.clone().multiplyScalar(xLen), 0x6aa8ff));
 
   axes.add(makeAxisArrow(new THREE.Vector3(1, 0, 0), sliceLen, 0xff6b4a));
-  axes.add(makeAxisArrow(new THREE.Vector3(0, 1, 0), refLen, 0x6bcf8e));
-  axes.add(makeAxisArrow(xDir, refLen, 0x6aa8ff));
+  axes.add(makeAxisArrow(new THREE.Vector3(0, 1, 0), yLen, 0x6bcf8e));
+  axes.add(makeAxisArrow(xDir, xLen, 0x6aa8ff));
 
   for (let i = 0; i < n; i++) {
     const sx = i * g;
@@ -441,11 +442,11 @@ function rebuildAxes(ctx) {
   axes.add(sliceLbl);
 
   const yLbl = makeAxisText("y", 0.28, 0.22, "#8eefb0");
-  yLbl.position.set(0.05, refLen + 0.28, 0.02 * USER_X_SIGN);
+  yLbl.position.set(0.05, yLen + 0.28, 0.02 * USER_X_SIGN);
   axes.add(yLbl);
 
   const xLbl = makeAxisText("x", 0.28, 0.22, "#9ec0ff");
-  xLbl.position.set(0.05, 0.15, USER_X_SIGN * (refLen + 0.28));
+  xLbl.position.set(0.05, 0.15, USER_X_SIGN * (xLen + 0.28));
   axes.add(xLbl);
 
   const originDot = new THREE.Mesh(
