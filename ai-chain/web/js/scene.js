@@ -414,7 +414,7 @@ function rebuildAxes(ctx) {
   axes.position.copy(origin);
 
   const sliceUnit = g; // 1 s-unit = 1 slice gap
-  const sliceLen = sliceUnit * 22; // s-axis to 22 units (was ~11 ticks, looked cramped)
+  const sliceLen = sliceUnit * 20; // s-axis length in gap-units
   // User unit on x/y = cube face = PLANE_SIZE; x drawn to ~2.25, y matches x
   const unit = PLANE_SIZE;
   const xLen = unit * 2.25;
@@ -429,8 +429,8 @@ function rebuildAxes(ctx) {
   axes.add(makeAxisArrow(new THREE.Vector3(0, 1, 0), yLen, 0x6bcf8e));
   axes.add(makeAxisArrow(xDir, xLen, 0x6aa8ff));
 
-  // Slice ticks every unit 0..22 (major feel); emphasize existing layer indices 0..n-1
-  for (let i = 0; i <= 22; i++) {
+  // Slice ticks every unit 0..20; emphasize existing layer indices 0..n-1
+  for (let i = 0; i <= 20; i++) {
     const sx = i * sliceUnit;
     const isLayer = i < n;
     const tickH = isLayer ? 0.14 : 0.08;
