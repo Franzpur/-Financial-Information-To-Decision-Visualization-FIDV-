@@ -1,20 +1,25 @@
+/**
+ * AI Chain Cube — Three.js scene.
+ * Concept targets: ../CONCEPTS.md  (tags [C-SLICE], [C-PULL], [C-STDVIEW], …)
+ * User axes (x,y,s) ≠ raw Three XYZ — see [C-USER-AXES] / [C-MAP].
+ */
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { COLORS, state, passesFilter, companyById } from "./state.js";
 
-const PLANE_SIZE = 4.2;
-const GAP = 0.55;
+const PLANE_SIZE = 4.2; // [C-AXIS-X]/[C-AXIS-Y] unit length (cube face edge)
+const GAP = 0.55; // base [C-AXIS-S] unit (= one slice gap when not exploded)
 /**
- * One user-x unit = cube depth = PLANE_SIZE (Three.js).
+ * [C-PULL] One user-x unit = cube depth = PLANE_SIZE (Three.js).
  * Pull moves a slice fully from user-x [0,1] into [1,2].
  */
 const PULL_OUT = PLANE_SIZE;
 /**
- * User axes: orange=slice (Three +X), green=y (Three +Y), blue=x (Three −Z).
- * Origin sits on the −slice, −y, −x corner → Three (−halfStack, −half, +half).
- * Cube face spans user-x∈[0,1] and user-y∈[0,1].
+ * [C-USER-AXES] orange=s Three+X; green=y Three+Y; blue=x Three−Z.
+ * [C-ORIGIN] (−slice,−y,−x) → Three (−halfStack, −half, +half).
+ * Cube face: user-x∈[0,1], user-y∈[0,1].
  */
-const USER_X_SIGN = -1; // Three.js Z *= USER_X_SIGN for +user-x
+const USER_X_SIGN = -1; // [C-AXIS-X] Three.js Z *= USER_X_SIGN for +user-x
 const N_LAYERS = () => state.layers.length;
 
 export function createScene(viewport, hooks = {}) {
@@ -112,7 +117,6 @@ export function createScene(viewport, hooks = {}) {
     applyVisibility: () => queueVisibilityTargets(ctx),
     layoutPlanes: () => layoutPlanes(ctx),
     resetCamera: () => resetCamera(ctx),
-    goCornerView: () => goCornerView(ctx, true),
     goStandardView: () => goStandardView(ctx, true),
     focusSlice: (i) => focusSlice(ctx, i),
     clearFocus: () => clearFocus(ctx),
@@ -408,8 +412,7 @@ function layoutPlanes(ctx) {
 }
 
 /**
- * Origin at cube bottom-left on the flipped-x side.
- * Orange = slice. Green = y. Blue = x (Three.js −Z from this origin).
+ * [C-AXES][C-ORIGIN] User axes from origin: orange=s, green=y, blue=x (−Z).
  */
 function rebuildAxes(ctx) {
   if (ctx.axesGroup) {
@@ -586,6 +589,7 @@ function makeXyPlaneLabel(text, w, h, fill) {
   return mesh;
 }
 
+/** [C-PULL][C-RETRACT] Ease slice along +x; camera untouched. */
 function lerpPullOut(ctx) {
   ctx.planeGroups.forEach((g, i) => {
     const target = state.focusLayer === i ? PULL_OUT : 0;
@@ -606,7 +610,7 @@ function framingDistance() {
 }
 
 
-/** User (x,y,s) → root-local Three.js. s-unit = slice gap; x/y-unit = PLANE_SIZE. */
+/** [C-MAP] User (x,y,s) → root-local Three.js. s-unit = slice gap; x/y-unit = PLANE_SIZE. */
 function userOriginLocal() {
   const n = N_LAYERS();
   const g = gapNow();
@@ -630,21 +634,21 @@ function userToWorld(ctx, xu, yu, su) {
 }
 
 /**
- * Standard framing:
- * - focused slice s*: camera (1.5, 0.5, s*+7) looking −s (pulled-face center)
- * - no focus: camera (1.8, 1.8, 20) looking at user origin
+ * [C-STDVIEW] Standard framing (user coords):
+ * - focused s*: camera (1.5, 0.5, s*+10) → look (1.5, 0.5, s*) (−s, pulled face)
+ * - no focus: camera (2.1, 2.1, 24) → user origin
  */
 function standardPose(ctx) {
   if (state.focusLayer != null) {
     const sStar = state.focusLayer;
     // Face the pulled slice (x∈[1,2] → center x=1.5)
     return {
-      pos: userToWorld(ctx, 1.5, 0.5, sStar + 7),
+      pos: userToWorld(ctx, 1.5, 0.5, sStar + 10),
       target: userToWorld(ctx, 1.5, 0.5, sStar),
     };
   }
   return {
-    pos: userToWorld(ctx, 1.8, 1.8, 20),
+    pos: userToWorld(ctx, 2.1, 2.1, 24),
     target: userToWorld(ctx, 0, 0, 0),
   };
 }
@@ -670,28 +674,8 @@ function stepCamAnim(ctx) {
   if (u >= 1) ctx.camAnim = null;
 }
 
-function cornerPose() {
-  const d = framingDistance();
-  return {
-    pos: new THREE.Vector3(d * 1.02, d * 0.68, USER_X_SIGN * d * 0.78),
-    target: new THREE.Vector3(0, 0, 0),
-  };
-}
 
-/** Upper-right three-face view, mirrored to the flipped-x side. */
-function goCornerView(ctx, animate = true) {
-  const { pos, target } = cornerPose();
-  ctx.camAnim = null;
-  if (animate) startCamAnim(ctx, pos, target, 520);
-  else {
-    ctx.camera.position.copy(pos);
-    ctx.controls.target.copy(target);
-    ctx.controls.update();
-  }
-  ctx.hooks.onCornerView?.();
-}
-
-
+/** [C-STDVIEW] Snap to standardPose for current focus state. */
 function goStandardView(ctx, animate = true) {
   const { pos, target } = standardPose(ctx);
   ctx.camAnim = null;
@@ -716,6 +700,7 @@ function resetCamera(ctx) {
   ctx.hooks.onReset?.();
 }
 
+/** [C-FOCUS-ACT][C-PULL][C-RETRACT][C-CAM-HOLD] Toggle/set focus; pull via visibility; do not move camera. */
 function focusSlice(ctx, i) {
   const n = N_LAYERS();
   if (i == null || i < 0 || i >= n) return;
@@ -730,10 +715,11 @@ function focusSlice(ctx, i) {
   state.focusLayer = i;
   state.selectedId = null;
   queueVisibilityTargets(ctx);
-  startCamAnim(ctx, ctx.camera.position.clone(), new THREE.Vector3(0, 0, 0), 380);
+  // Keep current camera — no recenter toward cube interior
   ctx.hooks.onFocusChange?.();
 }
 
+/** [C-ESC] Clear select first, then focus; camera unchanged. */
 function clearFocus(ctx) {
   if (state.selectedId != null) {
     state.selectedId = null;
@@ -921,7 +907,7 @@ function wireInput(ctx, viewport) {
 
   window.addEventListener("keydown", (e) => {
     const k = e.key.toLowerCase();
-    if (["q", "e", "w", "a", "s", "d", "r", "f", "v", "c"].includes(k)) e.preventDefault();
+    if (["q", "e", "w", "a", "s", "d", "r", "f", "c"].includes(k)) e.preventDefault();
     if (e.key === "Shift") ctx.keys.add("shift");
     else ctx.keys.add(k);
     if (e.key === "[" || e.key === "]") {
@@ -934,10 +920,6 @@ function wireInput(ctx, viewport) {
     if (k === "c") {
       e.preventDefault();
       goStandardView(ctx, true);
-    }
-    if (k === "v" || e.key === "Home") {
-      e.preventDefault();
-      goCornerView(ctx, true);
     }
     if (e.key === "Escape") {
       e.preventDefault();
@@ -960,7 +942,7 @@ function wireInput(ctx, viewport) {
   el.addEventListener("pointerup", (e) => {
     if (ctx.pointerState.btn === 1) {
       e.preventDefault();
-      if (!ctx.pointerState.moved) goCornerView(ctx, true);
+      if (!ctx.pointerState.moved) goStandardView(ctx, true);
       return;
     }
     if (ctx.pointerState.btn !== 0) return;
@@ -992,6 +974,7 @@ function setPointer(ctx, event) {
   return rect;
 }
 
+/** [C-PICK] company first; else [C-FOCUS-ACT] on slice plane. */
 function pick(ctx, event) {
   setPointer(ctx, event);
   const companyHits = ctx.raycaster.intersectObjects(

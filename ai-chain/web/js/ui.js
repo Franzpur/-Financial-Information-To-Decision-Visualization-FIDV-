@@ -1,3 +1,4 @@
+/** UI panels. Concepts: ../CONCEPTS.md ([C-STDVIEW], [C-FOCUS], …). */
 import {
   state,
   passesFilter,
@@ -145,13 +146,11 @@ export function createUI(sceneApi) {
     writeHash();
   });
 
+  // [C-STDVIEW]
   document.getElementById("standardView").addEventListener("click", () => {
     sceneApi.goStandardView();
   });
 
-  document.getElementById("cornerView").addEventListener("click", () => {
-    sceneApi.goCornerView();
-  });
 
   document.getElementById("explode").addEventListener("click", () => {
     state.exploded = !state.exploded;
