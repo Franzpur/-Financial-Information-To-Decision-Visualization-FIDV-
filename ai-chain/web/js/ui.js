@@ -25,14 +25,7 @@ export function createUI(sceneApi) {
       btn.title = L.blurb;
       btn.innerHTML = `<span class="idx">${i + 1}</span><span>${L.name}</span><span class="count">${L.companyCount ?? ""}</span>`;
       btn.addEventListener("click", () => {
-        state.focusLayer = state.focusLayer === i ? null : i;
-        if (state.focusLayer == null) state.selectedId = null;
-        syncLayerActive();
-        sceneApi.applyVisibility();
-        if (state.focusLayer != null) renderLayerRoster(state.focusLayer);
-        else setDetailDefault();
-        updateStatus();
-        writeHash();
+        sceneApi.focusSlice(i);
       });
       layerList.appendChild(btn);
     });
@@ -46,17 +39,25 @@ export function createUI(sceneApi) {
 
   function updateStatus() {
     const vis = visibleCompanies();
+    if (state.selectedId != null) {
+      const c = companyById(state.selectedId);
+      const L = c ? state.layers[c.layer] : null;
+      statusBar.textContent = c
+        ? `Selected · ${c.name}${c.ticker ? " (" + c.ticker + ")" : ""} · ${L?.name || ""} · Esc clears selection`
+        : `Selected · Esc clears`;
+      return;
+    }
     if (state.focusLayer != null) {
       const L = state.layers[state.focusLayer];
       const n = vis.filter((c) => c.layer === state.focusLayer).length;
-      statusBar.textContent = `Slice ${state.focusLayer + 1}: ${L.name} · ${n} visible`;
+      statusBar.textContent = `Slice ${state.focusLayer + 1}: ${L.name} · pulled x∈[1,2] · ${n} visible · Esc clears · click plane again to release`;
     } else {
-      statusBar.textContent = `All slices · ${vis.length} companies visible`;
+      statusBar.textContent = `All slices · ${vis.length} visible · click a plane or [ ] to focus · V / Home corner`;
     }
   }
 
   function setDetailDefault() {
-    detail.innerHTML = `<p>Click a point, pick a slice, or search. Camera stays put when you change slices.</p>`;
+    detail.innerHTML = `<p>Click a company, a slice plane, or a layer on the left. Focus pulls the slice into <strong>x∈[1,2]</strong>. Esc clears selection, then focus.</p>`;
   }
 
   function ringLabel(c) {

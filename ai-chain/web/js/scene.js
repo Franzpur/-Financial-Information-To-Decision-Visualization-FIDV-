@@ -75,9 +75,10 @@ export function createScene(viewport, hooks = {}) {
     keys: new Set(),
     raycaster: new THREE.Raycaster(),
     pointer: new THREE.Vector2(),
-    pointerState: { x: 0, y: 0, btn: -1 },
+    pointerState: { x: 0, y: 0, btn: -1, moved: false },
     dimTargets: new Map(),
     baseRotateSpeed: 2.4,
+    camAnim: null,
     hooks,
   };
 
@@ -98,6 +99,7 @@ export function createScene(viewport, hooks = {}) {
       7.5
     );
     applyKeyboard(ctx);
+    stepCamAnim(ctx);
     lerpVisibility(ctx);
     lerpPullOut(ctx);
     controls.update();
@@ -111,6 +113,8 @@ export function createScene(viewport, hooks = {}) {
     layoutPlanes: () => layoutPlanes(ctx),
     resetCamera: () => resetCamera(ctx),
     goCornerView: () => goCornerView(ctx, true),
+    focusSlice: (i) => focusSlice(ctx, i),
+    clearFocus: () => clearFocus(ctx),
     selectCompany: (id) => selectCompany(ctx, id),
     framingDistance: () => framingDistance(),
   };
@@ -261,6 +265,7 @@ function buildCube(ctx) {
     plane.rotation.y = Math.PI / 2;
     plane.renderOrder = 0;
     plane.userData.isSlicePlane = true;
+    plane.userData.layerIndex = i;
     plane.userData.baseOpacity = 0.3;
     g.add(plane);
 
@@ -275,6 +280,7 @@ function buildCube(ctx) {
     );
     edges.rotation.y = Math.PI / 2;
     edges.renderOrder = 0;
+    edges.userData.isSliceEdge = true;
     edges.userData.baseOpacity = 0.65;
     g.add(edges);
 
@@ -580,16 +586,16 @@ function makeXyPlaneLabel(text, w, h, fill) {
 }
 
 function lerpPullOut(ctx) {
-  const k = 0.14;
   ctx.planeGroups.forEach((g, i) => {
     const target = state.focusLayer === i ? PULL_OUT : 0;
     g.userData.targetPull = target;
     const cur = g.userData.pull ?? 0;
-    const next = cur + (target - cur) * k;
-    g.userData.pull = Math.abs(next - target) < 0.002 ? target : next;
+    const diff = target - cur;
+    const k = 0.13 + Math.min(0.12, Math.abs(diff) / PULL_OUT * 0.12);
+    const next = cur + diff * k;
+    g.userData.pull = Math.abs(next - target) < 0.003 ? target : next;
     const baseX = g.userData.baseX ?? layerXNow(i);
     const baseZ = g.userData.baseZ ?? 0;
-    // Flat pull along flipped user-+x (Three.js Z * USER_X_SIGN)
     g.position.set(baseX, 0, baseZ + USER_X_SIGN * g.userData.pull);
   });
 }
@@ -598,29 +604,94 @@ function framingDistance() {
   return Math.max(7.2, Math.hypot(stackWidth(), PLANE_SIZE) * 1.15);
 }
 
-/** Upper-right three-face view, mirrored to the flipped-x side. */
-function goCornerView(ctx, animate) {
+function startCamAnim(ctx, toPos, toTarget, dur = 480) {
+  ctx.camAnim = {
+    fromPos: ctx.camera.position.clone(),
+    fromTarget: ctx.controls.target.clone(),
+    toPos: toPos.clone(),
+    toTarget: toTarget.clone(),
+    t0: performance.now(),
+    dur,
+  };
+}
+
+function stepCamAnim(ctx) {
+  const a = ctx.camAnim;
+  if (!a) return;
+  const u = Math.min(1, (performance.now() - a.t0) / a.dur);
+  const e = 1 - (1 - u) ** 3;
+  ctx.camera.position.lerpVectors(a.fromPos, a.toPos, e);
+  ctx.controls.target.lerpVectors(a.fromTarget, a.toTarget, e);
+  if (u >= 1) ctx.camAnim = null;
+}
+
+function cornerPose() {
   const d = framingDistance();
-  const target = new THREE.Vector3(0, 0, 0);
-  // Mirrored to flipped-x side: camera sits along −user-x / outside the origin face
-  const pos = new THREE.Vector3(d * 1.02, d * 0.68, USER_X_SIGN * d * 0.78);
-  ctx.controls.target.copy(target);
-  if (animate) {
-    ctx.camera.position.lerp(pos, 1);
+  return {
+    pos: new THREE.Vector3(d * 1.02, d * 0.68, USER_X_SIGN * d * 0.78),
+    target: new THREE.Vector3(0, 0, 0),
+  };
+}
+
+/** Upper-right three-face view, mirrored to the flipped-x side. */
+function goCornerView(ctx, animate = true) {
+  const { pos, target } = cornerPose();
+  ctx.camAnim = null;
+  if (animate) startCamAnim(ctx, pos, target, 520);
+  else {
+    ctx.camera.position.copy(pos);
+    ctx.controls.target.copy(target);
+    ctx.controls.update();
   }
-  ctx.camera.position.copy(pos);
-  ctx.controls.update();
+  ctx.hooks.onCornerView?.();
 }
 
 function resetCamera(ctx) {
   state.focusLayer = null;
   state.selectedId = null;
+  state.hoverId = null;
   ctx.planeGroups.forEach((g) => {
     g.userData.targetPull = 0;
   });
-  goCornerView(ctx, false);
+  goCornerView(ctx, true);
   queueVisibilityTargets(ctx);
   ctx.hooks.onReset?.();
+}
+
+function focusSlice(ctx, i) {
+  const n = N_LAYERS();
+  if (i == null || i < 0 || i >= n) return;
+  if (state.focusLayer === i) {
+    state.focusLayer = null;
+    state.selectedId = null;
+    state.hoverId = null;
+    queueVisibilityTargets(ctx);
+    ctx.hooks.onClear?.();
+    return;
+  }
+  state.focusLayer = i;
+  state.selectedId = null;
+  queueVisibilityTargets(ctx);
+  startCamAnim(ctx, ctx.camera.position.clone(), new THREE.Vector3(0, 0, 0), 380);
+  ctx.hooks.onFocusChange?.();
+}
+
+function clearFocus(ctx) {
+  if (state.selectedId != null) {
+    state.selectedId = null;
+    queueVisibilityTargets(ctx);
+    if (state.focusLayer != null) ctx.hooks.onFocusChange?.();
+    else ctx.hooks.onClear?.();
+    return;
+  }
+  if (state.focusLayer != null) {
+    state.focusLayer = null;
+    state.hoverId = null;
+    queueVisibilityTargets(ctx);
+    ctx.hooks.onClear?.();
+    return;
+  }
+  ctx.hooks.onClear?.();
 }
 
 function selectCompany(ctx, id) {
@@ -632,7 +703,8 @@ function selectCompany(ctx, id) {
   if (mesh) {
     const world = new THREE.Vector3();
     mesh.getWorldPosition(world);
-    ctx.controls.target.lerp(new THREE.Vector3(world.x, 0, 0), 0.35);
+    const toTarget = new THREE.Vector3(world.x, world.y * 0.35, 0);
+    startCamAnim(ctx, ctx.camera.position.clone(), toTarget, 420);
   }
   queueVisibilityTargets(ctx);
   ctx.hooks.onSelect?.(c);
@@ -682,13 +754,20 @@ function queueVisibilityTargets(ctx) {
     // Focused slice draws after dimmed neighbors so its points stay visible
     g.renderOrder = dim ? 0 : 2;
     g.userData.targetPull = state.focusLayer === i ? PULL_OUT : 0;
+    const focused = state.focusLayer === i;
     g.children.forEach((ch) => {
       if (!ch.material || ch.material.opacity == null) return;
       const base = ch.userData.baseOpacity ?? 1;
-      if (ch.userData.isSlicePlane) ch.userData.targetOpacity = dim ? 0.05 : base;
-      else if (ch.userData.isRingGuide) ch.userData.targetOpacity = dim ? base * 0.08 : base;
-      else if (ch.isLineSegments && !ch.userData.isRingGuide) ch.userData.targetOpacity = dim ? 0.12 : base;
-      else if (ch.userData.isDomainLabel) ch.userData.targetOpacity = dim ? 0.15 : base;
+      if (ch.userData.isSlicePlane) {
+        ch.userData.targetOpacity = dim ? 0.04 : focused ? 0.38 : base;
+      } else if (ch.userData.isRingGuide) {
+        ch.userData.targetOpacity = dim ? base * 0.08 : base;
+      } else if (ch.userData.isSliceEdge || (ch.isLineSegments && !ch.userData.isRingGuide)) {
+        ch.userData.targetOpacity = dim ? 0.1 : focused ? 1 : base;
+        if (ch.material.color) ch.material.color.setHex(focused ? 0x8be0c0 : COLORS.EDGE);
+      } else if (ch.userData.isDomainLabel) {
+        ch.userData.targetOpacity = dim ? 0.15 : 1;
+      }
     });
   });
 }
@@ -792,20 +871,15 @@ function wireInput(ctx, viewport) {
       const step = e.key === "]" ? 1 : -1;
       const n = N_LAYERS();
       const cur = state.focusLayer == null ? Math.round(n / 2) : state.focusLayer;
-      state.focusLayer = Math.max(0, Math.min(n - 1, cur + step));
-      queueVisibilityTargets(ctx);
-      ctx.hooks.onFocusChange?.();
+      focusSlice(ctx, Math.max(0, Math.min(n - 1, cur + step)));
     }
-    if (k === "v") {
-      goCornerView(ctx, false);
-      ctx.hooks.onCornerView?.();
+    if (k === "v" || e.key === "Home") {
+      e.preventDefault();
+      goCornerView(ctx, true);
     }
     if (e.key === "Escape") {
-      state.focusLayer = null;
-      state.selectedId = null;
-      state.hoverId = null;
-      queueVisibilityTargets(ctx);
-      ctx.hooks.onClear?.();
+      e.preventDefault();
+      clearFocus(ctx);
     }
   });
   window.addEventListener("keyup", (e) => {
@@ -817,14 +891,30 @@ function wireInput(ctx, viewport) {
     ctx.pointerState.x = e.clientX;
     ctx.pointerState.y = e.clientY;
     ctx.pointerState.btn = e.button;
+    ctx.pointerState.moved = false;
+    if (e.button === 0 || e.button === 2) ctx.camAnim = null; // manual orbit/pan wins
+    if (e.button === 1) e.preventDefault();
   });
   el.addEventListener("pointerup", (e) => {
+    if (ctx.pointerState.btn === 1) {
+      e.preventDefault();
+      if (!ctx.pointerState.moved) goCornerView(ctx, true);
+      return;
+    }
     if (ctx.pointerState.btn !== 0) return;
+    if (!ctx.pointerState.moved) pick(ctx, e);
+  });
+  el.addEventListener("dblclick", (e) => {
+    setPointer(ctx, e);
+    const companyHits = ctx.raycaster.intersectObjects(ctx.meshes.filter((m) => m.visible), false);
+    if (!companyHits.length) clearFocus(ctx);
+  });
+  el.addEventListener("pointermove", (e) => {
     const dx = e.clientX - ctx.pointerState.x;
     const dy = e.clientY - ctx.pointerState.y;
-    if (dx * dx + dy * dy < 16) pick(ctx, e);
+    if (dx * dx + dy * dy > 16) ctx.pointerState.moved = true;
+    hover(ctx, e, viewport);
   });
-  el.addEventListener("pointermove", (e) => hover(ctx, e, viewport));
   el.addEventListener("pointerleave", () => {
     state.hoverId = null;
     ctx.hooks.onHover?.(null, null);
@@ -842,11 +932,24 @@ function setPointer(ctx, event) {
 
 function pick(ctx, event) {
   setPointer(ctx, event);
-  const hits = ctx.raycaster.intersectObjects(
+  const companyHits = ctx.raycaster.intersectObjects(
     ctx.meshes.filter((m) => m.visible),
     false
   );
-  if (hits.length) selectCompany(ctx, hits[0].object.userData.companyId);
+  if (companyHits.length) {
+    selectCompany(ctx, companyHits[0].object.userData.companyId);
+    return;
+  }
+  const planes = [];
+  ctx.planeGroups.forEach((g) => {
+    g.children.forEach((ch) => {
+      if (ch.userData && ch.userData.isSlicePlane) planes.push(ch);
+    });
+  });
+  const planeHits = ctx.raycaster.intersectObjects(planes, false);
+  if (planeHits.length) {
+    focusSlice(ctx, planeHits[0].object.userData.layerIndex);
+  }
 }
 
 function hover(ctx, event, viewport) {

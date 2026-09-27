@@ -1,5 +1,5 @@
 # WORKLOG — GOOGL / AI Chain Cube / FIDV
-更新：2026-09-26 · 账号 GitHub `Franzpur` · 本机路径见文末
+更新：2026-09-27 · 账号 GitHub `Franzpur` · 本机路径见文末
 
 格式：`U=`用户简令 · `A=`我方简应 · 够后续接续即可。
 
@@ -45,6 +45,13 @@
 |18| gh 授权码有没有给我 | 有：当时 `27CB-90E4` + device URL。 |
 |19| diff-tab：建分支并提交、**勿推** | 本地仓 `/Volumes/DATA/ANA_RSLT`：分支 `cursor/ai-chain-modular-cube`，commit `1ff981d`（未推）；排除 `_fidv_push/`。 |
 |20| 写工作日志（本文件） | 写 `WORKLOG.md`。 |
+
+
+### 阶段 E — 坐标/视角/交互 UX（09-26→09-27）
+| # | U | A |
+|---|---|---|
+|21| 轴命名、原点、抽出方向、角视图镜像、非美橙、遮挡/dim、轨道/滚轮 | 用户轴 s/x/y；抽出沿 +x [0,1]→[1,2]；`USER_X_SIGN=-1`；角视图镜像；橙非美；透明 dim；距离缩放 rotateSpeed；指数滚轮。 |
+|22| 继续按理解优化 UX，给足权限与时间 | 平滑相机动画；Esc 分层清除（选中→焦点）；点击切片平面聚焦；抽出缓动；聚焦边框高亮；中键/Home/V 角视图；双击空白清除；状态栏提示 pulled x∈[1,2]。 |
 
 ---
 

@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>AI Industry Chain — 3D Slice Cube</title>
-<link rel="stylesheet" href="/css/app.css?v=5" />
+<link rel="stylesheet" href="/css/app.css?v=6" />
 <script type="importmap">
 {
   "imports": {
@@ -26,7 +26,7 @@
 <div id="app" hidden>
   <aside class="left">
     <h1>AI industry chain cube</h1>
-    <p class="lede">Power (left) → models (right). Cube face = user <strong>x∈[0,1]</strong>, <strong>y∈[0,1]</strong>. Select a slice to pull it fully into <strong>x∈[1,2]</strong>; <kbd>V</kbd> = corner view.</p>
+    <p class="lede">Power (left) → models (right). Cube face = user <strong>x∈[0,1]</strong>, <strong>y∈[0,1]</strong>. Click a slice (or plane) to pull it into <strong>x∈[1,2]</strong>. <kbd>Esc</kbd> clears selection then focus; <kbd>V</kbd>/<kbd>Home</kbd> = corner view.</p>
     <div class="legend">
       <div class="sw"><span class="dot us"></span> US company</div>
       <div class="sw"><span class="dot intl"></span> Non-US company</div>
@@ -41,9 +41,10 @@
     <button type="button" id="helpToggle" class="help-toggle" title="Toggle controls help (?)">?</button>
     <div id="navHint" class="nav-hint">
       <strong>Controls</strong><br />
-      Left-drag orbit · Right-drag / Shift+left pan · Scroll zoom<br />
+      Left-drag orbit · Right-drag / Shift+left pan · Scroll zoom · Middle-click corner<br />
       <kbd>Q</kbd>/<kbd>E</kbd> yaw · <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> pan · <kbd>R</kbd>/<kbd>F</kbd> dolly · <kbd>Shift</kbd> faster<br />
-      <kbd>V</kbd> corner view · <kbd>[</kbd>/<kbd>]</kbd> slice (pulls out) · <kbd>Esc</kbd> clear · <kbd>?</kbd> help
+      Click plane / <kbd>[</kbd><kbd>]</kbd> focus slice · double-click empty clears · <kbd>Esc</kbd> layered clear<br />
+      <kbd>V</kbd>/<kbd>Home</kbd> corner view · <kbd>?</kbd> help
     </div>
     <div id="statusBar" class="status-bar">All slices · 0 companies</div>
     <div id="hoverTip" class="hover-tip" hidden></div>
@@ -64,7 +65,7 @@
     <div id="results"></div>
     <h2>Detail</h2>
     <div id="detail">
-      <p>Click a point, pick a slice, or search. View position stays put when you change slices.</p>
+      <p>Click a company, a slice plane, or search. Focus pulls the slice into x∈[1,2]. Esc clears selection, then focus.</p>
     </div>
     <p class="note">Data: <code>GOOGL_SUPPLY.xlsx</code> (gold rings) or public industry map. Served from SQLite via <code>/api/bundle</code>.</p>
   </aside>
