@@ -31,12 +31,12 @@
 |----|----|----|----------------|-------------------------|
 | **C-CUBE** | industry-chain cube | 产业链立方体 | Whole 3D stack of slices along **s** | `buildCube`, `root` |
 | **C-SLICE** | slice / layer / plane | 切片 / 层 / 平面 | One YZ wall = one industry stage; index `i` = user **s\*** | `planeGroups[i]`, `state.layers[i]`, `state.focusLayer` |
-| **C-POINT** | company point / sphere | 点球 / 公司点 | One company on a slice; emissive sphere | `ctx.meshes`, `ctx.byId` |
+| **C-POINT** | company point / sphere | 点球 / 公司点 | One company on a slice; emissive sphere; **center coplanar** with slice | `ctx.meshes`, `ctx.byId` |
 | **C-RING** | concentric ring | 同心环 / 营收环 | In-slice radius from revenue score 0–100; ring 10 = exact center | `revScore`, `ring`, ring guides |
 | **C-SUPPLY** | Alphabet supplier mark | 供应商标记 / 金环 | Gold ring when `valueM` from `GOOGL_SUPPLY` | `COLORS.SUPPLY`, filter `supply` |
 | **C-LABEL** | coplanar label | 共面标签 | Domain/company text glued to slice (not billboard) | `isDomainLabel`, company label planes |
 | **C-EDGE** | slice edge | 切片描边 | Focused slice edge highlights | `isSliceEdge` |
-| **C-AXES** | user axes | 用户坐标轴 | Orange **s**, green **y**, blue **x** from user origin | `rebuildAxes`, `axesGroup` |
+| **C-AXES** | user axes | 用户坐标轴 | **s/y/x** in ring-matched ice/steel blues from user origin | `rebuildAxes`, `axesGroup` |
 
 **Synonyms to normalize / 口语归一**
 
@@ -51,18 +51,18 @@
 | ID | EN | 中 | Rule / 约定 |
 |----|----|----|-------------|
 | **C-USER-AXES** | user axes `(x,y,s)` | 用户轴 | Product language. **Not** raw Three.js XYZ. |
-| **C-AXIS-S** | **s** (slice axis) | **s** 轴（切片轴） | Orange. Along stack. **1 s-unit = one slice gap** (`gapNow()`). Layer index `i` ⇒ **s\* = i**. Three.js **+X**. |
-| **C-AXIS-Y** | **y** | **y** 轴 | Green. Up the cube face. **1 y-unit = `PLANE_SIZE`**. Face spans **y∈[0,1]**. Three.js **+Y**. |
-| **C-AXIS-X** | **x** | **x** 轴 | Blue. Into/out of cube face. **1 x-unit = `PLANE_SIZE`**. Face spans **x∈[0,1]**; pulled far edge **x=2**. Three.js **−Z** via `USER_X_SIGN = -1`. |
+| **C-AXIS-S** | **s** (slice axis) | **s** 轴（切片轴） | Along stack. **1 s-unit = one slice gap** (`gapNow()`). Layer index `i` ⇒ **s\* = i**. Three.js **+X**. |
+| **C-AXIS-Y** | **y** | **y** 轴 | Up the cube face. **1 y-unit = `PLANE_SIZE`**. Face spans **y∈[0,1]**. Three.js **+Y**. |
+| **C-AXIS-X** | **x** | **x** 轴 | Into/out of cube face. **1 x-unit = `PLANE_SIZE`**. Face spans **x∈[0,1]**; pulled far edge **x=2**. Three.js **−Z** via `USER_X_SIGN = -1`. |
 | **C-ORIGIN** | user origin | 用户原点 | Corner **(x,y,s)=(0,0,0)** = −x, −y, −s of the cube. Three: `(−halfStack, −PLANE_SIZE/2, +PLANE_SIZE/2)`. |
 | **C-MAP** | user → Three | 用户→引擎映射 | `userToLocal` / `userToWorld`: `X += s·gap`, `Y += y·PLANE_SIZE`, `Z += USER_X_SIGN·x·PLANE_SIZE`, then `root.localToWorld` (honors Q/E yaw). |
 
 ```
 User (x,y,s)     Three.js (under root)
 ─────────────────────────────────────
-+s  orange       +X
-+y  green        +Y
-+x  blue         −Z  (USER_X_SIGN = -1)
++s  (ice)        +X
++y  (steel)      +Y
++x  (ring blue)  −Z  (USER_X_SIGN = -1)
 ```
 
 **Do not / 禁止**
@@ -94,8 +94,9 @@ User (x,y,s)     Three.js (under root)
 |----|----|----|---------------------|------|
 | **C-PULL** | pull out | 抽出 | Focused slice translates along **+x** by one face (`PULL_OUT = PLANE_SIZE`): content moves **x∈[0,1] → [1,2]**. | `lerpPullOut`, `targetPull` |
 | **C-RETRACT** | retract / pull back | 抽回 | Focus cleared or toggled off; slice returns to **x∈[0,1]**. **Camera must not auto-yaw toward origin.** | `focusSlice` toggle / `clearFocus` |
+| **C-PULL-ZONE** | pull-frame hit zone | 抽出点击区 | Square∖disk on slice face: inside 1×1 square, **outside** outermost concentric ring. Misses inside the ring do **not** toggle focus. | `isPullFrameHit`, `RING_SPREAD` |
 | **C-FOCUS-ACT** | focus slice | 聚焦切片 | Set `focusLayer`; apply dim + pull. Via plane click, layer list, or `[` `]`. | `focusSlice` |
-| **C-PICK** | pick company | 点选公司 | Raycast sphere → select + focus its layer. | `pick`, `selectCompany` |
+| **C-PICK** | pick company | 点选公司 | Raycast sphere → select + focus its layer. Plane toggle only if hit is in **C-PULL-ZONE**. | `pick`, `selectCompany` |
 | **C-STDVIEW** | standard view | 标准视角 | Snap camera to canonical pose for current focus state. Hotkey **C** / button / middle-click. | `goStandardView`, `standardPose` |
 | **C-RESET** | reset view | 重置 | Clear focus/select; go standard overview pose. | `resetCamera` |
 
@@ -121,8 +122,8 @@ Removed / 已废弃：旧「角视图 corner view」与 **V / Home** 绑定（�
 
 | Input | Action | Concept |
 |-------|--------|---------|
-| Left-drag | orbit | — |
-| Right-drag / Shift+left | pan | — |
+| Left-drag | pan (translate) | — |
+| Right-drag | orbit (fine; low rotateSpeed) | — |
 | Scroll | exponential dolly | — |
 | Middle-click | **C-STDVIEW** | standard view |
 | **C** | **C-STDVIEW** | 标准视角 |
@@ -132,7 +133,7 @@ Removed / 已废弃：旧「角视图 corner view」与 **V / Home** 绑定（�
 | **[ / ]** | prev/next focus slice | **C-FOCUS-ACT** + **C-PULL** |
 | **Esc** | layered clear | **C-ESC** |
 | **?** | help overlay | — |
-| Click empty slice plane | focus/toggle that slice | **C-FOCUS-ACT** |
+| Click slice **frame** (square∖ring) | focus/toggle that slice | **C-FOCUS-ACT** / **C-PULL-ZONE** |
 | Double-click empty | clear focus | **C-RETRACT** path |
 | Click company point | select | **C-PICK** |
 

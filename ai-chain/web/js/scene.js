@@ -14,8 +14,19 @@ const GAP = 0.55; // base [C-AXIS-S] unit (= one slice gap when not exploded)
  * Pull moves a slice fully from user-x [0,1] into [1,2].
  */
 const PULL_OUT = PLANE_SIZE;
+/** [C-RING] Outer concentric-ring radius in slice local YZ (= max company spread). */
+const RING_SPREAD = PLANE_SIZE * 0.38;
+/** Axis palette matched to concentric rings (cool steel / ice blue). */
+const AXIS_S = 0xd4e8ff; // = ring r=10
+const AXIS_Y = 0xb0cce8;
+const AXIS_X = 0x8eb6d8; // = ring guides
+const AXIS_S_CSS = "#d4e8ff";
+const AXIS_Y_CSS = "#b0cce8";
+const AXIS_X_CSS = "#8eb6d8";
+const AXIS_TICK_MAJOR = 0xc0d8f0;
+const AXIS_TICK_MINOR = 0x5a7088;
 /**
- * [C-USER-AXES] orange=s Three+X; green=y Three+Y; blue=x Three−Z.
+ * [C-USER-AXES] s→Three+X; y→Three+Y; x→Three−Z (colors match rings).
  * [C-ORIGIN] (−slice,−y,−x) → Three (−halfStack, −half, +half).
  * Cube face: user-x∈[0,1], user-y∈[0,1].
  */
@@ -39,18 +50,19 @@ export function createScene(viewport, hooks = {}) {
   controls.enableDamping = false;
   controls.enablePan = true;
   controls.screenSpacePanning = true;
-  // Base yaw feel; tick() scales by orbit radius so far views don't feel sluggish vs Q/E
-  controls.rotateSpeed = 2.4;
-  controls.panSpeed = 1.35;
+  // Low rotate feel for fine aiming; tick() scales mildly with orbit radius
+  controls.rotateSpeed = 0.35;
+  controls.panSpeed = 1.2;
   controls.zoomSpeed = 2.6;
   // Match R/F reach: allow near contact and very distant framing
   controls.minDistance = 0.35;
   controls.maxDistance = 320;
   controls.enableZoom = false; // custom wheel below — full exponential range
+  // Left = pan (translate); right = orbit (fine rotate)
   controls.mouseButtons = {
-    LEFT: THREE.MOUSE.ROTATE,
+    LEFT: THREE.MOUSE.PAN,
     MIDDLE: THREE.MOUSE.DOLLY,
-    RIGHT: THREE.MOUSE.PAN,
+    RIGHT: THREE.MOUSE.ROTATE,
   };
   controls.touches = { ONE: THREE.TOUCH.ROTATE, TWO: THREE.TOUCH.DOLLY_PAN };
   controls.target.set(0, 0, 0);
@@ -82,7 +94,7 @@ export function createScene(viewport, hooks = {}) {
     pointer: new THREE.Vector2(),
     pointerState: { x: 0, y: 0, btn: -1, moved: false },
     dimTargets: new Map(),
-    baseRotateSpeed: 2.4,
+    baseRotateSpeed: 0.35,
     camAnim: null,
     hooks,
   };
@@ -98,10 +110,11 @@ export function createScene(viewport, hooks = {}) {
     // Farther orbit radius → higher angular speed so on-screen spin matches Q/E better
     const dist = camera.position.distanceTo(controls.target);
     const ref = Math.max(6, framingDistance());
+    // Mild distance scale only — keep fine control (avoid multi-turn flicks)
     controls.rotateSpeed = THREE.MathUtils.clamp(
-      ctx.baseRotateSpeed * (dist / ref),
-      1.4,
-      7.5
+      ctx.baseRotateSpeed * Math.sqrt(dist / ref),
+      0.22,
+      0.85
     );
     applyKeyboard(ctx);
     stepCamAnim(ctx);
@@ -296,7 +309,7 @@ function buildCube(ctx) {
     g.add(domainLabel);
 
     for (let r = 1; r <= 10; r++) {
-      const rr = (PLANE_SIZE * 0.38) * (r / 10);
+      const rr = RING_SPREAD * (r / 10);
       const pts = [];
       for (let k = 0; k <= 64; k++) {
         const a = (k / 64) * Math.PI * 2;
@@ -350,9 +363,9 @@ function buildCube(ctx) {
     );
     mesh.userData.companyId = c.id;
     mesh.renderOrder = 5;
-    const spread = PLANE_SIZE * 0.38;
-    // Sit clearly in front of the YZ wall so neighboring slices can't cover the point
-    mesh.position.set(0.055 + r, c.y * spread, c.x * spread);
+    const spread = RING_SPREAD;
+    // [C-POINT] Sphere center coplanar with the YZ slice (local x = 0)
+    mesh.position.set(0, c.y * spread, c.x * spread);
     ctx.planeGroups[c.layer].add(mesh);
     ctx.meshes.push(mesh);
     ctx.byId.set(c.id, mesh);
@@ -376,7 +389,7 @@ function buildCube(ctx) {
     }
 
     const label = makeSliceTextPlane(makeCompanyLabelTexture(shortName(c), isUS), 0.72, 0.14);
-    label.position.set(0.07, mesh.position.y + r + 0.12, mesh.position.z);
+    label.position.set(0.02, mesh.position.y + r + 0.12, mesh.position.z);
     label.visible = false;
     label.renderOrder = 7;
     label.userData.isCompanyLabel = true;
@@ -412,7 +425,7 @@ function layoutPlanes(ctx) {
 }
 
 /**
- * [C-AXES][C-ORIGIN] User axes from origin: orange=s, green=y, blue=x (−Z).
+ * [C-AXES][C-ORIGIN] User axes from origin: s/y/x in ring ice-blue (−Z for +x).
  */
 function rebuildAxes(ctx) {
   if (ctx.axesGroup) {
@@ -443,13 +456,13 @@ function rebuildAxes(ctx) {
   const yLen = xLen;
   const xDir = new THREE.Vector3(0, 0, USER_X_SIGN); // −Z
 
-  axes.add(makeAxisLine(new THREE.Vector3(sliceLen, 0, 0), 0xff6b4a));
-  axes.add(makeAxisLine(new THREE.Vector3(0, yLen, 0), 0x6bcf8e));
-  axes.add(makeAxisLine(xDir.clone().multiplyScalar(xLen), 0x6aa8ff));
+  axes.add(makeAxisLine(new THREE.Vector3(sliceLen, 0, 0), AXIS_S));
+  axes.add(makeAxisLine(new THREE.Vector3(0, yLen, 0), AXIS_Y));
+  axes.add(makeAxisLine(xDir.clone().multiplyScalar(xLen), AXIS_X));
 
-  axes.add(makeAxisArrow(new THREE.Vector3(1, 0, 0), sliceLen, 0xff6b4a));
-  axes.add(makeAxisArrow(new THREE.Vector3(0, 1, 0), yLen, 0x6bcf8e));
-  axes.add(makeAxisArrow(xDir, xLen, 0x6aa8ff));
+  axes.add(makeAxisArrow(new THREE.Vector3(1, 0, 0), sliceLen, AXIS_S));
+  axes.add(makeAxisArrow(new THREE.Vector3(0, 1, 0), yLen, AXIS_Y));
+  axes.add(makeAxisArrow(xDir, xLen, AXIS_X));
 
   // Slice ticks every unit 0..20; emphasize existing layer indices 0..n-1
   for (let i = 0; i <= 20; i++) {
@@ -463,7 +476,7 @@ function rebuildAxes(ctx) {
           new THREE.Vector3(sx, tickH, 0),
         ]),
         new THREE.LineBasicMaterial({
-          color: isLayer ? 0xffb090 : 0x885544,
+          color: isLayer ? AXIS_TICK_MAJOR : AXIS_TICK_MINOR,
           transparent: true,
           opacity: isLayer ? 0.9 : 0.45,
           depthWrite: false,
@@ -472,7 +485,12 @@ function rebuildAxes(ctx) {
     );
     if (i % 2 === 0 || isLayer) {
       // Lock to s/y plane (Three.js XY) — never billboard toward camera
-      const num = makeSyPlaneLabel(String(i), isLayer ? 0.26 : 0.2, isLayer ? 0.2 : 0.16, isLayer ? "#ffc8b0" : "#a07060");
+      const num = makeSyPlaneLabel(
+        String(i),
+        isLayer ? 0.26 : 0.2,
+        isLayer ? 0.2 : 0.16,
+        isLayer ? AXIS_S_CSS : "#7a90a8"
+      );
       num.position.set(sx, tickH + 0.18, 0);
       axes.add(num);
     }
@@ -487,10 +505,10 @@ function rebuildAxes(ctx) {
           new THREE.Vector3(0, yy, 0),
           new THREE.Vector3(0.14, yy, 0),
         ]),
-        new THREE.LineBasicMaterial({ color: 0x8eefb0, transparent: true, opacity: 0.9, depthWrite: false })
+        new THREE.LineBasicMaterial({ color: AXIS_Y, transparent: true, opacity: 0.9, depthWrite: false })
       )
     );
-    const yl = makeSyPlaneLabel(String(yu), 0.2, 0.16, "#8eefb0");
+    const yl = makeSyPlaneLabel(String(yu), 0.2, 0.16, AXIS_Y_CSS);
     yl.position.set(0.32, yy, 0);
     axes.add(yl);
   }
@@ -504,24 +522,24 @@ function rebuildAxes(ctx) {
           new THREE.Vector3(0, 0, xz),
           new THREE.Vector3(0, 0.14, xz),
         ]),
-        new THREE.LineBasicMaterial({ color: 0x9ec0ff, transparent: true, opacity: 0.9, depthWrite: false })
+        new THREE.LineBasicMaterial({ color: AXIS_X, transparent: true, opacity: 0.9, depthWrite: false })
       )
     );
     // x-axis numerals sit in the x/y plane (Three.js YZ)
-    const xl = makeXyPlaneLabel(String(xu), 0.2, 0.16, "#9ec0ff");
+    const xl = makeXyPlaneLabel(String(xu), 0.2, 0.16, AXIS_X_CSS);
     xl.position.set(0, 0.32, xz);
     axes.add(xl);
   }
 
-  const sliceLbl = makeSyPlaneLabel("s", 0.32, 0.26, "#ff9a7a");
+  const sliceLbl = makeSyPlaneLabel("s", 0.32, 0.26, AXIS_S_CSS);
   sliceLbl.position.set(sliceLen + 0.4, 0.22, 0);
   axes.add(sliceLbl);
 
-  const yLbl = makeSyPlaneLabel("y", 0.28, 0.22, "#8eefb0");
+  const yLbl = makeSyPlaneLabel("y", 0.28, 0.22, AXIS_Y_CSS);
   yLbl.position.set(0.08, yLen + 0.28, 0);
   axes.add(yLbl);
 
-  const xLbl = makeXyPlaneLabel("x", 0.28, 0.22, "#9ec0ff");
+  const xLbl = makeXyPlaneLabel("x", 0.28, 0.22, AXIS_X_CSS);
   xLbl.position.set(0, 0.22, USER_X_SIGN * (xLen + 0.28));
   axes.add(xLbl);
 
@@ -886,6 +904,7 @@ function applyKeyboard(ctx) {
 
 function wireInput(ctx, viewport) {
   const el = ctx.renderer.domElement;
+  el.addEventListener("contextmenu", (e) => e.preventDefault()); // right-drag = rotate
 
   // Wheel: exponential dolly toward target — wide min/max like R/F reach
   el.addEventListener(
@@ -974,7 +993,26 @@ function setPointer(ctx, event) {
   return rect;
 }
 
-/** [C-PICK] company first; else [C-FOCUS-ACT] on slice plane. */
+/**
+ * [C-PULL-ZONE] Square-minus-circle on the slice face (user 1×1):
+ * inside |y|,|x_face| ≤ face/2, outside outermost ring (RING_SPREAD).
+ * Hits inside the ring field do not toggle focus — avoids miss-click retract.
+ */
+function isPullFrameHit(hit) {
+  const plane = hit.object;
+  const g = plane.parent;
+  if (!g) return false;
+  const local = g.worldToLocal(hit.point.clone());
+  const fy = local.y;
+  const fz = local.z; // face axes on YZ wall
+  const half = PLANE_SIZE / 2;
+  if (Math.abs(fy) > half + 1e-4 || Math.abs(fz) > half + 1e-4) return false;
+  const r2 = fy * fy + fz * fz;
+  const R = RING_SPREAD;
+  return r2 > R * R;
+}
+
+/** [C-PICK] company first; else [C-FOCUS-ACT] only in [C-PULL-ZONE]. */
 function pick(ctx, event) {
   setPointer(ctx, event);
   const companyHits = ctx.raycaster.intersectObjects(
@@ -992,9 +1030,10 @@ function pick(ctx, event) {
     });
   });
   const planeHits = ctx.raycaster.intersectObjects(planes, false);
-  if (planeHits.length) {
-    focusSlice(ctx, planeHits[0].object.userData.layerIndex);
-  }
+  if (!planeHits.length) return;
+  const hit = planeHits[0];
+  if (!isPullFrameHit(hit)) return;
+  focusSlice(ctx, hit.object.userData.layerIndex);
 }
 
 function hover(ctx, event, viewport) {
