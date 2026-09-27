@@ -14,6 +14,8 @@ const GAP = 0.55; // base [C-AXIS-S] unit (= one slice gap when not exploded)
  * Pull moves a slice fully from user-x [0,1] into [1,2].
  */
 const PULL_OUT = PLANE_SIZE;
+/** [C-RING] Outer concentric-ring radius in slice local YZ (= max company spread). */
+const RING_SPREAD = PLANE_SIZE * 0.38;
 /**
  * [C-USER-AXES] orange=s Three+X; green=y Three+Y; blue=x Three−Z.
  * [C-ORIGIN] (−slice,−y,−x) → Three (−halfStack, −half, +half).
@@ -296,7 +298,7 @@ function buildCube(ctx) {
     g.add(domainLabel);
 
     for (let r = 1; r <= 10; r++) {
-      const rr = (PLANE_SIZE * 0.38) * (r / 10);
+      const rr = RING_SPREAD * (r / 10);
       const pts = [];
       for (let k = 0; k <= 64; k++) {
         const a = (k / 64) * Math.PI * 2;
@@ -350,7 +352,7 @@ function buildCube(ctx) {
     );
     mesh.userData.companyId = c.id;
     mesh.renderOrder = 5;
-    const spread = PLANE_SIZE * 0.38;
+    const spread = RING_SPREAD;
     // Sit clearly in front of the YZ wall so neighboring slices can't cover the point
     mesh.position.set(0.055 + r, c.y * spread, c.x * spread);
     ctx.planeGroups[c.layer].add(mesh);
@@ -974,7 +976,26 @@ function setPointer(ctx, event) {
   return rect;
 }
 
-/** [C-PICK] company first; else [C-FOCUS-ACT] on slice plane. */
+/**
+ * [C-PULL-ZONE] Square-minus-circle on the slice face (user 1×1):
+ * inside |y|,|x_face| ≤ face/2, outside outermost ring (RING_SPREAD).
+ * Hits inside the ring field do not toggle focus — avoids miss-click retract.
+ */
+function isPullFrameHit(hit) {
+  const plane = hit.object;
+  const g = plane.parent;
+  if (!g) return false;
+  const local = g.worldToLocal(hit.point.clone());
+  const fy = local.y;
+  const fz = local.z; // face axes on YZ wall
+  const half = PLANE_SIZE / 2;
+  if (Math.abs(fy) > half + 1e-4 || Math.abs(fz) > half + 1e-4) return false;
+  const r2 = fy * fy + fz * fz;
+  const R = RING_SPREAD;
+  return r2 > R * R;
+}
+
+/** [C-PICK] company first; else [C-FOCUS-ACT] only in [C-PULL-ZONE]. */
 function pick(ctx, event) {
   setPointer(ctx, event);
   const companyHits = ctx.raycaster.intersectObjects(
@@ -992,9 +1013,10 @@ function pick(ctx, event) {
     });
   });
   const planeHits = ctx.raycaster.intersectObjects(planes, false);
-  if (planeHits.length) {
-    focusSlice(ctx, planeHits[0].object.userData.layerIndex);
-  }
+  if (!planeHits.length) return;
+  const hit = planeHits[0];
+  if (!isPullFrameHit(hit)) return;
+  focusSlice(ctx, hit.object.userData.layerIndex);
 }
 
 function hover(ctx, event, viewport) {

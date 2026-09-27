@@ -94,8 +94,9 @@ User (x,y,s)     Three.js (under root)
 |----|----|----|---------------------|------|
 | **C-PULL** | pull out | 抽出 | Focused slice translates along **+x** by one face (`PULL_OUT = PLANE_SIZE`): content moves **x∈[0,1] → [1,2]**. | `lerpPullOut`, `targetPull` |
 | **C-RETRACT** | retract / pull back | 抽回 | Focus cleared or toggled off; slice returns to **x∈[0,1]**. **Camera must not auto-yaw toward origin.** | `focusSlice` toggle / `clearFocus` |
+| **C-PULL-ZONE** | pull-frame hit zone | 抽出点击区 | Square∖disk on slice face: inside 1×1 square, **outside** outermost concentric ring. Misses inside the ring do **not** toggle focus. | `isPullFrameHit`, `RING_SPREAD` |
 | **C-FOCUS-ACT** | focus slice | 聚焦切片 | Set `focusLayer`; apply dim + pull. Via plane click, layer list, or `[` `]`. | `focusSlice` |
-| **C-PICK** | pick company | 点选公司 | Raycast sphere → select + focus its layer. | `pick`, `selectCompany` |
+| **C-PICK** | pick company | 点选公司 | Raycast sphere → select + focus its layer. Plane toggle only if hit is in **C-PULL-ZONE**. | `pick`, `selectCompany` |
 | **C-STDVIEW** | standard view | 标准视角 | Snap camera to canonical pose for current focus state. Hotkey **C** / button / middle-click. | `goStandardView`, `standardPose` |
 | **C-RESET** | reset view | 重置 | Clear focus/select; go standard overview pose. | `resetCamera` |
 
@@ -132,7 +133,7 @@ Removed / 已废弃：旧「角视图 corner view」与 **V / Home** 绑定（�
 | **[ / ]** | prev/next focus slice | **C-FOCUS-ACT** + **C-PULL** |
 | **Esc** | layered clear | **C-ESC** |
 | **?** | help overlay | — |
-| Click empty slice plane | focus/toggle that slice | **C-FOCUS-ACT** |
+| Click slice **frame** (square∖ring) | focus/toggle that slice | **C-FOCUS-ACT** / **C-PULL-ZONE** |
 | Double-click empty | clear focus | **C-RETRACT** path |
 | Click company point | select | **C-PICK** |
 
