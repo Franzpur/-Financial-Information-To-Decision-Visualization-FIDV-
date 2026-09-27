@@ -83,7 +83,7 @@ export function createScene(viewport, hooks = {}) {
   };
 
   buildCube(ctx);
-  goCornerView(ctx, false);
+  goStandardView(ctx, false);
   wireInput(ctx, viewport);
   resize(ctx, viewport);
   window.addEventListener("resize", () => resize(ctx, viewport));
@@ -113,6 +113,7 @@ export function createScene(viewport, hooks = {}) {
     layoutPlanes: () => layoutPlanes(ctx),
     resetCamera: () => resetCamera(ctx),
     goCornerView: () => goCornerView(ctx, true),
+    goStandardView: () => goStandardView(ctx, true),
     focusSlice: (i) => focusSlice(ctx, i),
     clearFocus: () => clearFocus(ctx),
     selectCompany: (id) => selectCompany(ctx, id),
@@ -604,6 +605,50 @@ function framingDistance() {
   return Math.max(7.2, Math.hypot(stackWidth(), PLANE_SIZE) * 1.15);
 }
 
+
+/** User (x,y,s) → root-local Three.js. s-unit = slice gap; x/y-unit = PLANE_SIZE. */
+function userOriginLocal() {
+  const n = N_LAYERS();
+  const g = gapNow();
+  const halfStack = ((n - 1) * g) / 2;
+  return new THREE.Vector3(-halfStack, -PLANE_SIZE / 2, PLANE_SIZE / 2);
+}
+
+function userToLocal(xu, yu, su) {
+  const o = userOriginLocal();
+  const sliceUnit = gapNow();
+  const unit = PLANE_SIZE;
+  return new THREE.Vector3(
+    o.x + su * sliceUnit,
+    o.y + yu * unit,
+    o.z + USER_X_SIGN * xu * unit
+  );
+}
+
+function userToWorld(ctx, xu, yu, su) {
+  return ctx.root.localToWorld(userToLocal(xu, yu, su));
+}
+
+/**
+ * Standard framing:
+ * - focused slice s*: camera (1.5, 0.5, s*+7) looking −s (pulled-face center)
+ * - no focus: camera (1.8, 1.8, 20) looking at user origin
+ */
+function standardPose(ctx) {
+  if (state.focusLayer != null) {
+    const sStar = state.focusLayer;
+    // Face the pulled slice (x∈[1,2] → center x=1.5)
+    return {
+      pos: userToWorld(ctx, 1.5, 0.5, sStar + 7),
+      target: userToWorld(ctx, 1.5, 0.5, sStar),
+    };
+  }
+  return {
+    pos: userToWorld(ctx, 1.8, 1.8, 20),
+    target: userToWorld(ctx, 0, 0, 0),
+  };
+}
+
 function startCamAnim(ctx, toPos, toTarget, dur = 480) {
   ctx.camAnim = {
     fromPos: ctx.camera.position.clone(),
@@ -646,6 +691,19 @@ function goCornerView(ctx, animate = true) {
   ctx.hooks.onCornerView?.();
 }
 
+
+function goStandardView(ctx, animate = true) {
+  const { pos, target } = standardPose(ctx);
+  ctx.camAnim = null;
+  if (animate) startCamAnim(ctx, pos, target, 520);
+  else {
+    ctx.camera.position.copy(pos);
+    ctx.controls.target.copy(target);
+    ctx.controls.update();
+  }
+  ctx.hooks.onStandardView?.();
+}
+
 function resetCamera(ctx) {
   state.focusLayer = null;
   state.selectedId = null;
@@ -653,7 +711,7 @@ function resetCamera(ctx) {
   ctx.planeGroups.forEach((g) => {
     g.userData.targetPull = 0;
   });
-  goCornerView(ctx, true);
+  goStandardView(ctx, true);
   queueVisibilityTargets(ctx);
   ctx.hooks.onReset?.();
 }
@@ -863,7 +921,7 @@ function wireInput(ctx, viewport) {
 
   window.addEventListener("keydown", (e) => {
     const k = e.key.toLowerCase();
-    if (["q", "e", "w", "a", "s", "d", "r", "f", "v"].includes(k)) e.preventDefault();
+    if (["q", "e", "w", "a", "s", "d", "r", "f", "v", "c"].includes(k)) e.preventDefault();
     if (e.key === "Shift") ctx.keys.add("shift");
     else ctx.keys.add(k);
     if (e.key === "[" || e.key === "]") {
@@ -872,6 +930,10 @@ function wireInput(ctx, viewport) {
       const n = N_LAYERS();
       const cur = state.focusLayer == null ? Math.round(n / 2) : state.focusLayer;
       focusSlice(ctx, Math.max(0, Math.min(n - 1, cur + step)));
+    }
+    if (k === "c") {
+      e.preventDefault();
+      goStandardView(ctx, true);
     }
     if (k === "v" || e.key === "Home") {
       e.preventDefault();

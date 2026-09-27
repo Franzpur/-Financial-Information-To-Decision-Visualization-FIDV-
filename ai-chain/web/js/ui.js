@@ -50,9 +50,9 @@ export function createUI(sceneApi) {
     if (state.focusLayer != null) {
       const L = state.layers[state.focusLayer];
       const n = vis.filter((c) => c.layer === state.focusLayer).length;
-      statusBar.textContent = `Slice ${state.focusLayer + 1}: ${L.name} · pulled x∈[1,2] · ${n} visible · Esc clears · click plane again to release`;
+      statusBar.textContent = `Slice ${state.focusLayer + 1}: ${L.name} · pulled x∈[1,2] · ${n} visible · C face-on · Esc clears`;
     } else {
-      statusBar.textContent = `All slices · ${vis.length} visible · click a plane or [ ] to focus · V / Home corner`;
+      statusBar.textContent = `All slices · ${vis.length} visible · C standard · click plane or [ ] to focus`;
     }
   }
 
@@ -143,6 +143,10 @@ export function createUI(sceneApi) {
     setDetailDefault();
     updateStatus();
     writeHash();
+  });
+
+  document.getElementById("standardView").addEventListener("click", () => {
+    sceneApi.goStandardView();
   });
 
   document.getElementById("cornerView").addEventListener("click", () => {

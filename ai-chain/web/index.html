@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>AI Industry Chain — 3D Slice Cube</title>
-<link rel="stylesheet" href="/css/app.css?v=6" />
+<link rel="stylesheet" href="/css/app.css?v=7" />
 <script type="importmap">
 {
   "imports": {
@@ -26,7 +26,7 @@
 <div id="app" hidden>
   <aside class="left">
     <h1>AI industry chain cube</h1>
-    <p class="lede">Power (left) → models (right). Cube face = user <strong>x∈[0,1]</strong>, <strong>y∈[0,1]</strong>. Click a slice (or plane) to pull it into <strong>x∈[1,2]</strong>. <kbd>Esc</kbd> clears selection then focus; <kbd>V</kbd>/<kbd>Home</kbd> = corner view.</p>
+    <p class="lede">Power (left) → models (right). Cube face = user <strong>x∈[0,1]</strong>, <strong>y∈[0,1]</strong>. Click a slice (or plane) to pull it into <strong>x∈[1,2]</strong>. <kbd>Esc</kbd> clears selection then focus; <kbd>C</kbd> = standard view (face slice / overview); <kbd>V</kbd> = corner.</p>
     <div class="legend">
       <div class="sw"><span class="dot us"></span> US company</div>
       <div class="sw"><span class="dot intl"></span> Non-US company</div>
@@ -44,7 +44,7 @@
       Left-drag orbit · Right-drag / Shift+left pan · Scroll zoom · Middle-click corner<br />
       <kbd>Q</kbd>/<kbd>E</kbd> yaw · <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> pan · <kbd>R</kbd>/<kbd>F</kbd> dolly · <kbd>Shift</kbd> faster<br />
       Click plane / <kbd>[</kbd><kbd>]</kbd> focus slice · double-click empty clears · <kbd>Esc</kbd> layered clear<br />
-      <kbd>V</kbd>/<kbd>Home</kbd> corner view · <kbd>?</kbd> help
+      <kbd>C</kbd> standard view · <kbd>V</kbd>/<kbd>Home</kbd> corner · <kbd>?</kbd> help
     </div>
     <div id="statusBar" class="status-bar">All slices · 0 companies</div>
     <div id="hoverTip" class="hover-tip" hidden></div>
@@ -53,7 +53,8 @@
       <button class="chip" data-filter="us">US only</button>
       <button class="chip" data-filter="intl">Non-US only</button>
       <button class="chip" data-filter="supply">Alphabet suppliers</button>
-      <button class="chip" id="cornerView">Corner view (V)</button>
+      <button class="chip" id="standardView">Standard (C)</button>
+      <button class="chip" id="cornerView">Corner (V)</button>
       <button class="chip" id="resetCam">Reset view</button>
       <button class="chip" id="explode">Explode / compact</button>
     </div>
