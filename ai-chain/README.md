@@ -2,12 +2,15 @@
 
 Modular 3D industry-chain explorer backed by SQLite.
 
+**Concepts (ZH/EN):** see [`CONCEPTS.md`](./CONCEPTS.md) before changing camera, axes, pull, or focus UX. Code tags look like `[C-SLICE]`, `[C-STDVIEW]`.
+
 ## Layout
 
 ```
 ai-chain/
   data/           layers.json, companies.json, ai_chain.db
   server/         db.py (schema + queries), app.py (HTTP API + static)
+  CONCEPTS.md     bilingual concept target library (agent continuity)
   web/            index.html, css/, js/ (api, state, scene, ui, main)
   scripts/seed.py refresh DB from JSON
   Open-AI-Chain.command

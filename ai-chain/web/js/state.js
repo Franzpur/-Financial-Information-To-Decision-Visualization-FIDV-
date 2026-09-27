@@ -1,4 +1,6 @@
-/** Shared app state + URL hash sync. */
+/** Shared app state + URL hash sync.
+ * Concepts: ../CONCEPTS.md — [C-FOCUS] focusLayer, [C-SELECT] selectedId, [C-FILTER] filterMode.
+ */
 
 export const COLORS = {
   US: 0x3cf0ff,
@@ -13,9 +15,9 @@ export const state = {
   companies: [],
   countries: {},
   filterMode: "all",
-  focusLayer: null,
-  selectedId: null,
-  hoverId: null,
+  focusLayer: null, // [C-FOCUS] slice index or null
+  selectedId: null, // [C-SELECT]
+  hoverId: null, // [C-HOVER]
   exploded: false,
   helpOpen: true,
 };

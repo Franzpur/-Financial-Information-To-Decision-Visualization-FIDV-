@@ -120,7 +120,11 @@ p { margin: 0 0 10px; }
   cursor: pointer;
   transition: background .12s, border-color .12s;
 }
-.layer-btn:hover, .layer-btn.active { background: #1c222b; border-color: var(--stroke); }
+.layer-btn:hover { background: #1c222b; border-color: var(--stroke); }
+.layer-btn.active {
+  background: rgba(139, 224, 192, 0.08);
+  border-color: rgba(139, 224, 192, 0.45);
+}
 .layer-btn .idx {
   width: 18px;
   height: 18px;
@@ -236,14 +240,12 @@ p { margin: 0 0 10px; }
   pointer-events: none;
   font-size: 11.5px;
   color: var(--muted);
-  background: rgba(11, 13, 16, 0.72);
+  background: rgba(11, 13, 16, 0.78);
   border: 1px solid #2a313c;
   border-radius: 6px;
-  padding: 4px 8px;
-  max-width: min(420px, calc(100% - 28px));
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  padding: 5px 10px;
+  max-width: min(560px, calc(100% - 28px));
+  line-height: 1.4;
 }
 
 .hover-tip {
