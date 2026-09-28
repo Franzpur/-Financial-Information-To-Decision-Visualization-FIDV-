@@ -1,8 +1,8 @@
 /** Stacked / line chart for annual coupon + principal (FIDV palette). */
 
 const COLORS = {
-  coupon: "#6aa8ff",
-  principal: "#ffb020",
+  coupon: "#3cf0ff",  // fluorescent cyan
+  principal: "#5CFF9A", // fluorescent green
   grid: "#2a313c",
   axis: "#9aa6b5",
   total: "#8be0c0",
@@ -36,15 +36,21 @@ export function drawCashflowChart(svg, rows, opts = {}) {
   svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
   while (svg.firstChild) svg.removeChild(svg.firstChild);
 
-  const pad = { top: 18, right: 16, bottom: 42, left: 58 };
+  const pad = { top: 18, right: 16, bottom: 42, left: 52 };
   const innerW = W - pad.left - pad.right;
   const innerH = H - pad.top - pad.bottom;
   if (!rows.length || innerW < 40 || innerH < 40) return;
 
-  const maxY = Math.max(
+  const rawMax = Math.max(
     ...rows.map((r) => (mode === "total" ? r.total : r.coupon + r.principal)),
     1
   );
+  // Y-axis: nice $5B steps → $5B, $10B, … $30B…
+  const STEP = 5e9;
+  const maxY = Math.max(STEP, Math.ceil(rawMax / STEP) * STEP);
+  const tickVals = [];
+  for (let v = 0; v <= maxY + 1e-6; v += STEP) tickVals.push(v);
+
   const n = rows.length;
   const gap = 0.22;
   const band = innerW / n;
@@ -53,12 +59,8 @@ export function drawCashflowChart(svg, rows, opts = {}) {
   const g = el("g", { transform: `translate(${pad.left},${pad.top})` });
   svg.appendChild(g);
 
-  // grid
-  const ticks = 5;
-  for (let i = 0; i <= ticks; i++) {
-    const t = i / ticks;
-    const y = innerH * (1 - t);
-    const val = maxY * t;
+  tickVals.forEach((val, i) => {
+    const y = innerH * (1 - val / maxY);
     g.appendChild(
       el("line", {
         x1: 0,
@@ -77,9 +79,9 @@ export function drawCashflowChart(svg, rows, opts = {}) {
       "font-size": 10,
       "text-anchor": "end",
     });
-    lab.textContent = fmtUsd(val);
+    lab.textContent = val === 0 ? "$0" : `$${(val / 1e9).toFixed(0)}B`;
     g.appendChild(lab);
-  }
+  });
 
   rows.forEach((row, i) => {
     const x = i * band + (band - barW) / 2;
@@ -149,16 +151,20 @@ export function drawCashflowChart(svg, rows, opts = {}) {
       g.appendChild(bar);
     }
 
-    const skip = n > 24 ? i % 2 !== 0 : false;
-    if (!skip || isSel) {
+    // Dense quarterly axis: label year on Q1 (or always if few bars / selected)
+    const isQ1 = /Q1$/.test(label) || label.endsWith("+");
+    const showLab = isSel || isQ1 || n <= 20 || (n <= 40 && i % 2 === 0);
+    if (showLab) {
       const tx = el("text", {
         x: i * band + band / 2,
         y: innerH + 16,
         fill: isSel ? COLORS.total : COLORS.axis,
-        "font-size": 10,
+        "font-size": n > 60 ? 8 : 9,
         "text-anchor": "middle",
       });
-      tx.textContent = label.length > 5 ? label.slice(2) : label;
+      if (label === "2060+") tx.textContent = "2060+";
+      else if (/Q\d$/.test(label)) tx.textContent = isQ1 ? label.slice(0, 4) : label.slice(5);
+      else tx.textContent = label.length > 5 ? label.slice(2) : label;
       g.appendChild(tx);
     }
   });

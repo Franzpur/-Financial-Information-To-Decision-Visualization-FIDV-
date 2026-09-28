@@ -1,6 +1,6 @@
 # GOOGL Bond Liability Cash-Flow (test branch module)
 
-Expand Alphabet / GOOGL bonds from `googl_bond_full.xlsx` (ICBC C / 928) into a **time × USD outflow** chart.
+Expand Alphabet / GOOGL bonds from `googl_bond_full.xlsx` (ICBC C / 928) into a **quarter × USD outflow** chart (year scale optional).
 
 ## Design
 

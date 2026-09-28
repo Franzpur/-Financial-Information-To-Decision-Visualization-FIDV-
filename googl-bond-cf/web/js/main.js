@@ -15,8 +15,9 @@ const state = {
   meta: null,
   bonds: [],
   rows: [],
+  scale: "quarter", // quarter | year
   mode: "stack",
-  selectedYear: null,
+  selectedPeriod: null,
 };
 
 function money(n) {
@@ -34,20 +35,41 @@ function renderSummary() {
   `;
 }
 
-function bondsMaturingIn(yearKey) {
-  if (yearKey === "2060+") {
+function bondsMaturingIn(periodKey) {
+  if (periodKey === "2060+") {
     return state.bonds.filter((b) => Number(String(b.maturity).slice(0, 4)) >= 2060);
   }
-  const y = Number(yearKey);
-  return state.bonds.filter((b) => Number(String(b.maturity).slice(0, 4)) === y);
+  // Year bucket: "2031"
+  if (/^\d{4}$/.test(String(periodKey))) {
+    const y = Number(periodKey);
+    return state.bonds.filter((b) => Number(String(b.maturity).slice(0, 4)) === y);
+  }
+  // Quarter bucket: "2031-Q3"
+  const m = String(periodKey).match(/^(\d{4})-Q([1-4])$/);
+  if (!m) return [];
+  const y = Number(m[1]);
+  const q = Number(m[2]);
+  const startMonth = (q - 1) * 3 + 1;
+  const endMonth = startMonth + 2;
+  return state.bonds.filter((b) => {
+    const d = String(b.maturity);
+    const by = Number(d.slice(0, 4));
+    const bm = Number(d.slice(5, 7));
+    return by === y && bm >= startMonth && bm <= endMonth;
+  });
+}
+
+function periodKey(row) {
+  return row.quarter != null ? row.quarter : row.year;
 }
 
 function renderDetail(row) {
   if (!row) {
-    detail.innerHTML = `<p>Click a bar to expand that year’s coupon vs principal and related maturities.</p>`;
+    detail.innerHTML = `<p>Click a bar to expand that quarter’s coupon vs principal and related maturities.</p>`;
     return;
   }
-  const mats = bondsMaturingIn(row.year);
+  const key = periodKey(row);
+  const mats = bondsMaturingIn(key);
   const list = mats
     .slice(0, 12)
     .map(
@@ -59,7 +81,7 @@ function renderDetail(row) {
     )
     .join("");
   detail.innerHTML = `
-    <h3>${row.year}</h3>
+    <h3>${key}</h3>
     <div class="meta">Expanded liability outflows (USD)</div>
     <div class="kv">
       <span>Coupon</span><strong>${money(row.coupon)}</strong>
@@ -75,30 +97,39 @@ function renderDetail(row) {
 function renderYearList() {
   yearList.innerHTML = "";
   state.rows.forEach((row) => {
+    const key = periodKey(row);
     const b = document.createElement("button");
     b.type = "button";
-    b.className = String(state.selectedYear) === String(row.year) ? "active" : "";
-    b.innerHTML = `<span>${row.year}</span><span>${money(row.total)}</span>`;
-    b.addEventListener("click", () => selectYear(row));
+    b.className = String(state.selectedPeriod) === String(key) ? "active" : "";
+    b.innerHTML = `<span>${key}</span><span>${money(row.total)}</span>`;
+    b.addEventListener("click", () => selectPeriod(row));
     yearList.appendChild(b);
   });
 }
 
-function selectYear(row) {
-  state.selectedYear = row ? row.year : null;
+function selectPeriod(row) {
+  state.selectedPeriod = row ? periodKey(row) : null;
   renderDetail(row);
   renderYearList();
   paint();
   statusBar.textContent = row
-    ? `Year ${row.year} · coupon ${money(row.coupon)} · principal ${money(row.principal)} · total ${money(row.total)}`
-    : `All years · ${state.rows.length} buckets · total ${money(state.meta.totalOutflowUsd)}`;
+    ? `${periodKey(row)} · coupon ${money(row.coupon)} · principal ${money(row.principal)} · total ${money(row.total)}`
+    : `${state.scale} · ${state.rows.length} buckets · total ${money(state.meta.totalOutflowUsd)}`;
 }
 
 function paint() {
-  drawCashflowChart(chart, state.rows, {
+  // Normalize rows so chart always uses .year as the x label field
+  const rows = state.rows.map((r) => ({
+    ...r,
+    year: periodKey(r),
+  }));
+  drawCashflowChart(chart, rows, {
     mode: state.mode,
-    selectedYear: state.selectedYear,
-    onSelect: (row) => selectYear(row),
+    selectedYear: state.selectedPeriod,
+    onSelect: (row) => {
+      const raw = state.rows.find((r) => String(periodKey(r)) === String(row.year));
+      selectPeriod(raw || row);
+    },
     onHover: (row, ev) => {
       if (!row || !ev) {
         tip.hidden = true;
@@ -113,33 +144,52 @@ function paint() {
   });
 }
 
+function applyScale(scale) {
+  state.scale = scale;
+  if (scale === "year") state.rows = state.series.byYear;
+  else state.rows = state.series.byQuarterChart || state.series.byQuarter;
+  updateChartSub();
+}
+
+function updateChartSub() {
+  const scaleLabel = state.scale === "year" ? "annual" : "quarterly";
+  const modeLabel = state.mode === "stack" ? "stacked" : "total line";
+  chartSub.textContent = `${scaleLabel} · ${modeLabel} · USD · as of ${state.meta.asOf}`;
+}
+
 async function boot() {
+
   try {
     const res = await fetch("/api/bundle");
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const bundle = await res.json();
     state.meta = bundle.meta;
     state.bonds = bundle.bonds;
-    state.rows = bundle.series.byYear;
+    state.series = bundle.series;
+    applyScale("quarter");
     loading.hidden = true;
     app.hidden = false;
     renderSummary();
-    chartSub.textContent = `stacked · USD · as of ${state.meta.asOf}`;
-    selectYear(null);
+    selectPeriod(null);
     paint();
 
+    document.querySelectorAll(".chip[data-scale]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        applyScale(btn.dataset.scale);
+        document.querySelectorAll(".chip[data-scale]").forEach((b) => b.classList.toggle("active", b === btn));
+        selectPeriod(null);
+        paint();
+      });
+    });
     document.querySelectorAll(".chip[data-mode]").forEach((btn) => {
       btn.addEventListener("click", () => {
         state.mode = btn.dataset.mode;
         document.querySelectorAll(".chip[data-mode]").forEach((b) => b.classList.toggle("active", b === btn));
-        chartSub.textContent =
-          state.mode === "stack"
-            ? `stacked · USD · as of ${state.meta.asOf}`
-            : `total line · USD · as of ${state.meta.asOf}`;
+        updateChartSub();
         paint();
       });
     });
-    document.getElementById("resetSel").addEventListener("click", () => selectYear(null));
+    document.getElementById("resetSel").addEventListener("click", () => selectPeriod(null));
     window.addEventListener("resize", () => paint());
   } catch (err) {
     loading.textContent = String(err && err.message ? err.message : err);

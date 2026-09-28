@@ -217,7 +217,29 @@ def aggregate(events: list[dict]) -> dict:
         }
         for q in sorted(by_quarter)
     ]
-    return {"byYear": chart_years, "byQuarter": quarters, "eventCount": len(events)}
+    # Chart default: quarterly scale; roll ultra-long tail into one bucket
+    chart_quarters = []
+    q_tail = {"quarter": "2060+", "coupon": 0.0, "principal": 0.0, "total": 0.0, "quarters": []}
+    for row in quarters:
+        y = int(str(row["quarter"])[:4]) if str(row["quarter"])[:4].isdigit() else 9999
+        if y >= 2060:
+            q_tail["coupon"] += row["coupon"]
+            q_tail["principal"] += row["principal"]
+            q_tail["total"] += row["total"]
+            q_tail["quarters"].append(row["quarter"])
+        else:
+            chart_quarters.append(row)
+    if q_tail["total"] > 0:
+        q_tail["coupon"] = round(q_tail["coupon"], 2)
+        q_tail["principal"] = round(q_tail["principal"], 2)
+        q_tail["total"] = round(q_tail["total"], 2)
+        chart_quarters.append(q_tail)
+    return {
+        "byYear": chart_years,
+        "byQuarter": quarters,
+        "byQuarterChart": chart_quarters,
+        "eventCount": len(events),
+    }
 
 
 def main():
