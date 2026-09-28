@@ -1,0 +1,186 @@
+:root {
+  color-scheme: dark;
+  --bg: #0b0d10;
+  --panel: #14181e;
+  --stroke: #2a313c;
+  --text: #e8edf4;
+  --muted: #9aa6b5;
+  --accent: #8be0c0;
+  --coupon: #6aa8ff;
+  --principal: #ffb020;
+  --us: #3cf0ff;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font: 14px/1.45 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+#app {
+  display: grid;
+  grid-template-columns: 280px 1fr 300px;
+  height: 100%;
+}
+
+aside {
+  background: var(--panel);
+  border-right: 1px solid var(--stroke);
+  padding: 16px 14px;
+  overflow: auto;
+}
+aside.right {
+  border-right: 0;
+  border-left: 1px solid var(--stroke);
+}
+
+h1 { font-size: 16px; font-weight: 600; margin: 0 0 6px; }
+h2 {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 18px 0 8px;
+}
+.lede, p, .note { color: var(--muted); font-size: 12.5px; }
+.lede { margin: 0 0 12px; }
+.note { font-size: 11.5px; margin-top: 14px; line-height: 1.5; }
+
+.kv {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 6px 10px;
+  font-size: 12.5px;
+}
+.kv span:nth-child(odd) { color: var(--muted); }
+.kv strong { font-variant-numeric: tabular-nums; color: var(--text); }
+
+.legend { display: flex; flex-direction: column; gap: 6px; margin: 10px 0; }
+.sw { display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--muted); }
+.dot { width: 10px; height: 10px; border-radius: 2px; flex: none; }
+.dot.coupon { background: var(--coupon); }
+.dot.principal { background: var(--principal); }
+
+#viewport {
+  position: relative;
+  min-width: 0;
+  overflow: hidden;
+  background: radial-gradient(120% 80% at 50% 40%, #121820 0%, var(--bg) 70%);
+  display: flex;
+  flex-direction: column;
+  padding: 16px 18px 18px;
+}
+
+.chart-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+.chart-head h2 { margin: 0; text-transform: none; letter-spacing: 0; font-size: 15px; color: var(--text); }
+.chart-head .sub { color: var(--muted); font-size: 12px; }
+
+#chartWrap {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  border: 1px solid var(--stroke);
+  border-radius: 10px;
+  background: rgba(11, 13, 16, 0.55);
+  padding: 12px 8px 8px;
+}
+
+#chart {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.hud {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+.chip {
+  background: rgba(20, 24, 30, .88);
+  border: 1px solid var(--stroke);
+  color: var(--text);
+  border-radius: 999px;
+  padding: 6px 11px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: border-color .15s, color .15s;
+}
+.chip:hover { border-color: #3d4a5c; }
+.chip.active { border-color: var(--accent); color: var(--accent); }
+
+.status-bar {
+  margin-top: 10px;
+  font-size: 11.5px;
+  color: var(--muted);
+  background: rgba(11, 13, 16, 0.78);
+  border: 1px solid #2a313c;
+  border-radius: 6px;
+  padding: 5px 10px;
+}
+
+#detail h3 { margin: 0 0 4px; font-size: 16px; font-weight: 600; }
+#detail .meta { color: var(--muted); font-size: 12px; margin-bottom: 10px; }
+#yearList {
+  max-height: 280px;
+  overflow: auto;
+  font-size: 12px;
+}
+#yearList button {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid #1c222b;
+  color: var(--text);
+  padding: 7px 4px;
+  cursor: pointer;
+  font-variant-numeric: tabular-nums;
+}
+#yearList button:hover, #yearList button.active { background: #1c222b; color: var(--accent); }
+
+.tip {
+  position: absolute;
+  z-index: 5;
+  pointer-events: none;
+  background: rgba(15, 19, 24, 0.95);
+  border: 1px solid var(--stroke);
+  border-radius: 6px;
+  padding: 6px 8px;
+  font-size: 11.5px;
+  color: var(--text);
+  white-space: nowrap;
+  transform: translate(-50%, -120%);
+}
+.tip[hidden] { display: none !important; }
+
+.loading {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: var(--bg);
+  z-index: 50;
+  color: var(--muted);
+}
+.loading[hidden], #app[hidden] { display: none !important; }
+
+@media (max-width: 980px) {
+  #app { grid-template-columns: 1fr; grid-template-rows: auto 1fr auto; }
+  aside { border: 0; border-bottom: 1px solid var(--stroke); max-height: 28vh; }
+  aside.right { border: 0; border-top: 1px solid var(--stroke); max-height: 30vh; }
+}

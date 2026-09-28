@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>GOOGL Bond Liability Cash-Flow — Expansion</title>
+<link rel="stylesheet" href="/css/app.css?v=1" />
+</head>
+<body>
+<div id="loading" class="loading">Building cash-flow expansion…</div>
+<div id="app" hidden>
+  <aside class="left">
+    <h1>GOOGL bond cash-flow</h1>
+    <p class="lede">Liability outflow expansion from <code>googl_bond_full</code> (ICBC C / 928). Horizontal = time; vertical = USD expense. Coupons + principal at maturity.</p>
+    <div class="legend">
+      <div class="sw"><span class="dot coupon"></span> Coupon (interest)</div>
+      <div class="sw"><span class="dot principal"></span> Principal (maturity)</div>
+    </div>
+    <h2>Book summary</h2>
+    <div class="kv" id="summaryKv"></div>
+    <p class="note">Non-USD notionals converted with a static FX snapshot for visualization only. Source Excel stays in <code>data/</code>.</p>
+  </aside>
+
+  <div id="viewport">
+    <div class="chart-head">
+      <h2>Annual liability outflows</h2>
+      <span class="sub" id="chartSub">stacked · USD</span>
+    </div>
+    <div id="chartWrap">
+      <svg id="chart" role="img" aria-label="Bond cash-flow by year"></svg>
+      <div id="tip" class="tip" hidden></div>
+    </div>
+    <div class="hud">
+      <button type="button" class="chip active" data-mode="stack">Stacked</button>
+      <button type="button" class="chip" data-mode="total">Total line</button>
+      <button type="button" class="chip" id="resetSel">Clear year</button>
+    </div>
+    <div id="statusBar" class="status-bar">—</div>
+  </div>
+
+  <aside class="right">
+    <h2>Year detail</h2>
+    <div id="detail">
+      <p>Click a bar to expand that year’s coupon vs principal and related maturities.</p>
+    </div>
+    <h2>Years</h2>
+    <div id="yearList"></div>
+  </aside>
+</div>
+<script type="module" src="/js/main.js"></script>
+</body>
+</html>

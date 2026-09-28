@@ -1,0 +1,1741 @@
+{
+  "meta": {
+    "title": "GOOGL bond liability cash-flow expansion",
+    "source": "ICBC C / 928 / googl_bond_full.xlsx",
+    "asOf": "2026-09-28",
+    "bondCount": 80,
+    "fxNote": "Non-USD notionals converted with static FX snapshot for viz only",
+    "fxToUsd": {
+      "USD": 1.0,
+      "EUR": 1.08,
+      "GBP": 1.27,
+      "JPY": 0.0067,
+      "AUD": 0.65,
+      "CHF": 1.12,
+      "CAD": 0.73
+    },
+    "totalCouponUsd": 108623827046.86,
+    "totalPrincipalUsd": 144610735944.2,
+    "totalOutflowUsd": 253234562991.06
+  },
+  "series": {
+    "byYear": [
+      {
+        "year": 2026,
+        "coupon": 1474090548.34,
+        "principal": 0.0,
+        "total": 1474090548.34
+      },
+      {
+        "year": 2027,
+        "coupon": 6708319457.18,
+        "principal": 1000000000.0,
+        "total": 7708319457.18
+      },
+      {
+        "year": 2028,
+        "coupon": 6686991430.26,
+        "principal": 4746428000.0,
+        "total": 11433419430.26
+      },
+      {
+        "year": 2029,
+        "coupon": 5563722751.75,
+        "principal": 29273642459.4,
+        "total": 34837365211.15
+      },
+      {
+        "year": 2030,
+        "coupon": 4961760584.01,
+        "principal": 7407226000.0,
+        "total": 12368986584.01
+      },
+      {
+        "year": 2031,
+        "coupon": 4672712954.08,
+        "principal": 9608861361.4,
+        "total": 14281574315.48
+      },
+      {
+        "year": 2032,
+        "coupon": 4342112823.94,
+        "principal": 6643120200.0,
+        "total": 10985233023.94
+      },
+      {
+        "year": 2033,
+        "coupon": 4014096144.48,
+        "principal": 8412299064.96,
+        "total": 12426395209.44
+      },
+      {
+        "year": 2034,
+        "coupon": 3741495334.99,
+        "principal": 3153654000.0,
+        "total": 6895149334.99
+      },
+      {
+        "year": 2035,
+        "coupon": 3605282517.49,
+        "principal": 4750000000.0,
+        "total": 8355282517.49
+      },
+      {
+        "year": 2036,
+        "coupon": 3284467278.17,
+        "principal": 11245264421.72,
+        "total": 14529731699.89
+      },
+      {
+        "year": 2037,
+        "coupon": 2871486396.81,
+        "principal": 1532115000.0,
+        "total": 4403601396.81
+      },
+      {
+        "year": 2038,
+        "coupon": 2819777515.56,
+        "principal": 1246428000.0,
+        "total": 4066205515.56
+      },
+      {
+        "year": 2039,
+        "coupon": 2776152535.56,
+        "principal": 2225097000.0,
+        "total": 5001249535.56
+      },
+      {
+        "year": 2040,
+        "coupon": 2684923558.56,
+        "principal": 1250000000.0,
+        "total": 3934923558.56
+      },
+      {
+        "year": 2041,
+        "coupon": 2661158629.27,
+        "principal": 2818336243.48,
+        "total": 5479494872.75
+      },
+      {
+        "year": 2042,
+        "coupon": 2531680218.13,
+        "principal": 0.0,
+        "total": 2531680218.13
+      },
+      {
+        "year": 2043,
+        "coupon": 2531680218.13,
+        "principal": 0.0,
+        "total": 2531680218.13
+      },
+      {
+        "year": 2044,
+        "coupon": 2531680218.13,
+        "principal": 1558035000.0,
+        "total": 4089715218.13
+      },
+      {
+        "year": 2045,
+        "coupon": 2469358818.13,
+        "principal": 5121470000.0,
+        "total": 7590828818.13
+      },
+      {
+        "year": 2046,
+        "coupon": 2190218386.88,
+        "principal": 4967805000.0,
+        "total": 7158023386.88
+      },
+      {
+        "year": 2047,
+        "coupon": 1929189841.88,
+        "principal": 0.0,
+        "total": 1929189841.88
+      },
+      {
+        "year": 2048,
+        "coupon": 1929189841.88,
+        "principal": 0.0,
+        "total": 1929189841.88
+      },
+      {
+        "year": 2049,
+        "coupon": 1929189841.88,
+        "principal": 0.0,
+        "total": 1929189841.88
+      },
+      {
+        "year": 2050,
+        "coupon": 1929189841.88,
+        "principal": 2500000000.0,
+        "total": 4429189841.88
+      },
+      {
+        "year": 2051,
+        "coupon": 1877939841.88,
+        "principal": 600841920.0,
+        "total": 2478781761.88
+      },
+      {
+        "year": 2052,
+        "coupon": 1866719119.02,
+        "principal": 0.0,
+        "total": 1866719119.02
+      },
+      {
+        "year": 2053,
+        "coupon": 1866719119.02,
+        "principal": 0.0,
+        "total": 1866719119.02
+      },
+      {
+        "year": 2054,
+        "coupon": 1866719119.02,
+        "principal": 1532115000.0,
+        "total": 3398834119.02
+      },
+      {
+        "year": 2055,
+        "coupon": 1766059519.02,
+        "principal": 5500000000.0,
+        "total": 7266059519.02
+      },
+      {
+        "year": 2056,
+        "coupon": 1358943683.33,
+        "principal": 9969680806.04,
+        "total": 11328624489.37
+      },
+      {
+        "year": 2057,
+        "coupon": 922327847.64,
+        "principal": 0.0,
+        "total": 922327847.64
+      },
+      {
+        "year": 2058,
+        "coupon": 922327847.64,
+        "principal": 2166620000.0,
+        "total": 3088947847.64
+      },
+      {
+        "year": 2059,
+        "coupon": 795038922.64,
+        "principal": 0.0,
+        "total": 795038922.64
+      },
+      {
+        "year": "2060+",
+        "coupon": 12541104340.28,
+        "principal": 15381696467.2,
+        "total": 27922800807.48,
+        "years": [
+          2060,
+          2061,
+          2062,
+          2063,
+          2064,
+          2065,
+          2066,
+          2067,
+          2068,
+          2069,
+          2070,
+          2071,
+          2072,
+          2073,
+          2074,
+          2075,
+          2076,
+          2077,
+          2078,
+          2079,
+          2080,
+          2081,
+          2082,
+          2083,
+          2084,
+          2085,
+          2086,
+          2087,
+          2088,
+          2089,
+          2090,
+          2091,
+          2092,
+          2093,
+          2094,
+          2095,
+          2096,
+          2097,
+          2098,
+          2099,
+          2100,
+          2101,
+          2102,
+          2103,
+          2104,
+          2105,
+          2106,
+          2107,
+          2108,
+          2109,
+          2110,
+          2111,
+          2112,
+          2113,
+          2114,
+          2115,
+          2116,
+          2117,
+          2118,
+          2119,
+          2120,
+          2121,
+          2122,
+          2123,
+          2124,
+          2125,
+          2126
+        ]
+      }
+    ],
+    "byQuarter": [
+      {
+        "quarter": "2026-Q4",
+        "coupon": 1474090548.34,
+        "principal": 0.0,
+        "total": 1474090548.34
+      },
+      {
+        "quarter": "2027-Q1",
+        "coupon": 1935946335.16,
+        "principal": 0.0,
+        "total": 1935946335.16
+      },
+      {
+        "quarter": "2027-Q2",
+        "coupon": 1695677057.59,
+        "principal": 0.0,
+        "total": 1695677057.59
+      },
+      {
+        "quarter": "2027-Q3",
+        "coupon": 1602605516.09,
+        "principal": 1000000000.0,
+        "total": 2602605516.09
+      },
+      {
+        "quarter": "2027-Q4",
+        "coupon": 1474090548.34,
+        "principal": 0.0,
+        "total": 1474090548.34
+      },
+      {
+        "quarter": "2028-Q1",
+        "coupon": 1931946335.16,
+        "principal": 0.0,
+        "total": 1931946335.16
+      },
+      {
+        "quarter": "2028-Q2",
+        "coupon": 1695677057.59,
+        "principal": 0.0,
+        "total": 1695677057.59
+      },
+      {
+        "quarter": "2028-Q3",
+        "coupon": 1598605516.09,
+        "principal": 2000000000.0,
+        "total": 3598605516.09
+      },
+      {
+        "quarter": "2028-Q4",
+        "coupon": 1460762521.42,
+        "principal": 2746428000.0,
+        "total": 4207190521.42
+      },
+      {
+        "quarter": "2029-Q1",
+        "coupon": 1890493308.24,
+        "principal": 5094643280.0,
+        "total": 6985136588.24
+      },
+      {
+        "quarter": "2029-Q2",
+        "coupon": 1362192780.67,
+        "principal": 21094242929.4,
+        "total": 22456435710.07
+      },
+      {
+        "quarter": "2029-Q3",
+        "coupon": 1210121239.17,
+        "principal": 3084756250.0,
+        "total": 4294877489.17
+      },
+      {
+        "quarter": "2029-Q4",
+        "coupon": 1100915423.68,
+        "principal": 0.0,
+        "total": 1100915423.68
+      },
+      {
+        "quarter": "2030-Q1",
+        "coupon": 1421946370.06,
+        "principal": 0.0,
+        "total": 1421946370.06
+      },
+      {
+        "quarter": "2030-Q2",
+        "coupon": 1306141147.93,
+        "principal": 2657226000.0,
+        "total": 3963367147.93
+      },
+      {
+        "quarter": "2030-Q3",
+        "coupon": 1147757642.35,
+        "principal": 2250000000.0,
+        "total": 3397757642.35
+      },
+      {
+        "quarter": "2030-Q4",
+        "coupon": 1085915423.68,
+        "principal": 2500000000.0,
+        "total": 3585915423.68
+      },
+      {
+        "quarter": "2031-Q1",
+        "coupon": 1409571370.06,
+        "principal": 3000000000.0,
+        "total": 4409571370.06
+      },
+      {
+        "quarter": "2031-Q2",
+        "coupon": 1178859915.93,
+        "principal": 809872111.4,
+        "total": 1988732027.33
+      },
+      {
+        "quarter": "2031-Q3",
+        "coupon": 1073882642.35,
+        "principal": 4552561250.0,
+        "total": 5626443892.35
+      },
+      {
+        "quarter": "2031-Q4",
+        "coupon": 1010399025.74,
+        "principal": 1246428000.0,
+        "total": 2256827025.74
+      },
+      {
+        "quarter": "2032-Q1",
+        "coupon": 1243571906.46,
+        "principal": 1001403200.0,
+        "total": 2244975106.46
+      },
+      {
+        "quarter": "2032-Q2",
+        "coupon": 1154593517.99,
+        "principal": 2225097000.0,
+        "total": 3379690517.99
+      },
+      {
+        "quarter": "2032-Q3",
+        "coupon": 969383178.75,
+        "principal": 0.0,
+        "total": 969383178.75
+      },
+      {
+        "quarter": "2032-Q4",
+        "coupon": 974564220.74,
+        "principal": 3416620000.0,
+        "total": 4391184220.74
+      },
+      {
+        "quarter": "2033-Q1",
+        "coupon": 1234659417.98,
+        "principal": 3000000000.0,
+        "total": 4234659417.98
+      },
+      {
+        "quarter": "2033-Q2",
+        "coupon": 1050483921.49,
+        "principal": 2912299064.96,
+        "total": 3962782986.45
+      },
+      {
+        "quarter": "2033-Q3",
+        "coupon": 903383178.75,
+        "principal": 2500000000.0,
+        "total": 3403383178.75
+      },
+      {
+        "quarter": "2033-Q4",
+        "coupon": 825569626.26,
+        "principal": 0.0,
+        "total": 825569626.26
+      },
+      {
+        "quarter": "2034-Q1",
+        "coupon": 1103659417.98,
+        "principal": 0.0,
+        "total": 1103659417.98
+      },
+      {
+        "quarter": "2034-Q2",
+        "coupon": 973883112.01,
+        "principal": 1907226000.0,
+        "total": 2881109112.01
+      },
+      {
+        "quarter": "2034-Q3",
+        "coupon": 838383178.75,
+        "principal": 0.0,
+        "total": 838383178.75
+      },
+      {
+        "quarter": "2034-Q4",
+        "coupon": 825569626.26,
+        "principal": 1246428000.0,
+        "total": 2071997626.26
+      },
+      {
+        "quarter": "2035-Q1",
+        "coupon": 1103659417.98,
+        "principal": 0.0,
+        "total": 1103659417.98
+      },
+      {
+        "quarter": "2035-Q2",
+        "coupon": 904746169.51,
+        "principal": 1250000000.0,
+        "total": 2154746169.51
+      },
+      {
+        "quarter": "2035-Q3",
+        "coupon": 838383178.75,
+        "principal": 0.0,
+        "total": 838383178.75
+      },
+      {
+        "quarter": "2035-Q4",
+        "coupon": 758493751.26,
+        "principal": 3500000000.0,
+        "total": 4258493751.26
+      },
+      {
+        "quarter": "2036-Q1",
+        "coupon": 1103659417.98,
+        "principal": 5072581200.0,
+        "total": 6176240617.98
+      },
+      {
+        "quarter": "2036-Q2",
+        "coupon": 794371169.51,
+        "principal": 1204878221.72,
+        "total": 1999249391.23
+      },
+      {
+        "quarter": "2036-Q3",
+        "coupon": 736383178.75,
+        "principal": 4967805000.0,
+        "total": 5704188178.75
+      },
+      {
+        "quarter": "2036-Q4",
+        "coupon": 650053511.93,
+        "principal": 0.0,
+        "total": 650053511.93
+      },
+      {
+        "quarter": "2037-Q1",
+        "coupon": 854112682.2,
+        "principal": 0.0,
+        "total": 854112682.2
+      },
+      {
+        "quarter": "2037-Q2",
+        "coupon": 768180930.18,
+        "principal": 1532115000.0,
+        "total": 2300295930.18
+      },
+      {
+        "quarter": "2037-Q3",
+        "coupon": 599139272.5,
+        "principal": 0.0,
+        "total": 599139272.5
+      },
+      {
+        "quarter": "2037-Q4",
+        "coupon": 650053511.93,
+        "principal": 0.0,
+        "total": 650053511.93
+      },
+      {
+        "quarter": "2038-Q1",
+        "coupon": 854112682.2,
+        "principal": 0.0,
+        "total": 854112682.2
+      },
+      {
+        "quarter": "2038-Q2",
+        "coupon": 716472048.93,
+        "principal": 0.0,
+        "total": 716472048.93
+      },
+      {
+        "quarter": "2038-Q3",
+        "coupon": 599139272.5,
+        "principal": 0.0,
+        "total": 599139272.5
+      },
+      {
+        "quarter": "2038-Q4",
+        "coupon": 650053511.93,
+        "principal": 1246428000.0,
+        "total": 1896481511.93
+      },
+      {
+        "quarter": "2039-Q1",
+        "coupon": 854112682.2,
+        "principal": 0.0,
+        "total": 854112682.2
+      },
+      {
+        "quarter": "2039-Q2",
+        "coupon": 716472048.93,
+        "principal": 2225097000.0,
+        "total": 2941569048.93
+      },
+      {
+        "quarter": "2039-Q3",
+        "coupon": 599139272.5,
+        "principal": 0.0,
+        "total": 599139272.5
+      },
+      {
+        "quarter": "2039-Q4",
+        "coupon": 606428531.93,
+        "principal": 0.0,
+        "total": 606428531.93
+      },
+      {
+        "quarter": "2040-Q1",
+        "coupon": 854112682.2,
+        "principal": 0.0,
+        "total": 854112682.2
+      },
+      {
+        "quarter": "2040-Q2",
+        "coupon": 625243071.93,
+        "principal": 0.0,
+        "total": 625243071.93
+      },
+      {
+        "quarter": "2040-Q3",
+        "coupon": 599139272.5,
+        "principal": 1250000000.0,
+        "total": 1849139272.5
+      },
+      {
+        "quarter": "2040-Q4",
+        "coupon": 606428531.93,
+        "principal": 0.0,
+        "total": 606428531.93
+      },
+      {
+        "quarter": "2041-Q1",
+        "coupon": 842237682.2,
+        "principal": 650912080.0,
+        "total": 1493149762.2
+      },
+      {
+        "quarter": "2041-Q2",
+        "coupon": 625243071.93,
+        "principal": 804163.48,
+        "total": 626047235.41
+      },
+      {
+        "quarter": "2041-Q3",
+        "coupon": 587264272.5,
+        "principal": 0.0,
+        "total": 587264272.5
+      },
+      {
+        "quarter": "2041-Q4",
+        "coupon": 606413602.64,
+        "principal": 2166620000.0,
+        "total": 2773033602.64
+      },
+      {
+        "quarter": "2042-Q1",
+        "coupon": 831938300.36,
+        "principal": 0.0,
+        "total": 831938300.36
+      },
+      {
+        "quarter": "2042-Q2",
+        "coupon": 625228142.64,
+        "principal": 0.0,
+        "total": 625228142.64
+      },
+      {
+        "quarter": "2042-Q3",
+        "coupon": 587264272.5,
+        "principal": 0.0,
+        "total": 587264272.5
+      },
+      {
+        "quarter": "2042-Q4",
+        "coupon": 487249502.64,
+        "principal": 0.0,
+        "total": 487249502.64
+      },
+      {
+        "quarter": "2043-Q1",
+        "coupon": 831938300.36,
+        "principal": 0.0,
+        "total": 831938300.36
+      },
+      {
+        "quarter": "2043-Q2",
+        "coupon": 625228142.64,
+        "principal": 0.0,
+        "total": 625228142.64
+      },
+      {
+        "quarter": "2043-Q3",
+        "coupon": 587264272.5,
+        "principal": 0.0,
+        "total": 587264272.5
+      },
+      {
+        "quarter": "2043-Q4",
+        "coupon": 487249502.64,
+        "principal": 0.0,
+        "total": 487249502.64
+      },
+      {
+        "quarter": "2044-Q1",
+        "coupon": 831938300.36,
+        "principal": 0.0,
+        "total": 831938300.36
+      },
+      {
+        "quarter": "2044-Q2",
+        "coupon": 625228142.64,
+        "principal": 0.0,
+        "total": 625228142.64
+      },
+      {
+        "quarter": "2044-Q3",
+        "coupon": 587264272.5,
+        "principal": 0.0,
+        "total": 587264272.5
+      },
+      {
+        "quarter": "2044-Q4",
+        "coupon": 487249502.64,
+        "principal": 1558035000.0,
+        "total": 2045284502.64
+      },
+      {
+        "quarter": "2045-Q1",
+        "coupon": 831938300.36,
+        "principal": 0.0,
+        "total": 831938300.36
+      },
+      {
+        "quarter": "2045-Q2",
+        "coupon": 625228142.64,
+        "principal": 3121470000.0,
+        "total": 3746698142.64
+      },
+      {
+        "quarter": "2045-Q3",
+        "coupon": 587264272.5,
+        "principal": 0.0,
+        "total": 587264272.5
+      },
+      {
+        "quarter": "2045-Q4",
+        "coupon": 424928102.64,
+        "principal": 2000000000.0,
+        "total": 2424928102.64
+      },
+      {
+        "quarter": "2046-Q1",
+        "coupon": 831938300.36,
+        "principal": 1500000000.0,
+        "total": 2331938300.36
+      },
+      {
+        "quarter": "2046-Q2",
+        "coupon": 440837711.39,
+        "principal": 0.0,
+        "total": 440837711.39
+      },
+      {
+        "quarter": "2046-Q3",
+        "coupon": 546014272.5,
+        "principal": 3467805000.0,
+        "total": 4013819272.5
+      },
+      {
+        "quarter": "2046-Q4",
+        "coupon": 371428102.64,
+        "principal": 0.0,
+        "total": 371428102.64
+      },
+      {
+        "quarter": "2047-Q1",
+        "coupon": 680799027.86,
+        "principal": 0.0,
+        "total": 680799027.86
+      },
+      {
+        "quarter": "2047-Q2",
+        "coupon": 440837711.39,
+        "principal": 0.0,
+        "total": 440837711.39
+      },
+      {
+        "quarter": "2047-Q3",
+        "coupon": 436125000.0,
+        "principal": 0.0,
+        "total": 436125000.0
+      },
+      {
+        "quarter": "2047-Q4",
+        "coupon": 371428102.64,
+        "principal": 0.0,
+        "total": 371428102.64
+      },
+      {
+        "quarter": "2048-Q1",
+        "coupon": 680799027.86,
+        "principal": 0.0,
+        "total": 680799027.86
+      },
+      {
+        "quarter": "2048-Q2",
+        "coupon": 440837711.39,
+        "principal": 0.0,
+        "total": 440837711.39
+      },
+      {
+        "quarter": "2048-Q3",
+        "coupon": 436125000.0,
+        "principal": 0.0,
+        "total": 436125000.0
+      },
+      {
+        "quarter": "2048-Q4",
+        "coupon": 371428102.64,
+        "principal": 0.0,
+        "total": 371428102.64
+      },
+      {
+        "quarter": "2049-Q1",
+        "coupon": 680799027.86,
+        "principal": 0.0,
+        "total": 680799027.86
+      },
+      {
+        "quarter": "2049-Q2",
+        "coupon": 440837711.39,
+        "principal": 0.0,
+        "total": 440837711.39
+      },
+      {
+        "quarter": "2049-Q3",
+        "coupon": 436125000.0,
+        "principal": 0.0,
+        "total": 436125000.0
+      },
+      {
+        "quarter": "2049-Q4",
+        "coupon": 371428102.64,
+        "principal": 0.0,
+        "total": 371428102.64
+      },
+      {
+        "quarter": "2050-Q1",
+        "coupon": 680799027.86,
+        "principal": 0.0,
+        "total": 680799027.86
+      },
+      {
+        "quarter": "2050-Q2",
+        "coupon": 440837711.39,
+        "principal": 0.0,
+        "total": 440837711.39
+      },
+      {
+        "quarter": "2050-Q3",
+        "coupon": 436125000.0,
+        "principal": 2500000000.0,
+        "total": 2936125000.0
+      },
+      {
+        "quarter": "2050-Q4",
+        "coupon": 371428102.64,
+        "principal": 0.0,
+        "total": 371428102.64
+      },
+      {
+        "quarter": "2051-Q1",
+        "coupon": 655174027.86,
+        "principal": 600841920.0,
+        "total": 1256015947.86
+      },
+      {
+        "quarter": "2051-Q2",
+        "coupon": 440837711.39,
+        "principal": 0.0,
+        "total": 440837711.39
+      },
+      {
+        "quarter": "2051-Q3",
+        "coupon": 410500000.0,
+        "principal": 0.0,
+        "total": 410500000.0
+      },
+      {
+        "quarter": "2051-Q4",
+        "coupon": 371428102.64,
+        "principal": 0.0,
+        "total": 371428102.64
+      },
+      {
+        "quarter": "2052-Q1",
+        "coupon": 643953305.0,
+        "principal": 0.0,
+        "total": 643953305.0
+      },
+      {
+        "quarter": "2052-Q2",
+        "coupon": 440837711.39,
+        "principal": 0.0,
+        "total": 440837711.39
+      },
+      {
+        "quarter": "2052-Q3",
+        "coupon": 410500000.0,
+        "principal": 0.0,
+        "total": 410500000.0
+      },
+      {
+        "quarter": "2052-Q4",
+        "coupon": 371428102.64,
+        "principal": 0.0,
+        "total": 371428102.64
+      },
+      {
+        "quarter": "2053-Q1",
+        "coupon": 643953305.0,
+        "principal": 0.0,
+        "total": 643953305.0
+      },
+      {
+        "quarter": "2053-Q2",
+        "coupon": 440837711.39,
+        "principal": 0.0,
+        "total": 440837711.39
+      },
+      {
+        "quarter": "2053-Q3",
+        "coupon": 410500000.0,
+        "principal": 0.0,
+        "total": 410500000.0
+      },
+      {
+        "quarter": "2053-Q4",
+        "coupon": 371428102.64,
+        "principal": 0.0,
+        "total": 371428102.64
+      },
+      {
+        "quarter": "2054-Q1",
+        "coupon": 643953305.0,
+        "principal": 0.0,
+        "total": 643953305.0
+      },
+      {
+        "quarter": "2054-Q2",
+        "coupon": 440837711.39,
+        "principal": 1532115000.0,
+        "total": 1972952711.39
+      },
+      {
+        "quarter": "2054-Q3",
+        "coupon": 410500000.0,
+        "principal": 0.0,
+        "total": 410500000.0
+      },
+      {
+        "quarter": "2054-Q4",
+        "coupon": 371428102.64,
+        "principal": 0.0,
+        "total": 371428102.64
+      },
+      {
+        "quarter": "2055-Q1",
+        "coupon": 643953305.0,
+        "principal": 0.0,
+        "total": 643953305.0
+      },
+      {
+        "quarter": "2055-Q2",
+        "coupon": 379553111.39,
+        "principal": 1500000000.0,
+        "total": 1879553111.39
+      },
+      {
+        "quarter": "2055-Q3",
+        "coupon": 410500000.0,
+        "principal": 0.0,
+        "total": 410500000.0
+      },
+      {
+        "quarter": "2055-Q4",
+        "coupon": 332053102.64,
+        "principal": 4000000000.0,
+        "total": 4332053102.64
+      },
+      {
+        "quarter": "2056-Q1",
+        "coupon": 643953305.0,
+        "principal": 4000000000.0,
+        "total": 4643953305.0
+      },
+      {
+        "quarter": "2056-Q2",
+        "coupon": 231178111.39,
+        "principal": 1469680806.04,
+        "total": 1700858917.43
+      },
+      {
+        "quarter": "2056-Q3",
+        "coupon": 297500000.0,
+        "principal": 4500000000.0,
+        "total": 4797500000.0
+      },
+      {
+        "quarter": "2056-Q4",
+        "coupon": 186312266.94,
+        "principal": 0.0,
+        "total": 186312266.94
+      },
+      {
+        "quarter": "2057-Q1",
+        "coupon": 387515805.0,
+        "principal": 0.0,
+        "total": 387515805.0
+      },
+      {
+        "quarter": "2057-Q2",
+        "coupon": 194437275.69,
+        "principal": 0.0,
+        "total": 194437275.69
+      },
+      {
+        "quarter": "2057-Q3",
+        "coupon": 154062500.0,
+        "principal": 0.0,
+        "total": 154062500.0
+      },
+      {
+        "quarter": "2057-Q4",
+        "coupon": 186312266.94,
+        "principal": 0.0,
+        "total": 186312266.94
+      },
+      {
+        "quarter": "2058-Q1",
+        "coupon": 387515805.0,
+        "principal": 2166620000.0,
+        "total": 2554135805.0
+      },
+      {
+        "quarter": "2058-Q2",
+        "coupon": 194437275.69,
+        "principal": 0.0,
+        "total": 194437275.69
+      },
+      {
+        "quarter": "2058-Q3",
+        "coupon": 154062500.0,
+        "principal": 0.0,
+        "total": 154062500.0
+      },
+      {
+        "quarter": "2058-Q4",
+        "coupon": 186312266.94,
+        "principal": 0.0,
+        "total": 186312266.94
+      },
+      {
+        "quarter": "2059-Q1",
+        "coupon": 260226880.0,
+        "principal": 0.0,
+        "total": 260226880.0
+      },
+      {
+        "quarter": "2059-Q2",
+        "coupon": 194437275.69,
+        "principal": 0.0,
+        "total": 194437275.69
+      },
+      {
+        "quarter": "2059-Q3",
+        "coupon": 154062500.0,
+        "principal": 0.0,
+        "total": 154062500.0
+      },
+      {
+        "quarter": "2059-Q4",
+        "coupon": 186312266.94,
+        "principal": 0.0,
+        "total": 186312266.94
+      },
+      {
+        "quarter": "2060-Q1",
+        "coupon": 260226880.0,
+        "principal": 0.0,
+        "total": 260226880.0
+      },
+      {
+        "quarter": "2060-Q2",
+        "coupon": 194437275.69,
+        "principal": 0.0,
+        "total": 194437275.69
+      },
+      {
+        "quarter": "2060-Q3",
+        "coupon": 154062500.0,
+        "principal": 2000000000.0,
+        "total": 2154062500.0
+      },
+      {
+        "quarter": "2060-Q4",
+        "coupon": 186312266.94,
+        "principal": 0.0,
+        "total": 186312266.94
+      },
+      {
+        "quarter": "2061-Q1",
+        "coupon": 237726880.0,
+        "principal": 0.0,
+        "total": 237726880.0
+      },
+      {
+        "quarter": "2061-Q2",
+        "coupon": 194437275.69,
+        "principal": 0.0,
+        "total": 194437275.69
+      },
+      {
+        "quarter": "2061-Q3",
+        "coupon": 131562500.0,
+        "principal": 0.0,
+        "total": 131562500.0
+      },
+      {
+        "quarter": "2061-Q4",
+        "coupon": 186312266.94,
+        "principal": 0.0,
+        "total": 186312266.94
+      },
+      {
+        "quarter": "2062-Q1",
+        "coupon": 237726880.0,
+        "principal": 0.0,
+        "total": 237726880.0
+      },
+      {
+        "quarter": "2062-Q2",
+        "coupon": 194437275.69,
+        "principal": 0.0,
+        "total": 194437275.69
+      },
+      {
+        "quarter": "2062-Q3",
+        "coupon": 131562500.0,
+        "principal": 0.0,
+        "total": 131562500.0
+      },
+      {
+        "quarter": "2062-Q4",
+        "coupon": 186312266.94,
+        "principal": 0.0,
+        "total": 186312266.94
+      },
+      {
+        "quarter": "2063-Q1",
+        "coupon": 237726880.0,
+        "principal": 0.0,
+        "total": 237726880.0
+      },
+      {
+        "quarter": "2063-Q2",
+        "coupon": 194437275.69,
+        "principal": 1589355000.0,
+        "total": 1783792275.69
+      },
+      {
+        "quarter": "2063-Q3",
+        "coupon": 131562500.0,
+        "principal": 0.0,
+        "total": 131562500.0
+      },
+      {
+        "quarter": "2063-Q4",
+        "coupon": 186312266.94,
+        "principal": 0.0,
+        "total": 186312266.94
+      },
+      {
+        "quarter": "2064-Q1",
+        "coupon": 237726880.0,
+        "principal": 0.0,
+        "total": 237726880.0
+      },
+      {
+        "quarter": "2064-Q2",
+        "coupon": 118148235.69,
+        "principal": 0.0,
+        "total": 118148235.69
+      },
+      {
+        "quarter": "2064-Q3",
+        "coupon": 131562500.0,
+        "principal": 0.0,
+        "total": 131562500.0
+      },
+      {
+        "quarter": "2064-Q4",
+        "coupon": 186312266.94,
+        "principal": 1558035000.0,
+        "total": 1744347266.94
+      },
+      {
+        "quarter": "2065-Q1",
+        "coupon": 237726880.0,
+        "principal": 0.0,
+        "total": 237726880.0
+      },
+      {
+        "quarter": "2065-Q2",
+        "coupon": 118148235.69,
+        "principal": 1500000000.0,
+        "total": 1618148235.69
+      },
+      {
+        "quarter": "2065-Q3",
+        "coupon": 131562500.0,
+        "principal": 0.0,
+        "total": 131562500.0
+      },
+      {
+        "quarter": "2065-Q4",
+        "coupon": 78398235.69,
+        "principal": 0.0,
+        "total": 78398235.69
+      },
+      {
+        "quarter": "2066-Q1",
+        "coupon": 237726880.0,
+        "principal": 1750000000.0,
+        "total": 1987726880.0
+      },
+      {
+        "quarter": "2066-Q2",
+        "coupon": 78398235.69,
+        "principal": 1010467.2,
+        "total": 79408702.89
+      },
+      {
+        "quarter": "2066-Q3",
+        "coupon": 81250000.0,
+        "principal": 2500000000.0,
+        "total": 2581250000.0
+      },
+      {
+        "quarter": "2066-Q4",
+        "coupon": 78375000.0,
+        "principal": 0.0,
+        "total": 78375000.0
+      },
+      {
+        "quarter": "2067-Q1",
+        "coupon": 106164380.0,
+        "principal": 0.0,
+        "total": 106164380.0
+      },
+      {
+        "quarter": "2067-Q2",
+        "coupon": 78375000.0,
+        "principal": 0.0,
+        "total": 78375000.0
+      },
+      {
+        "quarter": "2067-Q4",
+        "coupon": 78375000.0,
+        "principal": 0.0,
+        "total": 78375000.0
+      },
+      {
+        "quarter": "2068-Q1",
+        "coupon": 106164380.0,
+        "principal": 0.0,
+        "total": 106164380.0
+      },
+      {
+        "quarter": "2068-Q2",
+        "coupon": 78375000.0,
+        "principal": 0.0,
+        "total": 78375000.0
+      },
+      {
+        "quarter": "2068-Q4",
+        "coupon": 78375000.0,
+        "principal": 0.0,
+        "total": 78375000.0
+      },
+      {
+        "quarter": "2069-Q1",
+        "coupon": 106164380.0,
+        "principal": 0.0,
+        "total": 106164380.0
+      },
+      {
+        "quarter": "2069-Q2",
+        "coupon": 78375000.0,
+        "principal": 0.0,
+        "total": 78375000.0
+      },
+      {
+        "quarter": "2069-Q4",
+        "coupon": 78375000.0,
+        "principal": 0.0,
+        "total": 78375000.0
+      },
+      {
+        "quarter": "2070-Q1",
+        "coupon": 106164380.0,
+        "principal": 0.0,
+        "total": 106164380.0
+      },
+      {
+        "quarter": "2070-Q2",
+        "coupon": 78375000.0,
+        "principal": 0.0,
+        "total": 78375000.0
+      },
+      {
+        "quarter": "2070-Q4",
+        "coupon": 78375000.0,
+        "principal": 0.0,
+        "total": 78375000.0
+      },
+      {
+        "quarter": "2071-Q1",
+        "coupon": 106164380.0,
+        "principal": 0.0,
+        "total": 106164380.0
+      },
+      {
+        "quarter": "2071-Q2",
+        "coupon": 78375000.0,
+        "principal": 0.0,
+        "total": 78375000.0
+      },
+      {
+        "quarter": "2071-Q4",
+        "coupon": 78375000.0,
+        "principal": 0.0,
+        "total": 78375000.0
+      },
+      {
+        "quarter": "2072-Q1",
+        "coupon": 106164380.0,
+        "principal": 0.0,
+        "total": 106164380.0
+      },
+      {
+        "quarter": "2072-Q2",
+        "coupon": 78375000.0,
+        "principal": 0.0,
+        "total": 78375000.0
+      },
+      {
+        "quarter": "2072-Q4",
+        "coupon": 78375000.0,
+        "principal": 0.0,
+        "total": 78375000.0
+      },
+      {
+        "quarter": "2073-Q1",
+        "coupon": 106164380.0,
+        "principal": 0.0,
+        "total": 106164380.0
+      },
+      {
+        "quarter": "2073-Q2",
+        "coupon": 78375000.0,
+        "principal": 0.0,
+        "total": 78375000.0
+      },
+      {
+        "quarter": "2073-Q4",
+        "coupon": 78375000.0,
+        "principal": 0.0,
+        "total": 78375000.0
+      },
+      {
+        "quarter": "2074-Q1",
+        "coupon": 106164380.0,
+        "principal": 0.0,
+        "total": 106164380.0
+      },
+      {
+        "quarter": "2074-Q2",
+        "coupon": 78375000.0,
+        "principal": 0.0,
+        "total": 78375000.0
+      },
+      {
+        "quarter": "2074-Q4",
+        "coupon": 78375000.0,
+        "principal": 0.0,
+        "total": 78375000.0
+      },
+      {
+        "quarter": "2075-Q1",
+        "coupon": 106164380.0,
+        "principal": 0.0,
+        "total": 106164380.0
+      },
+      {
+        "quarter": "2075-Q2",
+        "coupon": 78375000.0,
+        "principal": 0.0,
+        "total": 78375000.0
+      },
+      {
+        "quarter": "2075-Q4",
+        "coupon": 78375000.0,
+        "principal": 2750000000.0,
+        "total": 2828375000.0
+      },
+      {
+        "quarter": "2076-Q1",
+        "coupon": 106164380.0,
+        "principal": 0.0,
+        "total": 106164380.0
+      },
+      {
+        "quarter": "2077-Q1",
+        "coupon": 106164380.0,
+        "principal": 0.0,
+        "total": 106164380.0
+      },
+      {
+        "quarter": "2078-Q1",
+        "coupon": 106164380.0,
+        "principal": 0.0,
+        "total": 106164380.0
+      },
+      {
+        "quarter": "2079-Q1",
+        "coupon": 106164380.0,
+        "principal": 0.0,
+        "total": 106164380.0
+      },
+      {
+        "quarter": "2080-Q1",
+        "coupon": 106164380.0,
+        "principal": 0.0,
+        "total": 106164380.0
+      },
+      {
+        "quarter": "2081-Q1",
+        "coupon": 106164380.0,
+        "principal": 0.0,
+        "total": 106164380.0
+      },
+      {
+        "quarter": "2082-Q1",
+        "coupon": 106164380.0,
+        "principal": 0.0,
+        "total": 106164380.0
+      },
+      {
+        "quarter": "2083-Q1",
+        "coupon": 106164380.0,
+        "principal": 0.0,
+        "total": 106164380.0
+      },
+      {
+        "quarter": "2084-Q1",
+        "coupon": 106164380.0,
+        "principal": 0.0,
+        "total": 106164380.0
+      },
+      {
+        "quarter": "2085-Q1",
+        "coupon": 106164380.0,
+        "principal": 0.0,
+        "total": 106164380.0
+      },
+      {
+        "quarter": "2086-Q1",
+        "coupon": 106164380.0,
+        "principal": 0.0,
+        "total": 106164380.0
+      },
+      {
+        "quarter": "2087-Q1",
+        "coupon": 106164380.0,
+        "principal": 0.0,
+        "total": 106164380.0
+      },
+      {
+        "quarter": "2088-Q1",
+        "coupon": 106164380.0,
+        "principal": 0.0,
+        "total": 106164380.0
+      },
+      {
+        "quarter": "2089-Q1",
+        "coupon": 106164380.0,
+        "principal": 0.0,
+        "total": 106164380.0
+      },
+      {
+        "quarter": "2090-Q1",
+        "coupon": 106164380.0,
+        "principal": 0.0,
+        "total": 106164380.0
+      },
+      {
+        "quarter": "2091-Q1",
+        "coupon": 106164380.0,
+        "principal": 0.0,
+        "total": 106164380.0
+      },
+      {
+        "quarter": "2092-Q1",
+        "coupon": 106164380.0,
+        "principal": 0.0,
+        "total": 106164380.0
+      },
+      {
+        "quarter": "2093-Q1",
+        "coupon": 106164380.0,
+        "principal": 0.0,
+        "total": 106164380.0
+      },
+      {
+        "quarter": "2094-Q1",
+        "coupon": 106164380.0,
+        "principal": 0.0,
+        "total": 106164380.0
+      },
+      {
+        "quarter": "2095-Q1",
+        "coupon": 106164380.0,
+        "principal": 0.0,
+        "total": 106164380.0
+      },
+      {
+        "quarter": "2096-Q1",
+        "coupon": 106164380.0,
+        "principal": 0.0,
+        "total": 106164380.0
+      },
+      {
+        "quarter": "2097-Q1",
+        "coupon": 106164380.0,
+        "principal": 0.0,
+        "total": 106164380.0
+      },
+      {
+        "quarter": "2098-Q1",
+        "coupon": 106164380.0,
+        "principal": 0.0,
+        "total": 106164380.0
+      },
+      {
+        "quarter": "2099-Q1",
+        "coupon": 106164380.0,
+        "principal": 0.0,
+        "total": 106164380.0
+      },
+      {
+        "quarter": "2100-Q1",
+        "coupon": 106164380.0,
+        "principal": 0.0,
+        "total": 106164380.0
+      },
+      {
+        "quarter": "2101-Q1",
+        "coupon": 106164380.0,
+        "principal": 0.0,
+        "total": 106164380.0
+      },
+      {
+        "quarter": "2102-Q1",
+        "coupon": 106164380.0,
+        "principal": 0.0,
+        "total": 106164380.0
+      },
+      {
+        "quarter": "2103-Q1",
+        "coupon": 106164380.0,
+        "principal": 0.0,
+        "total": 106164380.0
+      },
+      {
+        "quarter": "2104-Q1",
+        "coupon": 106164380.0,
+        "principal": 0.0,
+        "total": 106164380.0
+      },
+      {
+        "quarter": "2105-Q1",
+        "coupon": 106164380.0,
+        "principal": 0.0,
+        "total": 106164380.0
+      },
+      {
+        "quarter": "2106-Q1",
+        "coupon": 106164380.0,
+        "principal": 0.0,
+        "total": 106164380.0
+      },
+      {
+        "quarter": "2107-Q1",
+        "coupon": 106164380.0,
+        "principal": 0.0,
+        "total": 106164380.0
+      },
+      {
+        "quarter": "2108-Q1",
+        "coupon": 106164380.0,
+        "principal": 0.0,
+        "total": 106164380.0
+      },
+      {
+        "quarter": "2109-Q1",
+        "coupon": 106164380.0,
+        "principal": 0.0,
+        "total": 106164380.0
+      },
+      {
+        "quarter": "2110-Q1",
+        "coupon": 106164380.0,
+        "principal": 0.0,
+        "total": 106164380.0
+      },
+      {
+        "quarter": "2111-Q1",
+        "coupon": 106164380.0,
+        "principal": 0.0,
+        "total": 106164380.0
+      },
+      {
+        "quarter": "2112-Q1",
+        "coupon": 106164380.0,
+        "principal": 0.0,
+        "total": 106164380.0
+      },
+      {
+        "quarter": "2113-Q1",
+        "coupon": 106164380.0,
+        "principal": 0.0,
+        "total": 106164380.0
+      },
+      {
+        "quarter": "2114-Q1",
+        "coupon": 106164380.0,
+        "principal": 0.0,
+        "total": 106164380.0
+      },
+      {
+        "quarter": "2115-Q1",
+        "coupon": 106164380.0,
+        "principal": 0.0,
+        "total": 106164380.0
+      },
+      {
+        "quarter": "2116-Q1",
+        "coupon": 106164380.0,
+        "principal": 0.0,
+        "total": 106164380.0
+      },
+      {
+        "quarter": "2117-Q1",
+        "coupon": 106164380.0,
+        "principal": 0.0,
+        "total": 106164380.0
+      },
+      {
+        "quarter": "2118-Q1",
+        "coupon": 106164380.0,
+        "principal": 0.0,
+        "total": 106164380.0
+      },
+      {
+        "quarter": "2119-Q1",
+        "coupon": 106164380.0,
+        "principal": 0.0,
+        "total": 106164380.0
+      },
+      {
+        "quarter": "2120-Q1",
+        "coupon": 106164380.0,
+        "principal": 0.0,
+        "total": 106164380.0
+      },
+      {
+        "quarter": "2121-Q1",
+        "coupon": 106164380.0,
+        "principal": 0.0,
+        "total": 106164380.0
+      },
+      {
+        "quarter": "2122-Q1",
+        "coupon": 106164380.0,
+        "principal": 0.0,
+        "total": 106164380.0
+      },
+      {
+        "quarter": "2123-Q1",
+        "coupon": 106164380.0,
+        "principal": 0.0,
+        "total": 106164380.0
+      },
+      {
+        "quarter": "2124-Q1",
+        "coupon": 106164380.0,
+        "principal": 0.0,
+        "total": 106164380.0
+      },
+      {
+        "quarter": "2125-Q1",
+        "coupon": 106164380.0,
+        "principal": 0.0,
+        "total": 106164380.0
+      },
+      {
+        "quarter": "2126-Q1",
+        "coupon": 106164380.0,
+        "principal": 1733296000.0,
+        "total": 1839460380.0
+      }
+    ],
+    "eventCount": 2037
+  }
+}
