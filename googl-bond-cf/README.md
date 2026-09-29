@@ -4,7 +4,7 @@ Expand Alphabet / GOOGL bonds from `googl_bond_full.xlsx` (ICBC C / 928) into a 
 
 ## Design
 
-Matches the AI-chain cube look: dark panels (`#0b0d10` / `#14181e`), accent `#8be0c0`, coupon blue / principal amber stacks.
+Matches the AI-chain cube look: dark panels (`#0b0d10` / `#14181e`), accent `#8be0c0`, coupon cyan / principal amber. Quarterly columns cluster by calendar year; the `2060+` residual sits apart from the dated schedule.
 
 ## Data
 
