@@ -8,6 +8,10 @@ export const COLORS = {
   SUPPLY: 0xe8d44a,
   PLANE: 0x1a2330,
   EDGE: 0x3a4658,
+  // Debt sheet uses the same hues as firm marks, under debt names.
+  INTEREST: 0x3cf0ff,
+  PRINCIPAL: 0xffb020,
+  SHEET: 0x8be0c0,
 };
 
 export const state = {

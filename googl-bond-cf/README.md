@@ -1,10 +1,8 @@
-# GOOGL Bond Liability Cash-Flow (test branch module)
+# GOOGL bond book → debt series
 
-Expand Alphabet / GOOGL bonds from `googl_bond_full.xlsx` (ICBC C / 928) into a **quarter × USD outflow** chart (year scale optional).
+This folder is the debt **data** pipeline for the cube. It is not a second decision view.
 
-## Design
-
-Matches the AI-chain cube look: dark panels (`#0b0d10` / `#14181e`), accent `#8be0c0`, coupon cyan / principal amber. Quarterly columns cluster by calendar year; the `2060+` residual sits apart from the dated schedule.
+Expand Alphabet / GOOGL bonds from `googl_bond_full.xlsx` into coupon and principal by year and quarter. The cube reads `data/cashflow_series.json` and draws that series on the GOOGL node.
 
 ## Data
 
@@ -25,16 +23,12 @@ Each security expands to:
 - **principal** at maturity  
 Non-USD notionals → USD via a static FX snapshot (viz only).
 
-## Run
+## Check the series
+
+The cube is the view. This flat chart only checks the same numbers:
 
 ```bash
 ./Open-Bond-CF.command
-# or
-python3 scripts/build_cashflows.py && python3 server/app.py
 ```
 
-Open http://127.0.0.1:8791/
-
-## Branch
-
-Parallel to `ai-chain/`. Not on `main`. Current visual pass: `cursor/bond-cf-visual-polish-ad7c`. Earlier test branch: `cursor/googl-bond-cashflow`.
+http://127.0.0.1:8791/

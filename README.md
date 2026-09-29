@@ -2,47 +2,30 @@
 
 To standardly visualize statistics to fit human perception, so managers can make decisions more easily.
 
+The decision view is one cube. Firms are nodes on industry slices. Debt cash flow for a node is a sheet in that same coordinate space, not a second application.
+
 ## Modules
 
 | Path | Description |
 |------|-------------|
 | [`DESIGN.md`](./DESIGN.md) | **第一版设计理念** — 专业化、标准化、可操作化。设计前必读 |
-| [`ai-chain/`](./ai-chain/) | AI industry-chain **3D slice cube** — SQLite API + modular web UI (power → models) |
-| [`googl-bond-cf/`](./googl-bond-cf/) | **Test:** GOOGL bond liability cash-flow expansion chart (time × USD) — branch `cursor/googl-bond-cashflow` |
+| [`ai-chain/`](./ai-chain/) | Decision view. Industry-chain cube and the debt sheet on a firm node |
+| [`googl-bond-cf/`](./googl-bond-cf/) | Debt **data**: expand the GOOGL bond book into the series the cube reads |
 | [`WORKLOG.md`](./WORKLOG.md) | Session continuity log (asks / responses / conventions) |
-| [`ai-chain/CONCEPTS.md`](./ai-chain/CONCEPTS.md) | **Concept target library** (ZH/EN) — agent-facing glossary for slice / axes / pull / standard view |
+| [`ai-chain/CONCEPTS.md`](./ai-chain/CONCEPTS.md) | **Concept target library** (ZH/EN) — one name for slice, axes, pull, debt sheet |
 
-### Run the AI chain cube
+### Run
 
 ```bash
 ./Open-AI-Cube.command
-# or
-cd ai-chain && ./Open-AI-Chain.command
-# or
-cd ai-chain && python3 scripts/seed.py && python3 server/app.py
 ```
 
-Then open http://127.0.0.1:8787/
+Open http://127.0.0.1:8787/. Click a slice, then a GOOGL node, for the debt sheet.
 
-### Run the bond cash-flow chart
-
-This page is not on `main`. It lives on `cursor/bond-cf-visual-polish-ad7c` (and the earlier test branch `cursor/googl-bond-cashflow`). Double-clicking `index.html` does nothing useful: the chart loads data from a local API.
-
-On your own machine, from the repo root:
+Rebuild the debt series when the bond book changes:
 
 ```bash
-git fetch origin
-git checkout cursor/bond-cf-visual-polish-ad7c
-./Open-Bond-CF.command
+cd googl-bond-cf && python3 scripts/build_cashflows.py
 ```
 
-Or, without the launcher:
-
-```bash
-cd googl-bond-cf
-python3 scripts/build_cashflows.py && python3 server/app.py
-```
-
-Then open http://127.0.0.1:8791/
-
-`Open-Bond-CF.command` can be double-clicked on macOS. It rebuilds the cash-flow series, starts the server, and tries to open that URL. Stop it with Ctrl+C in the terminal that launched it. The server is local only; it is not a public website.
+`./Open-Bond-CF.command` only checks that series as a flat chart on port 8791. It is not the decision view.

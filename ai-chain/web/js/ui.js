@@ -80,7 +80,7 @@ export function createUI(sceneApi) {
     if (!meta) {
       return `<p class="note">GOOGL liability slice needs the bond series from googl-bond-cf.</p>`;
     }
-    return `<p class="note">The sheet and the table sit on this slice's right edge, at the same user-x as the pulled slice. Its baseline runs 45° off the s-axis, toward 1s+1x. Cyan interest is on the baseline; amber principal stacks above.</p>
+    return `<p class="note">Debt on this node. Interest sits on the baseline; principal stacks above. From 2080 the rest is one bar. Source: bond schedule in googl-bond-cf.</p>
       <div class="kv">
         <span>Interest</span><span>${usdB(meta.totalCouponUsd)}</span>
         <span>Principal</span><span>${usdB(meta.totalPrincipalUsd)}</span>
