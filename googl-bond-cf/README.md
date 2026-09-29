@@ -37,4 +37,4 @@ Open http://127.0.0.1:8791/
 
 ## Branch
 
-Intended for `cursor/googl-bond-cashflow` — parallel to `ai-chain/`, does not replace the cube.
+Parallel to `ai-chain/`. Not on `main`. Current visual pass: `cursor/bond-cf-visual-polish-ad7c`. Earlier test branch: `cursor/googl-bond-cashflow`.
