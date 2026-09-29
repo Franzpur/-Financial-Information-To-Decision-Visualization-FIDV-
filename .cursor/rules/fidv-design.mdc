@@ -1,0 +1,18 @@
+---
+description: FIDV first-version design doctrine. Read DESIGN.md before any product, visualization, or interaction design.
+alwaysApply: true
+---
+
+# FIDV design doctrine
+
+Before designing or changing a feature, view, chart, or interaction, follow `DESIGN.md` at the repo root (source: `First Version Product Idea.pdf`).
+
+FIDV is a tool that helps financial professionals judge and decide under heavy information. Version 1 focuses on AI-related technology, risk control, debt risk, and contagion across firms as nodes.
+
+Three principles, in order of use:
+
+1. **专业化** — professional financial data, trustworthy sources, common processed data, and distinctive processed data. Serve judgment, not decoration.
+2. **标准化** — globally intelligible terms, accepted classifications, one name for one concept across the product. One visual language: unified color, unified interface, geometry and technology that match human intuition. **简洁是第一要务.**
+3. **可操作化** — data can be imported, exported, merged, split, added, removed, and run through financial functions. Charts can be authored and exported in 1D, 2D, and 3D. All of that data lives in one 3D coordinate space and can be moved globally. Operable views depend on standardized concepts and coordinates.
+
+If a change fails any of the three, change the design before implementing it.

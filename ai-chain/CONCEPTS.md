@@ -18,6 +18,7 @@
 
 | Step | EN | 中 |
 |------|----|----|
+| 0 | Read [`DESIGN.md`](../DESIGN.md) before any design change | 改设计前先读仓库根目录的第一版设计理念 |
 | 1 | Resolve user words → concept ID | 把用户口语映射到概念 ID |
 | 2 | Prefer IDs over synonyms in edits | 改代码时用 ID，勿混用近义词 |
 | 3 | Do not break “Frozen rules” | 勿违反「冻结约定」 |

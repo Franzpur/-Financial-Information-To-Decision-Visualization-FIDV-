@@ -6,6 +6,7 @@ To standardly visualize statistics to fit human perception, so managers can make
 
 | Path | Description |
 |------|-------------|
+| [`DESIGN.md`](./DESIGN.md) | **第一版设计理念** — 专业化、标准化、可操作化。设计前必读 |
 | [`ai-chain/`](./ai-chain/) | AI industry-chain **3D slice cube** — SQLite API + modular web UI (power → models) |
 | [`googl-bond-cf/`](./googl-bond-cf/) | **Test:** GOOGL bond liability cash-flow expansion chart (time × USD) — branch `cursor/googl-bond-cashflow` |
 | [`WORKLOG.md`](./WORKLOG.md) | Session continuity log (asks / responses / conventions) |
