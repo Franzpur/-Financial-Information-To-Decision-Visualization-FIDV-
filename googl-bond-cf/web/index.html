@@ -4,51 +4,68 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>GOOGL Bond Liability Cash-Flow — Expansion</title>
-<link rel="stylesheet" href="/css/app.css?v=4" />
+<link rel="stylesheet" href="/css/app.css?v=6" />
 </head>
 <body>
 <div id="loading" class="loading">Building cash-flow expansion…</div>
 <div id="app" hidden>
   <aside class="left">
+    <p class="kicker">FIDV · liability test</p>
     <h1>GOOGL bond cash-flow</h1>
-    <p class="lede">Liability outflow expansion from <code>googl_bond_full</code> (ICBC C / 928). Default scale = <strong>quarter</strong>; vertical = USD expense (coupons + principal).</p>
-    <div class="legend">
-      <div class="sw"><span class="dot coupon"></span> Coupon (interest)</div>
-      <div class="sw"><span class="dot principal"></span> Principal (maturity)</div>
+    <p class="lede">Expanded coupons and principal, in USD, from the ICBC bond book.</p>
+
+    <div class="hero">
+      <div class="hero-label">Total expanded outflow</div>
+      <div class="hero-num" id="heroTotal">—</div>
+      <div class="hero-sub" id="heroSub">—</div>
+      <div class="mix" id="mixBar" title="Coupon versus principal"></div>
+      <div class="mix-labels" id="mixLabels"></div>
     </div>
-    <h2>Book summary</h2>
-    <div class="kv" id="summaryKv"></div>
-    <p class="note">Non-USD notionals converted with a static FX snapshot for visualization only. Source Excel stays in <code>data/</code>.</p>
+
+    <div class="metrics" id="summaryKv"></div>
+
+    <div class="legend">
+      <div class="sw"><span class="dot coupon"></span> Coupon · interest</div>
+      <div class="sw"><span class="dot principal"></span> Principal · at maturity</div>
+    </div>
+    <p class="note">Non-USD notionals use a static FX snapshot for this picture only. The <span class="tail-word">2060+</span> column is the residual tail, drawn apart from the dated schedule.</p>
   </aside>
 
   <div id="viewport">
     <div class="chart-head">
-      <h2>Liability outflows</h2>
-      <span class="sub" id="chartSub">quarterly · stacked · USD</span>
+      <div>
+        <h2>Liability outflows</h2>
+        <span class="sub" id="chartSub">quarterly · stacked · USD</span>
+      </div>
+      <button type="button" class="peak" id="peakChip">Peak —</button>
     </div>
     <div id="chartWrap">
-      <svg id="chart" role="img" aria-label="Bond cash-flow by year"></svg>
+      <svg id="chart" role="img" aria-label="Bond cash-flow by period"></svg>
       <div id="tip" class="tip" hidden></div>
     </div>
     <div class="hud">
-      <button type="button" class="chip active" data-scale="quarter">Quarter</button>
-      <button type="button" class="chip" data-scale="year">Year</button>
-      <button type="button" class="chip active" data-mode="stack">Stacked</button>
-      <button type="button" class="chip" data-mode="total">Total line</button>
-      <button type="button" class="chip" id="resetSel">Clear period</button>
+      <div class="seg" role="group" aria-label="Time scale">
+        <button type="button" class="chip active" data-scale="quarter">Quarter</button>
+        <button type="button" class="chip" data-scale="year">Year</button>
+      </div>
+      <div class="seg" role="group" aria-label="Chart mode">
+        <button type="button" class="chip active" data-mode="stack">Stacked</button>
+        <button type="button" class="chip" data-mode="total">Total</button>
+      </div>
+      <button type="button" class="chip ghost" id="resetSel">Clear period</button>
     </div>
     <div id="statusBar" class="status-bar">—</div>
   </div>
 
   <aside class="right">
-    <h2>Year detail</h2>
+    <h2>Period</h2>
     <div id="detail">
-      <p>Click a bar to expand that quarter’s coupon vs principal and related maturities.</p>
+      <p class="empty">Click a column to split that period into coupon and principal, and list bonds maturing in the window.</p>
     </div>
-    <h2>Periods</h2>
+    <h2>Ledger</h2>
     <div id="yearList"></div>
   </aside>
 </div>
-<script type="module" src="/js/main.js?v=4"></script>
+<script type="module" src="/js/main.js?v=6"></script>
 </body>
 </html>
