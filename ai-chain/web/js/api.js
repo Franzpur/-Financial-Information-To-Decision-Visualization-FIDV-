@@ -6,6 +6,12 @@ export async function fetchBundle() {
   return res.json();
 }
 
+export async function fetchGooglBond() {
+  const res = await fetch("/api/googl-bond", { cache: "no-store" });
+  if (!res.ok) throw new Error(`API /api/googl-bond failed (${res.status})`);
+  return res.json();
+}
+
 export async function searchCompanies(q) {
   const url = new URL("/api/companies", window.location.origin);
   url.searchParams.set("q", q);

@@ -43,8 +43,11 @@ export function createUI(sceneApi) {
     if (state.selectedId != null) {
       const c = companyById(state.selectedId);
       const L = c ? state.layers[c.layer] : null;
+      const fin = c && String(c.ticker || "").toUpperCase() === "GOOGL" && state.googlBond;
       statusBar.textContent = c
-        ? `Selected · ${c.name}${c.ticker ? " (" + c.ticker + ")" : ""} · ${L?.name || ""} · Esc clears selection`
+        ? fin
+          ? `GOOGL liability · ${state.financeScale === "quarter" ? "quarter" : "year"} · interest below, principal above · button on the sheet switches scale · Esc closes`
+          : `Selected · ${c.name}${c.ticker ? " (" + c.ticker + ")" : ""} · ${L?.name || ""} · Esc clears selection`
         : `Selected · Esc clears`;
       return;
     }
@@ -59,6 +62,30 @@ export function createUI(sceneApi) {
 
   function setDetailDefault() {
     detail.innerHTML = `<p>Click a company, a slice plane, or a layer on the left. Focus pulls the slice into <strong>x∈[1,2]</strong>. Esc clears selection, then focus.</p>`;
+  }
+
+  function usdB(n) {
+    if (n == null || Number.isNaN(Number(n))) return "—";
+    const v = Number(n);
+    const abs = Math.abs(v);
+    if (abs >= 1e12) return `$${(v / 1e12).toFixed(2)}T`;
+    if (abs >= 1e9) return `$${(v / 1e9).toFixed(2)}B`;
+    if (abs >= 1e6) return `$${(v / 1e6).toFixed(1)}M`;
+    return `$${v.toFixed(0)}`;
+  }
+
+  function liabilityNote(c) {
+    if (String(c.ticker || "").toUpperCase() !== "GOOGL") return "";
+    const meta = state.googlBond?.meta;
+    if (!meta) {
+      return `<p class="note">GOOGL liability slice needs the bond series from googl-bond-cf.</p>`;
+    }
+    return `<p class="note">The sheet and the table sit on this slice's right edge, at the same user-x as the pulled slice. Its baseline runs 45° off the s-axis, toward 1s+1x. Cyan interest is on the baseline; amber principal stacks above.</p>
+      <div class="kv">
+        <span>Interest</span><span>${usdB(meta.totalCouponUsd)}</span>
+        <span>Principal</span><span>${usdB(meta.totalPrincipalUsd)}</span>
+        <span>Expanded outflow</span><span>${usdB(meta.totalOutflowUsd)}</span>
+      </div>`;
   }
 
   function ringLabel(c) {
@@ -87,6 +114,7 @@ export function createUI(sceneApi) {
         <span>Source note</span><span>${c.sourceDetail || "—"}</span>
         <span>Role note</span><span>${c.note || "—"}</span>
       </div>
+      ${liabilityNote(c)}
     `;
   }
 
@@ -207,6 +235,9 @@ export function createUI(sceneApi) {
       hoverTip.textContent = `${c.name}${c.ticker ? " · " + c.ticker : ""}`;
       hoverTip.style.left = `${local.x}px`;
       hoverTip.style.top = `${local.y}px`;
+    },
+    onFinanceScale() {
+      updateStatus();
     },
     onSelect(c) {
       syncLayerActive();

@@ -1,4 +1,4 @@
-import { fetchBundle } from "./api.js";
+import { fetchBundle, fetchGooglBond } from "./api.js";
 import { state, readHash } from "./state.js";
 import { createScene } from "./scene.js";
 import { createUI } from "./ui.js";
@@ -20,10 +20,17 @@ window.addEventListener("unhandledrejection", (e) => console.error(e.reason));
 
 async function boot() {
   try {
-    const bundle = await fetchBundle();
+    const [bundle, bond] = await Promise.all([
+      fetchBundle(),
+      fetchGooglBond().catch((err) => {
+        console.warn("[ai-chain] GOOGL bond series unavailable", err);
+        return null;
+      }),
+    ]);
     state.layers = bundle.layers;
     state.companies = bundle.companies;
     state.countries = bundle.meta?.countries || {};
+    state.googlBond = bond;
 
     app.hidden = false;
     loading.hidden = true;
@@ -38,6 +45,7 @@ async function boot() {
       onClear: () => ui?.onClear(),
       onReset: () => ui?.onReset(),
       onHover: (c, local) => ui?.showHover(c, local),
+      onFinanceScale: () => ui?.onFinanceScale?.(),
     });
     ui = createUI(sceneApi);
     ui.renderLayers();

@@ -264,25 +264,25 @@ export function drawCashflowChart(svg, rows, opts = {}) {
       if (hC > 7 && hP > 7) gap = 2;
       const prinH = Math.max(0, hP - (gap ? 1 : 0));
       const coupH = Math.max(0, hC - (gap ? 1 : 0));
-      const yP = innerH - prinH;
-      const yC = yP - gap - coupH;
+      const yC = innerH - coupH;
+      const yP = yC - gap - prinH;
       const round = it.barW >= 8 ? 3 : 0;
-      if (prinH > 0) {
-        col.appendChild(el("path", {
-          class: "seg",
-          d: roundTopPath(it.x, yP, it.barW, prinH, hC > 0 ? 0 : round),
-          fill: "url(#gPrincipal)",
-        }));
-      }
       if (coupH > 0) {
         col.appendChild(el("path", {
           class: "seg",
-          d: roundTopPath(it.x, yC, it.barW, coupH, round),
+          d: roundTopPath(it.x, yC, it.barW, coupH, hP > 0 ? 0 : round),
           fill: "url(#gCoupon)",
         }));
       }
+      if (prinH > 0) {
+        col.appendChild(el("path", {
+          class: "seg",
+          d: roundTopPath(it.x, yP, it.barW, prinH, round),
+          fill: "url(#gPrincipal)",
+        }));
+      }
       if (it.tail && it.barW >= 8 && prinH + coupH > 0) {
-        const top = coupH > 0 ? yC : yP;
+        const top = prinH > 0 ? yP : yC;
         col.appendChild(el("rect", {
           x: it.x,
           y: top,

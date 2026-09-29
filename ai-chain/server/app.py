@@ -25,6 +25,7 @@ from db import (  # noqa: E402
 )
 
 WEB_ROOT = ROOT / "web"
+BOND_SERIES = ROOT.parent / "googl-bond-cf" / "data" / "cashflow_series.json"
 HOST = "127.0.0.1"
 PORT = 8787
 
@@ -154,6 +155,9 @@ class Handler(BaseHTTPRequestHandler):
                     return
                 self._send_json(200, {"company": company})
                 return
+            if path == "/api/googl-bond":
+                self._send_json(200, googl_bond_payload())
+                return
             if path == "/api/bundle":
                 # One-shot bootstrap payload for the SPA
                 self._send_json(
@@ -170,11 +174,33 @@ class Handler(BaseHTTPRequestHandler):
             conn.close()
 
 
+def _flow_row(row: dict, key: str) -> dict:
+    return {
+        key: row.get(key),
+        "coupon": float(row.get("coupon") or 0),
+        "principal": float(row.get("principal") or 0),
+        "total": float(row.get("total") or 0),
+    }
+
+
+def googl_bond_payload() -> dict:
+    """Yearly and quarterly liability rows for the in-cube financial slice."""
+    if not BOND_SERIES.is_file():
+        raise FileNotFoundError(f"missing bond series: {BOND_SERIES}")
+    raw = json.loads(BOND_SERIES.read_text(encoding="utf-8"))
+    series = raw.get("series") or {}
+    return {
+        "meta": dict(raw.get("meta") or {}),
+        "byYear": [_flow_row(row, "year") for row in series.get("byYear") or []],
+        "byQuarter": [_flow_row(row, "quarter") for row in series.get("byQuarter") or []],
+    }
+
+
 def main() -> None:
     ensure_db()
     httpd = ThreadingHTTPServer((HOST, PORT), Handler)
     print(f"[ai-chain] http://{HOST}:{PORT}/", flush=True)
-    print("[ai-chain] API: /api/bundle  /api/layers  /api/companies  /api/health", flush=True)
+    print("[ai-chain] API: /api/bundle  /api/googl-bond  /api/layers  /api/companies  /api/health", flush=True)
     try:
         httpd.serve_forever()
     except KeyboardInterrupt:

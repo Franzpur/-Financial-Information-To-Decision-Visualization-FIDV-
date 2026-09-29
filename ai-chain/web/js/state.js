@@ -20,6 +20,8 @@ export const state = {
   hoverId: null, // [C-HOVER]
   exploded: false,
   helpOpen: true,
+  googlBond: null, // [C-FINSLICE] { meta, byYear, byQuarter } or null
+  financeScale: "year", // [C-FINSLICE] "year" | "quarter"
 };
 
 export function visibleCompanies() {

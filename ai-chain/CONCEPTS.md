@@ -37,6 +37,7 @@
 | **C-SUPPLY** | Alphabet supplier mark | 供应商标记 / 金环 | Gold ring when `valueM` from `GOOGL_SUPPLY` | `COLORS.SUPPLY`, filter `supply` |
 | **C-LABEL** | coplanar label | 共面标签 | Domain/company text glued to slice (not billboard) | `isDomainLabel`, company label planes |
 | **C-EDGE** | slice edge | 切片描边 | Focused slice edge highlights | `isSliceEdge` |
+| **C-FINSLICE** | GOOGL financial slice | GOOGL 财务切片 | Sheet stays full slice size, hinged on the industry slice's **right edge** (pulled face, user **x = 2**). The **table** sits on that edge in the **upper half** — same user-x as the slice, not one unit behind. The year/quarter toggle is a small rounded square in the top-right corner. Cashflows from **2080** on fold into one bar (`2080+`). **Baseline** is 45° from **+s** toward **+x** (1s+1x). Bar outlines use the outer-ring stroke. No concentric rings on this sheet. Interest (cyan) on the baseline, principal (amber) above. | `buildFinanceSlice`, `state.googlBond` |
 | **C-AXES** | user axes | 用户坐标轴 | **s/y/x** in ring-matched ice/steel blues from user origin | `rebuildAxes`, `axesGroup` |
 
 **Synonyms to normalize / 口语归一**
@@ -98,6 +99,7 @@ User (x,y,s)     Three.js (under root)
 | **C-PULL-ZONE** | pull-frame hit zone | 抽出点击区 | Square∖disk on slice face: inside 1×1 square, **outside** outermost concentric ring. Misses inside the ring do **not** toggle focus. | `isPullFrameHit`, `RING_SPREAD` |
 | **C-FOCUS-ACT** | focus slice | 聚焦切片 | Set `focusLayer`; apply dim + pull. Via plane click, layer list, or `[` `]`. | `focusSlice` |
 | **C-PICK** | pick company | 点选公司 | Raycast sphere → select + focus its layer. Plane toggle only if hit is in **C-PULL-ZONE**. | `pick`, `selectCompany` |
+| **C-FINOPEN** | open liability slice | 打开财务切片 | Pick ticker **GOOGL**. Sheet attaches to the focused slice's right edge and the camera turns to face it. Esc clears the sheet; camera holds. | `showFinanceSlice`, `startFinanceYaw` |
 | **C-STDVIEW** | standard view | 标准视角 | Snap camera to canonical pose for current focus state. Hotkey **C** / button / middle-click. | `goStandardView`, `standardPose` |
 | **C-RESET** | reset view | 重置 | Clear focus/select; go standard overview pose. | `resetCamera` |
 
@@ -137,6 +139,7 @@ Removed / 已废弃：旧「角视图 corner view」与 **V / Home** 绑定（�
 | Click slice **frame** (square∖ring) | focus/toggle that slice | **C-FOCUS-ACT** / **C-PULL-ZONE** |
 | Double-click empty | clear focus | **C-RETRACT** path |
 | Click company point | select | **C-PICK** |
+| Click **GOOGL** point | liability sheet on the slice's right edge | **C-FINOPEN** |
 
 ---
 
