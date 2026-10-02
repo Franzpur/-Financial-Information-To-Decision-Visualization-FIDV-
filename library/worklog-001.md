@@ -90,6 +90,7 @@
 |43| 再加一个总参谋部呼出方式「电」。 | 任务：把「电」写进呼出词。主代理改 `agents/general-staff.md`、`agent_tasklist/general-staff.md`、`agent_tasklist/RULE.md`、`agents/README.md`。呼出词现为报文、报、电、M、Message，或直接呼出总参谋部。未派总参谋部去做规划。无总监。无子代理。本条由书记记入。 |
 |44| 电总参谋部：以往抽出不好看。与其让切片抽出，不如整个立方体左移淡出、切片位置不变，并指导手下修改。 | 任务：总参谋部先规划，执行代理再改抽出。主代理：焦点切片留在原位；其余立方体沿 −s 退开一面宽并淡出；线框跟随；轴线留在原点；标准视角改瞄面心 x=0.5。改了 `ai-chain/web/js/coords.js`、`scene.js`、`ui.js`、`index.html`、`ai-chain/CONCEPTS.md`。浏览器点开第 11 层，状态栏为 slice stays · cube exits −s。临时服务器已停。总参谋部第一个执行，规划为沿 −s 退场。总监第 1 次送审通过。本条由书记记入。 |
 |45| 电总参谋部：明确坐标与方向：x右，-x左，y上，-y下，s前，-s后。指称要改，刚才的抽出任务也要改。 | 任务：总参谋部先规划，再改概念与抽出轴。主代理：冻结 C-DIR。抽出改为沿 −x 退一面宽。改 CONCEPTS.md、coords.js（cubeExitX / sliceAnchor）、scene.js、ui.js、index.html。电力改为后（−s），不再叫左。状态栏为 cube exits −x (left)。临时服务器已停。总参谋部第一个执行。总监第 1 次送审通过。本条由书记记入。 |
+|46| 上传这些更改到 GitHub。 | 任务：提交并推到 origin/main。主代理：提交 99b39f8 已推送。内容含总参谋部、方向冻结（右=+x 左=−x 上=+y 下=−y 前=+s 后=−s）、抽出沿 −x 退场。未纳入 ai_chain.db 与 DATA-SPACE/。无总监。本条由书记记入。 |
 
 ---
 
