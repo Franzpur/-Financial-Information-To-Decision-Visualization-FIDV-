@@ -3,82 +3,38 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>AI Industry Chain — 3D Slice Cube</title>
-<link rel="stylesheet" href="/css/app.css?v=15" />
-<script type="importmap">
-{
-  "imports": {
-    "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
-    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
-  }
-}
-</script>
+<title>FIDV — Industry gate</title>
+<link rel="stylesheet" href="/css/app.css?v=17" />
 </head>
-<body>
-<div id="bootError" hidden></div>
-<!-- [C-SPLASH] Centered wordmark; fades out after boot paints the cube -->
-<div id="splash" class="splash" role="presentation" aria-hidden="true">
-  <div class="splash-mark">
-    <svg class="splash-logo" viewBox="0 0 280 72" width="220" height="56" aria-hidden="true">
-      <g fill="none" stroke="#e8edf4" stroke-width="1.25" stroke-linejoin="round">
-        <rect x="8" y="14" width="18" height="44" rx="1.5" opacity="0.95"/>
-        <rect x="22" y="14" width="18" height="44" rx="1.5" opacity="0.55"/>
-        <rect x="36" y="14" width="18" height="44" rx="1.5" opacity="0.28"/>
-      </g>
-      <text
-        x="72" y="48"
-        fill="#e8edf4"
-        font-family="Iowan Old Style, Palatino Linotype, Palatino, Georgia, serif"
-        font-size="34"
-        letter-spacing="0.22em"
-      >FIDV</text>
-      <line x1="72" y1="56" x2="248" y2="56" stroke="#8be0c0" stroke-width="1" opacity="0.55"/>
-    </svg>
-  </div>
-</div>
+<body class="home-body">
+  <main class="home" id="home">
+    <header class="home-brand">
+      <svg class="splash-logo home-logo" viewBox="0 0 280 72" width="200" height="52" aria-hidden="true">
+        <g fill="none" stroke="#e8edf4" stroke-width="1.25" stroke-linejoin="round">
+          <rect x="8" y="14" width="18" height="44" rx="1.5" opacity="0.95"/>
+          <rect x="22" y="14" width="18" height="44" rx="1.5" opacity="0.55"/>
+          <rect x="36" y="14" width="18" height="44" rx="1.5" opacity="0.28"/>
+        </g>
+        <text
+          x="72" y="48"
+          fill="#e8edf4"
+          font-family="Iowan Old Style, Palatino Linotype, Palatino, Georgia, serif"
+          font-size="34"
+          letter-spacing="0.22em"
+        >FIDV</text>
+        <line x1="72" y1="56" x2="248" y2="56" stroke="#8be0c0" stroke-width="1" opacity="0.55"/>
+      </svg>
+      <p class="home-lede">Choose a BICS level-1 industry coordinate, then enter the decision cube.</p>
+    </header>
 
-<div id="app" hidden>
-  <div id="viewport">
-    <div class="top-search">
-      <input id="search" type="search" placeholder="Search company or ticker…" autocomplete="off" />
-      <div id="results"></div>
-    </div>
+    <nav class="home-sectors" id="sectorList" aria-label="BICS level-1 sectors"></nav>
 
-    <aside id="detailPanel" class="float-panel float-detail" aria-label="Industry detail">
-      <div id="detail">
-        <p>Click a company or slice. The slice stays; the rest of the cube shifts left along −x and fades. Esc clears selection, then focus.</p>
-      </div>
-      <p class="note foot">Data via <code>/api/bundle</code>.</p>
-    </aside>
-
-    <button type="button" id="helpToggle" class="help-toggle" title="Toggle controls help (?)">?</button>
-    <div id="navHint" class="nav-hint hidden">
-      <strong>Controls</strong><br />
-      Left-drag pan · Right-drag orbit (fine) · Scroll zoom · Middle-click standard<br />
-      <kbd>Q</kbd>/<kbd>E</kbd> yaw · <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> pan · <kbd>R</kbd>/<kbd>F</kbd> dolly · <kbd>Shift</kbd> faster<br />
-      Click plane / <kbd>[</kbd><kbd>]</kbd> focus slice · double-click empty clears · <kbd>Esc</kbd> layered clear<br />
-      <kbd>C</kbd> / middle-click standard view · <kbd>?</kbd> help<br /><br />
-      <strong>Space</strong><br />
-      Power (back, <strong>−s</strong>) → models (front, <strong>+s</strong>). User axes <strong>(s, x, y)</strong>: <strong>+x</strong> right, <strong>−x</strong> left, <strong>+y</strong> up, <strong>−y</strong> down; face <strong>x,y∈[0,10]</strong>; <strong>1 s = 1 x = 1 y</strong>. View space radius <strong>200</strong>. Slice spacing <strong>d</strong> (default 100% = current gap; drag 0%–200%). Revenue rings: outer = 0–9.9; near-center = 90–99.9; <strong>100 = exact center</strong>.
-    </div>
-    <div id="statusBar" class="status-bar">All slices · 0 companies</div>
-    <div id="hoverTip" class="hover-tip" hidden></div>
-    <div class="hud">
-      <span class="hud-legend" aria-hidden="true"><span class="dot us"></span><span class="dot intl"></span></span>
-      <button class="chip active" data-filter="all">All</button>
-      <button class="chip" data-filter="us">US only</button>
-      <button class="chip" data-filter="intl">Non-US only</button>
-      <button class="chip" id="standardView">Standard (C)</button>
-      <button class="chip" id="resetCam">Reset view</button>
-      <label class="d-control" title="Slice spacing d (0%–200%)">
-        <span class="d-label">d</span>
-        <input id="gapD" type="range" min="0" max="200" step="1" value="100" />
-        <span id="gapDPct" class="d-pct">100%</span>
-      </label>
-    </div>
-  </div>
-</div>
-
-<script type="module" src="/js/main.js"></script>
+    <p class="home-cta-row">
+      <a class="chip active home-cta" id="enterCube" href="/cube?bics=19">Enter Technology cube</a>
+      <a class="chip home-cta-secondary" href="/cube">Enter cube</a>
+    </p>
+    <p class="home-note">Class-3 industry coordinates · Equity Hierarchy 2024 · decision view at <code>/cube</code></p>
+  </main>
+  <script type="module" src="/js/home.js"></script>
 </body>
 </html>

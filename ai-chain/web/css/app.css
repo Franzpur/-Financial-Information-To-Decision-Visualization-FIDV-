@@ -192,10 +192,131 @@ p { margin: 0 0 10px; }
   padding: 6px 11px;
   font-size: 12px;
   cursor: pointer;
+  text-decoration: none;
   transition: border-color .15s, color .15s, background .15s;
 }
 .chip:hover { border-color: #3d4a5c; }
 .chip.active { border-color: var(--accent); color: var(--accent); }
+
+/* —— [C-HOME] Engineering homepage / BICS L1 gate —— */
+.home-body {
+  min-height: 100%;
+  margin: 0;
+  background: radial-gradient(120% 80% at 50% 30%, #121820 0%, var(--bg) 70%);
+  color: var(--text);
+}
+.home {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 48px 20px 64px;
+  animation: splash-in 0.4s ease-out both;
+}
+.home-brand {
+  text-align: center;
+  margin-bottom: 36px;
+}
+.home-logo {
+  margin: 0 auto 18px;
+  display: block;
+}
+.home-lede {
+  margin: 0 auto;
+  max-width: 36em;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.5;
+}
+.home-sectors {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  margin: 0 0 28px;
+}
+.home-sector {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  min-width: 140px;
+  max-width: 200px;
+  padding: 10px 12px;
+  text-decoration: none;
+  color: var(--text);
+  background: var(--glass);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid rgba(42, 49, 60, 0.55);
+  border-radius: 10px;
+  transition: border-color .15s, color .15s, background .15s, transform .15s;
+}
+.home-sector:hover {
+  border-color: #4a586c;
+  background: var(--glass-strong);
+  transform: scale(1.02);
+}
+.home-sector-primary {
+  border-color: rgba(139, 224, 192, 0.55);
+  color: var(--accent);
+}
+.home-sector-primary:hover {
+  border-color: var(--accent);
+}
+.home-sector-en {
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+.home-sector-zh {
+  font-size: 11px;
+  color: var(--muted);
+}
+.home-sector-primary .home-sector-zh { color: rgba(139, 224, 192, 0.75); }
+.home-sector-code {
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+  letter-spacing: 0.02em;
+  margin-top: 4px;
+}
+.home-cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin: 0 0 16px;
+}
+.home-cta, .home-cta-secondary {
+  text-decoration: none;
+  pointer-events: auto;
+}
+.home-note {
+  text-align: center;
+  font-size: 11.5px;
+  color: var(--muted);
+  margin: 0;
+}
+.home-note code {
+  font-size: 11px;
+  color: var(--text);
+}
+.home-error {
+  color: var(--danger);
+  text-align: center;
+  width: 100%;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
 
 .d-control {
   pointer-events: auto;

@@ -59,6 +59,9 @@ def init_schema(conn: sqlite3.Connection) -> None:
     conn.commit()
 
 
+SRC_PUBLIC_MAP = "Public industry map"
+
+
 def _source_fields(layer_index: int, value_m: float | None) -> tuple[str, str]:
     if value_m is not None:
         return (
@@ -67,16 +70,16 @@ def _source_fields(layer_index: int, value_m: float | None) -> tuple[str, str]:
         )
     if layer_index == 0:
         return (
-            "Public industry map",
+            SRC_PUBLIC_MAP,
             "US utility / nuclear PPA coverage for AI data-center load. Not in GOOGL_SUPPLY.",
         )
     if layer_index >= 9:
         return (
-            "Public industry map",
+            SRC_PUBLIC_MAP,
             "Hyperscaler / frontier-lab placement for customer-facing end of the chain.",
         )
     return (
-        "Public industry map",
+        SRC_PUBLIC_MAP,
         "Standard AI semiconductor / infrastructure map (US-first). Not a quantified row in GOOGL_SUPPLY.",
     )
 
@@ -119,6 +122,57 @@ def seed_from_json(conn: sqlite3.Connection, data_dir: Path | None = None) -> No
     conn.commit()
 
 
+def _score_company(c: dict[str, Any], lo: float, span: float) -> float:
+    rev = float(c.get("revBn") or 0)
+    score = 50.0 if span < 1e-9 else ((rev - lo) / span) * 100.0
+    return max(0.0, min(100.0, score))
+
+
+def _place_ring_group(ring: int, group: list[dict[str, Any]]) -> None:
+    n = len(group)
+    for i, c in enumerate(group):
+        t = (ring + 0.5) / 10
+        radial = 1 - t
+        c["radial"] = radial
+        ang = 0 if n == 0 else (i / n) * math.pi * 2 + ring * 0.35 + (c.get("layer") or 0) * 0.11
+        c["ringCos"] = math.cos(ang) * radial
+        c["ringSin"] = math.sin(ang) * radial
+
+
+def _place_centers(centers: list[dict[str, Any]]) -> None:
+    for i, c in enumerate(centers):
+        c["radial"] = 0.0
+        if len(centers) == 1:
+            c["ringCos"] = 0.0
+            c["ringSin"] = 0.0
+            continue
+        ang = (i / len(centers)) * math.pi * 2
+        eps = 0.035
+        c["ringCos"] = math.cos(ang) * eps
+        c["ringSin"] = math.sin(ang) * eps
+
+
+def _assign_layer_rings(arr: list[dict[str, Any]]) -> None:
+    revs = [float(c.get("revBn") or 0) for c in arr]
+    lo, hi = min(revs), max(revs)
+    span = hi - lo
+    rings: list[list[dict[str, Any]]] = [[] for _ in range(10)]
+    centers: list[dict[str, Any]] = []
+    for c in arr:
+        score = _score_company(c, lo, span)
+        c["revScore"] = score
+        if score >= 100 - 1e-9:
+            c["ring"] = 10
+            centers.append(c)
+            continue
+        ring = min(9, int(math.floor(score / 10)))
+        c["ring"] = ring
+        rings[ring].append(c)
+    for ring, group in enumerate(rings):
+        _place_ring_group(ring, group)
+    _place_centers(centers)
+
+
 def assign_rings(companies: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """Min-max normalize revenue per layer; score 100 → center.
 
@@ -130,42 +184,7 @@ def assign_rings(companies: list[dict[str, Any]]) -> list[dict[str, Any]]:
         by_layer.setdefault(c["layer"], []).append(c)
 
     for arr in by_layer.values():
-        revs = [float(c.get("revBn") or 0) for c in arr]
-        lo, hi = min(revs), max(revs)
-        span = hi - lo
-        rings: list[list[dict[str, Any]]] = [[] for _ in range(10)]
-        centers: list[dict[str, Any]] = []
-        for c in arr:
-            rev = float(c.get("revBn") or 0)
-            score = 50.0 if span < 1e-9 else ((rev - lo) / span) * 100.0
-            score = max(0.0, min(100.0, score))
-            c["revScore"] = score
-            if score >= 100 - 1e-9:
-                c["ring"] = 10
-                centers.append(c)
-                continue
-            ring = min(9, int(math.floor(score / 10)))
-            c["ring"] = ring
-            rings[ring].append(c)
-        for ring, group in enumerate(rings):
-            n = len(group)
-            for i, c in enumerate(group):
-                t = (ring + 0.5) / 10
-                radial = 1 - t
-                c["radial"] = radial
-                ang = 0 if n == 0 else (i / n) * math.pi * 2 + ring * 0.35 + (c.get("layer") or 0) * 0.11
-                c["ringCos"] = math.cos(ang) * radial
-                c["ringSin"] = math.sin(ang) * radial
-        for i, c in enumerate(centers):
-            c["radial"] = 0.0
-            if len(centers) == 1:
-                c["ringCos"] = 0.0
-                c["ringSin"] = 0.0
-            else:
-                ang = (i / len(centers)) * math.pi * 2
-                eps = 0.035
-                c["ringCos"] = math.cos(ang) * eps
-                c["ringSin"] = math.sin(ang) * eps
+        _assign_layer_rings(arr)
     return companies
 
 
@@ -181,7 +200,7 @@ def row_company(r: sqlite3.Row) -> dict[str, Any]:
         "valueM": r["value_m"],
         "source": r["source"],
         "sourceDetail": r["source_detail"],
-        # 3类坐标 / 法人坐标。格式 00-00-00-00-00-00-0000，对应 Bloomberg BICS。待填。
+        # 3类坐标 / 行业坐标（C-COORD-3）。BICS 7×2 连字符；库见 class-3-coords。待填。
         "legalEntityCoord": "",
     }
 

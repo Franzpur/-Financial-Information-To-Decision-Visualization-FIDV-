@@ -36,7 +36,10 @@ export function createUI(sceneApi) {
       const n = vis.filter((c) => c.layer === state.focusLayer).length;
       statusBar.textContent = `Slice ${state.focusLayer + 1}: ${L.name} · slice stays · cube exits −x (left) · ${n} visible · C face-on · Esc clears`;
     } else {
-      statusBar.textContent = `All slices · ${vis.length} visible · C standard · click plane or [ ] to focus`;
+      const gate = state.bicsCode
+        ? ` · BICS L1 ${state.bicsCode}${state.bicsName ? " " + state.bicsName : ""}`
+        : "";
+      statusBar.textContent = `All slices · ${vis.length} visible · C standard · click plane or [ ] to focus${gate}`;
     }
   }
 

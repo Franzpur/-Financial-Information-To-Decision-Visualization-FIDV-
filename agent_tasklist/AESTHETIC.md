@@ -46,6 +46,11 @@
 - 施加：`ai-chain/scripts/set-command-icon.sh` → `Open-AI-Chain.command` 与根 `Open-AI-Cube.command`。
 - Git 不保证 resource fork；克隆后需重跑脚本。
 
+### 工程首页（C-HOME）
+
+- `/`：BICS L1 门厅；字标同族；13 入口玻璃条；Technology（19）accent 主路径；无新闻/统计堆砌。
+- `/cube`：决策立方体 + 完整 splash 时序；首页不重演 3s+4s hold/fade。
+
 ---
 
 ## 2. 延展原则（新功能 / 新分页）
@@ -62,8 +67,8 @@
 
 | 资产 | 路径 |
 |------|------|
-| 色板 / chrome | `ai-chain/web/css/app.css` |
-| 壳 + splash DOM/SVG | `ai-chain/web/index.html` |
+| 色板 / chrome / 首页 | `ai-chain/web/css/app.css`；`ai-chain/web/index.html`（C-HOME）；`ai-chain/web/js/home.js` |
+| 壳 + splash DOM/SVG | `ai-chain/web/cube.html`（C-CUBE + splash） |
 | splash 时序 | `ai-chain/web/js/main.js` |
 | 面板类名与 HUD 外观 | `ai-chain/web/js/ui.js`（视觉层） |
 | 启动图标 | `ai-chain/assets/fidv-launcher*` |

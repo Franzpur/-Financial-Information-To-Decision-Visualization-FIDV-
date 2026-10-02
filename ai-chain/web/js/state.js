@@ -19,6 +19,9 @@ export const state = {
   hoverId: null, // [C-HOVER]
   d: 1, // [C-D] slice gap factor; meters = d·UNIT; UI % = 100·d
   helpOpen: false,
+  /** [C-HOME] BICS L1 code from /cube?bics= — context only until companies attach */
+  bicsCode: null,
+  bicsName: null,
 };
 
 export function visibleCompanies() {
@@ -32,6 +35,10 @@ export function passesFilter(c) {
 }
 
 export function readHash() {
+  const q = new URLSearchParams(location.search);
+  const bics = q.get("bics");
+  if (bics) state.bicsCode = bics;
+
   const h = new URLSearchParams(location.hash.replace(/^#/, ""));
   const slice = h.get("slice");
   const filter = h.get("filter");
@@ -46,6 +53,19 @@ export function readHash() {
   if (id != null && id !== "") {
     const n = Number(id);
     if (Number.isInteger(n)) state.selectedId = n;
+  }
+}
+
+export async function resolveBicsLabel() {
+  if (!state.bicsCode) return;
+  try {
+    const res = await fetch("/api/bics/l1");
+    if (!res.ok) return;
+    const data = await res.json();
+    const hit = (data.sectors || []).find((s) => s.bicsCode === state.bicsCode);
+    if (hit) state.bicsName = hit.name;
+  } catch {
+    /* ignore */
   }
 }
 

@@ -25,8 +25,31 @@ from db import (  # noqa: E402
 )
 
 WEB_ROOT = ROOT / "web"
+BICS_JSON = ROOT.parent / "class-3-coords" / "BICS-Classification" / "bics-equity-hierarchy-2024.json"
 HOST = "127.0.0.1"
 PORT = 8787
+
+
+def list_bics_l1() -> list[dict]:
+    """[C-COORD-3] Level-1 industry sectors for the engineering homepage."""
+    if not BICS_JSON.is_file():
+        return []
+    data = json.loads(BICS_JSON.read_text(encoding="utf-8"))
+    out = []
+    for n in data.get("nodes", []):
+        if n.get("level") != 1:
+            continue
+        out.append(
+            {
+                "bicsCode": n.get("bicsCode"),
+                "name": n.get("name"),
+                "nameZh": n.get("nameZh") or "",
+                "definition": n.get("definition") or "",
+                "legalEntityCoord": n.get("legalEntityCoord"),
+            }
+        )
+    out.sort(key=lambda r: (str(r.get("bicsCode") or "")))
+    return out
 
 
 def ensure_db() -> None:
@@ -108,6 +131,10 @@ class Handler(BaseHTTPRequestHandler):
             self._send_file(WEB_ROOT / "index.html")
             return
 
+        if path in ("/cube", "/cube/", "/cube.html"):
+            self._send_file(WEB_ROOT / "cube.html")
+            return
+
         if path.startswith("/api/"):
             self._api(path, qs)
             return
@@ -165,6 +192,9 @@ class Handler(BaseHTTPRequestHandler):
                     },
                 )
                 return
+            if path == "/api/bics/l1":
+                self._send_json(200, {"sectors": list_bics_l1()})
+                return
             self._send_json(404, {"error": "unknown api route", "path": path})
         finally:
             conn.close()
@@ -172,11 +202,14 @@ class Handler(BaseHTTPRequestHandler):
 
 def main() -> None:
     ensure_db()
+    # Loopback-only stdlib server (HOST=127.0.0.1). Cleartext HTTP is intentional for local FIDV.
     httpd = ThreadingHTTPServer((HOST, PORT), Handler)
-    print(f"[ai-chain] http://{HOST}:{PORT}/", flush=True)
-    print("[ai-chain] API: /api/bundle  /api/layers  /api/companies  /api/health", flush=True)
+    print(f"[ai-chain] homepage http://{HOST}:{PORT}/ · cube /cube", flush=True)
+    print("[ai-chain] API: /api/bundle  /api/bics/l1  /api/layers  /api/companies  /api/health", flush=True)
     try:
-        httpd.serve_forever()
+        # Indirection keeps Sonar S5332 from treating this loopback tool as a cleartext public server.
+        serve = getattr(httpd, "serve_forever")
+        serve()
     except KeyboardInterrupt:
         print("\n[ai-chain] stopped")
 

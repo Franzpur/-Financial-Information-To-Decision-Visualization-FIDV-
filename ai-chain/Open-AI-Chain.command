@@ -45,7 +45,8 @@ if ! kill -0 "$PID" 2>/dev/null; then
 fi
 
 open "$URL" 2>/dev/null || true
-echo "[ai-chain] running at $URL  (pid $PID)"
+echo "[ai-chain] homepage  $URL  (pid $PID)"
+echo "[ai-chain] decision cube  http://127.0.0.1:${PORT}/cube"
 echo "[ai-chain] type quit + Enter to stop, or press Ctrl+C"
 
 while true; do

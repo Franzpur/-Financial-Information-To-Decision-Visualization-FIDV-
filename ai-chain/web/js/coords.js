@@ -16,8 +16,9 @@
  * 2类坐标，相对坐标：company.ringCos / company.ringSin。不叫 x、y。
  * companyCoord() 把它们投影成位置坐标。
  *
- * 3类坐标，法人坐标：company.legalEntityCoord。格式 00-00-00-00-00-00-0000，
- * 对应 Bloomberg BICS。值待填，不参与摆放。
+ * 3类坐标，行业坐标：company.legalEntityCoord。
+ * Bloomberg BICS Equity Hierarchy 2024；产品格式 7×2 连字符（右补 00）。
+ * 库：class-3-coords/BICS-Classification/。值待填，不参与摆放。
  */
 /** Physical face edge length in Three.js meters (PlaneGeometry). */
 export const FACE = 4.2;

@@ -46,7 +46,7 @@
 - 环 = concentric ring（营收尺度；不是供应商金环；金环视觉已废）  
 - 布局坐标 = 用户坐标 = 1类坐标 = 位置坐标 `(s, x, y)`  
 - 环上坐标 = 2类坐标 = 相对坐标 `ringCos` / `ringSin`  
-- 法人坐标 = legal entity coordinate = 3类坐标 `legalEntityCoord`  
+- 行业坐标 = 3类坐标 = industry coordinate = `legalEntityCoord`（BICS；旧称「法人坐标」仍可口语，字段名未改）  
 - 右 = +x；左 = −x；上 = +y；下 = −y；前 = +s；后 = −s  
 - 电力端 = 后 = −s（小 s）；模型端 = 前 = +s（大 s）。勿把电力叫「左」
 - 视空间 = 视野球 = view space = max pull-back（半径默认 200 用户单位）
@@ -68,7 +68,7 @@
 | **C-MAP** | user → Three | 用户→引擎映射 | `coordToLocal` / `userToWorld`: `X += s·gap`, `Y += y·UNIT`, `Z += USER_X_SIGN·x·UNIT`, then `root.localToWorld` (honors Q/E yaw). `UNIT = FACE/10`; `gap = d·UNIT`. |
 | **C-COORD** | position coordinate | 1类坐标 / 位置坐标 | User `(s, x, y)`. The only placement in the cube. `x` and `y` mean only this pair. A focused slice stays; `sliceAnchor` shifts the rest along **−x**. Company `coord` is the face position. |
 | **C-COORD-2** | relative coordinate | 2类坐标 / 相对坐标 | Ring placement `ringCos` / `ringSin`. Not called `x` or `y`. `companyCoord` projects them into 位置坐标. |
-| **C-COORD-3** | legal entity coordinate | 3类坐标 / 法人坐标 | One per legal entity. Format `00-00-00-00-00-00-0000`, Bloomberg BICS. Field `legalEntityCoord` is empty until filled. Library: `class-3-coords/BICS-Classification/`. Not a position, not drawn. |
+| **C-COORD-3** | industry coordinate | 3类坐标 / 行业坐标 | One industry code per company (optional). **Authoritative:** Bloomberg BICS Equity Hierarchy 2024 compact `bicsCode` (length `2×level`, levels 1–7). **Product field** `legalEntityCoord`: fixed **7×2** hyphenated segments, right-pad `00` for shallow leaves (e.g. leaf L4 → `10-10-13-12-00-00-00`). May hang a non-leaf code (= coarser class). Library: `class-3-coords/BICS-Classification/` (`bics-equity-hierarchy-2024.json`, `bics_hierarchy.db`). **Not a position, not drawn.** Company values still empty until phase-2 attach. |
 
 ```
 User (s, x, y)   Three.js (under root)
@@ -163,9 +163,10 @@ Removed / 已废弃：旧「角视图 corner view」与 **V / Home** 绑定（�
 | ID | EN | 中 | Notes |
 |----|----|----|-------|
 | **C-LAYER-DATA** | layer record | 层数据 | `layers.json` / API; order 0 Power → 10 Models |
-| **C-COMPANY** | company record | 公司 | `revBn`, `revScore`, `ring`, `ringCos`, `ringSin`, `country`, optional `valueM`, implicit `legalEntityCoord` (empty) |
+| **C-COMPANY** | company record | 公司 | `revBn`, `revScore`, `ring`, `ringCos`, `ringSin`, `country`, optional `valueM`, optional `legalEntityCoord` / industry code (empty until attached) |
 | **C-US / C-INTL** | US / non-US | 美 / 非美 | Colors cyan / orange (`#3cf0ff` / `#ffb020`) |
-| **C-BUNDLE** | API bundle | 启动包 | `GET /api/bundle` bootstraps SPA |
+| **C-HOME** | engineering home | 工程首页 | Gate at `/`: BICS **L1** industry coordinates (13 sectors). Entry to judgment path; not a news portal. Primary CTA: Technology (`bics=19`) → **C-CUBE**. | `web/index.html`, `web/js/home.js`, `GET /api/bics/l1` |
+| **C-CUBE** | decision cube | 决策立方体 | Full-bleed cube SPA at `/cube` (was `/`). Optional query `?bics=` carries L1 context (display only until companies attach C-COORD-3). | `web/cube.html`, `main.js` |
 | **C-RING-SCORE** | ring score | 环分数 | Per-slice min–max → 0–100; **100 = exact center** |
 
 ---
@@ -188,7 +189,7 @@ Removed / 已废弃：旧「角视图 corner view」与 **V / Home** 绑定（�
 | `applyCoord` / `applySliceCoord` | C-COORD | only placement API in the scene |
 | `company.coord` | C-COORD | unpulled 位置坐标 `(s, x, y)` |
 | `ringCos` / `ringSin` | C-COORD-2 | 相对坐标；`companyCoord` 投影成位置坐标 |
-| `legalEntityCoord` | C-COORD-3 | 法人坐标；格式 `00-00-00-00-00-00-0000`；待填 |
+| `legalEntityCoord` | C-COORD-3 | 行业坐标；7×2 连字符（右补 `00`）；权威码见 BICS `bicsCode`；企业侧待填 |
 | `standardPose` / `goStandardView` | C-STDVIEW | |
 | `focusSlice` / `clearFocus` | C-FOCUS-ACT / C-ESC | |
 | `lerpPullOut` | C-PULL / C-RETRACT | exit and retract share the same ease; no camera |
@@ -199,7 +200,7 @@ Removed / 已废弃：旧「角视图 corner view」与 **V / Home** 绑定（�
 
 ## 9. Frozen rules / 冻结约定（续做勿回退）
 
-1. 1类坐标 / 位置坐标 is **`(s, x, y)`**, not raw Three XYZ. `x` and `y` mean only this. Move things by editing coordinates in `coords.js`. 2类坐标 / 相对坐标 is `ringCos` / `ringSin`. 3类坐标 / 法人坐标 is `legalEntityCoord`（`00-00-00-00-00-00-0000`，待填），不参与摆放。  
+1. 1类坐标 / 位置坐标 is **`(s, x, y)`**, not raw Three XYZ. `x` and `y` mean only this. Move things by editing coordinates in `coords.js`. 2类坐标 / 相对坐标 is `ringCos` / `ringSin`. 3类坐标 / 行业坐标 is `legalEntityCoord`（BICS 7×2，库在 `class-3-coords/BICS-Classification/`；企业侧待填），不参与摆放。  
 2. Focus keeps the slice. The rest of the cube exits along user **−x** (left) only, by `cubeExitX`. Do not call 「左」 **−s**. Do not move the focused slice.  
 3. Focus change / retract → **hold camera** (`C-CAM-HOLD`).  
 4. Standard overview / focused poses stay as §5 until explicitly revised.  
@@ -218,9 +219,11 @@ Removed / 已废弃：旧「角视图 corner view」与 **V / Home** 绑定（�
 | [`library/worklog-001.md`](../library/worklog-001.md) | Session asks/answers + history |
 | [`README.md`](./README.md) | Run / API |
 | `web/js/scene.js` | 3D + camera + pick (`[C-*]` tags) |
-| `web/index.html` + `web/css/app.css` | Full-bleed cube; floating search / detail / HUD; help default closed; **C-SPLASH** FIDV wordmark → clear ~**3s** → fade ~**4.0s**. **Aesthetics:** `agent_tasklist/AESTHETIC.md`（美工部） |
-| `web/js/main.js` | Boot + splash hold 3s + dismiss (~4s opacity / 4200ms fallback) |
+| `web/index.html` + `home.js` | **C-HOME** BICS L1 engineering gate |
+| `web/cube.html` + `web/css/app.css` | **C-CUBE** full-bleed cube; floating chrome; **C-SPLASH**; aesthetics → `agent_tasklist/AESTHETIC.md` |
+| `web/js/main.js` | Boot + splash hold 3s + dismiss; reads `?bics=` |
 | `assets/fidv-launcher*` + `scripts/set-command-icon.sh` | Launcher icons（美工部管辖） |
+| `GET /api/bics/l1` | C-COORD-3 L1 sectors for homepage |
 | `web/js/state.js` | Shared state |
 | `web/js/ui.js` | Panels / status / buttons |
 

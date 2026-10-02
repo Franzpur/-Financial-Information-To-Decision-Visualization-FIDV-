@@ -1,5 +1,5 @@
 import { fetchBundle } from "./api.js";
-import { state, readHash } from "./state.js";
+import { state, readHash, resolveBicsLabel } from "./state.js";
 import { createScene } from "./scene.js";
 import { createUI } from "./ui.js";
 
@@ -71,6 +71,7 @@ async function boot() {
     ui = createUI(sceneApi);
     ui.renderLayers();
     readHash();
+    await resolveBicsLabel();
     ui.hydrateFromHash();
 
     await waitTwoFrames();
