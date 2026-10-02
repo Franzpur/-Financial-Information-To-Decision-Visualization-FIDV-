@@ -12,6 +12,7 @@ import {
   USER_X_SIGN,
   LAYOUT,
   gapOf,
+  cubeExitX,
   coordToLocal,
   localToCoord,
   localOffset,
@@ -33,8 +34,6 @@ const AXIS_X_CSS = "#8eb6d8";
 const AXIS_TICK_MAJOR = 0xc0d8f0;
 const AXIS_TICK_MINOR = 0x5a7088;
 const N_LAYERS = () => state.layers.length;
-const PULL_X = LAYOUT.pullX;
-
 export function createScene(viewport, hooks = {}) {
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(0x0b0d10);
@@ -98,6 +97,7 @@ export function createScene(viewport, hooks = {}) {
     dimTargets: new Map(),
     baseRotateSpeed: 0.35,
     camAnim: null,
+    cubeExit: 0,
     hooks,
   };
 
@@ -167,7 +167,7 @@ function applySliceCoord(object, sliceIndex, coord) {
 }
 
 function placeSliceGroup(g, i) {
-  applyCoord(g, sliceAnchor(i, g.userData.pull ?? 0));
+  applyCoord(g, sliceAnchor(i, g.userData.exitX ?? 0));
 }
 
 function pointRadius(c) {
@@ -407,8 +407,10 @@ function buildCube(ctx) {
 }
 
 function layoutPlanes(ctx) {
+  const exit = ctx.cubeExit ?? 0;
   ctx.planeGroups.forEach((g, i) => {
-    g.userData.targetPull = state.focusLayer === i ? PULL_X : 0;
+    g.userData.pull = 0;
+    g.userData.exitX = state.focusLayer != null && i !== state.focusLayer ? exit : 0;
     placeSliceGroup(g, i);
   });
   syncFrame(ctx);
@@ -432,7 +434,9 @@ function syncFrame(ctx) {
   const box = new THREE.Box3().setFromPoints([v3(min), v3(max)]);
   const helper = new THREE.Box3Helper(box, 0x2a3545);
   helper.material.transparent = true;
-  helper.material.opacity = 0.35;
+  helper.material.depthWrite = false;
+  helper.material.opacity = state.focusLayer == null ? 0.35 : 0;
+  helper.position.copy(v3(localOffset(0, -(ctx.cubeExit ?? 0), 0, gap)));
   ctx.root.add(helper);
   ctx.boxHelper = helper;
 }
@@ -513,7 +517,7 @@ function rebuildAxes(ctx) {
     axes.add(yl);
   }
 
-  // x ticks: 0 (origin face), 1 (far face / cube), 2 (pulled-out far edge)
+  // x ticks: 0 (origin face), 1 (far face), 2 (axis mark; the slice no longer travels here)
   for (const xu of [0, 1, 2]) {
     axes.add(
       new THREE.Line(
@@ -603,18 +607,31 @@ function makeXyPlaneLabel(text, w, h, fill) {
   return mesh;
 }
 
-/** [C-PULL][C-RETRACT] Ease slice along +x (user units); camera untouched. */
+/** [C-PULL][C-RETRACT] Focused slice stays. The rest of the cube eases along −x (left) and the frame follows. */
 function lerpPullOut(ctx) {
+  const target = state.focusLayer == null ? 0 : cubeExitX();
+  const cur = ctx.cubeExit ?? 0;
+  const diff = target - cur;
+  const k = 0.13 + Math.min(0.12, Math.abs(diff) * 0.12);
+  const next = cur + diff * k;
+  ctx.cubeExit = Math.abs(next - target) < 0.001 ? target : next;
   ctx.planeGroups.forEach((g, i) => {
-    const target = state.focusLayer === i ? PULL_X : 0;
-    g.userData.targetPull = target;
-    const cur = g.userData.pull ?? 0;
-    const diff = target - cur;
-    const k = 0.13 + Math.min(0.12, Math.abs(diff) * 0.12);
-    const next = cur + diff * k;
-    g.userData.pull = Math.abs(next - target) < 0.001 ? target : next;
+    g.userData.pull = 0;
+    g.userData.exitX = state.focusLayer != null && i !== state.focusLayer ? ctx.cubeExit : 0;
     placeSliceGroup(g, i);
   });
+  placeFrame(ctx);
+}
+
+function placeFrame(ctx) {
+  const frame = ctx.boxHelper;
+  if (!frame?.material) return;
+  frame.position.copy(v3(localOffset(0, -(ctx.cubeExit ?? 0), 0, gapNow())));
+  const target = state.focusLayer == null ? 0.35 : 0;
+  const mat = frame.material;
+  mat.transparent = true;
+  mat.opacity += (target - mat.opacity) * 0.18;
+  if (Math.abs(mat.opacity - target) < 0.01) mat.opacity = target;
 }
 
 function framingDistance() {
@@ -629,7 +646,7 @@ function userToWorld(ctx, coord) {
 
 /**
  * [C-STDVIEW] Standard framing in (s, x, y):
- * - focused s*: camera (s*+10, 1.5, 0.5) → look (s*, 1.5, 0.5) (−s, pulled face)
+ * - focused s*: camera (s*+10, 0.5, 0.5) → look (s*, 0.5, 0.5) (from +s / front)
  * - no focus: camera (24, 2.1, 2.1) → user origin (0, 0, 0)
  */
 function standardPose(ctx) {
@@ -689,7 +706,8 @@ function resetCamera(ctx) {
   state.selectedId = null;
   state.hoverId = null;
   ctx.planeGroups.forEach((g) => {
-    g.userData.targetPull = 0;
+    g.userData.pull = 0;
+    g.userData.exitX = 0;
   });
   goStandardView(ctx, true);
   queueVisibilityTargets(ctx);
@@ -741,9 +759,8 @@ function selectCompany(ctx, id) {
   state.focusLayer = c.layer;
   const mesh = ctx.byId.get(id);
   if (mesh?.userData.coord) {
-    const pull = ctx.planeGroups[c.layer]?.userData.pull ?? 0;
     const base = mesh.userData.coord;
-    const world = userToWorld(ctx, { s: base.s, x: base.x + pull, y: base.y });
+    const world = userToWorld(ctx, { s: base.s, x: base.x, y: base.y });
     const toTarget = new THREE.Vector3(world.x, world.y * 0.35, 0);
     startCamAnim(ctx, ctx.camera.position.clone(), toTarget, 420);
   }
@@ -766,7 +783,7 @@ function queueVisibilityTargets(ctx) {
     const hovered = c.id === state.hoverId;
     // Off-focus: crush emissive + opacity (must use transparent materials or glow stays lit)
     const targetEmissive = selected ? 2.2 : hovered ? 1.9 : onFocus ? (c.country === "US" ? 1.35 : 1.25) : 0.06;
-    const targetOpacity = onFocus ? 1 : 0.1;
+    const targetOpacity = onFocus ? 1 : 0;
     const targetScale = selected ? 1.4 : hovered ? 1.25 : onFocus ? 1 : 0.55;
     mesh.userData.targetEmissive = targetEmissive;
     mesh.userData.targetOpacity = targetOpacity;
@@ -785,7 +802,7 @@ function queueVisibilityTargets(ctx) {
     if (mesh.userData.ring) {
       mesh.userData.ring.renderOrder = onFocus ? 9 : 4;
       mesh.userData.ring.material.transparent = true;
-      mesh.userData.ring.material.opacity = onFocus ? 1 : 0.12;
+      mesh.userData.ring.userData.targetOpacity = onFocus ? 1 : 0;
     }
     if (mesh.userData.label) mesh.userData.label.renderOrder = onFocus ? 10 : 4;
   });
@@ -794,20 +811,20 @@ function queueVisibilityTargets(ctx) {
     const dim = state.focusLayer != null && i !== state.focusLayer;
     // Focused slice draws after dimmed neighbors so its points stay visible
     g.renderOrder = dim ? 0 : 2;
-    g.userData.targetPull = state.focusLayer === i ? PULL_X : 0;
+    g.userData.pull = 0;
     const focused = state.focusLayer === i;
     g.children.forEach((ch) => {
       if (!ch.material || ch.material.opacity == null) return;
       const base = ch.userData.baseOpacity ?? 1;
       if (ch.userData.isSlicePlane) {
-        ch.userData.targetOpacity = dim ? 0.04 : focused ? 0.38 : base;
+        ch.userData.targetOpacity = dim ? 0 : focused ? 0.38 : base;
       } else if (ch.userData.isRingGuide) {
-        ch.userData.targetOpacity = dim ? base * 0.08 : base;
+        ch.userData.targetOpacity = dim ? 0 : base;
       } else if (ch.userData.isSliceEdge || (ch.isLineSegments && !ch.userData.isRingGuide)) {
-        ch.userData.targetOpacity = dim ? 0.1 : focused ? 1 : base;
+        ch.userData.targetOpacity = dim ? 0 : focused ? 1 : base;
         if (ch.material.color) ch.material.color.setHex(focused ? 0x8be0c0 : COLORS.EDGE);
       } else if (ch.userData.isDomainLabel) {
-        ch.userData.targetOpacity = dim ? 0.15 : 1;
+        ch.userData.targetOpacity = dim ? 0 : 1;
       }
     });
   });
@@ -982,8 +999,7 @@ function isPullFrameHit(ctx, hit) {
   if (!g) return false;
   const rootLocal = ctx.root.worldToLocal(hit.point.clone());
   const coord = localToCoord(rootLocal, N_LAYERS(), gapNow());
-  const pull = g.userData.pull ?? 0;
-  const dx = coord.x - (LAYOUT.faceCenter.x + pull);
+  const dx = coord.x - LAYOUT.faceCenter.x;
   const dy = coord.y - LAYOUT.faceCenter.y;
   if (Math.abs(dx) > 0.5 + 1e-4 || Math.abs(dy) > 0.5 + 1e-4) return false;
   const R = LAYOUT.ringRadius;

@@ -85,6 +85,11 @@
 |38| 这个执行方式是对的。书记每个谈话都要出现，比总监更根本，但不参与决策；只在谈话的最后出现，是最后一个任务 | 任务：写入用法，并作为本次谈话最后一项记下。主代理改 `agent_tasklist/RULE.md`、`agents/secretary.md`、`agent_tasklist/secretary.md`、`agents/README.md`。无总监。本条由书记记入。 |
 |39| 最后创建 library，作为书记的工作区，把包括 worklog 在内的记录性文档放进去。书记要看 worklog 是否过大，超过 1 万字就建第二册。worklog 分册为 worklog-xxx，xxx 是编号。 | 任务：建 library，把现有工作日志改为第 001 册，并写明换册规则。主代理：建 library/。原 WORKLOG.md 移为 library/worklog-001.md（未满 10000 字，未开第二册）。规则写入 agent_tasklist/secretary.md、agents/secretary.md、agent_tasklist/RULE.md。README 与 ai-chain/CONCEPTS.md 的链接改指向本册。无总监。本条由书记记入。 |
 |40| 把今天的更改全部上传至 GitHub 并同步。 | 任务：提交并推到 origin/main。主代理：提交 ab8d71b，再与 origin/main 合并（冲突保留今天的位置坐标），合并提交 6414e30 已推送。未纳入 ai_chain.db 与 DATA-SPACE/。工作日志仍在 library/worklog-001.md。无总监。本条由书记记入。 |
+|41| 创建子代理总参谋部 General Staff：读 worklog、concept 和工程结构，把自然语言要求拆成意志加任务列表；全新问题可提创新方案；产出规划下达执行代理；无权指导总监和书记。 | 任务：建总参谋部及其任务，并写明它不指挥总监和书记。主代理：写 `agents/general-staff.md`、`agent_tasklist/general-staff.md`，链到 `.cursor/agents/general-staff.md`；在 `agent_tasklist/RULE.md` 写明先规划、再执行。知识来源是 library 的 worklog、`ai-chain/CONCEPTS.md`、`README.md` 与 `ai-chain/README.md`。无总监。本条由书记记入。 |
+|42| 再给总参谋部加两条限定：只在下达任务前用「报文」「报」「M」「Message」或直接呼出总参谋部时才执行；一旦执行，必须是第一个执行任务的代理。 | 任务：把这两条写进总参谋部的用法。主代理改 `agents/general-staff.md`、`agent_tasklist/general-staff.md`、`agent_tasklist/RULE.md`、`agents/README.md`。未呼出总参谋部去规划，所以没有派它。无总监。无子代理。本条由书记记入。 |
+|43| 再加一个总参谋部呼出方式「电」。 | 任务：把「电」写进呼出词。主代理改 `agents/general-staff.md`、`agent_tasklist/general-staff.md`、`agent_tasklist/RULE.md`、`agents/README.md`。呼出词现为报文、报、电、M、Message，或直接呼出总参谋部。未派总参谋部去做规划。无总监。无子代理。本条由书记记入。 |
+|44| 电总参谋部：以往抽出不好看。与其让切片抽出，不如整个立方体左移淡出、切片位置不变，并指导手下修改。 | 任务：总参谋部先规划，执行代理再改抽出。主代理：焦点切片留在原位；其余立方体沿 −s 退开一面宽并淡出；线框跟随；轴线留在原点；标准视角改瞄面心 x=0.5。改了 `ai-chain/web/js/coords.js`、`scene.js`、`ui.js`、`index.html`、`ai-chain/CONCEPTS.md`。浏览器点开第 11 层，状态栏为 slice stays · cube exits −s。临时服务器已停。总参谋部第一个执行，规划为沿 −s 退场。总监第 1 次送审通过。本条由书记记入。 |
+|45| 电总参谋部：明确坐标与方向：x右，-x左，y上，-y下，s前，-s后。指称要改，刚才的抽出任务也要改。 | 任务：总参谋部先规划，再改概念与抽出轴。主代理：冻结 C-DIR。抽出改为沿 −x 退一面宽。改 CONCEPTS.md、coords.js（cubeExitX / sliceAnchor）、scene.js、ui.js、index.html。电力改为后（−s），不再叫左。状态栏为 cube exits −x (left)。临时服务器已停。总参谋部第一个执行。总监第 1 次送审通过。本条由书记记入。 |
 
 ---
 

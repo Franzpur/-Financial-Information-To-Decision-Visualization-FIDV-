@@ -26,7 +26,7 @@
 <div id="app" hidden>
   <aside class="left">
     <h1>AI industry chain cube</h1>
-    <p class="lede">Power (left) → models (right). Space is <strong>(s, x, y)</strong>: slice index, then face <strong>x∈[0,1]</strong>, <strong>y∈[0,1]</strong>. Click a slice to pull it into <strong>x∈[1,2]</strong>. <kbd>Esc</kbd> clears selection then focus; <kbd>C</kbd> = standard view (face slice / overview).</p>
+    <p class="lede">Power (back, <strong>−s</strong>) → models (front, <strong>+s</strong>). Space is <strong>(s, x, y)</strong>: <strong>+x</strong> right, <strong>−x</strong> left, <strong>+y</strong> up, <strong>−y</strong> down. Click a slice: it stays, and the rest of the cube shifts left along <strong>−x</strong> and fades. <kbd>Esc</kbd> clears selection then focus; <kbd>C</kbd> = standard view (face slice / overview).</p>
     <div class="legend">
       <div class="sw"><span class="dot us"></span> US company</div>
       <div class="sw"><span class="dot intl"></span> Non-US company</div>
@@ -65,7 +65,7 @@
     <div id="results"></div>
     <h2>Detail</h2>
     <div id="detail">
-      <p>Click a company, a slice plane, or search. Focus pulls the slice into x∈[1,2]. Esc clears selection, then focus.</p>
+      <p>Click a company, a slice plane, or search. The slice stays; the rest of the cube shifts left along −x and fades. Esc clears selection, then focus.</p>
     </div>
     <p class="note">Data: <code>GOOGL_SUPPLY.xlsx</code> (gold rings) or public industry map. Served from SQLite via <code>/api/bundle</code>.</p>
   </aside>

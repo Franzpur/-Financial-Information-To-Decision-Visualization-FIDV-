@@ -47,6 +47,8 @@
 - 布局坐标 = 用户坐标 = 1类坐标 = 位置坐标 `(s, x, y)`  
 - 环上坐标 = 2类坐标 = 相对坐标 `ringCos` / `ringSin`  
 - 法人坐标 = legal entity coordinate = 3类坐标 `legalEntityCoord`  
+- 右 = +x；左 = −x；上 = +y；下 = −y；前 = +s；后 = −s  
+- 电力端 = 后 = −s（小 s）；模型端 = 前 = +s（大 s）。勿把电力叫「左」
 
 ---
 
@@ -55,12 +57,13 @@
 | ID | EN | 中 | Rule / 约定 |
 |----|----|----|-------------|
 | **C-USER-AXES** | user axes `(s, x, y)` | 用户轴 | Product language. Tuple order is **s, then x, then y**. **Not** raw Three.js XYZ. |
-| **C-AXIS-S** | **s** (slice axis) | **s** 轴（切片轴） | Along stack. **1 s-unit = one slice gap** (`gapNow()`). Layer index `i` ⇒ **s = i**. Three.js **+X**. |
-| **C-AXIS-Y** | **y** | **y** 轴 | Up the cube face. **1 y-unit = `FACE`**. Face spans **y∈[0,1]**. Three.js **+Y**. |
-| **C-AXIS-X** | **x** | **x** 轴 | Out of the cube face. **1 x-unit = `FACE`**. Face spans **x∈[0,1]**; pulled far edge **x=2**. Three.js **−Z** via `USER_X_SIGN = -1`. |
+| **C-DIR** | direction names | 方向指称 | **右=+x，左=−x，上=+y，下=−y，前=+s，后=−s**。口语「左」不得指电力端或 −s。 |
+| **C-AXIS-S** | **s** (slice axis) | **s** 轴（切片轴） | Front / back. **+s** front, **−s** back. **1 s-unit = one slice gap** (`gapNow()`). Layer index `i` ⇒ **s = i**. Power is back (small s); models are front (large s). Three.js **+X**. |
+| **C-AXIS-Y** | **y** | **y** 轴 | Up / down on the face. **+y** up, **−y** down. **1 y-unit = `FACE`**. Face spans **y∈[0,1]**. Three.js **+Y**. |
+| **C-AXIS-X** | **x** | **x** 轴 | Right / left on the face. **+x** right, **−x** left. **1 x-unit = `FACE`**. Face spans **x∈[0,1]**. Three.js **−Z** via `USER_X_SIGN = -1`. |
 | **C-ORIGIN** | user origin | 用户原点 | Corner **(s, x, y)=(0, 0, 0)**. Three: `(−halfStack, −FACE/2, +FACE/2)`. |
 | **C-MAP** | user → Three | 用户→引擎映射 | `coordToLocal` / `userToWorld`: `X += s·gap`, `Y += y·FACE`, `Z += USER_X_SIGN·x·FACE`, then `root.localToWorld` (honors Q/E yaw). |
-| **C-COORD** | position coordinate | 1类坐标 / 位置坐标 | User `(s, x, y)`. The only placement in the cube. `x` and `y` mean only this pair. Slice pull is `+x` on the slice anchor (`sliceAnchor`). Company `coord` is the **unpulled** face position. |
+| **C-COORD** | position coordinate | 1类坐标 / 位置坐标 | User `(s, x, y)`. The only placement in the cube. `x` and `y` mean only this pair. A focused slice stays; `sliceAnchor` shifts the rest along **−x**. Company `coord` is the face position. |
 | **C-COORD-2** | relative coordinate | 2类坐标 / 相对坐标 | Ring placement `ringCos` / `ringSin`. Not called `x` or `y`. `companyCoord` projects them into 位置坐标. |
 | **C-COORD-3** | legal entity coordinate | 3类坐标 / 法人坐标 | One per legal entity. Format `00-00-00-00-00-00-0000`, Bloomberg BICS. Field `legalEntityCoord` is empty until filled. Library: `3类坐标库/BICS Classification/`. Not a position, not drawn. |
 
@@ -85,10 +88,10 @@ Position changes go through `ai-chain/web/js/coords.js` (`LAYOUT`, or an object'
 
 | ID | EN | 中 | State field / 字段 | Behavior / 行为 |
 |----|----|----|-------------------|-----------------|
-| **C-FOCUS** | focused slice | 焦点切片 | `state.focusLayer = i \| null` | One slice active; others **dim**; focused may **pull**. |
+| **C-FOCUS** | focused slice | 焦点切片 | `state.focusLayer = i \| null` | One slice stays put; the rest of the cube shifts along **−x** (left) and fades. |
 | **C-SELECT** | selected company | 选中公司 | `state.selectedId` | Detail panel; stronger emissive. Esc clears this first. |
 | **C-HOVER** | hover | 悬停 | `state.hoverId` | Tooltip only. |
-| **C-DIM** | off-focus dim | 离焦变暗 | — | Non-focus slices/points lower opacity/emissive; dimmed materials must stay `transparent`. |
+| **C-DIM** | off-focus fade | 离焦淡出 | — | Non-focus slices fade to opacity 0 and must stay `transparent`. Focus cleared restores the resting opacity. |
 | **C-FILTER** | filter mode | 过滤 | `state.filterMode` | `all` / `us` / `intl` / `supply`. |
 | **C-EXPLODE** | explode spacing | 爆炸间距 | `state.exploded` | Extra gap between slices. |
 
@@ -101,10 +104,10 @@ Position changes go through `ai-chain/web/js/coords.js` (`LAYOUT`, or an object'
 
 | ID | EN | 中 | What happens / 效果 | Code |
 |----|----|----|---------------------|------|
-| **C-PULL** | pull out | 抽出 | Focused slice translates along **+x** by one face (`LAYOUT.pullX = 1`): content moves **x∈[0,1] → [1,2]**. | `lerpPullOut`, `sliceAnchor` |
-| **C-RETRACT** | retract / pull back | 抽回 | Focus cleared or toggled off; slice returns to **x∈[0,1]**. **Camera must not auto-yaw toward origin.** | `focusSlice` toggle / `clearFocus` |
+| **C-PULL** | cube exit | 抽出 | Focused slice stays at its **s** and **x∈[0,1]**. The rest of the cube shifts together along **−x** (left) by `cubeExitX()` (one face) and fades out. | `lerpPullOut`, `sliceAnchor`, `cubeExitX` |
+| **C-RETRACT** | retract | 抽回 | Focus cleared; the cube eases back along **+x** to each slice's face and fades in. **Camera must not auto-yaw toward origin.** | `focusSlice` toggle / `clearFocus` |
 | **C-PULL-ZONE** | pull-frame hit zone | 抽出点击区 | Square∖disk on slice face: inside 1×1 square, **outside** outermost concentric ring. Misses inside the ring do **not** toggle focus. Tested in user `(s, x, y)`. | `isPullFrameHit`, `LAYOUT.ringRadius` |
-| **C-FOCUS-ACT** | focus slice | 聚焦切片 | Set `focusLayer`; apply dim + pull. Via plane click, layer list, or `[` `]`. | `focusSlice` |
+| **C-FOCUS-ACT** | focus slice | 聚焦切片 | Set `focusLayer`; the slice stays, the cube exits. Via plane click, layer list, or `[` `]`. | `focusSlice` |
 | **C-PICK** | pick company | 点选公司 | Raycast sphere → select + focus its layer. Plane toggle only if hit is in **C-PULL-ZONE**. | `pick`, `selectCompany` |
 | **C-STDVIEW** | standard view | 标准视角 | Snap camera to canonical pose for current focus state. Hotkey **C** / button / middle-click. | `goStandardView`, `standardPose` |
 | **C-RESET** | reset view | 重置 | Clear focus/select; go standard overview pose. | `resetCamera` |
@@ -120,8 +123,8 @@ User coordinates `(s, x, y)`. Looking direction via OrbitControls `target`. Numb
 
 | Mode | Camera `(s, x, y)` | Look-at | 中文说明 |
 |------|--------------------|---------|----------|
-| **Pulled** (`focusLayer = s*`) | `(s* + 10, 1.5, 0.5)` | `(s*, 1.5, 0.5)` (−**s**) | 正对抽出切片中心（x=1.5） |
-| **Overview** (no focus) | `(24, 2.1, 2.1)` | user origin `(0, 0, 0)` | 未抽出总览 |
+| **Focused** (`focusLayer = s*`) | `(s* + 10, 0.5, 0.5)` | `(s*, 0.5, 0.5)` (from **+s** / front) | 从前方正对留在原地的面心（x=0.5） |
+| **Overview** (no focus) | `(24, 2.1, 2.1)` | user origin `(0, 0, 0)` | 未聚焦总览 |
 
 Removed / 已废弃：旧「角视图 corner view」与 **V / Home** 绑定（勿恢复 unless product asks）。
 
@@ -166,7 +169,7 @@ Removed / 已废弃：旧「角视图 corner view」与 **V / Home** 绑定（�
 |--------|------------|------|
 | `state.focusLayer` | C-FOCUS | `null` = overview |
 | `state.selectedId` | C-SELECT | |
-| `LAYOUT.pullX` | C-PULL | `1` user-x (one face) |
+| `cubeExitX()` | C-PULL | one face width along **−x** (left) |
 | `USER_X_SIGN` | C-AXIS-X | `-1` |
 | `FACE` | C-AXIS-X/Y unit | face edge length in Three units |
 | `gapNow()` / `GAP` | C-AXIS-S unit | |
@@ -185,9 +188,9 @@ Removed / 已废弃：旧「角视图 corner view」与 **V / Home** 绑定（�
 ## 9. Frozen rules / 冻结约定（续做勿回退）
 
 1. 1类坐标 / 位置坐标 is **`(s, x, y)`**, not raw Three XYZ. `x` and `y` mean only this. Move things by editing coordinates in `coords.js`. 2类坐标 / 相对坐标 is `ringCos` / `ringSin`. 3类坐标 / 法人坐标 is `legalEntityCoord`（`00-00-00-00-00-00-0000`，待填），不参与摆放。  
-2. Pull is along user **+x** only; never along **s**.  
+2. Focus keeps the slice. The rest of the cube exits along user **−x** (left) only, by `cubeExitX`. Do not call 「左」 **−s**. Do not move the focused slice.  
 3. Focus change / retract → **hold camera** (`C-CAM-HOLD`).  
-4. Standard overview / pulled poses stay as §5 until explicitly revised.  
+4. Standard overview / focused poses stay as §5 until explicitly revised.  
 5. Dimmed points need `transparent: true` or opacity is ignored.  
 6. Labels stay **coplanar** on the slice (no CSS2D billboard).  
 7. Server owns ring layout; browser does not re-scale rings on filter.  
@@ -207,7 +210,7 @@ Removed / 已废弃：旧「角视图 corner view」与 **V / Home** 绑定（�
 | `web/js/ui.js` | Panels / status / buttons |
 
 **One-liner resume / 一句话续工**  
-立方体 = 沿 **s** 堆的 **切片**；位置一律 **(s, x, y)**；抽出沿 **x** 到 [1,2]；**C** = 标准视角；切层/抽回不扭相机。
+立方体 = 沿 **s** 堆的 **切片**；位置一律 **(s, x, y)**；右=+x 左=−x 上=+y 下=−y 前=+s 后=−s；焦点切片不动，离焦立方体沿 **−x** 左移淡出；**C** = 标准视角；切层/抽回不扭相机。
 
 ---
 

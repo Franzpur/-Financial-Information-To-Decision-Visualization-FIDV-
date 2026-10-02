@@ -3,5 +3,6 @@
 角色定义在 `agents/`。这里放每个角色对应的任务，创建角色之前先把任务放进来。
 
 - `DESIGN.md`：总监的任务
+- `general-staff.md`：总参谋部的任务
 - `secretary.md`：书记的任务
 - `RULE.md`：父代理派任务时怎么写

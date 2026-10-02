@@ -5,9 +5,10 @@
  * Three.js is only the renderer. To move something, change this coordinate
  * (LAYOUT below, or the object's coord). Do not write raw Three.js positions.
  *
- *   s  slice index. 1 = one inter-slice gap. Layer i sits at s = i.
- *   x  out of the cube face. Unpulled face is x∈[0,1]; a pulled slice is x∈[1,2].
- *   y  up the cube face. Face is y∈[0,1].
+ *   s  front (+s) / back (−s). Layer i sits at s = i.
+ *   x  right (+x) / left (−x). A slice face is x∈[0,1].
+ *   y  up (+y) / down (−y). Face is y∈[0,1].
+ *   Focus keeps that slice. The rest of the cube shifts left along −x by cubeExitX().
  *
  * 调位置：改本文件 LAYOUT，或改对象的 (s, x, y)。不要直接写 Three.js 坐标。
  *
@@ -28,8 +29,6 @@ export const LAYOUT = {
   faceCenter: { x: 0.5, y: 0.5 },
   /** [C-RING] Outermost ring radius, in face units (1 = full edge). */
   ringRadius: 0.38,
-  /** [C-PULL] Focused slice shifts by this many user-x (one full face). */
-  pullX: 1,
   /** [C-LABEL] Domain name on the slice. x/y are absolute user coords on the unpulled face. */
   domainLabel: {
     x: 0.75,
@@ -46,7 +45,7 @@ export const LAYOUT = {
   axes: { sEnd: 20, xEnd: 2.25, yEnd: 2.25 },
   /** [C-STDVIEW] Camera and look-at, user (s, x, y). */
   camera: {
-    pulled: { sOffset: 10, x: 1.5, y: 0.5 },
+    pulled: { sOffset: 10, x: 0.5, y: 0.5 },
     overview: {
       pos: { s: 24, x: 2.1, y: 2.1 },
       target: { s: 0, x: 0, y: 0 },
@@ -99,11 +98,16 @@ export function localOffset(ds, dx, dy, gap) {
   };
 }
 
-/** Slice group anchor: face center, plus pull along +x. */
-export function sliceAnchor(s, pullX = 0) {
+/** [C-PULL] One face width along −x (left). Focused slice stays; the rest of the cube uses this. */
+export function cubeExitX() {
+  return 1;
+}
+
+/** Slice group anchor. exitX moves this slice along −x. The focused slice passes 0. */
+export function sliceAnchor(s, exitX = 0) {
   return {
     s,
-    x: LAYOUT.faceCenter.x + pullX,
+    x: LAYOUT.faceCenter.x - exitX,
     y: LAYOUT.faceCenter.y,
   };
 }
