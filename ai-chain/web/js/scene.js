@@ -9,9 +9,12 @@ import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { COLORS, state, passesFilter, companyById } from "./state.js";
 import {
   FACE,
+  FACE_SPAN,
+  UNIT,
   USER_X_SIGN,
   LAYOUT,
-  gapOf,
+  gapMeters,
+  gapSafe,
   cubeExitX,
   coordToLocal,
   localToCoord,
@@ -22,6 +25,7 @@ import {
   companyLabelCoord,
   ringOffset,
   axisChrome,
+  viewSpaceMeters,
 } from "./coords.js";
 
 /** Axis palette matched to concentric rings (cool steel / ice blue). */
@@ -37,10 +41,11 @@ const N_LAYERS = () => state.layers.length;
 export function createScene(viewport, hooks = {}) {
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(0x0b0d10);
-  // Far fog so deep wheel-zoom still has atmosphere without eating the cube early
-  scene.fog = new THREE.Fog(0x0b0d10, 55, 380);
+  // [C-VIEW-SPACE] Fog / far clip track pull-back radius (R·UNIT), never d
+  const viewM = viewSpaceMeters();
+  scene.fog = new THREE.Fog(0x0b0d10, viewM * 0.45, viewM * 2.0);
 
-  const camera = new THREE.PerspectiveCamera(42, 1, 0.05, 600);
+  const camera = new THREE.PerspectiveCamera(42, 1, 0.05, viewM * 2.5);
   camera.position.set(8.2, 4.8, 8.2);
 
   const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -55,9 +60,9 @@ export function createScene(viewport, hooks = {}) {
   controls.rotateSpeed = 0.35;
   controls.panSpeed = 1.2;
   controls.zoomSpeed = 2.6;
-  // Match R/F reach: allow near contact and very distant framing
+  // [C-VIEW-SPACE] max pull-back = user radius R via UNIT; minDistance unchanged
   controls.minDistance = 0.35;
-  controls.maxDistance = 320;
+  controls.maxDistance = viewM;
   controls.enableZoom = false; // custom wheel below — full exponential range
   // Left = pan (translate); right = orbit (fine rotate)
   controls.mouseButtons = {
@@ -98,6 +103,7 @@ export function createScene(viewport, hooks = {}) {
     baseRotateSpeed: 0.35,
     camAnim: null,
     cubeExit: 0,
+    exitStayLayer: null,
     hooks,
   };
 
@@ -141,7 +147,12 @@ export function createScene(viewport, hooks = {}) {
 }
 
 function gapNow() {
-  return gapOf(state.exploded);
+  // [C-D] gap = d · UNIT (d=1 default; d=0 stacks)
+  return gapMeters(state.d);
+}
+
+function gapDivNow() {
+  return gapSafe(state.d);
 }
 
 function v3(p) {
@@ -170,8 +181,7 @@ function placeSliceGroup(g, i) {
   applyCoord(g, sliceAnchor(i, g.userData.exitX ?? 0));
 }
 
-function pointRadius(c) {
-  if (c.valueM != null) return Math.min(0.042, 0.022 + Math.sqrt(c.valueM) / 620);
+function pointRadius(_c) {
   return 0.022;
 }
 
@@ -319,7 +329,7 @@ function buildCube(ctx) {
 
     for (let r = 1; r <= 10; r++) {
       const radiusUser = LAYOUT.ringRadius * (r / 10);
-      const liftS = LAYOUT.ringGuideLiftMeters / gapNow();
+      const liftS = LAYOUT.ringGuideLiftMeters / gapDivNow();
       const pts = [];
       for (let k = 0; k <= 64; k++) {
         const a = (k / 64) * Math.PI * 2;
@@ -347,7 +357,6 @@ function buildCube(ctx) {
 
   state.companies.forEach((c) => {
     const isUS = c.country === "US";
-    const isSupply = c.valueM != null;
     const color = isUS ? COLORS.US : COLORS.INTL;
     const r = pointRadius(c);
     const mesh = new THREE.Mesh(
@@ -374,24 +383,6 @@ function buildCube(ctx) {
     ctx.meshes.push(mesh);
     ctx.byId.set(c.id, mesh);
 
-    if (isSupply) {
-      const ring = new THREE.Mesh(
-        new THREE.TorusGeometry(r * 1.6, 0.005, 8, 20),
-        new THREE.MeshBasicMaterial({
-          color: COLORS.SUPPLY,
-          depthWrite: false,
-          transparent: true,
-          opacity: 1,
-        })
-      );
-      ring.rotation.y = Math.PI / 2;
-      ring.position.copy(mesh.position);
-      ring.renderOrder = 6;
-      ring.userData.companyId = c.id;
-      ctx.planeGroups[c.layer].add(ring);
-      mesh.userData.ring = ring;
-    }
-
     const label = makeSliceTextPlane(makeCompanyLabelTexture(shortName(c), isUS), 0.72, 0.14);
     applySliceCoord(label, c.layer, companyLabelCoord(coord, r, gapNow()));
     label.visible = false;
@@ -408,9 +399,11 @@ function buildCube(ctx) {
 
 function layoutPlanes(ctx) {
   const exit = ctx.cubeExit ?? 0;
+  const stay =
+    state.focusLayer != null ? state.focusLayer : ctx.exitStayLayer;
   ctx.planeGroups.forEach((g, i) => {
     g.userData.pull = 0;
-    g.userData.exitX = state.focusLayer != null && i !== state.focusLayer ? exit : 0;
+    g.userData.exitX = stay != null && i !== stay ? exit : 0;
     placeSliceGroup(g, i);
   });
   syncFrame(ctx);
@@ -427,10 +420,14 @@ function syncFrame(ctx) {
   }
   const n = N_LAYERS();
   const gap = gapNow();
-  const padS = LAYOUT.framePad.sMeters / gap;
-  const padF = LAYOUT.framePad.faceMeters / FACE;
+  const padS = LAYOUT.framePad.sMeters / gapDivNow();
+  const padF = LAYOUT.framePad.faceMeters / UNIT;
   const min = coordToLocal({ s: -padS, x: -padF, y: -padF }, n, gap);
-  const max = coordToLocal({ s: n - 1 + padS, x: 1 + padF, y: 1 + padF }, n, gap);
+  const max = coordToLocal(
+    { s: n - 1 + padS, x: FACE_SPAN + padF, y: FACE_SPAN + padF },
+    n,
+    gap
+  );
   const box = new THREE.Box3().setFromPoints([v3(min), v3(max)]);
   const helper = new THREE.Box3Helper(box, 0x2a3545);
   helper.material.transparent = true;
@@ -473,8 +470,8 @@ function rebuildAxes(ctx) {
   axes.add(makeAxisLine(at(0, chrome.xEnd, 0), AXIS_X));
 
   axes.add(makeAxisArrow(sDir, chrome.sEnd * gap, AXIS_S));
-  axes.add(makeAxisArrow(yDir, chrome.yEnd * FACE, AXIS_Y));
-  axes.add(makeAxisArrow(xDir, chrome.xEnd * FACE, AXIS_X));
+  axes.add(makeAxisArrow(yDir, chrome.yEnd * UNIT, AXIS_Y));
+  axes.add(makeAxisArrow(xDir, chrome.xEnd * UNIT, AXIS_X));
 
   // Slice ticks every unit 0..sEnd; emphasize existing layer indices 0..n-1
   for (let i = 0; i <= chrome.sEnd; i++) {
@@ -504,8 +501,8 @@ function rebuildAxes(ctx) {
     }
   }
 
-  // y ticks: 0 at origin, 1 at cube top (also on s/y plane)
-  for (const yu of [0, 1]) {
+  // y ticks: 0 at origin, FACE_SPAN at cube top (also on s/y plane)
+  for (const yu of [0, FACE_SPAN]) {
     axes.add(
       new THREE.Line(
         new THREE.BufferGeometry().setFromPoints([at(0, 0, yu), at(chrome.yTickS, 0, yu)]),
@@ -517,8 +514,8 @@ function rebuildAxes(ctx) {
     axes.add(yl);
   }
 
-  // x ticks: 0 (origin face), 1 (far face), 2 (axis mark; the slice no longer travels here)
-  for (const xu of [0, 1, 2]) {
+  // x ticks: 0 (origin face), FACE_SPAN (far face), 2*FACE_SPAN (axis mark)
+  for (const xu of [0, FACE_SPAN, FACE_SPAN * 2]) {
     axes.add(
       new THREE.Line(
         new THREE.BufferGeometry().setFromPoints([at(0, xu, 0), at(0, xu, chrome.xTickY)]),
@@ -607,8 +604,11 @@ function makeXyPlaneLabel(text, w, h, fill) {
   return mesh;
 }
 
-/** [C-PULL][C-RETRACT] Focused slice stays. The rest of the cube eases along −x (left) and the frame follows. */
+/** [C-PULL][C-RETRACT] Focused slice stays. Exit eases along −x out and +x back; frame follows. */
 function lerpPullOut(ctx) {
+  if (state.focusLayer != null) ctx.exitStayLayer = state.focusLayer;
+  const stay =
+    state.focusLayer != null ? state.focusLayer : ctx.exitStayLayer;
   const target = state.focusLayer == null ? 0 : cubeExitX();
   const cur = ctx.cubeExit ?? 0;
   const diff = target - cur;
@@ -617,9 +617,13 @@ function lerpPullOut(ctx) {
   ctx.cubeExit = Math.abs(next - target) < 0.001 ? target : next;
   ctx.planeGroups.forEach((g, i) => {
     g.userData.pull = 0;
-    g.userData.exitX = state.focusLayer != null && i !== state.focusLayer ? ctx.cubeExit : 0;
+    g.userData.exitX = stay != null && i !== stay ? ctx.cubeExit : 0;
     placeSliceGroup(g, i);
   });
+  if (state.focusLayer == null && ctx.cubeExit < 0.001) {
+    ctx.cubeExit = 0;
+    ctx.exitStayLayer = null;
+  }
   placeFrame(ctx);
 }
 
@@ -646,7 +650,7 @@ function userToWorld(ctx, coord) {
 
 /**
  * [C-STDVIEW] Standard framing in (s, x, y):
- * - focused s*: camera (s*+10, 0.5, 0.5) → look (s*, 0.5, 0.5) (from +s / front)
+ * - focused s*: camera (s*+10, 5, 5) → look (s*, 5, 5) (from +s / front)
  * - no focus: camera (24, 2.1, 2.1) → user origin (0, 0, 0)
  */
 function standardPose(ctx) {
@@ -705,6 +709,8 @@ function resetCamera(ctx) {
   state.focusLayer = null;
   state.selectedId = null;
   state.hoverId = null;
+  ctx.cubeExit = 0;
+  ctx.exitStayLayer = null;
   ctx.planeGroups.forEach((g) => {
     g.userData.pull = 0;
     g.userData.exitX = 0;
@@ -719,6 +725,7 @@ function focusSlice(ctx, i) {
   const n = N_LAYERS();
   if (i == null || i < 0 || i >= n) return;
   if (state.focusLayer === i) {
+    ctx.exitStayLayer = state.focusLayer;
     state.focusLayer = null;
     state.selectedId = null;
     state.hoverId = null;
@@ -727,6 +734,7 @@ function focusSlice(ctx, i) {
     return;
   }
   state.focusLayer = i;
+  ctx.exitStayLayer = i;
   state.selectedId = null;
   queueVisibilityTargets(ctx);
   // Keep current camera — no recenter toward cube interior
@@ -743,6 +751,7 @@ function clearFocus(ctx) {
     return;
   }
   if (state.focusLayer != null) {
+    ctx.exitStayLayer = state.focusLayer;
     state.focusLayer = null;
     state.hoverId = null;
     queueVisibilityTargets(ctx);
@@ -757,6 +766,7 @@ function selectCompany(ctx, id) {
   if (!c) return;
   state.selectedId = id;
   state.focusLayer = c.layer;
+  ctx.exitStayLayer = c.layer;
   const mesh = ctx.byId.get(id);
   if (mesh?.userData.coord) {
     const base = mesh.userData.coord;
@@ -775,7 +785,6 @@ function queueVisibilityTargets(ctx) {
     const show = passesFilter(c);
     const onFocus = state.focusLayer == null || c.layer === state.focusLayer;
     mesh.visible = show;
-    if (mesh.userData.ring) mesh.userData.ring.visible = show;
     if (mesh.userData.label) {
       mesh.userData.label.visible = show && state.focusLayer != null && c.layer === state.focusLayer;
     }
@@ -788,22 +797,11 @@ function queueVisibilityTargets(ctx) {
     mesh.userData.targetEmissive = targetEmissive;
     mesh.userData.targetOpacity = targetOpacity;
     mesh.userData.targetScale = targetScale;
-    // Focused opaque for depth; dimmed must be transparent or opacity is ignored
+    // Opacity always lerps; transparent while fading so fade-in matches fade-out.
     const mat = mesh.material;
-    if (onFocus) {
-      mat.transparent = false;
-      mat.depthWrite = true;
-      mat.opacity = Math.max(mat.opacity, 0.99);
-    } else {
-      mat.transparent = true;
-      mat.depthWrite = false;
-    }
+    mat.transparent = true;
+    mat.depthWrite = false;
     mesh.renderOrder = onFocus ? 8 : 4;
-    if (mesh.userData.ring) {
-      mesh.userData.ring.renderOrder = onFocus ? 9 : 4;
-      mesh.userData.ring.material.transparent = true;
-      mesh.userData.ring.userData.targetOpacity = onFocus ? 1 : 0;
-    }
     if (mesh.userData.label) mesh.userData.label.renderOrder = onFocus ? 10 : 4;
   });
 
@@ -821,8 +819,8 @@ function queueVisibilityTargets(ctx) {
       } else if (ch.userData.isRingGuide) {
         ch.userData.targetOpacity = dim ? 0 : base;
       } else if (ch.userData.isSliceEdge || (ch.isLineSegments && !ch.userData.isRingGuide)) {
-        ch.userData.targetOpacity = dim ? 0 : focused ? 1 : base;
-        if (ch.material.color) ch.material.color.setHex(focused ? 0x8be0c0 : COLORS.EDGE);
+        ch.userData.targetOpacity = dim ? 0 : base;
+        if (ch.material.color) ch.material.color.setHex(COLORS.EDGE);
       } else if (ch.userData.isDomainLabel) {
         ch.userData.targetOpacity = dim ? 0 : 1;
       }
@@ -839,14 +837,10 @@ function lerpVisibility(ctx) {
       mat.emissiveIntensity += (mesh.userData.targetEmissive - mat.emissiveIntensity) * k;
     }
     if (mesh.userData.targetOpacity != null) {
-      // Opacity only affects drawing when transparent === true
-      const dimming = mesh.userData.targetOpacity < 0.99;
-      if (dimming) {
-        mat.transparent = true;
-        mat.depthWrite = false;
-      }
+      mat.transparent = true;
+      mat.depthWrite = false;
       mat.opacity += (mesh.userData.targetOpacity - mat.opacity) * k;
-      if (!dimming && mat.opacity > 0.98) {
+      if (mesh.userData.targetOpacity >= 0.99 && mat.opacity > 0.98) {
         mat.opacity = 1;
         mat.transparent = false;
         mat.depthWrite = true;
@@ -1001,7 +995,8 @@ function isPullFrameHit(ctx, hit) {
   const coord = localToCoord(rootLocal, N_LAYERS(), gapNow());
   const dx = coord.x - LAYOUT.faceCenter.x;
   const dy = coord.y - LAYOUT.faceCenter.y;
-  if (Math.abs(dx) > 0.5 + 1e-4 || Math.abs(dy) > 0.5 + 1e-4) return false;
+  const half = FACE_SPAN / 2;
+  if (Math.abs(dx) > half + 1e-4 || Math.abs(dy) > half + 1e-4) return false;
   const R = LAYOUT.ringRadius;
   return dx * dx + dy * dy > R * R;
 }

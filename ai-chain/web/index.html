@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>AI Industry Chain — 3D Slice Cube</title>
-<link rel="stylesheet" href="/css/app.css?v=9" />
+<link rel="stylesheet" href="/css/app.css?v=11" />
 <script type="importmap">
 {
   "imports": {
@@ -24,51 +24,45 @@
 </div>
 
 <div id="app" hidden>
-  <aside class="left">
-    <h1>AI industry chain cube</h1>
-    <p class="lede">Power (back, <strong>−s</strong>) → models (front, <strong>+s</strong>). Space is <strong>(s, x, y)</strong>: <strong>+x</strong> right, <strong>−x</strong> left, <strong>+y</strong> up, <strong>−y</strong> down. Click a slice: it stays, and the rest of the cube shifts left along <strong>−x</strong> and fades. <kbd>Esc</kbd> clears selection then focus; <kbd>C</kbd> = standard view (face slice / overview).</p>
-    <div class="legend">
-      <div class="sw"><span class="dot us"></span> US company</div>
-      <div class="sw"><span class="dot intl"></span> Non-US company</div>
-      <div class="sw"><span class="dot supply"></span> Alphabet supplier</div>
-    </div>
-    <h2>Slices <span class="hint-inline">click · [ ]</span></h2>
-    <div class="layers" id="layerList"></div>
-    <p class="note">Revenue is min–max scaled 0–100 within each slice. Outer ring = 0–9.9; near-center ring = 90–99.9; <strong>100 = exact center</strong>. Sphere size marks Alphabet supplier weight when available.</p>
-  </aside>
-
   <div id="viewport">
+    <div class="top-search">
+      <input id="search" type="search" placeholder="Search company or ticker…" autocomplete="off" />
+      <div id="results"></div>
+    </div>
+
+    <aside id="detailPanel" class="float-panel float-detail" aria-label="Industry detail">
+      <div id="detail">
+        <p>Click a company or slice. The slice stays; the rest of the cube shifts left along −x and fades. Esc clears selection, then focus.</p>
+      </div>
+      <p class="note foot">Data via <code>/api/bundle</code>.</p>
+    </aside>
+
     <button type="button" id="helpToggle" class="help-toggle" title="Toggle controls help (?)">?</button>
-    <div id="navHint" class="nav-hint">
+    <div id="navHint" class="nav-hint hidden">
       <strong>Controls</strong><br />
       Left-drag pan · Right-drag orbit (fine) · Scroll zoom · Middle-click standard<br />
       <kbd>Q</kbd>/<kbd>E</kbd> yaw · <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> pan · <kbd>R</kbd>/<kbd>F</kbd> dolly · <kbd>Shift</kbd> faster<br />
       Click plane / <kbd>[</kbd><kbd>]</kbd> focus slice · double-click empty clears · <kbd>Esc</kbd> layered clear<br />
-      <kbd>C</kbd> / middle-click standard view · <kbd>?</kbd> help
+      <kbd>C</kbd> / middle-click standard view · <kbd>?</kbd> help<br /><br />
+      <strong>Space</strong><br />
+      Power (back, <strong>−s</strong>) → models (front, <strong>+s</strong>). User axes <strong>(s, x, y)</strong>: <strong>+x</strong> right, <strong>−x</strong> left, <strong>+y</strong> up, <strong>−y</strong> down; face <strong>x,y∈[0,10]</strong>; <strong>1 s = 1 x = 1 y</strong>. View space radius <strong>200</strong>. Slice spacing <strong>d</strong> (default 100% = current gap; drag 0%–200%). Revenue rings: outer = 0–9.9; near-center = 90–99.9; <strong>100 = exact center</strong>.
     </div>
     <div id="statusBar" class="status-bar">All slices · 0 companies</div>
     <div id="hoverTip" class="hover-tip" hidden></div>
     <div class="hud">
+      <span class="hud-legend" aria-hidden="true"><span class="dot us"></span><span class="dot intl"></span></span>
       <button class="chip active" data-filter="all">All</button>
       <button class="chip" data-filter="us">US only</button>
       <button class="chip" data-filter="intl">Non-US only</button>
-      <button class="chip" data-filter="supply">Alphabet suppliers</button>
       <button class="chip" id="standardView">Standard (C)</button>
       <button class="chip" id="resetCam">Reset view</button>
-      <button class="chip" id="explode">Explode / compact</button>
+      <label class="d-control" title="Slice spacing d (0%–200%)">
+        <span class="d-label">d</span>
+        <input id="gapD" type="range" min="0" max="200" step="1" value="100" />
+        <span id="gapDPct" class="d-pct">100%</span>
+      </label>
     </div>
   </div>
-
-  <aside class="right">
-    <h2>Search</h2>
-    <input id="search" type="search" placeholder="e.g. NVIDIA, Constellation, OpenAI" autocomplete="off" />
-    <div id="results"></div>
-    <h2>Detail</h2>
-    <div id="detail">
-      <p>Click a company, a slice plane, or search. The slice stays; the rest of the cube shifts left along −x and fades. Esc clears selection, then focus.</p>
-    </div>
-    <p class="note">Data: <code>GOOGL_SUPPLY.xlsx</code> (gold rings) or public industry map. Served from SQLite via <code>/api/bundle</code>.</p>
-  </aside>
 </div>
 
 <script type="module" src="/js/main.js"></script>

@@ -6,9 +6,10 @@
  * (LAYOUT below, or the object's coord). Do not write raw Three.js positions.
  *
  *   s  front (+s) / back (−s). Layer i sits at s = i.
- *   x  right (+x) / left (−x). A slice face is x∈[0,1].
- *   y  up (+y) / down (−y). Face is y∈[0,1].
- *   Focus keeps that slice. The rest of the cube shifts left along −x by cubeExitX().
+ *   x  right (+x) / left (−x). A slice face is x∈[0,10].
+ *   y  up (+y) / down (−y). Face is y∈[0,10].
+ *   1 s = 1 x = 1 y = UNIT meters. Focus keeps that slice.
+ *   The rest of the cube shifts left along −x by cubeExitX().
  *
  * 调位置：改本文件 LAYOUT，或改对象的 (s, x, y)。不要直接写 Three.js 坐标。
  *
@@ -18,21 +19,28 @@
  * 3类坐标，法人坐标：company.legalEntityCoord。格式 00-00-00-00-00-00-0000，
  * 对应 Bloomberg BICS。值待填，不参与摆放。
  */
-export const FACE = 4.2; // Three.js meters per 1 user-x or 1 user-y
-export const GAP = 0.55; // Three.js meters per 1 user-s when compact
-export const GAP_EXPLODED = GAP * 2.2;
+/** Physical face edge length in Three.js meters (PlaneGeometry). */
+export const FACE = 4.2;
+/** User units across one face edge. Vertices are 0 and FACE_SPAN. */
+export const FACE_SPAN = 10;
+/** Meters per 1 user-s, 1 user-x, or 1 user-y. */
+export const UNIT = FACE / FACE_SPAN;
+/** [C-D] Meters between slices when d=1 (default spacing). */
+export const GAP = UNIT;
+/** [C-D] Floor for divisions when d→0 (layout may still use gap=0). */
+export const D_EPS = 1e-3;
 /** [C-AXIS-X] +user-x → Three.js −Z. */
 export const USER_X_SIGN = -1;
 
 export const LAYOUT = {
-  /** Unpulled slice center. The face is the unit square around this point. */
-  faceCenter: { x: 0.5, y: 0.5 },
-  /** [C-RING] Outermost ring radius, in face units (1 = full edge). */
-  ringRadius: 0.38,
-  /** [C-LABEL] Domain name on the slice. x/y are absolute user coords on the unpulled face. */
+  /** Slice center. The face is the square [0, FACE_SPAN]² around this point. */
+  faceCenter: { x: FACE_SPAN / 2, y: FACE_SPAN / 2 },
+  /** [C-RING] Outermost ring radius, in user face units. */
+  ringRadius: 3.8,
+  /** [C-LABEL] Domain name on the slice. x/y are absolute user coords on the face. */
   domainLabel: {
-    x: 0.75,
-    y: (FACE - 0.28) / FACE,
+    x: 7.5,
+    y: (FACE - 0.28) / UNIT,
     liftMeters: 0.03,
   },
   /** Company name sits on the point, nudged +s and +y so it clears the sphere. */
@@ -42,23 +50,40 @@ export const LAYOUT = {
   /** Wireframe padding around the unit cube, in meters (constant on screen when s-gap changes). */
   framePad: { sMeters: 0.25, faceMeters: 0.225 },
   /** [C-AXES] Axis lengths in user units. Tick chrome is derived in axisChrome(). */
-  axes: { sEnd: 20, xEnd: 2.25, yEnd: 2.25 },
+  axes: { sEnd: 20, xEnd: 22.5, yEnd: 22.5 },
   /** [C-STDVIEW] Camera and look-at, user (s, x, y). */
   camera: {
-    pulled: { sOffset: 10, x: 0.5, y: 0.5 },
+    pulled: { sOffset: 10, x: FACE_SPAN / 2, y: FACE_SPAN / 2 },
     overview: {
-      pos: { s: 24, x: 2.1, y: 2.1 },
+      pos: { s: 24, x: 21, y: 21 },
       target: { s: 0, x: 0, y: 0 },
     },
   },
+  /**
+   * [C-VIEW-SPACE] View space: sphere about user origin.
+   * Radius is in user units (1 s = 1 x = 1 y). Convert with UNIT only
+   * (never multiply by d) — this is coordinate scale, not slice spacing.
+   */
+  viewSpace: { radius: 200 },
 };
+
+/** [C-VIEW-SPACE] Farthest camera pull-back in Three meters (= R · UNIT). */
+export function viewSpaceMeters() {
+  return LAYOUT.viewSpace.radius * UNIT;
+}
+
+/** [C-D] Slice gap in meters: gap = d · UNIT. d=1 is default; d=0 stacks slices. */
+export function gapMeters(d) {
+  return d * UNIT;
+}
+
+/** [C-D] Gap used only where code divides by gap (never zero). */
+export function gapSafe(d) {
+  return Math.max(d, D_EPS) * UNIT;
+}
 
 export function sxy(s, x, y) {
   return { s, x, y };
-}
-
-export function gapOf(exploded) {
-  return exploded ? GAP_EXPLODED : GAP;
 }
 
 export function originLocal(nLayers, gap) {
@@ -71,18 +96,19 @@ export function coordToLocal(coord, nLayers, gap) {
   const o = originLocal(nLayers, gap);
   return {
     x: o.x + coord.s * gap,
-    y: o.y + coord.y * FACE,
-    z: o.z + USER_X_SIGN * coord.x * FACE,
+    y: o.y + coord.y * UNIT,
+    z: o.z + USER_X_SIGN * coord.x * UNIT,
   };
 }
 
-/** Root-local Three.js {x, y, z} → (s, x, y). */
+/** Root-local Three.js {x, y, z} → (s, x, y). Uses gapSafe when d→0. */
 export function localToCoord(p, nLayers, gap) {
   const o = originLocal(nLayers, gap);
+  const gs = Math.max(gap, D_EPS * UNIT);
   return {
-    s: (p.x - o.x) / gap,
-    y: (p.y - o.y) / FACE,
-    x: (p.z - o.z) / (USER_X_SIGN * FACE),
+    s: (p.x - o.x) / gs,
+    y: (p.y - o.y) / UNIT,
+    x: (p.z - o.z) / (USER_X_SIGN * UNIT),
   };
 }
 
@@ -93,14 +119,14 @@ export function localToCoord(p, nLayers, gap) {
 export function localOffset(ds, dx, dy, gap) {
   return {
     x: ds * gap,
-    y: dy * FACE,
-    z: USER_X_SIGN * dx * FACE,
+    y: dy * UNIT,
+    z: USER_X_SIGN * dx * UNIT,
   };
 }
 
 /** [C-PULL] One face width along −x (left). Focused slice stays; the rest of the cube uses this. */
 export function cubeExitX() {
-  return 1;
+  return FACE_SPAN;
 }
 
 /** Slice group anchor. exitX moves this slice along −x. The focused slice passes 0. */
@@ -125,18 +151,20 @@ export function companyCoord(layer, ringCos, ringSin) {
 }
 
 export function domainLabelCoord(layer, gap) {
+  const g = Math.max(gap, D_EPS * UNIT);
   return {
-    s: layer + LAYOUT.domainLabel.liftMeters / gap,
+    s: layer + LAYOUT.domainLabel.liftMeters / g,
     x: LAYOUT.domainLabel.x,
     y: LAYOUT.domainLabel.y,
   };
 }
 
 export function companyLabelCoord(base, radiusMeters, gap) {
+  const g = Math.max(gap, D_EPS * UNIT);
   return {
-    s: base.s + LAYOUT.companyLabel.liftMeters / gap,
+    s: base.s + LAYOUT.companyLabel.liftMeters / g,
     x: base.x,
-    y: base.y + (radiusMeters + LAYOUT.companyLabel.aboveMeters) / FACE,
+    y: base.y + (radiusMeters + LAYOUT.companyLabel.aboveMeters) / UNIT,
   };
 }
 
@@ -151,11 +179,12 @@ export function ringOffset(radiusUser, angle) {
 /**
  * Axis tick / label coordinates. Lengths sEnd/xEnd/yEnd are user units.
  * The small pads match the previous meter offsets, so they stay put when the
- * s-gap changes (pads are meters ÷ current gap or face).
+ * s-gap changes (pads are meters ÷ current gap or UNIT).
  */
 export function axisChrome(gap) {
-  const s = (meters) => meters / gap;
-  const u = (meters) => meters / FACE;
+  const g = Math.max(gap, D_EPS * UNIT);
+  const s = (meters) => meters / g;
+  const u = (meters) => meters / UNIT;
   const { sEnd, xEnd, yEnd } = LAYOUT.axes;
   return {
     sEnd,

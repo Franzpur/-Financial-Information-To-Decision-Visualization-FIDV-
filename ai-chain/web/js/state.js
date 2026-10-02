@@ -5,7 +5,6 @@
 export const COLORS = {
   US: 0x3cf0ff,
   INTL: 0xffb020,
-  SUPPLY: 0xe8d44a,
   PLANE: 0x1a2330,
   EDGE: 0x3a4658,
 };
@@ -18,8 +17,8 @@ export const state = {
   focusLayer: null, // [C-FOCUS] slice index or null
   selectedId: null, // [C-SELECT]
   hoverId: null, // [C-HOVER]
-  exploded: false,
-  helpOpen: true,
+  d: 1, // [C-D] slice gap factor; meters = d·UNIT; UI % = 100·d
+  helpOpen: false,
 };
 
 export function visibleCompanies() {
@@ -29,7 +28,6 @@ export function visibleCompanies() {
 export function passesFilter(c) {
   if (state.filterMode === "us") return c.country === "US";
   if (state.filterMode === "intl") return c.country !== "US";
-  if (state.filterMode === "supply") return c.valueM != null;
   return true;
 }
 
@@ -38,7 +36,7 @@ export function readHash() {
   const slice = h.get("slice");
   const filter = h.get("filter");
   const id = h.get("id");
-  if (filter && ["all", "us", "intl", "supply"].includes(filter)) {
+  if (filter && ["all", "us", "intl"].includes(filter)) {
     state.filterMode = filter;
   }
   if (slice != null && slice !== "") {

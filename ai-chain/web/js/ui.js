@@ -9,7 +9,6 @@ import {
 import { formatCoord } from "./coords.js";
 
 export function createUI(sceneApi) {
-  const layerList = document.getElementById("layerList");
   const detail = document.getElementById("detail");
   const results = document.getElementById("results");
   const statusBar = document.getElementById("statusBar");
@@ -18,26 +17,9 @@ export function createUI(sceneApi) {
   const helpToggle = document.getElementById("helpToggle");
   let searchTimer = null;
 
-  function renderLayers() {
-    layerList.innerHTML = "";
-    state.layers.forEach((L, i) => {
-      const btn = document.createElement("button");
-      btn.className = "layer-btn" + (state.focusLayer === i ? " active" : "");
-      btn.type = "button";
-      btn.title = L.blurb;
-      btn.innerHTML = `<span class="idx">${i + 1}</span><span>${L.name}</span><span class="count">${L.companyCount ?? ""}</span>`;
-      btn.addEventListener("click", () => {
-        sceneApi.focusSlice(i);
-      });
-      layerList.appendChild(btn);
-    });
-  }
-
-  function syncLayerActive() {
-    [...layerList.children].forEach((c, j) => {
-      c.classList.toggle("active", j === state.focusLayer);
-    });
-  }
+  // Layer list chrome removed — focus via plane click / [ ] / search / right float roster.
+  function renderLayers() {}
+  function syncLayerActive() {}
 
   function updateStatus() {
     const vis = visibleCompanies();
@@ -59,7 +41,7 @@ export function createUI(sceneApi) {
   }
 
   function setDetailDefault() {
-    detail.innerHTML = `<p>Click a company, a slice plane, or a layer in the list. The slice stays. The rest of the cube shifts left along <strong>−x</strong> and fades. Esc clears selection, then focus.</p>`;
+    detail.innerHTML = `<p>Click a company or slice. The slice stays; the rest of the cube shifts left along <strong>−x</strong> and fades. Esc clears selection, then focus.</p>`;
   }
 
   function ringLabel(c) {
@@ -153,11 +135,21 @@ export function createUI(sceneApi) {
     sceneApi.goStandardView();
   });
 
-
-  document.getElementById("explode").addEventListener("click", () => {
-    state.exploded = !state.exploded;
+  const gapD = document.getElementById("gapD");
+  const gapDPct = document.getElementById("gapDPct");
+  function syncGapDUI() {
+    const pct = Math.round(state.d * 100);
+    gapD.value = String(pct);
+    gapDPct.textContent = `${pct}%`;
+  }
+  syncGapDUI();
+  gapD.addEventListener("input", () => {
+    state.d = Number(gapD.value) / 100;
+    gapDPct.textContent = `${gapD.value}%`;
     sceneApi.layoutPlanes();
   });
+
+  navHint.classList.toggle("hidden", !state.helpOpen);
 
   document.getElementById("search").addEventListener("input", (e) => {
     const q = e.target.value.trim().toLowerCase();

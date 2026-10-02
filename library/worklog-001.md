@@ -91,6 +91,12 @@
 |44| 电总参谋部：以往抽出不好看。与其让切片抽出，不如整个立方体左移淡出、切片位置不变，并指导手下修改。 | 任务：总参谋部先规划，执行代理再改抽出。主代理：焦点切片留在原位；其余立方体沿 −s 退开一面宽并淡出；线框跟随；轴线留在原点；标准视角改瞄面心 x=0.5。改了 `ai-chain/web/js/coords.js`、`scene.js`、`ui.js`、`index.html`、`ai-chain/CONCEPTS.md`。浏览器点开第 11 层，状态栏为 slice stays · cube exits −s。临时服务器已停。总参谋部第一个执行，规划为沿 −s 退场。总监第 1 次送审通过。本条由书记记入。 |
 |45| 电总参谋部：明确坐标与方向：x右，-x左，y上，-y下，s前，-s后。指称要改，刚才的抽出任务也要改。 | 任务：总参谋部先规划，再改概念与抽出轴。主代理：冻结 C-DIR。抽出改为沿 −x 退一面宽。改 CONCEPTS.md、coords.js（cubeExitX / sliceAnchor）、scene.js、ui.js、index.html。电力改为后（−s），不再叫左。状态栏为 cube exits −x (left)。临时服务器已停。总参谋部第一个执行。总监第 1 次送审通过。本条由书记记入。 |
 |46| 上传这些更改到 GitHub。 | 任务：提交并推到 origin/main。主代理：提交 99b39f8 已推送。内容含总参谋部、方向冻结（右=+x 左=−x 上=+y 下=−y 前=+s 后=−s）、抽出沿 −x 退场。未纳入 ai_chain.db 与 DATA-SPACE/。无总监。本条由书记记入。 |
+|47| 把 3类坐标库 改成英文名，怕路径出问题。 | 任务：改目录名为英文，并同步概念里的路径。主代理：`3类坐标库/` → `class-3-coords/`；`BICS Classification/` → `BICS-Classification/`；`待填.txt` → `pending.txt`。`ai-chain/CONCEPTS.md` 的 C-COORD-3 Library 已改。旧 worklog 历史行未改。总监第 1 次送审通过。本条由书记记入。 |
+|48| 电总参谋部：切片 x,y 顶点改为 10（单位长度缩为 1/10），s 单位长度也定为 1，与 x,y 一样。 | 任务：总参谋部先规划，再改单位与面跨度。主代理：FACE_SPAN=10，UNIT=FACE/10，GAP=UNIT；面心 (5,5)；cubeExitX=10。改 coords.js、scene.js、CONCEPTS.md、index.html。方向与 −x 抽出语义未改。总参谋部第一个执行。总监第 1 次送审通过。本条由书记记入。 |
+|49| 电总参谋部：取消选中后切片边缘绿色荧光高亮，改用选中前那种暗一些的蓝色边缘。 | 任务：总参谋部先规划，再改焦点边框色。主代理：scene.js 焦点边框不再用 0x8be0c0，始终 COLORS.EDGE，opacity 用 base。CONCEPTS C-EDGE 已同步。总参谋部第一个执行。总监第 1 次送审通过。本条由书记记入。 |
+|50| 电总参谋部：抽回应当有和抽出淡出一样的淡入动画。 | 任务：总参谋部先规划，再把抽回做成与抽出同档的缓动。主代理：scene.js 用 exitStayLayer 让抽回位移跟 cubeExit 缓回；去掉透明度瞬拉；lerpVisibility 双向同档；金环也走 opacity lerp。CONCEPTS C-RETRACT/C-DIM 已同步。总参谋部第一个执行。总监第 1 次送审通过。本条由书记记入。 |
+|51| 电总参谋部：去掉 Alphabet/Google 相关公司外的黄环（早期遗留；产品将不止 Google）。 | 任务：总参谋部先规划，再去黄环。主代理：去掉 Torus/COLORS.SUPPLY/supply 筛选与图例；点半径固定 0.022；保留 valueM 与详情。改 scene.js、state.js、index.html、app.css、CONCEPTS.md（C-SUPPLY/C-FILTER）。总参谋部第一个执行。总监第 1 次送审通过。本条由书记记入。 |
+|52| 电总参谋部：建视空间——原点球；相机最远拉回；半径优先 x=y=s=100。 | 任务：总参谋部先规划 C-VIEW-SPACE（R=100 用户单位，maxDistance=R·UNIT；不画球；轴不变；硬壳原点延后），再执行。主代理：LAYOUT.viewSpace/viewSpaceMeters→coords.js；scene.js maxDistance/fog/far；CONCEPTS C-VIEW-SPACE；index lede。总参谋部第一个执行。总监第 1 次送审通过。本条由书记记入。 |
 
 ---
 
