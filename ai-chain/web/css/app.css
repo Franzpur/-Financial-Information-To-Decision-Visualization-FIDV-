@@ -209,7 +209,15 @@ p { margin: 0 0 10px; }
   max-width: 920px;
   margin: 0 auto;
   padding: 48px 20px 64px;
-  animation: splash-in 0.4s ease-out both;
+}
+.home-pending {
+  visibility: hidden;
+}
+.home-ready .home-sectors,
+.home-ready .home-cta-row,
+.home-ready .home-lede,
+.home-ready .home-note {
+  animation: splash-in 0.35s ease-out both;
 }
 .home-brand {
   text-align: center;

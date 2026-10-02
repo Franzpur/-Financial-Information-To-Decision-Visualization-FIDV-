@@ -36,7 +36,8 @@
 
 - 居中 **FIDV** 衬线字标（Iowan / Palatino / Georgia 栈）+ 左侧三片薄切片意象 + accent 细线。
 - 入场：约 **0.4s** 轻淡入（`splash-in`）。
-- 立方体绘出后：**清晰态维持约 3s**，再 **约 4s** opacity 淡出（JS fade fallback **4200ms**）。
+- **仅挂在工程首页 `/`（C-HOME）**：清晰态维持约 **2s**，再 **约 4s** opacity 淡出（JS fade fallback **4200ms**）。开屏期实心 `--bg` 盖住门厅，避免与 `.home-logo` 双标叠影；淡出后再露扇区/CTA。
+- **进 `/cube`（含分类入口）不播开屏。**
 - 无转圈、无 Loading 长文案、不画视空间球。
 
 ### 启动图标
@@ -48,8 +49,8 @@
 
 ### 工程首页（C-HOME）
 
-- `/`：BICS L1 门厅；字标同族；13 入口玻璃条；Technology（19）accent 主路径；无新闻/统计堆砌。
-- `/cube`：决策立方体 + 完整 splash 时序；首页不重演 3s+4s hold/fade。
+- `/`：BICS L1 门厅；先 **C-SPLASH**（hold ~2s → fade ~4s），再字标同族门厅 + 13 入口玻璃条；Technology（19）accent 主路径；无新闻/统计堆砌。
+- `/cube`：决策立方体冷启动，**无** splash。
 
 ---
 
@@ -67,9 +68,9 @@
 
 | 资产 | 路径 |
 |------|------|
-| 色板 / chrome / 首页 | `ai-chain/web/css/app.css`；`ai-chain/web/index.html`（C-HOME）；`ai-chain/web/js/home.js` |
-| 壳 + splash DOM/SVG | `ai-chain/web/cube.html`（C-CUBE + splash） |
-| splash 时序 | `ai-chain/web/js/main.js` |
+| 色板 / chrome / 首页 | `ai-chain/web/css/app.css`；`ai-chain/web/index.html`（C-HOME + C-SPLASH）；`ai-chain/web/js/home.js` |
+| 立方体壳 | `ai-chain/web/cube.html`（C-CUBE；无 splash） |
+| splash 时序 | `ai-chain/web/js/home.js`（hold ~2s → fade ~4s） |
 | 面板类名与 HUD 外观 | `ai-chain/web/js/ui.js`（视觉层） |
 | 启动图标 | `ai-chain/assets/fidv-launcher*` |
 | 图标脚本 | `ai-chain/scripts/set-command-icon.sh` |
