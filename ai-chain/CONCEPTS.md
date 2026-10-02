@@ -37,12 +37,16 @@
 | **C-LABEL** | coplanar label | 共面标签 | Domain/company text glued to slice (not billboard) | `isDomainLabel`, company label planes |
 | **C-EDGE** | slice edge | 切片描边 | Focused slice edge highlights | `isSliceEdge` |
 | **C-AXES** | user axes | 用户坐标轴 | **s/y/x** in ring-matched ice/steel blues from user origin | `rebuildAxes`, `axesGroup` |
+| **C-COORD** | position coordinate `(s, x, y)` | 1类坐标 / 位置坐标 | User coordinate. The only placement language in the cube. `x` and `y` mean only this. Edit `LAYOUT` or an object's coord; do not place with raw Three XYZ | `coords.js`, `applyCoord`, `applySliceCoord` |
 
 **Synonyms to normalize / 口语归一**
 
 - 切片 = slice = layer = 层 = plane（UI「Slices」）  
 - 点球 = 点 = sphere = company point（勿与「金环」混淆）  
 - 环 = concentric ring（营收尺度）；金环 = supplier mark  
+- 布局坐标 = 用户坐标 = 1类坐标 = 位置坐标 `(s, x, y)`  
+- 环上坐标 = 2类坐标 = 相对坐标 `ringCos` / `ringSin`  
+- 法人坐标 = legal entity coordinate = 3类坐标 `legalEntityCoord`  
 
 ---
 
@@ -50,20 +54,25 @@
 
 | ID | EN | 中 | Rule / 约定 |
 |----|----|----|-------------|
-| **C-USER-AXES** | user axes `(x,y,s)` | 用户轴 | Product language. **Not** raw Three.js XYZ. |
-| **C-AXIS-S** | **s** (slice axis) | **s** 轴（切片轴） | Along stack. **1 s-unit = one slice gap** (`gapNow()`). Layer index `i` ⇒ **s\* = i**. Three.js **+X**. |
-| **C-AXIS-Y** | **y** | **y** 轴 | Up the cube face. **1 y-unit = `PLANE_SIZE`**. Face spans **y∈[0,1]**. Three.js **+Y**. |
-| **C-AXIS-X** | **x** | **x** 轴 | Into/out of cube face. **1 x-unit = `PLANE_SIZE`**. Face spans **x∈[0,1]**; pulled far edge **x=2**. Three.js **−Z** via `USER_X_SIGN = -1`. |
-| **C-ORIGIN** | user origin | 用户原点 | Corner **(x,y,s)=(0,0,0)** = −x, −y, −s of the cube. Three: `(−halfStack, −PLANE_SIZE/2, +PLANE_SIZE/2)`. |
-| **C-MAP** | user → Three | 用户→引擎映射 | `userToLocal` / `userToWorld`: `X += s·gap`, `Y += y·PLANE_SIZE`, `Z += USER_X_SIGN·x·PLANE_SIZE`, then `root.localToWorld` (honors Q/E yaw). |
+| **C-USER-AXES** | user axes `(s, x, y)` | 用户轴 | Product language. Tuple order is **s, then x, then y**. **Not** raw Three.js XYZ. |
+| **C-AXIS-S** | **s** (slice axis) | **s** 轴（切片轴） | Along stack. **1 s-unit = one slice gap** (`gapNow()`). Layer index `i` ⇒ **s = i**. Three.js **+X**. |
+| **C-AXIS-Y** | **y** | **y** 轴 | Up the cube face. **1 y-unit = `FACE`**. Face spans **y∈[0,1]**. Three.js **+Y**. |
+| **C-AXIS-X** | **x** | **x** 轴 | Out of the cube face. **1 x-unit = `FACE`**. Face spans **x∈[0,1]**; pulled far edge **x=2**. Three.js **−Z** via `USER_X_SIGN = -1`. |
+| **C-ORIGIN** | user origin | 用户原点 | Corner **(s, x, y)=(0, 0, 0)**. Three: `(−halfStack, −FACE/2, +FACE/2)`. |
+| **C-MAP** | user → Three | 用户→引擎映射 | `coordToLocal` / `userToWorld`: `X += s·gap`, `Y += y·FACE`, `Z += USER_X_SIGN·x·FACE`, then `root.localToWorld` (honors Q/E yaw). |
+| **C-COORD** | position coordinate | 1类坐标 / 位置坐标 | User `(s, x, y)`. The only placement in the cube. `x` and `y` mean only this pair. Slice pull is `+x` on the slice anchor (`sliceAnchor`). Company `coord` is the **unpulled** face position. |
+| **C-COORD-2** | relative coordinate | 2类坐标 / 相对坐标 | Ring placement `ringCos` / `ringSin`. Not called `x` or `y`. `companyCoord` projects them into 位置坐标. |
+| **C-COORD-3** | legal entity coordinate | 3类坐标 / 法人坐标 | One per legal entity. Format `00-00-00-00-00-00-0000`, Bloomberg BICS. Field `legalEntityCoord` is empty until filled. Library: `3类坐标库/BICS Classification/`. Not a position, not drawn. |
 
 ```
-User (x,y,s)     Three.js (under root)
+User (s, x, y)   Three.js (under root)
 ─────────────────────────────────────
 +s  (ice)        +X
 +y  (steel)      +Y
 +x  (ring blue)  −Z  (USER_X_SIGN = -1)
 ```
+
+Position changes go through `ai-chain/web/js/coords.js` (`LAYOUT`, or an object's `{s, x, y}`). Scene code calls `applyCoord` / `applySliceCoord`.
 
 **Do not / 禁止**
 
@@ -92,9 +101,9 @@ User (x,y,s)     Three.js (under root)
 
 | ID | EN | 中 | What happens / 效果 | Code |
 |----|----|----|---------------------|------|
-| **C-PULL** | pull out | 抽出 | Focused slice translates along **+x** by one face (`PULL_OUT = PLANE_SIZE`): content moves **x∈[0,1] → [1,2]**. | `lerpPullOut`, `targetPull` |
+| **C-PULL** | pull out | 抽出 | Focused slice translates along **+x** by one face (`LAYOUT.pullX = 1`): content moves **x∈[0,1] → [1,2]**. | `lerpPullOut`, `sliceAnchor` |
 | **C-RETRACT** | retract / pull back | 抽回 | Focus cleared or toggled off; slice returns to **x∈[0,1]**. **Camera must not auto-yaw toward origin.** | `focusSlice` toggle / `clearFocus` |
-| **C-PULL-ZONE** | pull-frame hit zone | 抽出点击区 | Square∖disk on slice face: inside 1×1 square, **outside** outermost concentric ring. Misses inside the ring do **not** toggle focus. | `isPullFrameHit`, `RING_SPREAD` |
+| **C-PULL-ZONE** | pull-frame hit zone | 抽出点击区 | Square∖disk on slice face: inside 1×1 square, **outside** outermost concentric ring. Misses inside the ring do **not** toggle focus. Tested in user `(s, x, y)`. | `isPullFrameHit`, `LAYOUT.ringRadius` |
 | **C-FOCUS-ACT** | focus slice | 聚焦切片 | Set `focusLayer`; apply dim + pull. Via plane click, layer list, or `[` `]`. | `focusSlice` |
 | **C-PICK** | pick company | 点选公司 | Raycast sphere → select + focus its layer. Plane toggle only if hit is in **C-PULL-ZONE**. | `pick`, `selectCompany` |
 | **C-STDVIEW** | standard view | 标准视角 | Snap camera to canonical pose for current focus state. Hotkey **C** / button / middle-click. | `goStandardView`, `standardPose` |
@@ -107,12 +116,12 @@ Changing or clearing slice focus **must not** animate orbit target into the cube
 
 ## 5. Standard view poses / 标准视角位姿 `[C-STDVIEW]`
 
-User coordinates. Looking direction via OrbitControls `target`.
+User coordinates `(s, x, y)`. Looking direction via OrbitControls `target`. Numbers live in `LAYOUT.camera`.
 
-| Mode | Camera `(x,y,s)` | Look-at | 中文说明 |
-|------|------------------|---------|----------|
-| **Pulled** (`focusLayer = s*`) | `(1.5, 0.5, s* + 10)` | `(1.5, 0.5, s*)` (−**s**) | 正对抽出切片中心（x=1.5） |
-| **Overview** (no focus) | `(2.1, 2.1, 24)` | user origin `(0,0,0)` | 未抽出总览 |
+| Mode | Camera `(s, x, y)` | Look-at | 中文说明 |
+|------|--------------------|---------|----------|
+| **Pulled** (`focusLayer = s*`) | `(s* + 10, 1.5, 0.5)` | `(s*, 1.5, 0.5)` (−**s**) | 正对抽出切片中心（x=1.5） |
+| **Overview** (no focus) | `(24, 2.1, 2.1)` | user origin `(0, 0, 0)` | 未抽出总览 |
 
 Removed / 已废弃：旧「角视图 corner view」与 **V / Home** 绑定（勿恢复 unless product asks）。
 
@@ -144,7 +153,7 @@ Removed / 已废弃：旧「角视图 corner view」与 **V / Home** 绑定（�
 | ID | EN | 中 | Notes |
 |----|----|----|-------|
 | **C-LAYER-DATA** | layer record | 层数据 | `layers.json` / API; order 0 Power → 10 Models |
-| **C-COMPANY** | company record | 公司 | `revBn`, `revScore`, `ring`, `country`, optional `valueM` |
+| **C-COMPANY** | company record | 公司 | `revBn`, `revScore`, `ring`, `ringCos`, `ringSin`, `country`, optional `valueM`, implicit `legalEntityCoord` (empty) |
 | **C-US / C-INTL** | US / non-US | 美 / 非美 | Colors cyan / orange (`#3cf0ff` / `#ffb020`) |
 | **C-BUNDLE** | API bundle | 启动包 | `GET /api/bundle` bootstraps SPA |
 | **C-RING-SCORE** | ring score | 环分数 | Per-slice min–max → 0–100; **100 = exact center** |
@@ -157,11 +166,15 @@ Removed / 已废弃：旧「角视图 corner view」与 **V / Home** 绑定（�
 |--------|------------|------|
 | `state.focusLayer` | C-FOCUS | `null` = overview |
 | `state.selectedId` | C-SELECT | |
-| `PULL_OUT` | C-PULL | `= PLANE_SIZE` |
+| `LAYOUT.pullX` | C-PULL | `1` user-x (one face) |
 | `USER_X_SIGN` | C-AXIS-X | `-1` |
-| `PLANE_SIZE` | C-AXIS-X/Y unit | face edge length in Three units |
+| `FACE` | C-AXIS-X/Y unit | face edge length in Three units |
 | `gapNow()` / `GAP` | C-AXIS-S unit | |
-| `userToWorld` | C-MAP | |
+| `coordToLocal` / `userToWorld` | C-MAP | argument is `{s, x, y}` |
+| `applyCoord` / `applySliceCoord` | C-COORD | only placement API in the scene |
+| `company.coord` | C-COORD | unpulled 位置坐标 `(s, x, y)` |
+| `ringCos` / `ringSin` | C-COORD-2 | 相对坐标；`companyCoord` 投影成位置坐标 |
+| `legalEntityCoord` | C-COORD-3 | 法人坐标；格式 `00-00-00-00-00-00-0000`；待填 |
 | `standardPose` / `goStandardView` | C-STDVIEW | |
 | `focusSlice` / `clearFocus` | C-FOCUS-ACT / C-ESC | |
 | `lerpPullOut` | C-PULL / C-RETRACT | easing only; no camera |
@@ -171,7 +184,7 @@ Removed / 已废弃：旧「角视图 corner view」与 **V / Home** 绑定（�
 
 ## 9. Frozen rules / 冻结约定（续做勿回退）
 
-1. User language is **`(x,y,s)`**, not raw Three XYZ.  
+1. 1类坐标 / 位置坐标 is **`(s, x, y)`**, not raw Three XYZ. `x` and `y` mean only this. Move things by editing coordinates in `coords.js`. 2类坐标 / 相对坐标 is `ringCos` / `ringSin`. 3类坐标 / 法人坐标 is `legalEntityCoord`（`00-00-00-00-00-00-0000`，待填），不参与摆放。  
 2. Pull is along user **+x** only; never along **s**.  
 3. Focus change / retract → **hold camera** (`C-CAM-HOLD`).  
 4. Standard overview / pulled poses stay as §5 until explicitly revised.  
@@ -187,15 +200,15 @@ Removed / 已废弃：旧「角视图 corner view」与 **V / Home** 绑定（�
 | Doc | Role |
 |-----|------|
 | **This file** | Concept targets (agent-facing) |
-| [`WORKLOG.md`](../WORKLOG.md) | Session asks/answers + history |
+| [`library/worklog-001.md`](../library/worklog-001.md) | Session asks/answers + history |
 | [`README.md`](./README.md) | Run / API |
 | `web/js/scene.js` | 3D + camera + pick (`[C-*]` tags) |
 | `web/js/state.js` | Shared state |
 | `web/js/ui.js` | Panels / status / buttons |
 
 **One-liner resume / 一句话续工**  
-立方体 = 沿 **s** 堆的 **切片**；点球在切片上；抽出沿 **x** 到 [1,2]；**C** = 标准视角；切层/抽回不扭相机。
+立方体 = 沿 **s** 堆的 **切片**；位置一律 **(s, x, y)**；抽出沿 **x** 到 [1,2]；**C** = 标准视角；切层/抽回不扭相机。
 
 ---
 
-*Last updated: 2026-09-27 · Keep in sync with `standardPose` and hotkeys in `scene.js`.*
+*Last updated: 2026-10-02 · Coordinates are `(s, x, y)` in `web/js/coords.js`. Keep in sync with `LAYOUT.camera` and hotkeys in `scene.js`.*

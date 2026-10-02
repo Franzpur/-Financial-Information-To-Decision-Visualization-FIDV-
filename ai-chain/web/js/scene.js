@@ -1,21 +1,28 @@
 /**
  * AI Chain Cube — Three.js scene.
  * Concept targets: ../CONCEPTS.md  (tags [C-SLICE], [C-PULL], [C-STDVIEW], …)
- * User axes (x,y,s) ≠ raw Three XYZ — see [C-USER-AXES] / [C-MAP].
+ * Layout lives in user (s, x, y). See coords.js [C-COORD] / [C-MAP].
+ * Three.js positions are produced only by applyCoord / applySliceCoord.
  */
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { COLORS, state, passesFilter, companyById } from "./state.js";
+import {
+  FACE,
+  USER_X_SIGN,
+  LAYOUT,
+  gapOf,
+  coordToLocal,
+  localToCoord,
+  localOffset,
+  sliceAnchor,
+  companyCoord,
+  domainLabelCoord,
+  companyLabelCoord,
+  ringOffset,
+  axisChrome,
+} from "./coords.js";
 
-const PLANE_SIZE = 4.2; // [C-AXIS-X]/[C-AXIS-Y] unit length (cube face edge)
-const GAP = 0.55; // base [C-AXIS-S] unit (= one slice gap when not exploded)
-/**
- * [C-PULL] One user-x unit = cube depth = PLANE_SIZE (Three.js).
- * Pull moves a slice fully from user-x [0,1] into [1,2].
- */
-const PULL_OUT = PLANE_SIZE;
-/** [C-RING] Outer concentric-ring radius in slice local YZ (= max company spread). */
-const RING_SPREAD = PLANE_SIZE * 0.38;
 /** Axis palette matched to concentric rings (cool steel / ice blue). */
 const AXIS_S = 0xd4e8ff; // = ring r=10
 const AXIS_Y = 0xb0cce8;
@@ -25,13 +32,8 @@ const AXIS_Y_CSS = "#b0cce8";
 const AXIS_X_CSS = "#8eb6d8";
 const AXIS_TICK_MAJOR = 0xc0d8f0;
 const AXIS_TICK_MINOR = 0x5a7088;
-/**
- * [C-USER-AXES] s→Three+X; y→Three+Y; x→Three−Z (colors match rings).
- * [C-ORIGIN] (−slice,−y,−x) → Three (−halfStack, −half, +half).
- * Cube face: user-x∈[0,1], user-y∈[0,1].
- */
-const USER_X_SIGN = -1; // [C-AXIS-X] Three.js Z *= USER_X_SIGN for +user-x
 const N_LAYERS = () => state.layers.length;
+const PULL_X = LAYOUT.pullX;
 
 export function createScene(viewport, hooks = {}) {
   const scene = new THREE.Scene();
@@ -138,25 +140,34 @@ export function createScene(viewport, hooks = {}) {
   };
 }
 
-function layerX(i) {
-  const n = N_LAYERS();
-  const width = (n - 1) * GAP;
-  return -width / 2 + i * GAP;
-}
-
-function stackWidth() {
-  return Math.max(GAP, (N_LAYERS() - 1) * GAP) + (state.exploded ? GAP * 2.2 : 0);
-}
-
 function gapNow() {
-  return state.exploded ? GAP * 2.2 : GAP;
+  return gapOf(state.exploded);
 }
 
-function layerXNow(i) {
-  const n = N_LAYERS();
-  const g = gapNow();
-  const width = (n - 1) * g;
-  return -width / 2 + i * g;
+function v3(p) {
+  return new THREE.Vector3(p.x, p.y, p.z);
+}
+
+/** [C-COORD] Place a root child at an absolute user coordinate. */
+function applyCoord(object, coord) {
+  object.position.copy(v3(coordToLocal(coord, N_LAYERS(), gapNow())));
+  object.userData.coord = { s: coord.s, x: coord.x, y: coord.y };
+}
+
+/**
+ * [C-COORD] Place a slice child. `coord` is the unpulled layout coordinate.
+ * The slice group carries pull, so children stay fixed in the slice.
+ */
+function applySliceCoord(object, sliceIndex, coord) {
+  const dx = coord.x - LAYOUT.faceCenter.x;
+  const dy = coord.y - LAYOUT.faceCenter.y;
+  const ds = coord.s - sliceIndex;
+  object.position.copy(v3(localOffset(ds, dx, dy, gapNow())));
+  object.userData.coord = { s: coord.s, x: coord.x, y: coord.y };
+}
+
+function placeSliceGroup(g, i) {
+  applyCoord(g, sliceAnchor(i, g.userData.pull ?? 0));
 }
 
 function pointRadius(c) {
@@ -265,11 +276,9 @@ function buildCube(ctx) {
     g.userData.layer = i;
     g.userData.pull = 0;
     g.userData.targetPull = 0;
-    g.userData.baseX = 0;
-    g.userData.baseZ = 0;
 
     const plane = new THREE.Mesh(
-      new THREE.PlaneGeometry(PLANE_SIZE, PLANE_SIZE),
+      new THREE.PlaneGeometry(FACE, FACE),
       new THREE.MeshStandardMaterial({
         color: COLORS.PLANE,
         transparent: true,
@@ -288,7 +297,7 @@ function buildCube(ctx) {
     g.add(plane);
 
     const edges = new THREE.LineSegments(
-      new THREE.EdgesGeometry(new THREE.PlaneGeometry(PLANE_SIZE, PLANE_SIZE)),
+      new THREE.EdgesGeometry(new THREE.PlaneGeometry(FACE, FACE)),
       new THREE.LineBasicMaterial({
         color: COLORS.EDGE,
         transparent: true,
@@ -303,17 +312,19 @@ function buildCube(ctx) {
     g.add(edges);
 
     const domainLabel = makeSliceTextPlane(makeDomainLabelTexture(L.name), 1.9, 0.38);
-    domainLabel.position.set(0.03, PLANE_SIZE / 2 - 0.28, -PLANE_SIZE / 2 + 1.05);
+    applySliceCoord(domainLabel, i, domainLabelCoord(i, gapNow()));
     domainLabel.userData.isDomainLabel = true;
     domainLabel.userData.baseOpacity = 1;
     g.add(domainLabel);
 
     for (let r = 1; r <= 10; r++) {
-      const rr = RING_SPREAD * (r / 10);
+      const radiusUser = LAYOUT.ringRadius * (r / 10);
+      const liftS = LAYOUT.ringGuideLiftMeters / gapNow();
       const pts = [];
       for (let k = 0; k <= 64; k++) {
         const a = (k / 64) * Math.PI * 2;
-        pts.push(new THREE.Vector3(0.008, Math.sin(a) * rr, Math.cos(a) * rr));
+        const { dx, dy } = ringOffset(radiusUser, a);
+        pts.push(v3(localOffset(liftS, dx, dy, gapNow())));
       }
       const ringLine = new THREE.Line(
         new THREE.BufferGeometry().setFromPoints(pts),
@@ -333,14 +344,6 @@ function buildCube(ctx) {
     ctx.planeGroups.push(g);
     root.add(g);
   });
-
-  const w = stackWidth() + 0.5;
-  const boxMesh = new THREE.Mesh(new THREE.BoxGeometry(w, PLANE_SIZE + 0.45, PLANE_SIZE + 0.45));
-  const box = new THREE.BoxHelper(boxMesh, 0x2a3545);
-  box.material.transparent = true;
-  box.material.opacity = 0.35;
-  root.add(box);
-  ctx.boxHelper = box;
 
   state.companies.forEach((c) => {
     const isUS = c.country === "US";
@@ -363,9 +366,10 @@ function buildCube(ctx) {
     );
     mesh.userData.companyId = c.id;
     mesh.renderOrder = 5;
-    const spread = RING_SPREAD;
-    // [C-POINT] Sphere center coplanar with the YZ slice (local x = 0)
-    mesh.position.set(0, c.y * spread, c.x * spread);
+    // [C-POINT] Layout coordinate on the unpulled face, from ringCos/ringSin.
+    const coord = companyCoord(c.layer, c.ringCos, c.ringSin);
+    c.coord = coord;
+    applySliceCoord(mesh, c.layer, coord);
     ctx.planeGroups[c.layer].add(mesh);
     ctx.meshes.push(mesh);
     ctx.byId.set(c.id, mesh);
@@ -389,7 +393,7 @@ function buildCube(ctx) {
     }
 
     const label = makeSliceTextPlane(makeCompanyLabelTexture(shortName(c), isUS), 0.72, 0.14);
-    label.position.set(0.02, mesh.position.y + r + 0.12, mesh.position.z);
+    applySliceCoord(label, c.layer, companyLabelCoord(coord, r, gapNow()));
     label.visible = false;
     label.renderOrder = 7;
     label.userData.isCompanyLabel = true;
@@ -404,24 +408,33 @@ function buildCube(ctx) {
 
 function layoutPlanes(ctx) {
   ctx.planeGroups.forEach((g, i) => {
-    const pull = g.userData.pull ?? 0;
-    g.userData.baseX = layerXNow(i);
-    g.userData.baseZ = 0;
-    // Pull along flipped user-x (Three.js −Z)
-    g.position.set(g.userData.baseX, 0, g.userData.baseZ + USER_X_SIGN * pull);
-    g.userData.targetPull = state.focusLayer === i ? PULL_OUT : 0;
+    g.userData.targetPull = state.focusLayer === i ? PULL_X : 0;
+    placeSliceGroup(g, i);
   });
+  syncFrame(ctx);
+  rebuildAxes(ctx);
+}
+
+/** [C-COORD] Wire cube around user (s, x, y) from the padded unit cube. */
+function syncFrame(ctx) {
   if (ctx.boxHelper) {
     ctx.root.remove(ctx.boxHelper);
-    const w = stackWidth() + 0.5;
-    const boxMesh = new THREE.Mesh(new THREE.BoxGeometry(w, PLANE_SIZE + 0.45, PLANE_SIZE + 0.45));
-    const helper = new THREE.BoxHelper(boxMesh, 0x2a3545);
-    helper.material.transparent = true;
-    helper.material.opacity = 0.35;
-    ctx.root.add(helper);
-    ctx.boxHelper = helper;
+    ctx.boxHelper.geometry?.dispose?.();
+    ctx.boxHelper.material?.dispose?.();
+    ctx.boxHelper = null;
   }
-  rebuildAxes(ctx);
+  const n = N_LAYERS();
+  const gap = gapNow();
+  const padS = LAYOUT.framePad.sMeters / gap;
+  const padF = LAYOUT.framePad.faceMeters / FACE;
+  const min = coordToLocal({ s: -padS, x: -padF, y: -padF }, n, gap);
+  const max = coordToLocal({ s: n - 1 + padS, x: 1 + padF, y: 1 + padF }, n, gap);
+  const box = new THREE.Box3().setFromPoints([v3(min), v3(max)]);
+  const helper = new THREE.Box3Helper(box, 0x2a3545);
+  helper.material.transparent = true;
+  helper.material.opacity = 0.35;
+  ctx.root.add(helper);
+  ctx.boxHelper = helper;
 }
 
 /**
@@ -441,40 +454,31 @@ function rebuildAxes(ctx) {
   }
 
   const n = N_LAYERS();
-  const g = gapNow();
-  const halfStack = ((n - 1) * g) / 2;
-  // Opposite Z corner vs previous: origin at +Z face, user-+x points toward −Z
-  const origin = new THREE.Vector3(-halfStack, -PLANE_SIZE / 2, PLANE_SIZE / 2);
+  const gap = gapNow();
+  const chrome = axisChrome(gap);
   const axes = new THREE.Group();
-  axes.position.copy(origin);
+  applyCoord(axes, { s: 0, x: 0, y: 0 });
 
-  const sliceUnit = g; // 1 s-unit = 1 slice gap
-  const sliceLen = sliceUnit * 20; // s-axis length in gap-units
-  // User unit on x/y = cube face = PLANE_SIZE; x drawn to ~2.25, y matches x
-  const unit = PLANE_SIZE;
-  const xLen = unit * 2.25;
-  const yLen = xLen;
-  const xDir = new THREE.Vector3(0, 0, USER_X_SIGN); // −Z
+  const at = (s, x, y) => v3(localOffset(s, x, y, gap));
+  const sDir = new THREE.Vector3(1, 0, 0);
+  const yDir = new THREE.Vector3(0, 1, 0);
+  const xDir = new THREE.Vector3(0, 0, USER_X_SIGN);
 
-  axes.add(makeAxisLine(new THREE.Vector3(sliceLen, 0, 0), AXIS_S));
-  axes.add(makeAxisLine(new THREE.Vector3(0, yLen, 0), AXIS_Y));
-  axes.add(makeAxisLine(xDir.clone().multiplyScalar(xLen), AXIS_X));
+  axes.add(makeAxisLine(at(chrome.sEnd, 0, 0), AXIS_S));
+  axes.add(makeAxisLine(at(0, 0, chrome.yEnd), AXIS_Y));
+  axes.add(makeAxisLine(at(0, chrome.xEnd, 0), AXIS_X));
 
-  axes.add(makeAxisArrow(new THREE.Vector3(1, 0, 0), sliceLen, AXIS_S));
-  axes.add(makeAxisArrow(new THREE.Vector3(0, 1, 0), yLen, AXIS_Y));
-  axes.add(makeAxisArrow(xDir, xLen, AXIS_X));
+  axes.add(makeAxisArrow(sDir, chrome.sEnd * gap, AXIS_S));
+  axes.add(makeAxisArrow(yDir, chrome.yEnd * FACE, AXIS_Y));
+  axes.add(makeAxisArrow(xDir, chrome.xEnd * FACE, AXIS_X));
 
-  // Slice ticks every unit 0..20; emphasize existing layer indices 0..n-1
-  for (let i = 0; i <= 20; i++) {
-    const sx = i * sliceUnit;
+  // Slice ticks every unit 0..sEnd; emphasize existing layer indices 0..n-1
+  for (let i = 0; i <= chrome.sEnd; i++) {
     const isLayer = i < n;
-    const tickH = isLayer ? 0.14 : 0.08;
+    const tickH = isLayer ? chrome.tickLayerY : chrome.tickMinorY;
     axes.add(
       new THREE.Line(
-        new THREE.BufferGeometry().setFromPoints([
-          new THREE.Vector3(sx, 0, 0),
-          new THREE.Vector3(sx, tickH, 0),
-        ]),
+        new THREE.BufferGeometry().setFromPoints([at(i, 0, 0), at(i, 0, tickH)]),
         new THREE.LineBasicMaterial({
           color: isLayer ? AXIS_TICK_MAJOR : AXIS_TICK_MINOR,
           transparent: true,
@@ -491,56 +495,48 @@ function rebuildAxes(ctx) {
         isLayer ? 0.2 : 0.16,
         isLayer ? AXIS_S_CSS : "#7a90a8"
       );
-      num.position.set(sx, tickH + 0.18, 0);
+      num.position.copy(at(i, 0, tickH + chrome.labelGapY));
       axes.add(num);
     }
   }
 
   // y ticks: 0 at origin, 1 at cube top (also on s/y plane)
   for (const yu of [0, 1]) {
-    const yy = yu * unit;
     axes.add(
       new THREE.Line(
-        new THREE.BufferGeometry().setFromPoints([
-          new THREE.Vector3(0, yy, 0),
-          new THREE.Vector3(0.14, yy, 0),
-        ]),
+        new THREE.BufferGeometry().setFromPoints([at(0, 0, yu), at(chrome.yTickS, 0, yu)]),
         new THREE.LineBasicMaterial({ color: AXIS_Y, transparent: true, opacity: 0.9, depthWrite: false })
       )
     );
     const yl = makeSyPlaneLabel(String(yu), 0.2, 0.16, AXIS_Y_CSS);
-    yl.position.set(0.32, yy, 0);
+    yl.position.copy(at(chrome.yNumeralS, 0, yu));
     axes.add(yl);
   }
 
   // x ticks: 0 (origin face), 1 (far face / cube), 2 (pulled-out far edge)
   for (const xu of [0, 1, 2]) {
-    const xz = USER_X_SIGN * xu * unit;
     axes.add(
       new THREE.Line(
-        new THREE.BufferGeometry().setFromPoints([
-          new THREE.Vector3(0, 0, xz),
-          new THREE.Vector3(0, 0.14, xz),
-        ]),
+        new THREE.BufferGeometry().setFromPoints([at(0, xu, 0), at(0, xu, chrome.xTickY)]),
         new THREE.LineBasicMaterial({ color: AXIS_X, transparent: true, opacity: 0.9, depthWrite: false })
       )
     );
     // x-axis numerals sit in the x/y plane (Three.js YZ)
     const xl = makeXyPlaneLabel(String(xu), 0.2, 0.16, AXIS_X_CSS);
-    xl.position.set(0, 0.32, xz);
+    xl.position.copy(at(0, xu, chrome.xNumeralY));
     axes.add(xl);
   }
 
   const sliceLbl = makeSyPlaneLabel("s", 0.32, 0.26, AXIS_S_CSS);
-  sliceLbl.position.set(sliceLen + 0.4, 0.22, 0);
+  sliceLbl.position.copy(at(chrome.sLabel.s, chrome.sLabel.x, chrome.sLabel.y));
   axes.add(sliceLbl);
 
   const yLbl = makeSyPlaneLabel("y", 0.28, 0.22, AXIS_Y_CSS);
-  yLbl.position.set(0.08, yLen + 0.28, 0);
+  yLbl.position.copy(at(chrome.yLabel.s, chrome.yLabel.x, chrome.yLabel.y));
   axes.add(yLbl);
 
   const xLbl = makeXyPlaneLabel("x", 0.28, 0.22, AXIS_X_CSS);
-  xLbl.position.set(0, 0.22, USER_X_SIGN * (xLen + 0.28));
+  xLbl.position.copy(at(chrome.xLabel.s, chrome.xLabel.x, chrome.xLabel.y));
   axes.add(xLbl);
 
   const originDot = new THREE.Mesh(
@@ -607,67 +603,49 @@ function makeXyPlaneLabel(text, w, h, fill) {
   return mesh;
 }
 
-/** [C-PULL][C-RETRACT] Ease slice along +x; camera untouched. */
+/** [C-PULL][C-RETRACT] Ease slice along +x (user units); camera untouched. */
 function lerpPullOut(ctx) {
   ctx.planeGroups.forEach((g, i) => {
-    const target = state.focusLayer === i ? PULL_OUT : 0;
+    const target = state.focusLayer === i ? PULL_X : 0;
     g.userData.targetPull = target;
     const cur = g.userData.pull ?? 0;
     const diff = target - cur;
-    const k = 0.13 + Math.min(0.12, Math.abs(diff) / PULL_OUT * 0.12);
+    const k = 0.13 + Math.min(0.12, Math.abs(diff) * 0.12);
     const next = cur + diff * k;
-    g.userData.pull = Math.abs(next - target) < 0.003 ? target : next;
-    const baseX = g.userData.baseX ?? layerXNow(i);
-    const baseZ = g.userData.baseZ ?? 0;
-    g.position.set(baseX, 0, baseZ + USER_X_SIGN * g.userData.pull);
+    g.userData.pull = Math.abs(next - target) < 0.001 ? target : next;
+    placeSliceGroup(g, i);
   });
 }
 
 function framingDistance() {
-  return Math.max(7.2, Math.hypot(stackWidth(), PLANE_SIZE) * 1.15);
+  const span = Math.max(gapNow(), (N_LAYERS() - 1) * gapNow());
+  return Math.max(7.2, Math.hypot(span, FACE) * 1.15);
 }
 
-
-/** [C-MAP] User (x,y,s) → root-local Three.js. s-unit = slice gap; x/y-unit = PLANE_SIZE. */
-function userOriginLocal() {
-  const n = N_LAYERS();
-  const g = gapNow();
-  const halfStack = ((n - 1) * g) / 2;
-  return new THREE.Vector3(-halfStack, -PLANE_SIZE / 2, PLANE_SIZE / 2);
-}
-
-function userToLocal(xu, yu, su) {
-  const o = userOriginLocal();
-  const sliceUnit = gapNow();
-  const unit = PLANE_SIZE;
-  return new THREE.Vector3(
-    o.x + su * sliceUnit,
-    o.y + yu * unit,
-    o.z + USER_X_SIGN * xu * unit
-  );
-}
-
-function userToWorld(ctx, xu, yu, su) {
-  return ctx.root.localToWorld(userToLocal(xu, yu, su));
+/** [C-MAP] User (s, x, y) → world Three.js, including root yaw. */
+function userToWorld(ctx, coord) {
+  return ctx.root.localToWorld(v3(coordToLocal(coord, N_LAYERS(), gapNow())));
 }
 
 /**
- * [C-STDVIEW] Standard framing (user coords):
- * - focused s*: camera (1.5, 0.5, s*+10) → look (1.5, 0.5, s*) (−s, pulled face)
- * - no focus: camera (2.1, 2.1, 24) → user origin
+ * [C-STDVIEW] Standard framing in (s, x, y):
+ * - focused s*: camera (s*+10, 1.5, 0.5) → look (s*, 1.5, 0.5) (−s, pulled face)
+ * - no focus: camera (24, 2.1, 2.1) → user origin (0, 0, 0)
  */
 function standardPose(ctx) {
   if (state.focusLayer != null) {
     const sStar = state.focusLayer;
-    // Face the pulled slice (x∈[1,2] → center x=1.5)
+    const cam = LAYOUT.camera.pulled;
+    const look = { s: sStar, x: cam.x, y: cam.y };
     return {
-      pos: userToWorld(ctx, 1.5, 0.5, sStar + 10),
-      target: userToWorld(ctx, 1.5, 0.5, sStar),
+      pos: userToWorld(ctx, { s: sStar + cam.sOffset, x: cam.x, y: cam.y }),
+      target: userToWorld(ctx, look),
     };
   }
+  const overview = LAYOUT.camera.overview;
   return {
-    pos: userToWorld(ctx, 2.1, 2.1, 24),
-    target: userToWorld(ctx, 0, 0, 0),
+    pos: userToWorld(ctx, overview.pos),
+    target: userToWorld(ctx, overview.target),
   };
 }
 
@@ -762,9 +740,10 @@ function selectCompany(ctx, id) {
   state.selectedId = id;
   state.focusLayer = c.layer;
   const mesh = ctx.byId.get(id);
-  if (mesh) {
-    const world = new THREE.Vector3();
-    mesh.getWorldPosition(world);
+  if (mesh?.userData.coord) {
+    const pull = ctx.planeGroups[c.layer]?.userData.pull ?? 0;
+    const base = mesh.userData.coord;
+    const world = userToWorld(ctx, { s: base.s, x: base.x + pull, y: base.y });
     const toTarget = new THREE.Vector3(world.x, world.y * 0.35, 0);
     startCamAnim(ctx, ctx.camera.position.clone(), toTarget, 420);
   }
@@ -815,7 +794,7 @@ function queueVisibilityTargets(ctx) {
     const dim = state.focusLayer != null && i !== state.focusLayer;
     // Focused slice draws after dimmed neighbors so its points stay visible
     g.renderOrder = dim ? 0 : 2;
-    g.userData.targetPull = state.focusLayer === i ? PULL_OUT : 0;
+    g.userData.targetPull = state.focusLayer === i ? PULL_X : 0;
     const focused = state.focusLayer === i;
     g.children.forEach((ch) => {
       if (!ch.material || ch.material.opacity == null) return;
@@ -994,22 +973,21 @@ function setPointer(ctx, event) {
 }
 
 /**
- * [C-PULL-ZONE] Square-minus-circle on the slice face (user 1×1):
- * inside |y|,|x_face| ≤ face/2, outside outermost ring (RING_SPREAD).
- * Hits inside the ring field do not toggle focus — avoids miss-click retract.
+ * [C-PULL-ZONE] Square-minus-disk on the slice face, in user (s, x, y):
+ * inside the 1×1 face, outside the outermost ring. Hits inside the ring
+ * do not toggle focus.
  */
-function isPullFrameHit(hit) {
-  const plane = hit.object;
-  const g = plane.parent;
+function isPullFrameHit(ctx, hit) {
+  const g = hit.object.parent;
   if (!g) return false;
-  const local = g.worldToLocal(hit.point.clone());
-  const fy = local.y;
-  const fz = local.z; // face axes on YZ wall
-  const half = PLANE_SIZE / 2;
-  if (Math.abs(fy) > half + 1e-4 || Math.abs(fz) > half + 1e-4) return false;
-  const r2 = fy * fy + fz * fz;
-  const R = RING_SPREAD;
-  return r2 > R * R;
+  const rootLocal = ctx.root.worldToLocal(hit.point.clone());
+  const coord = localToCoord(rootLocal, N_LAYERS(), gapNow());
+  const pull = g.userData.pull ?? 0;
+  const dx = coord.x - (LAYOUT.faceCenter.x + pull);
+  const dy = coord.y - LAYOUT.faceCenter.y;
+  if (Math.abs(dx) > 0.5 + 1e-4 || Math.abs(dy) > 0.5 + 1e-4) return false;
+  const R = LAYOUT.ringRadius;
+  return dx * dx + dy * dy > R * R;
 }
 
 /** [C-PICK] company first; else [C-FOCUS-ACT] only in [C-PULL-ZONE]. */
@@ -1032,7 +1010,7 @@ function pick(ctx, event) {
   const planeHits = ctx.raycaster.intersectObjects(planes, false);
   if (!planeHits.length) return;
   const hit = planeHits[0];
-  if (!isPullFrameHit(hit)) return;
+  if (!isPullFrameHit(ctx, hit)) return;
   focusSlice(ctx, hit.object.userData.layerIndex);
 }
 

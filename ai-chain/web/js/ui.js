@@ -6,6 +6,7 @@ import {
   companyById,
   visibleCompanies,
 } from "./state.js";
+import { formatCoord } from "./coords.js";
 
 export function createUI(sceneApi) {
   const layerList = document.getElementById("layerList");
@@ -81,6 +82,7 @@ export function createUI(sceneApi) {
         <span>Country</span><span>${region}</span>
         <span>Revenue (approx.)</span><span>${c.revBn != null ? `$${c.revBn}B / yr` : "—"}</span>
         <span>Size score</span><span>${c.revScore != null ? c.revScore.toFixed(1) + " / 100" : "—"}</span>
+        <span>Position (s, x, y)</span><span>${formatCoord(c.coord)}</span>
         <span>Concentric ring</span><span>${ringLabel(c)}</span>
         <span>Alphabet link</span><span>${c.valueM != null ? `~$${c.valueM.toFixed(0)}M (GOOGL_SUPPLY)` : "Not in quantified supplier table"}</span>
         <span>Data source</span><span>${c.source || "—"}</span>

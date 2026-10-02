@@ -1,0 +1,1 @@
+../../agents/chief-inspector.md

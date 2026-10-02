@@ -37,7 +37,7 @@ Open http://127.0.0.1:8787/
 | `GET /api/companies/:id` | One company (ring-normalized) |
 | `GET /api/bundle` | Bootstrap payload for the SPA |
 
-Ring positions (`revScore`, `ring`, `x`, `y`) are computed server-side so the browser never embeds the company table.
+Ring positions (`revScore`, `ring`, `ringCos`, `ringSin`) are computed server-side so the browser never embeds the company table. The 3D space itself is user coordinates `(s, x, y)` — see `web/js/coords.js`. Edit `LAYOUT` (or an object's coord) to move something; do not place scene objects with raw Three.js coordinates.
 
 ## Legacy
 

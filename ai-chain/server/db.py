@@ -120,7 +120,11 @@ def seed_from_json(conn: sqlite3.Connection, data_dir: Path | None = None) -> No
 
 
 def assign_rings(companies: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    """Min-max normalize revenue per layer; score 100 → center."""
+    """Min-max normalize revenue per layer; score 100 → center.
+
+    `ringCos` / `ringSin` are the point on the concentric ring, in [-1, 1].
+    User position is only `(s, x, y)`, projected in web/js/coords.js `companyCoord()`.
+    """
     by_layer: dict[int, list[dict[str, Any]]] = {}
     for c in companies:
         by_layer.setdefault(c["layer"], []).append(c)
@@ -150,18 +154,18 @@ def assign_rings(companies: list[dict[str, Any]]) -> list[dict[str, Any]]:
                 radial = 1 - t
                 c["radial"] = radial
                 ang = 0 if n == 0 else (i / n) * math.pi * 2 + ring * 0.35 + (c.get("layer") or 0) * 0.11
-                c["x"] = math.cos(ang) * radial
-                c["y"] = math.sin(ang) * radial
+                c["ringCos"] = math.cos(ang) * radial
+                c["ringSin"] = math.sin(ang) * radial
         for i, c in enumerate(centers):
             c["radial"] = 0.0
             if len(centers) == 1:
-                c["x"] = 0.0
-                c["y"] = 0.0
+                c["ringCos"] = 0.0
+                c["ringSin"] = 0.0
             else:
                 ang = (i / len(centers)) * math.pi * 2
                 eps = 0.035
-                c["x"] = math.cos(ang) * eps
-                c["y"] = math.sin(ang) * eps
+                c["ringCos"] = math.cos(ang) * eps
+                c["ringSin"] = math.sin(ang) * eps
     return companies
 
 
@@ -177,6 +181,8 @@ def row_company(r: sqlite3.Row) -> dict[str, Any]:
         "valueM": r["value_m"],
         "source": r["source"],
         "sourceDetail": r["source_detail"],
+        # 3类坐标 / 法人坐标。格式 00-00-00-00-00-00-0000，对应 Bloomberg BICS。待填。
+        "legalEntityCoord": "",
     }
 
 
