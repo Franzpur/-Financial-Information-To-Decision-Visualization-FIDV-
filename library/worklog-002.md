@@ -20,6 +20,7 @@
 |60| 电总参谋部：检查启动图标/开屏/logo/网页设计代码，划归美工部子代理，统一美学并延展。 | GS will → created art-department agent + AESTHETIC.md ownership inventory; RULE/README/CONCEPTS/root README; no code folder move. Inspector pass #1. |
 |61| 电总参谋部：赋予调度除总监书记外所有 subagents 之权；在我安排下可编辑管理除总监书记外所有 subagent。 | GS will → updated general-staff + RULE + READMEs + AESTHETIC + art-department; hard exclude 总监/书记; parent Task dispatch + file apply; inspector pass #1. |
 |62| 书记：撰写权利架构表——子代理权利-责任、任务文件、权力关系（谁受谁管理）。 | 任务：权利架构表入册。主代理派书记。书记据 agents/README、RULE、各任务真源核对名册后写入本节下方「2. 权利架构表」。无其它子代理。路径：library/worklog-002.md。 |
+|63| 电总参谋部：上传更改至 github。 | 任务：上传。总参谋部规划上传。主代理提交 a90e56a（splash、launcher icons、art-department、GS 调度权、权利表）并 push main→origin（https://github.com/Franzpur/-Financial-Information-To-Decision-Visualization-FIDV-.git）；排除 Office 锁文件 ~$2144414.xlsx。无总监（仅上传）。路径：a90e56a。 |
 
 ---
 
