@@ -218,7 +218,9 @@ Removed / 已废弃：旧「角视图 corner view」与 **V / Home** 绑定（�
 | [`library/worklog-001.md`](../library/worklog-001.md) | Session asks/answers + history |
 | [`README.md`](./README.md) | Run / API |
 | `web/js/scene.js` | 3D + camera + pick (`[C-*]` tags) |
-| `web/index.html` + `web/css/app.css` | Full-bleed cube; floating search / detail / HUD; help default closed |
+| `web/index.html` + `web/css/app.css` | Full-bleed cube; floating search / detail / HUD; help default closed; **C-SPLASH** FIDV wordmark → clear ~**3s** → fade ~**4.0s**. **Aesthetics:** `agent_tasklist/AESTHETIC.md`（美工部） |
+| `web/js/main.js` | Boot + splash hold 3s + dismiss (~4s opacity / 4200ms fallback) |
+| `assets/fidv-launcher*` + `scripts/set-command-icon.sh` | Launcher icons（美工部管辖） |
 | `web/js/state.js` | Shared state |
 | `web/js/ui.js` | Panels / status / buttons |
 

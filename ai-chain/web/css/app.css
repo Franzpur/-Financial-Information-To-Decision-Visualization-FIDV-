@@ -315,30 +315,32 @@ p { margin: 0 0 10px; }
   box-shadow: 0 6px 18px rgba(0, 0, 0, .35);
 }
 
-.loading {
+.splash {
   position: fixed;
   inset: 0;
   display: grid;
   place-items: center;
   background: var(--bg);
   z-index: 50;
+  opacity: 1;
+  transition: opacity 4s cubic-bezier(0.33, 0, 0.2, 1);
 }
-.loading[hidden] { display: none !important; }
+.splash.splash-out {
+  opacity: 0;
+  pointer-events: none;
+}
+.splash-mark {
+  animation: splash-in 0.4s ease-out both;
+}
+.splash-logo {
+  display: block;
+}
+@keyframes splash-in {
+  from { opacity: 0; transform: scale(0.98); }
+  to { opacity: 1; transform: scale(1); }
+}
+
 #app[hidden] { display: none !important; }
-.loading-card {
-  text-align: center;
-  color: var(--muted);
-}
-.spinner {
-  width: 28px;
-  height: 28px;
-  margin: 0 auto 12px;
-  border-radius: 50%;
-  border: 2px solid #2a313c;
-  border-top-color: var(--accent);
-  animation: spin .7s linear infinite;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
 
 #bootError {
   position: fixed;

@@ -26,6 +26,14 @@ python3 scripts/seed.py && python3 server/app.py
 
 Open http://127.0.0.1:8787/
 
+While the `.command` launcher is running, type `quit` + Enter (or Ctrl+C) to stop the server.
+
+Finder icons for the launchers live in `assets/fidv-launcher.icns`. After a fresh clone, re-apply with:
+
+```bash
+./scripts/set-command-icon.sh
+```
+
 ## API
 
 | Route | Purpose |
