@@ -84,6 +84,7 @@
 |37| 写子代理书记 secretary，记录提问、任务、主代理和子代理的执行，简介但有重点、能回溯 | 任务：建书记及其任务。主代理写 `agents/secretary.md`、`agent_tasklist/secretary.md`，并链到 `.cursor/agents/secretary.md`。无子代理。 |
 |38| 这个执行方式是对的。书记每个谈话都要出现，比总监更根本，但不参与决策；只在谈话的最后出现，是最后一个任务 | 任务：写入用法，并作为本次谈话最后一项记下。主代理改 `agent_tasklist/RULE.md`、`agents/secretary.md`、`agent_tasklist/secretary.md`、`agents/README.md`。无总监。本条由书记记入。 |
 |39| 最后创建 library，作为书记的工作区，把包括 worklog 在内的记录性文档放进去。书记要看 worklog 是否过大，超过 1 万字就建第二册。worklog 分册为 worklog-xxx，xxx 是编号。 | 任务：建 library，把现有工作日志改为第 001 册，并写明换册规则。主代理：建 library/。原 WORKLOG.md 移为 library/worklog-001.md（未满 10000 字，未开第二册）。规则写入 agent_tasklist/secretary.md、agents/secretary.md、agent_tasklist/RULE.md。README 与 ai-chain/CONCEPTS.md 的链接改指向本册。无总监。本条由书记记入。 |
+|40| 把今天的更改全部上传至 GitHub 并同步。 | 任务：提交并推到 origin/main。主代理：提交 ab8d71b，再与 origin/main 合并（冲突保留今天的位置坐标），合并提交 6414e30 已推送。未纳入 ai_chain.db 与 DATA-SPACE/。工作日志仍在 library/worklog-001.md。无总监。本条由书记记入。 |
 
 ---
 
