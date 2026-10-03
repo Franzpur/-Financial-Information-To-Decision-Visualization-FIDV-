@@ -19,9 +19,10 @@ export const state = {
   hoverId: null, // [C-HOVER]
   d: 1, // [C-D] slice gap factor; meters = d·UNIT; UI % = 100·d
   helpOpen: false,
-  /** [C-HOME] BICS L1 code from /cube?bics= — context only until companies attach */
+  /** [C-HOME] BICS code from /cube?bics= — any level; context only until companies attach */
   bicsCode: null,
   bicsName: null,
+  bicsLevel: null,
 };
 
 export function visibleCompanies() {
@@ -59,11 +60,14 @@ export function readHash() {
 export async function resolveBicsLabel() {
   if (!state.bicsCode) return;
   try {
-    const res = await fetch("/api/bics/l1");
+    const res = await fetch(`/api/bics/node?code=${encodeURIComponent(state.bicsCode)}`);
     if (!res.ok) return;
     const data = await res.json();
-    const hit = (data.sectors || []).find((s) => s.bicsCode === state.bicsCode);
-    if (hit) state.bicsName = hit.name;
+    const hit = data.node;
+    if (hit) {
+      state.bicsName = hit.name;
+      state.bicsLevel = hit.level;
+    }
   } catch {
     /* ignore */
   }

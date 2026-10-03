@@ -32,7 +32,7 @@ python3 build_bics_hierarchy.py
 
 可挂非叶码（粗分类）；一企一码（一期约定）。企业逐户填码属二期，本期库内 `legalEntityCoord` 仅出现在层级节点上。
 
-工程首页（`/`）消费 **L1** 十三扇区：`GET /api/bics/l1` → 进 `/cube?bics=`。
+工程首页（`/`）同版面钻 **L1–L7**：`GET /api/bics/children?parent=`；叶格进 `/cube?bics=`。
 
 ## 与立方体
 

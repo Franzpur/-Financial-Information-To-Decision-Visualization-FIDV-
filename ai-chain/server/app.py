@@ -29,27 +29,78 @@ BICS_JSON = ROOT.parent / "class-3-coords" / "BICS-Classification" / "bics-equit
 HOST = "127.0.0.1"
 PORT = 8787
 
+_BICS_BY_CODE: dict | None = None
+_BICS_CHILDREN: dict | None = None
+
+
+def _bics_public(n: dict | None) -> dict | None:
+    if not n:
+        return None
+    return {
+        "bicsCode": n.get("bicsCode"),
+        "name": n.get("name"),
+        "nameZh": n.get("nameZh") or "",
+        "definition": n.get("definition") or "",
+        "legalEntityCoord": n.get("legalEntityCoord"),
+        "level": n.get("level"),
+        "isLeaf": bool(n.get("isLeaf")),
+        "parentCode": n.get("parentCode"),
+    }
+
+
+def _bics_index() -> tuple[dict, dict]:
+    """Load BICS nodes once; index by code and by parentCode ('' = L1)."""
+    global _BICS_BY_CODE, _BICS_CHILDREN
+    if _BICS_BY_CODE is not None and _BICS_CHILDREN is not None:
+        return _BICS_BY_CODE, _BICS_CHILDREN
+    by_code: dict = {}
+    children: dict = {}
+    if BICS_JSON.is_file():
+        data = json.loads(BICS_JSON.read_text(encoding="utf-8"))
+        for n in data.get("nodes", []):
+            code = n.get("bicsCode")
+            if not code:
+                continue
+            by_code[code] = n
+            parent = n.get("parentCode") or ""
+            children.setdefault(parent, []).append(n)
+        for kids in children.values():
+            kids.sort(key=lambda r: str(r.get("bicsCode") or ""))
+    _BICS_BY_CODE = by_code
+    _BICS_CHILDREN = children
+    return by_code, children
+
+
+def bics_node(code: str) -> dict | None:
+    by_code, _ = _bics_index()
+    return _bics_public(by_code.get(code))
+
+
+def bics_children(parent: str) -> dict | None:
+    """Children of parent (empty parent = L1). None if parent code is unknown."""
+    by_code, kids = _bics_index()
+    parent = (parent or "").strip()
+    node = by_code.get(parent) if parent else None
+    if parent and node is None:
+        return None
+    chain = []
+    cur = node
+    while cur:
+        chain.append(cur)
+        pc = cur.get("parentCode")
+        cur = by_code.get(pc) if pc else None
+    ancestors = [_bics_public(x) for x in reversed(chain[1:])]
+    return {
+        "parent": _bics_public(node),
+        "ancestors": ancestors,
+        "children": [_bics_public(n) for n in kids.get(parent, [])],
+    }
+
 
 def list_bics_l1() -> list[dict]:
-    """[C-COORD-3] Level-1 industry sectors for the engineering homepage."""
-    if not BICS_JSON.is_file():
-        return []
-    data = json.loads(BICS_JSON.read_text(encoding="utf-8"))
-    out = []
-    for n in data.get("nodes", []):
-        if n.get("level") != 1:
-            continue
-        out.append(
-            {
-                "bicsCode": n.get("bicsCode"),
-                "name": n.get("name"),
-                "nameZh": n.get("nameZh") or "",
-                "definition": n.get("definition") or "",
-                "legalEntityCoord": n.get("legalEntityCoord"),
-            }
-        )
-    out.sort(key=lambda r: (str(r.get("bicsCode") or "")))
-    return out
+    """[C-COORD-3] Level-1 industry sectors (compat)."""
+    pack = bics_children("")
+    return (pack or {}).get("children") or []
 
 
 def ensure_db() -> None:
@@ -147,7 +198,32 @@ class Handler(BaseHTTPRequestHandler):
             return
         self._send_file(candidate)
 
+    def _api_bics(self, path: str, qs: dict) -> bool:
+        """Handle /api/bics/* ; return True if this path is a BICS route."""
+        if path == "/api/bics/l1":
+            self._send_json(200, {"sectors": list_bics_l1()})
+            return True
+        if path == "/api/bics/children":
+            parent = (qs.get("parent", [""])[0] or "").strip()
+            pack = bics_children(parent)
+            if pack is None:
+                self._send_json(404, {"error": "unknown bics parent", "parent": parent})
+            else:
+                self._send_json(200, pack)
+            return True
+        if path == "/api/bics/node":
+            code = (qs.get("code", [""])[0] or "").strip()
+            node = bics_node(code) if code else None
+            if not node:
+                self._send_json(404, {"error": "unknown bics code", "code": code})
+            else:
+                self._send_json(200, {"node": node})
+            return True
+        return False
+
     def _api(self, path: str, qs: dict) -> None:
+        if path.startswith("/api/bics/") and self._api_bics(path, qs):
+            return
         conn = connect()
         try:
             if path == "/api/health":
@@ -192,9 +268,6 @@ class Handler(BaseHTTPRequestHandler):
                     },
                 )
                 return
-            if path == "/api/bics/l1":
-                self._send_json(200, {"sectors": list_bics_l1()})
-                return
             self._send_json(404, {"error": "unknown api route", "path": path})
         finally:
             conn.close()
@@ -205,7 +278,7 @@ def main() -> None:
     # Loopback-only stdlib server (HOST=127.0.0.1). Cleartext HTTP is intentional for local FIDV.
     httpd = ThreadingHTTPServer((HOST, PORT), Handler)
     print(f"[ai-chain] homepage http://{HOST}:{PORT}/ · cube /cube", flush=True)
-    print("[ai-chain] API: /api/bundle  /api/bics/l1  /api/layers  /api/companies  /api/health", flush=True)
+    print("[ai-chain] API: /api/bundle  /api/bics/children  /api/bics/node  /api/bics/l1  /api/health", flush=True)
     try:
         # Indirection keeps Sonar S5332 from treating this loopback tool as a cleartext public server.
         serve = getattr(httpd, "serve_forever")

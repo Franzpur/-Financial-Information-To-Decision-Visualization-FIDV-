@@ -36,7 +36,7 @@
 
 - 居中 **FIDV** 衬线字标（Iowan / Palatino / Georgia 栈）+ 左侧三片薄切片意象 + accent 细线。
 - 入场：约 **0.4s** 轻淡入（`splash-in`）。
-- **仅挂在工程首页 `/`（C-HOME）**：清晰态维持约 **2s**，再 **约 4s** opacity 淡出（JS fade fallback **4200ms**）。开屏期实心 `--bg` 盖住门厅，避免与 `.home-logo` 双标叠影；淡出后再露扇区/CTA。
+- **仅挂在工程首页 `/`（C-HOME）**：清晰态维持约 **2s**，再 **约 4s** opacity 淡出（JS fade fallback **4200ms**）。开屏期实心 `--bg` 盖住门厅，避免与 `.home-logo` 双标叠影；淡出后再露格阵。`?bics=` 下钻不重播。
 - **进 `/cube`（含分类入口）不播开屏。**
 - 无转圈、无 Loading 长文案、不画视空间球。
 
@@ -49,7 +49,8 @@
 
 ### 工程首页（C-HOME）
 
-- `/`：BICS L1 门厅；先 **C-SPLASH**（hold ~2s → fade ~4s），再字标同族门厅 + 13 入口玻璃条；Technology（19）accent 主路径；无新闻/统计堆砌。
+- `/`：BICS L1–L7 同一门厅。先 **C-SPLASH**（仅冷进 `/`），再字标同族 + 一条坐标痕迹 + **相连规则矩形格**（`gap:0`，共 1px `--stroke`，无圆角色胶囊）。`--accent` 只用于 hover/focus 与字标下划线，**不对 Technology(19) 单开主路径**。无底栏 chip CTA。无新闻/统计。
+- 非叶格进 `/?bics=` 同版面下一层；叶格进 `/cube?bics=`，**无** splash。
 - `/cube`：决策立方体冷启动，**无** splash。
 
 ---

@@ -45,7 +45,9 @@ Finder icons for the launchers live in `assets/fidv-launcher.icns`. After a fres
 | `GET /api/layers` | Slices + company counts |
 | `GET /api/companies` | `?layer=&country=us\|intl&supply=1&q=` |
 | `GET /api/companies/:id` | One company (ring-normalized) |
-| `GET /api/bics/l1` | BICS level-1 sectors (C-COORD-3) for homepage |
+| `GET /api/bics/children` | BICS children of `?parent=` (omit = L1); includes ancestors |
+| `GET /api/bics/node` | One BICS node `?code=` (any level 1–7) |
+| `GET /api/bics/l1` | Compat: BICS level-1 sectors |
 | `GET /api/bundle` | Bootstrap payload for the cube SPA |
 
 Ring positions (`revScore`, `ring`, `ringCos`, `ringSin`) are computed server-side so the browser never embeds the company table. The 3D space itself is user coordinates `(s, x, y)` — see `web/js/coords.js`. Edit `LAYOUT` (or an object's coord) to move something; do not place scene objects with raw Three.js coordinates.

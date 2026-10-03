@@ -165,7 +165,7 @@ Removed / 已废弃：旧「角视图 corner view」与 **V / Home** 绑定（�
 | **C-LAYER-DATA** | layer record | 层数据 | `layers.json` / API; order 0 Power → 10 Models |
 | **C-COMPANY** | company record | 公司 | `revBn`, `revScore`, `ring`, `ringCos`, `ringSin`, `country`, optional `valueM`, optional `legalEntityCoord` / industry code (empty until attached) |
 | **C-US / C-INTL** | US / non-US | 美 / 非美 | Colors cyan / orange (`#3cf0ff` / `#ffb020`) |
-| **C-HOME** | engineering home | 工程首页 | Gate at `/`: BICS **L1** industry coordinates (13 sectors). Entry to judgment path; not a news portal. Primary CTA: Technology (`bics=19`) → **C-CUBE**. Hosts **C-SPLASH**. | `web/index.html`, `web/js/home.js`, `GET /api/bics/l1` |
+| **C-HOME** | engineering home | 工程首页 | Gate at `/`: same board for BICS **L1–L7**. Non-leaf cell → `/?bics=` next board; **leaf** cell → **C-CUBE** `/cube?bics=`. Not a news portal. No Technology highlight, no bottom CTA. Hosts **C-SPLASH** (cold `/` only). | `web/index.html`, `web/js/home.js`, `GET /api/bics/children` |
 | **C-CUBE** | decision cube SPA | 决策立方体页 | Full-bleed cube at `/cube`. Optional `?bics=` context only. **No splash.** | `web/cube.html`, `main.js` |
 | **C-SPLASH** | splash | 开屏 | Only on **C-HOME**: FIDV wordmark → clear hold ~**2s** → fade ~**4s**. Entering `/cube` from a sector plays no splash. | `#splash` in `index.html`, `home.js` |
 | **C-RING-SCORE** | ring score | 环分数 | Per-slice min–max → 0–100; **100 = exact center** |
@@ -220,11 +220,13 @@ Removed / 已废弃：旧「角视图 corner view」与 **V / Home** 绑定（�
 | [`library/worklog-001.md`](../library/worklog-001.md) | Session asks/answers + history |
 | [`README.md`](./README.md) | Run / API |
 | `web/js/scene.js` | 3D + camera + pick (`[C-*]` tags) |
-| `web/index.html` + `home.js` | **C-HOME** + **C-SPLASH** (hold ~2s, fade ~4s) |
+| `web/index.html` + `home.js` | **C-HOME** L1–L7 board + **C-SPLASH** (hold ~2s, fade ~4s; skip on `?bics=`) |
 | `web/cube.html` + `web/css/app.css` | **C-CUBE** full-bleed cube; floating chrome; **no splash**; aesthetics → `agent_tasklist/AESTHETIC.md` |
 | `web/js/main.js` | Cube boot only; reads `?bics=` |
 | `assets/fidv-launcher*` + `scripts/set-command-icon.sh` | Launcher icons（美工部管辖） |
-| `GET /api/bics/l1` | C-COORD-3 L1 sectors for homepage |
+| `GET /api/bics/children` | C-COORD-3 children of `parent` (empty = L1) |
+| `GET /api/bics/node` | One BICS node by `code` (any level) |
+| `GET /api/bics/l1` | Compat: L1 sectors only |
 | `web/js/state.js` | Shared state |
 | `web/js/ui.js` | Panels / status / buttons |
 

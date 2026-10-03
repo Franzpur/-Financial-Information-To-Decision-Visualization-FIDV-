@@ -1,4 +1,4 @@
-/** [C-HOME] + [C-SPLASH] BICS L1 gate; splash only on this page. */
+/** [C-HOME] + [C-SPLASH] BICS L1–L7 gate; splash only on cold `/`. */
 
 const splash = document.getElementById("splash");
 const home = document.getElementById("home");
@@ -11,6 +11,14 @@ function waitTwoFrames() {
   return new Promise((resolve) => {
     requestAnimationFrame(() => requestAnimationFrame(resolve));
   });
+}
+
+function currentBics() {
+  return new URLSearchParams(location.search).get("bics") || "";
+}
+
+function skipSplash() {
+  return Boolean(currentBics()) || sessionStorage.getItem("fidvSplashSeen") === "1";
 }
 
 /** Fade out splash (~4s); remove when done. */
@@ -50,30 +58,74 @@ function escapeHtml(s) {
     .replace(/"/g, "&quot;");
 }
 
-async function loadL1() {
+function trailHtml(ancestors, node) {
+  const bits = [];
+  bits.push(`<a href="/">All</a>`);
+  for (const a of ancestors) {
+    bits.push(`<span class="home-trail-sep">/</span>`);
+    bits.push(
+      `<a href="/?bics=${encodeURIComponent(a.bicsCode)}">${escapeHtml(a.name)}</a>`,
+    );
+  }
+  if (node) {
+    bits.push(`<span class="home-trail-sep">/</span>`);
+    bits.push(`<span class="home-trail-current">${escapeHtml(node.name)}</span>`);
+  }
+  return bits.join("");
+}
+
+function cellHref(node) {
+  if (node.isLeaf) return `/cube?bics=${encodeURIComponent(node.bicsCode)}`;
+  return `/?bics=${encodeURIComponent(node.bicsCode)}`;
+}
+
+function renderCells(listEl, children) {
+  listEl.innerHTML = "";
+  for (const s of children) {
+    const a = document.createElement("a");
+    a.className = "home-sector";
+    a.href = cellHref(s);
+    a.title = s.definition || s.name;
+    a.innerHTML =
+      `<span class="home-sector-en">${escapeHtml(s.name)}</span>` +
+      (s.nameZh ? `<span class="home-sector-zh">${escapeHtml(s.nameZh)}</span>` : "") +
+      `<span class="home-sector-code">${escapeHtml(s.legalEntityCoord || s.bicsCode)}</span>`;
+    listEl.appendChild(a);
+  }
+}
+
+async function loadBoard() {
   const list = document.getElementById("sectorList");
-  const enter = document.getElementById("enterCube");
+  const trail = document.getElementById("homeTrail");
+  const lede = document.getElementById("homeLede");
+  const parent = currentBics();
+  const url = parent
+    ? `/api/bics/children?parent=${encodeURIComponent(parent)}`
+    : "/api/bics/children";
   try {
-    const res = await fetch("/api/bics/l1");
-    if (!res.ok) throw new Error(`l1 ${res.status}`);
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`children ${res.status}`);
     const data = await res.json();
-    const sectors = data.sectors || [];
-    list.innerHTML = "";
-    for (const s of sectors) {
-      const a = document.createElement("a");
-      a.className = "home-sector" + (s.bicsCode === "19" ? " home-sector-primary" : "");
-      a.href = `/cube?bics=${encodeURIComponent(s.bicsCode)}`;
-      a.title = s.definition || s.name;
-      a.innerHTML =
-        `<span class="home-sector-en">${escapeHtml(s.name)}</span>` +
-        (s.nameZh ? `<span class="home-sector-zh">${escapeHtml(s.nameZh)}</span>` : "") +
-        `<span class="home-sector-code">${escapeHtml(s.legalEntityCoord || s.bicsCode)}</span>`;
-      list.appendChild(a);
+    const node = data.parent;
+    if (node?.isLeaf) {
+      location.replace(`/cube?bics=${encodeURIComponent(node.bicsCode)}`);
+      return;
     }
-    const tech = sectors.find((s) => s.bicsCode === "19");
-    if (tech && enter) {
-      enter.href = `/cube?bics=19`;
-      enter.textContent = `Enter ${tech.name} cube`;
+    const children = data.children || [];
+    renderCells(list, children);
+    if (node) {
+      home?.classList.add("home-drilled");
+      if (lede) {
+        lede.textContent = `Level ${node.level} · ${node.name} · next board, or a leaf opens the cube.`;
+      }
+      if (trail) {
+        trail.hidden = false;
+        trail.innerHTML = trailHtml(data.ancestors || [], node);
+      }
+    } else if (trail) {
+      home?.classList.remove("home-drilled");
+      trail.hidden = true;
+      trail.innerHTML = "";
     }
   } catch (err) {
     list.innerHTML = `<p class="home-error">Failed to load industry coordinates. Is the server running?</p>`;
@@ -83,12 +135,17 @@ async function loadL1() {
 
 async function bootHome() {
   try {
-    // Prefetch sectors under the splash; reveal only after splash ends.
-    const loadPromise = loadL1();
+    const loadPromise = loadBoard();
+    if (skipSplash()) {
+      if (splash?.isConnected) splash.remove();
+      revealHome();
+      await loadPromise;
+      return;
+    }
     await waitTwoFrames();
-    // [C-SPLASH] Hold logo clear ~2s, then fade (~4s)
     await sleep(2000);
     await dismissSplash();
+    sessionStorage.setItem("fidvSplashSeen", "1");
     revealHome();
     await loadPromise;
   } catch (err) {
