@@ -38,6 +38,7 @@
 |78| 电总参谋部：写一张带到 Bloomberg 即可拉回所需 L2–L4 的 Excel。 | 任务：彭博上机拉数表。总参谋部调度信息部 request。主代理落盘 DATA-SPACE/ICBC C/20261003/BICS_LEGALENTITY/pull-staples-l2l4.xlsx：A–F 锁 Staples 6494 行原序；G/I/K 同 FOMULAR EXAMPLE 的 _xll.BQL（L2 group / L3 industry / L4 sub-industry 英文短名）；READ_ME 上机；M 列 500 行一批。拷回前摄入仍跳过 staples 文件名。INFORMATION.md 已加词条。无总监（无立方体代码）。ai-chain 未改。 |
 |79| 电总参谋部：sonar 报 4 个 problem，帮忙解决。 | 任务：修 4 条 SonarLint。总参谋部先盘点：ingest 1、app.py 2、list.html 1。主代理：ingest 去 StopIteration、finally 关簿；app.py 用 TEMP 表代 f-string IN、拆主业函数；list 补 h1/label、空表去 role=table。名单过滤仍可用。总监第 1 次通过。无美工部。路径：class-3-coords/BICS-Classification/ingest_20261003_entities.py、ai-chain/server/app.py、ai-chain/web/list.html。 |
 |80| 电总参谋部：上传到 GitHub。 | 任务：上传。总参谋部规划已执行。主代理 commit `3924505` 并 push origin/main。含 C-LIST、信息部、pull-staples-l2l4.xlsx、Sonar 修复。未提交 11 张 L1 xlsx、BQLX.pdf、FOMULAR EXAMPLE、~$ 锁、实体 db。无总监（仅上传）。HEAD=origin/main。路径：https://github.com/Franzpur/-Financial-Information-To-Decision-Visualization-FIDV- `3924505`。 |
+|81| DATA-SPACE 文件夹仍蓝，问是否没推。 | 任务：补传未跟踪的 20261003。主代理：上次只推 pull-staples；928 已在仓，企业表与 BQLX.pdf 未跟踪故文件夹蓝。commit `d94e7e9` 并 push：11 张 L1 + Government + FOMULAR EXAMPLE + BQLX.pdf；gitignore `**/~$*` 不跟踪 Office 锁。无总监（仅补传）。无子代理。HEAD=origin/main。 |
 
 ---
 
