@@ -45,6 +45,8 @@
 |85| 电总参谋部：filter 太占空间，改成下拉条，最上设计搜索。 | 总参谋部规划；派美工部。主代理：chip 墙收成可搜索 combobox（关闭面当前国+计数；打开最上 Search country）；名单名/ticker 筛独立；?listingCountry= 不变。总监第1次通过。未 push。 |
 |86| 电总参谋部：换国家整页刷新闪一下回顶部，没法保持原先视角；查来源并改正。 | 总参谋部：根因是 nation-opt 整页 href。主代理：preventDefault + pushState + 再拉 children/entities；打开下拉时记下 scrollY（选项聚焦曾把画面拽回控件）；首页格计数就地改。总监第1次通过。未 push。 |
 |87| 电总参谋部：3类坐标后面三级 -00-00-00 用不上就隐藏；知道有7级，只显示4级。 | 总参谋部规划；派美工部。主代理：displayIndustryCoord 切前4段；库仍7×2；L1 仍见 10-00-00-00。总监第1次通过。未 push。 |
+|88| 电总参谋部：上传至 GitHub，然后书记，再更新工程史。 | 总参谋部：先改史再一次 commit+push。主代理修订 FIDV-engineering-history-report.md/.html 接到 #87（补 3.10：#83–#87），commit `0f6d504` 并 push origin/main。含 listing.py、nations.js、上市国筛、四段坐标门面、入职读本。未提交实体 db / ai_chain.db / ~$ 锁。无总监（上传+记录文档）。HEAD=origin/main。路径：https://github.com/Franzpur/-Financial-Information-To-Decision-Visualization-FIDV- `0f6d504`。 |
+|89| library 文件夹发黄，问是否没同步；同步一下。 | 任务：补传工作日志。#88 写于 push 之后故未进 0f6d504。主代理将本条与 #88 一并 commit 并 push origin/main。无总监。无总参谋部（未电）。无其它子代理。 |
 
 ---
 
