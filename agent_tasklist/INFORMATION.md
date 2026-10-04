@@ -43,10 +43,11 @@
 | BICS 层级 / C-COORD-3 库 | `class-3-coords/BICS-Classification/bics-equity-hierarchy-2024.json` |
 | 四级成员库 | `class-3-coords/BICS-Classification/bics_entities_20261003.db` |
 | 摄入 | `python3 class-3-coords/BICS-Classification/ingest_20261003_entities.py` |
-| 四级名单 API | `GET /api/bics/entities?bics=<L4 compact>` — 仅**主业 L4**；身份=完整 Member Ticker |
+| 四级名单 API | `GET /api/bics/entities?bics=<L4 compact>` — 仅**主业 L4**；身份=完整 Member Ticker；可选 `listingCountry=` |
 | 主业 | 同一 ticker 最大 `pct_tot_rev`（空不当 100）；并列：`ind_rev` → `bics_code_l4` → `source_file` → `id` |
 | 其他业务 | 非主业 L1 及其 `% Tot Rev`（同 L1 多行加总）；`pct_sum` 只加已披露段 |
-| 门厅子节点 API | `GET /api/bics/children?parent=` |
+| 门厅子节点 API | `GET /api/bics/children?parent=`；可选 `listingCountry=`（ISO 或 `UNMAPPED`）；返回 `companyCount` / `totalCount` / `listingCountries` |
+| 上市地 | 黄键倒数第二段交易所码 → ISO（`listing.py`）；CN=加拿大、CH=中国沪、IT=以色列、SP=新加坡、SG=塞尔维亚、IE=伊朗 Farabourse。未映射进 Unmapped，不猜。**不是**总部国，**不是**立方体 `?country=` |
 | 权威码 | `bicsCode`，长度 `2×level` |
 | 产品坐标 | `legalEntityCoord`，7×2 连字符，浅叶右补 `00` |
 | Staples | `BICS_Comsumer Staples.xlsx` — **仅 L1，无四级成员** |

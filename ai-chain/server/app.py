@@ -14,6 +14,7 @@ from urllib.parse import parse_qs, urlparse
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "server"))
 
+from listing import country_label, parse_ticker  # noqa: E402
 from db import (  # noqa: E402
     DB_PATH,
     connect,
@@ -78,10 +79,11 @@ def bics_node(code: str) -> dict | None:
     return _bics_public(by_code.get(code))
 
 
-def bics_children(parent: str) -> dict | None:
+def bics_children(parent: str, listing_country: str | None = None) -> dict | None:
     """Children of parent (empty parent = L1). None if parent code is unknown."""
     by_code, kids = _bics_index()
     parent = (parent or "").strip()
+    loc = (listing_country or "").strip() or None
     node = by_code.get(parent) if parent else None
     if parent and node is None:
         return None
@@ -92,10 +94,26 @@ def bics_children(parent: str) -> dict | None:
         pc = cur.get("parentCode")
         cur = by_code.get(pc) if pc else None
     ancestors = [_bics_public(x) for x in reversed(chain[1:])]
+    children = []
+    for n in kids.get(parent, []):
+        pub = _bics_public(n)
+        if not pub:
+            continue
+        counts = _count_pack(pub.get("bicsCode") or "", loc)
+        pub["companyCount"] = counts["companyCount"]
+        children.append(pub)
+    parent_pub = _bics_public(node)
+    prefix = parent if parent else ""
+    board = _count_pack(prefix, loc)
     return {
-        "parent": _bics_public(node),
+        "parent": parent_pub,
         "ancestors": ancestors,
-        "children": [_bics_public(n) for n in kids.get(parent, [])],
+        "children": children,
+        "companyCount": board["companyCount"],
+        "totalCount": board["totalCount"],
+        "listingCountries": board["listingCountries"],
+        "unmappedCount": board["unmappedCount"],
+        "listingCountry": loc,
     }
 
 
@@ -193,12 +211,88 @@ def _entity_if_primary(ticker: str, rows: list, code: str) -> dict | None:
     }
 
 
-def list_bics_entities(code: str) -> dict | None:
+_PRIMARY_BY_L4: dict[str, list[tuple[str, str | None]]] | None = None
+
+
+def _primary_index() -> dict[str, list[tuple[str, str | None]]]:
+    """Primary L4 memberships: distinct ticker → listing country."""
+    global _PRIMARY_BY_L4
+    if _PRIMARY_BY_L4 is not None:
+        return _PRIMARY_BY_L4
+    out: dict[str, list[tuple[str, str | None]]] = {}
+    conn = _entities_conn()
+    if conn is None:
+        _PRIMARY_BY_L4 = {}
+        return _PRIMARY_BY_L4
+    try:
+        by_ticker: dict[str, list] = {}
+        cur = conn.execute(
+            """SELECT id, name, ticker, l1_name, l2_name, l3_name, l4_name,
+                      bics_code_l4, legal_entity_coord, mkt_cap, ind_rev,
+                      pct_tot_rev, source_file
+               FROM entity_memberships
+               WHERE ticker IS NOT NULL AND ticker != ''"""
+        )
+        for row in cur:
+            by_ticker.setdefault(row["ticker"], []).append(row)
+        for ticker, rows in by_ticker.items():
+            primary = min(rows, key=_primary_sort_key)
+            if primary["pct_tot_rev"] is None:
+                continue
+            code = str(primary["bics_code_l4"] or "")
+            loc = parse_ticker(ticker)["listingCountry"]
+            out.setdefault(code, []).append((ticker, loc))
+    finally:
+        conn.close()
+    _PRIMARY_BY_L4 = out
+    return out
+
+
+def _tickers_under(prefix: str) -> list[tuple[str, str | None]]:
+    acc: list[tuple[str, str | None]] = []
+    for code, rows in _primary_index().items():
+        if not prefix or code.startswith(prefix):
+            acc.extend(rows)
+    return acc
+
+
+def _count_pack(prefix: str, listing_country: str | None) -> dict:
+    rows = _tickers_under(prefix)
+    total = len(rows)
+    by_c: dict[str, int] = {}
+    unmapped = 0
+    for _, loc in rows:
+        if not loc:
+            unmapped += 1
+        else:
+            by_c[loc] = by_c.get(loc, 0) + 1
+    if listing_country == "UNMAPPED":
+        filtered = unmapped
+    elif listing_country:
+        filtered = by_c.get(listing_country, 0)
+    else:
+        filtered = total
+    nations = [
+        {"listingCountry": iso, "label": country_label(iso), "count": n}
+        for iso, n in sorted(by_c.items(), key=lambda kv: (-kv[1], kv[0]))
+    ]
+    if unmapped:
+        nations.append({"listingCountry": "UNMAPPED", "label": "Unmapped", "count": unmapped})
+    return {
+        "companyCount": filtered,
+        "totalCount": total,
+        "listingCountries": nations,
+        "unmappedCount": unmapped,
+    }
+
+
+def list_bics_entities(code: str, listing_country: str | None = None) -> dict | None:
     """Companies whose primary L4 equals this code. One row per Member Ticker."""
+    loc = (listing_country or "").strip() or None
     node = bics_node(code)
     if not node or node.get("level") != 4:
         return None
-    pack = bics_children(code)
+    pack = bics_children(code, loc)
     entities: list[dict] = []
     conn = _entities_conn()
     if conn is not None:
@@ -206,8 +300,16 @@ def list_bics_entities(code: str) -> dict | None:
             by_ticker = _memberships_by_ticker(conn, _tickers_for_l4(conn, code))
             for ticker, rows in by_ticker.items():
                 item = _entity_if_primary(ticker, rows, code)
-                if item:
-                    entities.append(item)
+                if not item:
+                    continue
+                loc_info = parse_ticker(ticker)
+                item.update(loc_info)
+                if loc == "UNMAPPED":
+                    if not loc_info["listingCountryUnmapped"]:
+                        continue
+                elif loc and loc_info["listingCountry"] != loc:
+                    continue
+                entities.append(item)
             entities.sort(
                 key=lambda e: (
                     -(float(e["pct_tot_rev"]) if e["pct_tot_rev"] is not None else 0.0),
@@ -216,11 +318,16 @@ def list_bics_entities(code: str) -> dict | None:
             )
         finally:
             conn.close()
+    board = pack or {}
     return {
         "node": node,
-        "ancestors": (pack or {}).get("ancestors") or [],
+        "ancestors": board.get("ancestors") or [],
         "entities": entities,
         "count": len(entities),
+        "totalCount": board.get("totalCount") or 0,
+        "listingCountries": board.get("listingCountries") or [],
+        "unmappedCount": board.get("unmappedCount") or 0,
+        "listingCountry": loc,
     }
 
 
@@ -235,6 +342,8 @@ def ensure_db() -> None:
     else:
         print(f"[ai-chain] using SQLite → {DB_PATH} ({n} companies)")
     conn.close()
+    n_pri = sum(len(v) for v in _primary_index().values())
+    print(f"[ai-chain] primary listings {n_pri} tickers", flush=True)
 
 
 def json_bytes(obj) -> bytes:
@@ -330,7 +439,8 @@ class Handler(BaseHTTPRequestHandler):
             return True
         if path == "/api/bics/children":
             parent = (qs.get("parent", [""])[0] or "").strip()
-            pack = bics_children(parent)
+            loc = (qs.get("listingCountry", [""])[0] or "").strip() or None
+            pack = bics_children(parent, loc)
             if pack is None:
                 self._send_json(404, {"error": "unknown bics parent", "parent": parent})
             else:
@@ -346,7 +456,8 @@ class Handler(BaseHTTPRequestHandler):
             return True
         if path == "/api/bics/entities":
             code = (qs.get("bics", [""])[0] or "").strip()
-            pack = list_bics_entities(code) if code else None
+            loc = (qs.get("listingCountry", [""])[0] or "").strip() or None
+            pack = list_bics_entities(code, loc) if code else None
             if pack is None:
                 self._send_json(400, {"error": "bics must be a level-4 code", "bics": code})
             else:

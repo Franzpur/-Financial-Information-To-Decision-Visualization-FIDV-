@@ -68,7 +68,7 @@
 | **C-MAP** | user → Three | 用户→引擎映射 | `coordToLocal` / `userToWorld`: `X += s·gap`, `Y += y·UNIT`, `Z += USER_X_SIGN·x·UNIT`, then `root.localToWorld` (honors Q/E yaw). `UNIT = FACE/10`; `gap = d·UNIT`. |
 | **C-COORD** | position coordinate | 1类坐标 / 位置坐标 | User `(s, x, y)`. The only placement in the cube. `x` and `y` mean only this pair. A focused slice stays; `sliceAnchor` shifts the rest along **−x**. Company `coord` is the face position. |
 | **C-COORD-2** | relative coordinate | 2类坐标 / 相对坐标 | Ring placement `ringCos` / `ringSin`. Not called `x` or `y`. `companyCoord` projects them into 位置坐标. |
-| **C-COORD-3** | industry coordinate | 3类坐标 / 行业坐标 | One industry code per company (optional). **Authoritative:** Bloomberg BICS Equity Hierarchy 2024 compact `bicsCode` (length `2×level`, levels 1–7). **Product field** `legalEntityCoord`: fixed **7×2** hyphenated segments, right-pad `00` for shallow leaves (e.g. leaf L4 → `10-10-13-12-00-00-00`). May hang a non-leaf code (= coarser class). Library: `class-3-coords/BICS-Classification/` (`bics-equity-hierarchy-2024.json`, `bics_hierarchy.db`). **Not a position, not drawn.** Company values still empty until phase-2 attach. |
+| **C-COORD-3** | industry coordinate | 3类坐标 / 行业坐标 | One industry code per company (optional). **Authoritative:** Bloomberg BICS Equity Hierarchy 2024 compact `bicsCode` (length `2×level`, levels 1–7). **Product field** `legalEntityCoord`: stored as fixed **7×2** hyphenated segments, right-pad `00` for shallow leaves (e.g. leaf L4 → `10-10-13-12-00-00-00`). **Gate / list chrome shows the first 4 groups only** (`10-10-13-12`); L5–L7 including pad `00` are hidden, not deleted. May hang a non-leaf code (= coarser class). Library: `class-3-coords/BICS-Classification/`. **Not a position, not drawn on the cube.** |
 
 ```
 User (s, x, y)   Three.js (under root)
@@ -165,8 +165,9 @@ Removed / 已废弃：旧「角视图 corner view」与 **V / Home** 绑定（�
 | **C-LAYER-DATA** | layer record | 层数据 | `layers.json` / API; order 0 Power → 10 Models |
 | **C-COMPANY** | company record | 公司 | `revBn`, `revScore`, `ring`, `ringCos`, `ringSin`, `country`, optional `valueM`, optional `legalEntityCoord` / industry code (empty until attached) |
 | **C-US / C-INTL** | US / non-US | 美 / 非美 | Colors cyan / orange (`#3cf0ff` / `#ffb020`) |
-| **C-HOME** | engineering home | 工程首页 | Gate at `/`: BICS **L1–L3** same board (`/?bics=`). **Level-4** cell → **C-LIST**. Shallow leaves above L4 still `/cube?bics=`. Not a news portal. Hosts **C-SPLASH** (cold `/` only). | `web/index.html`, `home.js`, `GET /api/bics/children` |
-| **C-LIST** | L4 company list | 四级公司名单 | `/list?bics=<L4 compact>`. One company per full **Member Ticker**, only if this L4 is its **primary** (max `% Tot Rev`, then `ind_rev`, `bics_code_l4`, `source_file`, `id`). Other L1 shares listed as annotations; disclosed % sum is `pct_sum`. No splash. Same L4 still opens **C-CUBE**. | `web/list.html`, `list.js`, `GET /api/bics/entities` |
+| **C-HOME** | engineering home | 工程首页 | Gate at `/`: BICS **L1–L3** same board (`/?bics=`). Optional `?listingCountry=` (ISO or `UNMAPPED`) via a **searchable listing-country dropdown** (not a chip wall; not cube `?country=`). **Level-4** cell → **C-LIST**. Breadcrumb **fixed** top-left (`All / …`). Sector cells show **4-segment** industry coords (`displayIndustryCoord`) and subtree **company counts**. Header one **Decision cube** control → **C-CUBE**. Shallow leaves above L4 still `/cube?bics=`. Hosts **C-SPLASH** (cold `/` only). | `web/index.html`, `home.js`, `nations.js`, `GET /api/bics/children` |
+| **C-LIST** | L4 company list | 四级公司名单 | `/list?bics=<L4 compact>` plus optional `?listingCountry=`. One company per full **Member Ticker**, only if this L4 is its **primary**. Industry coord column uses **4-segment** chrome. Other L1 shares as annotations. Country from yellow-key (see **C-LISTING**). No splash. Same header **Decision cube** as C-HOME. | `web/list.html`, `list.js`, `GET /api/bics/entities` |
+| **C-LISTING** | listing country | 上市地 | ISO from Bloomberg yellow-key **exchange token** (second-last before `Equity`/`Corp`/…), mapped in `server/listing.py`. **Not** headquarters. **Not** an 8th industry axis. Unmapped venues stay **Unmapped**. Distinct from cube **C-US / C-INTL**. Changing country on C-HOME / C-LIST is in-page `history` + refetch — no document reload, no splash, keep board scroll. |
 | **C-CUBE** | decision cube SPA | 决策立方体页 | Full-bleed cube at `/cube`. Optional `?bics=` context only. **No splash.** Not the L4 click target. | `web/cube.html`, `main.js` |
 | **C-SPLASH** | splash | 开屏 | Only on **C-HOME**: FIDV wordmark → clear hold ~**2s** → fade ~**4s**. `/list` and `/cube` play no splash. | `#splash` in `index.html`, `home.js` |
 | **C-RING-SCORE** | ring score | 环分数 | Per-slice min–max → 0–100; **100 = exact center** |
@@ -191,7 +192,7 @@ Removed / 已废弃：旧「角视图 corner view」与 **V / Home** 绑定（�
 | `applyCoord` / `applySliceCoord` | C-COORD | only placement API in the scene |
 | `company.coord` | C-COORD | unpulled 位置坐标 `(s, x, y)` |
 | `ringCos` / `ringSin` | C-COORD-2 | 相对坐标；`companyCoord` 投影成位置坐标 |
-| `legalEntityCoord` | C-COORD-3 | 行业坐标；7×2 连字符（右补 `00`）；权威码见 BICS `bicsCode`；企业名单见 20261003 L4 成员表 |
+| `legalEntityCoord` | C-COORD-3 | 行业坐标；存储 7×2（右补 `00`）；闸门/名单 **只显示前 4 段**（`displayIndustryCoord`）；权威码 `bicsCode` |
 | `standardPose` / `goStandardView` | C-STDVIEW | |
 | `focusSlice` / `clearFocus` | C-FOCUS-ACT / C-ESC | |
 | `lerpPullOut` | C-PULL / C-RETRACT | exit and retract share the same ease; no camera |
@@ -202,7 +203,7 @@ Removed / 已废弃：旧「角视图 corner view」与 **V / Home** 绑定（�
 
 ## 9. Frozen rules / 冻结约定（续做勿回退）
 
-1. 1类坐标 / 位置坐标 is **`(s, x, y)`**, not raw Three XYZ. `x` and `y` mean only this. Move things by editing coordinates in `coords.js`. 2类坐标 / 相对坐标 is `ringCos` / `ringSin`. 3类坐标 / 行业坐标 is `legalEntityCoord`（BICS 7×2，库在 `class-3-coords/BICS-Classification/`；企业侧待填），不参与摆放。  
+1. 1类坐标 / 位置坐标 is **`(s, x, y)`**, not raw Three XYZ. `x` and `y` mean only this. Move things by editing coordinates in `coords.js`. 2类坐标 / 相对坐标 is `ringCos` / `ringSin`. 3类坐标 / 行业坐标 is `legalEntityCoord`（BICS **存储** 7×2，库在 `class-3-coords/BICS-Classification/`；**闸门与名单 chrome 只画前 4 段**），不参与摆放。  
 2. Focus keeps the slice. The rest of the cube exits along user **−x** (left) only, by `cubeExitX`. Do not call 「左」 **−s**. Do not move the focused slice.  
 3. Focus change / retract → **hold camera** (`C-CAM-HOLD`).  
 4. Standard overview / focused poses stay as §5 until explicitly revised.  
@@ -221,7 +222,7 @@ Removed / 已废弃：旧「角视图 corner view」与 **V / Home** 绑定（�
 | [`library/worklog-001.md`](../library/worklog-001.md) | Session asks/answers + history |
 | [`README.md`](./README.md) | Run / API |
 | `web/js/scene.js` | 3D + camera + pick (`[C-*]` tags) |
-| `web/index.html` + `home.js` | **C-HOME** L1–L3 board + **C-SPLASH**; L4 cells → **C-LIST** |
+| `web/index.html` + `home.js` | **C-HOME** L1–L3 board + **C-SPLASH** + header Decision cube; L4 cells → **C-LIST** |
 | `web/list.html` + `list.js` | **C-LIST** L4 company table (no splash) |
 | `web/cube.html` + `web/css/app.css` | **C-CUBE** full-bleed cube; floating chrome; **no splash**; aesthetics → `agent_tasklist/AESTHETIC.md` |
 | `web/js/main.js` | Cube boot only; reads `?bics=` |

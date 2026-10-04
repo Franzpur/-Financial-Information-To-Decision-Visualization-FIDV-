@@ -39,6 +39,12 @@
 |79| 电总参谋部：sonar 报 4 个 problem，帮忙解决。 | 任务：修 4 条 SonarLint。总参谋部先盘点：ingest 1、app.py 2、list.html 1。主代理：ingest 去 StopIteration、finally 关簿；app.py 用 TEMP 表代 f-string IN、拆主业函数；list 补 h1/label、空表去 role=table。名单过滤仍可用。总监第 1 次通过。无美工部。路径：class-3-coords/BICS-Classification/ingest_20261003_entities.py、ai-chain/server/app.py、ai-chain/web/list.html。 |
 |80| 电总参谋部：上传到 GitHub。 | 任务：上传。总参谋部规划已执行。主代理 commit `3924505` 并 push origin/main。含 C-LIST、信息部、pull-staples-l2l4.xlsx、Sonar 修复。未提交 11 张 L1 xlsx、BQLX.pdf、FOMULAR EXAMPLE、~$ 锁、实体 db。无总监（仅上传）。HEAD=origin/main。路径：https://github.com/Franzpur/-Financial-Information-To-Decision-Visualization-FIDV- `3924505`。 |
 |81| DATA-SPACE 文件夹仍蓝，问是否没推。 | 任务：补传未跟踪的 20261003。主代理：上次只推 pull-staples；928 已在仓，企业表与 BQLX.pdf 未跟踪故文件夹蓝。commit `d94e7e9` 并 push：11 张 L1 + Government + FOMULAR EXAMPLE + BQLX.pdf；gitignore `**/~$*` 不跟踪 Office 锁。无总监（仅补传）。无子代理。HEAD=origin/main。 |
+|82| 书记：把此前工作总结成可打印报告，给队员讲工程发展史、准备 teamwork。 | 任务：入职读本。书记只记账。主代理据 worklog-001/002 与 DESIGN/CONCEPTS 汇编 `library/FIDV-engineering-history-report.md` 与同名 `.html`（A4 打印）；`library/README` 挂链。无总监（记录文档）。无总参谋部（未电）。无子代理。路径：`library/FIDV-engineering-history-report.*`。 |
+|83| 电总参谋部：好像没有按钮打开立方体了，给我个按钮。 | 任务：立方体入口按钮。总参谋部先规划，派美工部：页眉一枚玻璃链。主代理：C-HOME/C-LIST `.home-cube` Decision cube → `/cube` 或 `/cube?bics=`；删名单脚注；无底栏、无立方体开屏。总监第 1 次通过。路径：index.html、list.html、home.js、list.js、app.css、CONCEPTS、AESTHETIC。 |
+|84| 电总参谋部：按 ticker 分辨上市国；filter 按钮筛一国；每按钮右上角收录数；整页公司总数；面包屑/路径固定屏幕位置不随下钻挪动。 | 总参谋部规划；先美工部+信息部。主代理：listing.py 黄键交易所→ISO（非总部；非立方体 country）；/?listingCountry= 与 /list 共用；格与国 chip 右上角计数；页合计；.home-trail-fixed top 14 left 20。总监第1次通过。未 push。约 46559 主业 ticker；未映射进 Unmapped。 |
+|85| 电总参谋部：filter 太占空间，改成下拉条，最上设计搜索。 | 总参谋部规划；派美工部。主代理：chip 墙收成可搜索 combobox（关闭面当前国+计数；打开最上 Search country）；名单名/ticker 筛独立；?listingCountry= 不变。总监第1次通过。未 push。 |
+|86| 电总参谋部：换国家整页刷新闪一下回顶部，没法保持原先视角；查来源并改正。 | 总参谋部：根因是 nation-opt 整页 href。主代理：preventDefault + pushState + 再拉 children/entities；打开下拉时记下 scrollY（选项聚焦曾把画面拽回控件）；首页格计数就地改。总监第1次通过。未 push。 |
+|87| 电总参谋部：3类坐标后面三级 -00-00-00 用不上就隐藏；知道有7级，只显示4级。 | 总参谋部规划；派美工部。主代理：displayIndustryCoord 切前4段；库仍7×2；L1 仍见 10-00-00-00。总监第1次通过。未 push。 |
 
 ---
 

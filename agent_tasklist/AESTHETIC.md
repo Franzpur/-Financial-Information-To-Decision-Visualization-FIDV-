@@ -49,17 +49,17 @@
 
 ### 工程首页（C-HOME）
 
-- `/`：BICS L1–L3 同一门厅。先 **C-SPLASH**（仅冷进 `/`），再字标同族 + 一条坐标痕迹 + **相连规则矩形格**。`--accent` 只用于 hover/focus 与字标下划线。无底栏 chip CTA。无新闻/统计。
+- `/`：BICS L1–L3 同一门厅。先 **C-SPLASH**（仅冷进 `/`），再字标同族 + **固定左上**坐标痕迹（`.home-trail-fixed`，`top:14px; left:20px`；钻入不挪位）+ 页眉一枚玻璃链 **Decision cube** + 一枚玻璃直角 **上市地下拉**（关闭面当前国名+角标数；打开后最上搜索、下列 All/各国+角标数）+ 页级公司总数（控件外 muted 一行）+ **相连规则矩形格**（格右上角收录数；格底行业坐标 **只画 4 段** muted tabular，不因变短改字号）。`--accent` 只用于 hover/focus 与字标下划线。无底栏 chip CTA。无新闻。
 - **L4 格进 `/list?bics=`（C-LIST）**，不再下钻 L5–L7，也不因该格是叶而进立方体。浅于 L4 的叶仍可 `/cube?bics=`。
 - `/cube`：决策立方体冷启动，**无** splash。
 
 ### 四级名单（C-LIST）
 
-- `/list?bics=`：门厅同族（`home-body`、字标、`.home-trail`），**无开屏**。
+- `/list?bics=`：门厅同族（`home-body`、字标、`.home-trail-fixed`、上市地下拉），**无开屏**。名/ticker 筛（`.list-filter`）与国别搜索分属两控件。
 - 公司为细线行表（共边 1px `--stroke`，无胶囊）。一行一企。名 `--text`；ticker / 坐标 / 主业 L1 占比 `--muted` tabular。其他一级 + % 用名下 muted 字链（` · `），无 chip。窄屏旁注仍跟在名下。
 - 筛名/ticker：trail 下一条细边输入，不搬立方体顶栏搜索皮。
 - 空态一条 muted 短句。
-- 同一 L4 码保留进立方体：名单脚注链到 `/cube?bics=`（字链，非 chip 条）。
+- 同一 L4 码保留进立方体：品牌头一枚玻璃链 **Decision cube** → `/cube?bics=`，与首页同一控件；无页底第二条、非 chip 条。
 
 ---
 

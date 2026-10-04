@@ -1,11 +1,16 @@
 /** [C-LIST] L4 BICS membership list from 20261003. No splash. */
 
+import { renderNations } from "./nations.js?v=33";
+import { displayIndustryCoord } from "./coords.js?v=34";
+
+if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+
 const table = document.getElementById("listTable");
 const trail = document.getElementById("listTrail");
 const lede = document.getElementById("listLede");
 const note = document.getElementById("listNote");
 const filterEl = document.getElementById("listFilter");
-const cubeLink = document.getElementById("listCubeLink");
+const cubeLink = document.getElementById("homeCubeLink");
 
 let rows = [];
 
@@ -21,12 +26,31 @@ function currentBics() {
   return new URLSearchParams(location.search).get("bics") || "";
 }
 
-function trailHtml(ancestors, node) {
-  const bits = [`<a href="/">All</a>`];
+function currentListing() {
+  return new URLSearchParams(location.search).get("listingCountry") || "";
+}
+
+function gateHref(bics, country) {
+  const p = new URLSearchParams();
+  if (bics) p.set("bics", bics);
+  if (country) p.set("listingCountry", country);
+  const q = p.toString();
+  return q ? `/?${q}` : "/";
+}
+
+function listHref(bics, country) {
+  const p = new URLSearchParams();
+  p.set("bics", bics);
+  if (country) p.set("listingCountry", country);
+  return `/list?${p.toString()}`;
+}
+
+function trailHtml(ancestors, node, country) {
+  const bits = [`<a href="${escapeHtml(gateHref("", country))}">All</a>`];
   for (const a of ancestors) {
     bits.push(`<span class="home-trail-sep">/</span>`);
     bits.push(
-      `<a href="/?bics=${encodeURIComponent(a.bicsCode)}">${escapeHtml(a.name)}</a>`,
+      `<a href="${escapeHtml(gateHref(a.bicsCode, country))}">${escapeHtml(a.name)}</a>`,
     );
   }
   if (node) {
@@ -34,6 +58,12 @@ function trailHtml(ancestors, node) {
     bits.push(`<span class="home-trail-current">${escapeHtml(node.name)}</span>`);
   }
   return bits.join("");
+}
+
+function bindNations(el, nations, total, country, bics) {
+  renderNations(el, nations, total, country, (code) => listHref(bics, code), (code, href) =>
+    applyListing(href, true),
+  );
 }
 
 function fmtPct(v) {
@@ -55,7 +85,7 @@ function rowHtml(e) {
     `<div class="list-row" role="row">` +
     `<span class="list-name">${escapeHtml(e.name || "")}${otherNote(e)}</span>` +
     `<span class="list-ticker">${escapeHtml(e.ticker || "")}</span>` +
-    `<span class="list-coord">${escapeHtml(e.legal_entity_coord || e.bics_code_l4 || "")}</span>` +
+    `<span class="list-coord">${escapeHtml(displayIndustryCoord(e.legal_entity_coord || e.bics_code_l4 || ""))}</span>` +
     `<span class="list-pct">${fmtPct(e.pct_tot_rev)}</span>` +
     `</div>`
   );
@@ -90,14 +120,50 @@ function render(q) {
     note.textContent = `${shown.length} of ${rows.length} companies · primary L4 · 20261003`;
 }
 
-async function bootList() {
+function renderTotal(el, count, total, country) {
+  if (!el) return;
+  if (country) {
+    el.textContent = `${count} companies in this filter · ${total} in this class`;
+  } else {
+    el.textContent = `${total} companies in this class`;
+  }
+}
+
+async function applyListing(href, push) {
+  const y =
+    typeof document.getElementById("nationList")?._nationScrollY === "number"
+      ? document.getElementById("nationList")._nationScrollY
+      : window.scrollY;
+  if (document.activeElement && document.activeElement !== document.body) {
+    document.activeElement.blur();
+  }
+  if (push) history.pushState({ scrollY: y }, "", href);
+  await loadList();
+  restoreScroll(y);
+}
+
+function restoreScroll(y) {
+  const apply = () => window.scrollTo(0, y);
+  apply();
+  requestAnimationFrame(() => {
+    apply();
+    requestAnimationFrame(apply);
+  });
+  setTimeout(apply, 0);
+  setTimeout(apply, 80);
+}
+
+async function loadList() {
   const code = currentBics();
+  const loc = currentListing();
   if (!code) {
     note.textContent = "Missing ?bics= level-4 code.";
     return;
   }
   try {
-    const res = await fetch(`/api/bics/entities?bics=${encodeURIComponent(code)}`);
+    const qs = new URLSearchParams({ bics: code });
+    if (loc) qs.set("listingCountry", loc);
+    const res = await fetch(`/api/bics/entities?${qs.toString()}`);
     if (res.status === 400) {
       note.textContent = "This page lists level-4 classes only.";
       return;
@@ -109,10 +175,18 @@ async function bootList() {
     if (lede && node) {
       lede.textContent = `Level 4 · ${node.name} · ${data.count || 0} companies`;
     }
-    if (trail) trail.innerHTML = trailHtml(data.ancestors || [], node);
+    if (trail) trail.innerHTML = trailHtml(data.ancestors || [], node, loc);
+    bindNations(
+      document.getElementById("nationList"),
+      data.listingCountries,
+      data.totalCount,
+      loc,
+      code,
+    );
+    renderTotal(document.getElementById("listTotal"), data.count, data.totalCount, loc);
     if (cubeLink) cubeLink.href = `/cube?bics=${encodeURIComponent(code)}`;
     document.title = node ? `FIDV — ${node.name}` : document.title;
-    render("");
+    render(filterEl?.value || "");
   } catch (err) {
     note.textContent = "Failed to load companies. Is the server running?";
     console.error(err);
@@ -120,4 +194,10 @@ async function bootList() {
 }
 
 filterEl?.addEventListener("input", () => render(filterEl.value));
-bootList();
+loadList();
+window.addEventListener("popstate", () => {
+  loadList().then(() => {
+    const y = history.state?.scrollY;
+    if (typeof y === "number") restoreScroll(y);
+  });
+});
