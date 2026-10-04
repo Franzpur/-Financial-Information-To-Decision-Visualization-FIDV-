@@ -46,6 +46,7 @@ Finder icons for the launchers live in `assets/fidv-launcher.icns`. After a fres
 | `GET /api/companies` | `?layer=&country=us\|intl&supply=1&q=` |
 | `GET /api/companies/:id` | One company (ring-normalized) |
 | `GET /api/bics/children` | BICS children of `?parent=` (omit = L1); includes ancestors |
+| `GET /api/bics/entities` | Companies whose **primary L4** is `?bics=` (one ticker; other L1 % on the row) |
 | `GET /api/bics/node` | One BICS node `?code=` (any level 1–7) |
 | `GET /api/bics/l1` | Compat: BICS level-1 sectors |
 | `GET /api/bundle` | Bootstrap payload for the cube SPA |

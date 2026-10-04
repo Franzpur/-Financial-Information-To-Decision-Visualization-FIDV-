@@ -14,7 +14,7 @@
 
 **硬排除：** 总参谋部不调度、不指导、不改写总监与书记。父代理不得因 GS 规划去改 `chief-inspector` / `secretary` 或其任务真源。
 
-调度落地：父代理按任务单调用 Task，`subagent_type` 对应该角色（如 `art-department`）。总参谋部会话内不自行 spawn 其它子代理。
+调度落地：父代理按任务单调用 Task，`subagent_type` 对应该角色（如 `art-department`、`information-department`）。总参谋部会话内不自行 spawn 其它子代理。
 
 ## 美工部
 
@@ -32,6 +32,20 @@
 
 任务写法见 `agent_tasklist/art-department.md`。
 
+## 信息部
+
+信息部管数据读取、调用词条、乱缺建议、以及彭博 Excel / BQLX 公式方案，对照 `agent_tasklist/INFORMATION.md` 与三分部文件。与美工部同级，隶属总参谋部调度。
+
+调出时机：
+
+1. 用户呼出「信息部」或「information department」
+2. 需要读数、管数、立词条；或数据乱/缺需建议或上报业主；或要为工程补数生成扒取公式表
+3. 总参谋部规划任务单写明「调度信息部」时——父代理按单派出
+
+任务必须有 **`desk=`**（`manage` | `clean` | `request`）。交回格式见角色文件。信息部默认不改仓。
+
+任务写法见 `agent_tasklist/information-department.md`。
+
 ## 总监
 
 总监是代码改动的终审，不是规划会。父代理在总监交回之前，不能宣布这次代码改动已经完成。
@@ -40,11 +54,11 @@
 
 ## 任务里必须有
 
-1. 角色：`agents/` 里的文件名，例如 `chief-inspector`、`art-department`。
+1. 角色：`agents/` 里的文件名，例如 `chief-inspector`、`art-department`、`information-department`。
 2. 用户原话：本次要判断的那一句，不改写。
-3. 材料：已经发生的代码改动，写路径或 diff。不送计划。总监的标准是 `agent_tasklist/DESIGN.md`；美工部的标准是 `agent_tasklist/AESTHETIC.md`。
+3. 材料：已经发生的代码改动，写路径或 diff。不送计划。总监的标准是 `agent_tasklist/DESIGN.md`；美工部的标准是 `agent_tasklist/AESTHETIC.md`；信息部的标准是 `agent_tasklist/INFORMATION.md`（及点名分部）。信息部任务还须有 `desk=`。
 4. 送审次数：写明「这是第 N 次送审」。第一次送审 N = 1。（仅总监）
-5. 交回：总监只要结论；通过时不要建议。打回时要有「总监建议」，建议只能从 `agent_tasklist/DESIGN.md` 来。美工部交回格式见其角色文件。
+5. 交回：总监只要结论；通过时不要建议。打回时要有「总监建议」，建议只能从 `agent_tasklist/DESIGN.md` 来。美工部、信息部交回格式见其角色文件。
 
 ## 对话栏
 

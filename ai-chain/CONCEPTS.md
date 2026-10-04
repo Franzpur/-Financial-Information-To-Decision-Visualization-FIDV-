@@ -165,9 +165,10 @@ Removed / 已废弃：旧「角视图 corner view」与 **V / Home** 绑定（�
 | **C-LAYER-DATA** | layer record | 层数据 | `layers.json` / API; order 0 Power → 10 Models |
 | **C-COMPANY** | company record | 公司 | `revBn`, `revScore`, `ring`, `ringCos`, `ringSin`, `country`, optional `valueM`, optional `legalEntityCoord` / industry code (empty until attached) |
 | **C-US / C-INTL** | US / non-US | 美 / 非美 | Colors cyan / orange (`#3cf0ff` / `#ffb020`) |
-| **C-HOME** | engineering home | 工程首页 | Gate at `/`: same board for BICS **L1–L7**. Non-leaf cell → `/?bics=` next board; **leaf** cell → **C-CUBE** `/cube?bics=`. Not a news portal. No Technology highlight, no bottom CTA. Hosts **C-SPLASH** (cold `/` only). | `web/index.html`, `web/js/home.js`, `GET /api/bics/children` |
-| **C-CUBE** | decision cube SPA | 决策立方体页 | Full-bleed cube at `/cube`. Optional `?bics=` context only. **No splash.** | `web/cube.html`, `main.js` |
-| **C-SPLASH** | splash | 开屏 | Only on **C-HOME**: FIDV wordmark → clear hold ~**2s** → fade ~**4s**. Entering `/cube` from a sector plays no splash. | `#splash` in `index.html`, `home.js` |
+| **C-HOME** | engineering home | 工程首页 | Gate at `/`: BICS **L1–L3** same board (`/?bics=`). **Level-4** cell → **C-LIST**. Shallow leaves above L4 still `/cube?bics=`. Not a news portal. Hosts **C-SPLASH** (cold `/` only). | `web/index.html`, `home.js`, `GET /api/bics/children` |
+| **C-LIST** | L4 company list | 四级公司名单 | `/list?bics=<L4 compact>`. One company per full **Member Ticker**, only if this L4 is its **primary** (max `% Tot Rev`, then `ind_rev`, `bics_code_l4`, `source_file`, `id`). Other L1 shares listed as annotations; disclosed % sum is `pct_sum`. No splash. Same L4 still opens **C-CUBE**. | `web/list.html`, `list.js`, `GET /api/bics/entities` |
+| **C-CUBE** | decision cube SPA | 决策立方体页 | Full-bleed cube at `/cube`. Optional `?bics=` context only. **No splash.** Not the L4 click target. | `web/cube.html`, `main.js` |
+| **C-SPLASH** | splash | 开屏 | Only on **C-HOME**: FIDV wordmark → clear hold ~**2s** → fade ~**4s**. `/list` and `/cube` play no splash. | `#splash` in `index.html`, `home.js` |
 | **C-RING-SCORE** | ring score | 环分数 | Per-slice min–max → 0–100; **100 = exact center** |
 
 ---
@@ -190,7 +191,7 @@ Removed / 已废弃：旧「角视图 corner view」与 **V / Home** 绑定（�
 | `applyCoord` / `applySliceCoord` | C-COORD | only placement API in the scene |
 | `company.coord` | C-COORD | unpulled 位置坐标 `(s, x, y)` |
 | `ringCos` / `ringSin` | C-COORD-2 | 相对坐标；`companyCoord` 投影成位置坐标 |
-| `legalEntityCoord` | C-COORD-3 | 行业坐标；7×2 连字符（右补 `00`）；权威码见 BICS `bicsCode`；企业侧待填 |
+| `legalEntityCoord` | C-COORD-3 | 行业坐标；7×2 连字符（右补 `00`）；权威码见 BICS `bicsCode`；企业名单见 20261003 L4 成员表 |
 | `standardPose` / `goStandardView` | C-STDVIEW | |
 | `focusSlice` / `clearFocus` | C-FOCUS-ACT / C-ESC | |
 | `lerpPullOut` | C-PULL / C-RETRACT | exit and retract share the same ease; no camera |
@@ -220,13 +221,16 @@ Removed / 已废弃：旧「角视图 corner view」与 **V / Home** 绑定（�
 | [`library/worklog-001.md`](../library/worklog-001.md) | Session asks/answers + history |
 | [`README.md`](./README.md) | Run / API |
 | `web/js/scene.js` | 3D + camera + pick (`[C-*]` tags) |
-| `web/index.html` + `home.js` | **C-HOME** L1–L7 board + **C-SPLASH** (hold ~2s, fade ~4s; skip on `?bics=`) |
+| `web/index.html` + `home.js` | **C-HOME** L1–L3 board + **C-SPLASH**; L4 cells → **C-LIST** |
+| `web/list.html` + `list.js` | **C-LIST** L4 company table (no splash) |
 | `web/cube.html` + `web/css/app.css` | **C-CUBE** full-bleed cube; floating chrome; **no splash**; aesthetics → `agent_tasklist/AESTHETIC.md` |
 | `web/js/main.js` | Cube boot only; reads `?bics=` |
 | `assets/fidv-launcher*` + `scripts/set-command-icon.sh` | Launcher icons（美工部管辖） |
 | `GET /api/bics/children` | C-COORD-3 children of `parent` (empty = L1) |
+| `GET /api/bics/entities` | 20261003 companies whose primary L4 is `?bics=` |
 | `GET /api/bics/node` | One BICS node by `code` (any level) |
 | `GET /api/bics/l1` | Compat: L1 sectors only |
+| 信息部 / `agent_tasklist/INFORMATION.md` | 数据目录、调用词条、乱缺建议、BQLX 公式方案 |
 | `web/js/state.js` | Shared state |
 | `web/js/ui.js` | Panels / status / buttons |
 

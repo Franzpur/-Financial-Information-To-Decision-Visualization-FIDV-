@@ -49,9 +49,17 @@
 
 ### 工程首页（C-HOME）
 
-- `/`：BICS L1–L7 同一门厅。先 **C-SPLASH**（仅冷进 `/`），再字标同族 + 一条坐标痕迹 + **相连规则矩形格**（`gap:0`，共 1px `--stroke`，无圆角色胶囊）。`--accent` 只用于 hover/focus 与字标下划线，**不对 Technology(19) 单开主路径**。无底栏 chip CTA。无新闻/统计。
-- 非叶格进 `/?bics=` 同版面下一层；叶格进 `/cube?bics=`，**无** splash。
+- `/`：BICS L1–L3 同一门厅。先 **C-SPLASH**（仅冷进 `/`），再字标同族 + 一条坐标痕迹 + **相连规则矩形格**。`--accent` 只用于 hover/focus 与字标下划线。无底栏 chip CTA。无新闻/统计。
+- **L4 格进 `/list?bics=`（C-LIST）**，不再下钻 L5–L7，也不因该格是叶而进立方体。浅于 L4 的叶仍可 `/cube?bics=`。
 - `/cube`：决策立方体冷启动，**无** splash。
+
+### 四级名单（C-LIST）
+
+- `/list?bics=`：门厅同族（`home-body`、字标、`.home-trail`），**无开屏**。
+- 公司为细线行表（共边 1px `--stroke`，无胶囊）。一行一企。名 `--text`；ticker / 坐标 / 主业 L1 占比 `--muted` tabular。其他一级 + % 用名下 muted 字链（` · `），无 chip。窄屏旁注仍跟在名下。
+- 筛名/ticker：trail 下一条细边输入，不搬立方体顶栏搜索皮。
+- 空态一条 muted 短句。
+- 同一 L4 码保留进立方体：名单脚注链到 `/cube?bics=`（字链，非 chip 条）。
 
 ---
 
@@ -70,6 +78,7 @@
 | 资产 | 路径 |
 |------|------|
 | 色板 / chrome / 首页 | `ai-chain/web/css/app.css`；`ai-chain/web/index.html`（C-HOME + C-SPLASH）；`ai-chain/web/js/home.js` |
+| 四级名单 | `ai-chain/web/list.html`；`ai-chain/web/js/list.js` |
 | 立方体壳 | `ai-chain/web/cube.html`（C-CUBE；无 splash） |
 | splash 时序 | `ai-chain/web/js/home.js`（hold ~2s → fade ~4s） |
 | 面板类名与 HUD 外观 | `ai-chain/web/js/ui.js`（视觉层） |

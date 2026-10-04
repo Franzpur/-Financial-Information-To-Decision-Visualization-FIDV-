@@ -75,6 +75,7 @@ function trailHtml(ancestors, node) {
 }
 
 function cellHref(node) {
+  if (node.level === 4) return `/list?bics=${encodeURIComponent(node.bicsCode)}`;
   if (node.isLeaf) return `/cube?bics=${encodeURIComponent(node.bicsCode)}`;
   return `/?bics=${encodeURIComponent(node.bicsCode)}`;
 }
@@ -107,6 +108,10 @@ async function loadBoard() {
     if (!res.ok) throw new Error(`children ${res.status}`);
     const data = await res.json();
     const node = data.parent;
+    if (node?.level === 4) {
+      location.replace(`/list?bics=${encodeURIComponent(node.bicsCode)}`);
+      return;
+    }
     if (node?.isLeaf) {
       location.replace(`/cube?bics=${encodeURIComponent(node.bicsCode)}`);
       return;
@@ -116,7 +121,7 @@ async function loadBoard() {
     if (node) {
       home?.classList.add("home-drilled");
       if (lede) {
-        lede.textContent = `Level ${node.level} · ${node.name} · next board, or a leaf opens the cube.`;
+        lede.textContent = `Level ${node.level} · ${node.name} · next board, or a level-4 cell opens the company list.`;
       }
       if (trail) {
         trail.hidden = false;

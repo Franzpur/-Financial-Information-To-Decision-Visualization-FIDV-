@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>FIDV — Company list</title>
+<link rel="stylesheet" href="/css/app.css?v=21" />
+</head>
+<body class="home-body">
+  <main class="home home-drilled home-ready" id="listPage">
+    <header class="home-brand">
+      <a href="/" class="home-logo-link" aria-label="FIDV industry gate">
+      <svg class="splash-logo home-logo" viewBox="0 0 280 72" width="160" height="42" aria-hidden="true">
+        <g fill="none" stroke="#e8edf4" stroke-width="1.25" stroke-linejoin="round">
+          <rect x="8" y="14" width="18" height="44" rx="1.5" opacity="0.95"/>
+          <rect x="22" y="14" width="18" height="44" rx="1.5" opacity="0.55"/>
+          <rect x="36" y="14" width="18" height="44" rx="1.5" opacity="0.28"/>
+        </g>
+        <text
+          x="72" y="48"
+          fill="#e8edf4"
+          font-family="Iowan Old Style, Palatino Linotype, Palatino, Georgia, serif"
+          font-size="34"
+          letter-spacing="0.22em"
+        >FIDV</text>
+        <line x1="72" y1="56" x2="248" y2="56" stroke="#8be0c0" stroke-width="1" opacity="0.55"/>
+      </svg>
+      </a>
+      <p class="home-lede" id="listLede">Level-4 company list.</p>
+      <nav class="home-trail" id="listTrail" aria-label="Coordinate path"></nav>
+      <label class="list-filter-wrap" for="listFilter">
+        <span class="visually-hidden">Filter companies</span>
+        <input class="list-filter" id="listFilter" type="search" placeholder="Filter name or ticker" autocomplete="off" />
+      </label>
+    </header>
+
+    <h1 class="visually-hidden">Company list</h1>
+    <div class="list-table" id="listTable" aria-label="Companies in this class"></div>
+    <p class="home-note" id="listNote"></p>
+    <p class="home-note" id="listCube"><a id="listCubeLink" href="/cube">Decision cube</a> for this industry coordinate</p>
+  </main>
+  <script type="module" src="/js/list.js?v=22"></script>
+</body>
+</html>

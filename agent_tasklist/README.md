@@ -5,6 +5,9 @@
 - `DESIGN.md`：总监的任务
 - `AESTHETIC.md`：美工部的美学真源
 - `art-department.md`：美工部的派用步骤
+- `INFORMATION.md`：信息部的数据真源（词条 / 地图）
+- `INFORMATION-manage.md` / `INFORMATION-clean.md` / `INFORMATION-request.md`：信息部三分部
+- `information-department.md`：信息部的派用步骤
 - `general-staff.md`：总参谋部的任务（含调度/管理非排除子代理；细则亦见 `RULE.md`）
 - `secretary.md`：书记的任务
 - `RULE.md`：父代理派任务时怎么写

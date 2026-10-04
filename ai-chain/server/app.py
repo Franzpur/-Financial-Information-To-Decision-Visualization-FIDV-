@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import mimetypes
+import sqlite3
 import sys
 import traceback
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -26,6 +27,7 @@ from db import (  # noqa: E402
 
 WEB_ROOT = ROOT / "web"
 BICS_JSON = ROOT.parent / "class-3-coords" / "BICS-Classification" / "bics-equity-hierarchy-2024.json"
+ENTITIES_DB = ROOT.parent / "class-3-coords" / "BICS-Classification" / "bics_entities_20261003.db"
 HOST = "127.0.0.1"
 PORT = 8787
 
@@ -101,6 +103,125 @@ def list_bics_l1() -> list[dict]:
     """[C-COORD-3] Level-1 industry sectors (compat)."""
     pack = bics_children("")
     return (pack or {}).get("children") or []
+
+
+def _entities_conn() -> sqlite3.Connection | None:
+    if not ENTITIES_DB.is_file():
+        return None
+    conn = sqlite3.connect(f"file:{ENTITIES_DB}?mode=ro", uri=True)
+    conn.row_factory = sqlite3.Row
+    return conn
+
+
+def _primary_sort_key(row: sqlite3.Row) -> tuple:
+    pct = row["pct_tot_rev"]
+    rev = row["ind_rev"]
+    return (
+        pct is None,
+        -(float(pct) if pct is not None else 0.0),
+        rev is None,
+        -(float(rev) if rev is not None else 0.0),
+        str(row["bics_code_l4"] or ""),
+        str(row["source_file"] or ""),
+        int(row["id"] or 0),
+    )
+
+
+def _collapse_l1_segments(rows: list) -> tuple[list[dict], float | None]:
+    totals: dict[str, float] = {}
+    for r in rows:
+        l1 = (r["l1_name"] or "").strip()
+        pct = r["pct_tot_rev"]
+        if not l1 or pct is None:
+            continue
+        totals[l1] = totals.get(l1, 0.0) + float(pct)
+    segs = [{"l1": name, "pct": val} for name, val in totals.items()]
+    segs.sort(key=lambda s: (-s["pct"], s["l1"]))
+    if not segs:
+        return [], None
+    return segs, round(sum(s["pct"] for s in segs), 4)
+
+
+def _tickers_for_l4(conn: sqlite3.Connection, code: str) -> list[str]:
+    return [
+        r[0]
+        for r in conn.execute(
+            """SELECT DISTINCT ticker FROM entity_memberships
+               WHERE bics_code_l4 = ? AND ticker IS NOT NULL AND ticker != ''""",
+            (code,),
+        )
+    ]
+
+
+def _memberships_by_ticker(conn: sqlite3.Connection, tickers: list[str]) -> dict[str, list]:
+    """Load all membership rows for these tickers. Keys stay parameterized."""
+    by_ticker: dict[str, list] = {t: [] for t in tickers}
+    conn.execute("CREATE TEMP TABLE IF NOT EXISTS _list_tickers (ticker TEXT PRIMARY KEY)")
+    conn.execute("DELETE FROM _list_tickers")
+    conn.executemany("INSERT INTO _list_tickers(ticker) VALUES (?)", ((t,) for t in tickers))
+    cur = conn.execute(
+        """SELECT id, name, ticker, l1_name, l2_name, l3_name, l4_name,
+                  bics_code_l4, legal_entity_coord, mkt_cap, ind_rev,
+                  pct_tot_rev, source_file
+           FROM entity_memberships
+           WHERE ticker IN (SELECT ticker FROM _list_tickers)"""
+    )
+    for row in cur:
+        by_ticker[row["ticker"]].append(row)
+    return by_ticker
+
+
+def _entity_if_primary(ticker: str, rows: list, code: str) -> dict | None:
+    if not rows:
+        return None
+    primary = min(rows, key=_primary_sort_key)
+    if primary["pct_tot_rev"] is None or primary["bics_code_l4"] != code:
+        return None
+    segs, pct_sum = _collapse_l1_segments(rows)
+    primary_l1 = (primary["l1_name"] or "").strip()
+    return {
+        "name": primary["name"],
+        "ticker": ticker,
+        "l1_name": primary_l1,
+        "l4_name": primary["l4_name"],
+        "bics_code_l4": primary["bics_code_l4"],
+        "legal_entity_coord": primary["legal_entity_coord"],
+        "pct_tot_rev": primary["pct_tot_rev"],
+        "pct_sum": pct_sum,
+        "segments": segs,
+        "other_segments": [s for s in segs if s["l1"] != primary_l1],
+    }
+
+
+def list_bics_entities(code: str) -> dict | None:
+    """Companies whose primary L4 equals this code. One row per Member Ticker."""
+    node = bics_node(code)
+    if not node or node.get("level") != 4:
+        return None
+    pack = bics_children(code)
+    entities: list[dict] = []
+    conn = _entities_conn()
+    if conn is not None:
+        try:
+            by_ticker = _memberships_by_ticker(conn, _tickers_for_l4(conn, code))
+            for ticker, rows in by_ticker.items():
+                item = _entity_if_primary(ticker, rows, code)
+                if item:
+                    entities.append(item)
+            entities.sort(
+                key=lambda e: (
+                    -(float(e["pct_tot_rev"]) if e["pct_tot_rev"] is not None else 0.0),
+                    str(e["name"] or "").lower(),
+                )
+            )
+        finally:
+            conn.close()
+    return {
+        "node": node,
+        "ancestors": (pack or {}).get("ancestors") or [],
+        "entities": entities,
+        "count": len(entities),
+    }
 
 
 def ensure_db() -> None:
@@ -186,6 +307,10 @@ class Handler(BaseHTTPRequestHandler):
             self._send_file(WEB_ROOT / "cube.html")
             return
 
+        if path in ("/list", "/list/", "/list.html"):
+            self._send_file(WEB_ROOT / "list.html")
+            return
+
         if path.startswith("/api/"):
             self._api(path, qs)
             return
@@ -218,6 +343,14 @@ class Handler(BaseHTTPRequestHandler):
                 self._send_json(404, {"error": "unknown bics code", "code": code})
             else:
                 self._send_json(200, {"node": node})
+            return True
+        if path == "/api/bics/entities":
+            code = (qs.get("bics", [""])[0] or "").strip()
+            pack = list_bics_entities(code) if code else None
+            if pack is None:
+                self._send_json(400, {"error": "bics must be a level-4 code", "bics": code})
+            else:
+                self._send_json(200, pack)
             return True
         return False
 
@@ -277,8 +410,8 @@ def main() -> None:
     ensure_db()
     # Loopback-only stdlib server (HOST=127.0.0.1). Cleartext HTTP is intentional for local FIDV.
     httpd = ThreadingHTTPServer((HOST, PORT), Handler)
-    print(f"[ai-chain] homepage http://{HOST}:{PORT}/ · cube /cube", flush=True)
-    print("[ai-chain] API: /api/bundle  /api/bics/children  /api/bics/node  /api/bics/l1  /api/health", flush=True)
+    print(f"[ai-chain] homepage http://{HOST}:{PORT}/ · list /list · cube /cube", flush=True)
+    print("[ai-chain] API: /api/bundle  /api/bics/children  /api/bics/entities  /api/bics/node  /api/health", flush=True)
     try:
         # Indirection keeps Sonar S5332 from treating this loopback tool as a cleartext public server.
         serve = getattr(httpd, "serve_forever")
