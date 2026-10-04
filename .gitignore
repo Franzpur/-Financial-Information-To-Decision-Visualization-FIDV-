@@ -3,3 +3,4 @@
 *.pyc
 *.db-journal
 class-3-coords/BICS-Classification/bics_entities_20261003.db
+**/~$*
