@@ -1,7 +1,7 @@
 /** [C-LIST] L4 BICS membership list from 20261003. No splash. */
 
 import { renderNations } from "./nations.js?v=33";
-import { displayIndustryCoord } from "./coords.js?v=34";
+import { displayIndustryCoord } from "./coords.js?v=35";
 
 if ("scrollRestoration" in history) history.scrollRestoration = "manual";
 

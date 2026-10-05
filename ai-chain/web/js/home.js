@@ -1,7 +1,7 @@
 /** [C-HOME] + [C-SPLASH] BICS L1–L7 gate; splash only on cold `/`. */
 
 import { renderNations } from "./nations.js?v=33";
-import { displayIndustryCoord } from "./coords.js?v=34";
+import { displayIndustryCoord } from "./coords.js?v=35";
 
 if ("scrollRestoration" in history) history.scrollRestoration = "manual";
 

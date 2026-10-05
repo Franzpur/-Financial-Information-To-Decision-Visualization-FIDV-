@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
-"""Map DATA-SPACE 20261003 BICS member workbooks onto L4 hierarchy codes.
+"""Map DATA-SPACE BICS member workbooks onto L4 hierarchy codes.
 
-Skips Consumer Staples (no L2–L4 columns) and Office lock / formula-example files.
+Sources: 20261003 L1 workbooks (with Level4 columns) and 20261005 Staples
+one-file-per-L4 workbooks (L4 from filename). Skips the old L1-only Staples
+book, pull-* formula sheets, Office locks, and the formula example.
 Does not commit xlsx. Output: bics_entities_20261003.db
 """
 from __future__ import annotations
@@ -20,10 +22,11 @@ except ImportError:
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parents[1]
 HIER_JSON = HERE / "bics-equity-hierarchy-2024.json"
-SRC_DIR = REPO / "DATA-SPACE" / "ICBC C" / "20261003" / "BICS_LEGALENTITY"
+SRC_DIRS = (
+    REPO / "DATA-SPACE" / "ICBC C" / "20261003" / "BICS_LEGALENTITY",
+    REPO / "DATA-SPACE" / "ICBC C" / "20261005",
+)
 DB_OUT = HERE / "bics_entities_20261003.db"
-
-SKIP_NAME_PARTS = ("staples", "fomular", "~$")
 
 L1_FROM_FILE = {
     "BICS_Communications.xlsx": "Communications",
@@ -37,6 +40,12 @@ L1_FROM_FILE = {
     "BICS_Technology.xlsx": "Technology",
     "BICS_Utilities.xlsx": "Utilities",
     "__BICS_Government__.xlsx": "Government",
+    "BICS_Government.xlsx": "Government",
+}
+
+STAPLES_L1 = "Consumer Staples"
+FILENAME_L4_ALIASES = {
+    "agricultural & producers": "agricultural producers",
 }
 
 
@@ -48,15 +57,52 @@ def cellstr(v) -> str:
     return str(v).strip()
 
 
-def load_name_index() -> dict[tuple[str, int], dict]:
+def load_hierarchy() -> tuple[dict[tuple[str, int], dict], dict[str, dict], dict[str, dict]]:
     data = json.loads(HIER_JSON.read_text(encoding="utf-8"))
-    idx: dict[tuple[str, int], dict] = {}
+    by_name: dict[tuple[str, int], dict] = {}
+    by_code: dict[str, dict] = {}
+    staples_l4: dict[str, dict] = {}
     for n in data.get("nodes", []):
-        name = (n.get("name") or "").strip().lower()
+        name = (n.get("name") or "").strip()
         lvl = n.get("level")
+        code = str(n.get("bicsCode") or "")
         if name and lvl:
-            idx[(name, int(lvl))] = n
-    return idx
+            by_name[(name.lower(), int(lvl))] = n
+        if code:
+            by_code[code] = n
+        if int(lvl or 0) == 4 and code.startswith("12"):
+            staples_l4[norm_key(name)] = n
+    return by_name, by_code, staples_l4
+
+
+def norm_key(s: str) -> str:
+    t = (s or "").lower().replace("&", " ").replace("-", " ")
+    return " ".join(t.split())
+
+
+def l4_from_filename(path: Path, staples_l4: dict[str, dict]) -> dict | None:
+    stem = path.stem.strip()
+    alias = FILENAME_L4_ALIASES.get(stem.lower(), stem.lower())
+    return staples_l4.get(norm_key(alias)) or staples_l4.get(norm_key(stem))
+
+
+def ancestors(node: dict, by_code: dict[str, dict]) -> tuple[str, str, str]:
+    l1 = l2 = l3 = ""
+    cur: dict | None = node
+    seen = 0
+    while cur and seen < 8:
+        seen += 1
+        lvl = cur.get("level")
+        name = (cur.get("name") or "").strip()
+        if lvl == 1:
+            l1 = name
+        elif lvl == 2:
+            l2 = name
+        elif lvl == 3:
+            l3 = name
+        pc = cur.get("parentCode")
+        cur = by_code.get(pc) if pc else None
+    return l1, l2, l3
 
 
 def header_map(row) -> dict[str, int]:
@@ -92,7 +138,15 @@ def as_float(v):
 
 def should_skip(path: Path) -> bool:
     n = path.name.lower()
-    return any(part in n for part in SKIP_NAME_PARTS)
+    if n.startswith("~$"):
+        return True
+    if "fomular" in n:
+        return True
+    if n.startswith("pull-"):
+        return True
+    if "comsumer staples" in n or n.startswith("bics_consumer staples"):
+        return True
+    return False
 
 
 def _at(row, idx) -> str:
@@ -101,7 +155,14 @@ def _at(row, idx) -> str:
     return cellstr(row[idx])
 
 
-def _ingest_rows(wb, path: Path, idx: dict, cur: sqlite3.Cursor) -> tuple[int, int]:
+def _ingest_rows(
+    wb,
+    path: Path,
+    by_name: dict,
+    by_code: dict,
+    staples_l4: dict,
+    cur: sqlite3.Cursor,
+) -> tuple[int, int]:
     ws = wb[wb.sheetnames[0]]
     rows = ws.iter_rows(values_only=True)
     header = next(rows, None)
@@ -116,19 +177,35 @@ def _ingest_rows(wb, path: Path, idx: dict, cur: sqlite3.Cursor) -> tuple[int, i
     i_l2 = col(hmap, "level2", "level 2")
     i_l3 = col(hmap, "level3", "level 3")
     i_l4 = col(hmap, "level4", "level 4")
-    if i_l4 is None:
+    file_node = l4_from_filename(path, staples_l4) if i_l4 is None else None
+    if i_l4 is None and file_node is None:
         return 0, 0
     ok = 0
     reject = 0
-    l1 = L1_FROM_FILE.get(path.name, "")
+    file_l1 = L1_FROM_FILE.get(path.name, "")
     for r in rows:
         if not any(c not in (None, "") for c in r):
             continue
-        l4 = _at(r, i_l4)
-        node = idx.get((l4.lower(), 4)) if l4 and l4 not in ("#N/A", "n/a") else None
+        node = None
+        l4 = ""
+        if i_l4 is not None:
+            l4 = _at(r, i_l4)
+            if l4 and l4 not in ("#N/A", "n/a"):
+                node = by_name.get((l4.lower(), 4))
+        else:
+            node = file_node
+            l4 = (node.get("name") or "") if node else ""
         if not node:
             reject += 1
             continue
+        if file_l1:
+            l1 = file_l1
+            l2 = _at(r, i_l2)
+            l3 = _at(r, i_l3)
+        else:
+            l1, l2, l3 = ancestors(node, by_code)
+            if not l1:
+                l1 = STAPLES_L1
         cur.execute(
             """INSERT INTO entity_memberships
                (name, ticker, l1_name, l2_name, l3_name, l4_name, bics_code_l4,
@@ -138,8 +215,8 @@ def _ingest_rows(wb, path: Path, idx: dict, cur: sqlite3.Cursor) -> tuple[int, i
                 _at(r, i_co),
                 _at(r, i_tk),
                 l1,
-                _at(r, i_l2),
-                _at(r, i_l3),
+                l2,
+                l3,
                 l4,
                 node.get("bicsCode"),
                 node.get("legalEntityCoord"),
@@ -153,22 +230,36 @@ def _ingest_rows(wb, path: Path, idx: dict, cur: sqlite3.Cursor) -> tuple[int, i
     return ok, reject
 
 
-def ingest_file(path: Path, idx: dict, cur: sqlite3.Cursor) -> tuple[int, int]:
+def ingest_file(
+    path: Path,
+    by_name: dict,
+    by_code: dict,
+    staples_l4: dict,
+    cur: sqlite3.Cursor,
+) -> tuple[int, int]:
     wb = load_workbook(path, data_only=True, read_only=True)
     try:
-        return _ingest_rows(wb, path, idx, cur)
+        return _ingest_rows(wb, path, by_name, by_code, staples_l4, cur)
     finally:
         wb.close()
+
+
+def source_files() -> list[Path]:
+    files: list[Path] = []
+    for folder in SRC_DIRS:
+        if not folder.is_dir():
+            print(f"missing source dir {folder}", file=sys.stderr)
+            sys.exit(1)
+        files.extend(p for p in folder.glob("*.xlsx") if not should_skip(p))
+    files.sort(key=lambda p: (str(p.parent), p.name.lower()))
+    return files
 
 
 def main() -> None:
     if not HIER_JSON.is_file():
         print("missing hierarchy JSON", HIER_JSON, file=sys.stderr)
         sys.exit(1)
-    if not SRC_DIR.is_dir():
-        print("missing source dir", SRC_DIR, file=sys.stderr)
-        sys.exit(1)
-    idx = load_name_index()
+    by_name, by_code, staples_l4 = load_hierarchy()
     if DB_OUT.exists():
         DB_OUT.unlink()
     conn = sqlite3.connect(DB_OUT)
@@ -198,10 +289,9 @@ def main() -> None:
     )
     total_ok = 0
     total_rej = 0
-    files = sorted(p for p in SRC_DIR.glob("*.xlsx") if not should_skip(p))
-    for path in files:
-        ok, rej = ingest_file(path, idx, cur)
-        print(f"{path.name}: kept={ok} reject={rej}")
+    for path in source_files():
+        ok, rej = ingest_file(path, by_name, by_code, staples_l4, cur)
+        print(f"{path.parent.name}/{path.name}: kept={ok} reject={rej}")
         total_ok += ok
         total_rej += rej
     conn.commit()

@@ -189,11 +189,19 @@ def _memberships_by_ticker(conn: sqlite3.Connection, tickers: list[str]) -> dict
     return by_ticker
 
 
+def _entity_coord(row) -> str:
+    """Unsigned 7×2 from the library; '-' prefix if the winning % Tot Rev is empty."""
+    raw = str(row["legal_entity_coord"] or "").strip()
+    if row["pct_tot_rev"] is None and raw and not raw.startswith("-"):
+        return "-" + raw
+    return raw
+
+
 def _entity_if_primary(ticker: str, rows: list, code: str) -> dict | None:
     if not rows:
         return None
     primary = min(rows, key=_primary_sort_key)
-    if primary["pct_tot_rev"] is None or primary["bics_code_l4"] != code:
+    if primary["bics_code_l4"] != code:
         return None
     segs, pct_sum = _collapse_l1_segments(rows)
     primary_l1 = (primary["l1_name"] or "").strip()
@@ -203,7 +211,7 @@ def _entity_if_primary(ticker: str, rows: list, code: str) -> dict | None:
         "l1_name": primary_l1,
         "l4_name": primary["l4_name"],
         "bics_code_l4": primary["bics_code_l4"],
-        "legal_entity_coord": primary["legal_entity_coord"],
+        "legal_entity_coord": _entity_coord(primary),
         "pct_tot_rev": primary["pct_tot_rev"],
         "pct_sum": pct_sum,
         "segments": segs,
@@ -237,8 +245,6 @@ def _primary_index() -> dict[str, list[tuple[str, str | None]]]:
             by_ticker.setdefault(row["ticker"], []).append(row)
         for ticker, rows in by_ticker.items():
             primary = min(rows, key=_primary_sort_key)
-            if primary["pct_tot_rev"] is None:
-                continue
             code = str(primary["bics_code_l4"] or "")
             loc = parse_ticker(ticker)["listingCountry"]
             out.setdefault(code, []).append((ticker, loc))
@@ -312,6 +318,7 @@ def list_bics_entities(code: str, listing_country: str | None = None) -> dict | 
                 entities.append(item)
             entities.sort(
                 key=lambda e: (
+                    e["pct_tot_rev"] is None,
                     -(float(e["pct_tot_rev"]) if e["pct_tot_rev"] is not None else 0.0),
                     str(e["name"] or "").lower(),
                 )

@@ -18,7 +18,8 @@
  *
  * 3类坐标，行业坐标：company.legalEntityCoord。
  * Bloomberg BICS Equity Hierarchy 2024；产品格式 7×2 连字符（右补 00）。
- * 闸门/名单 chrome 只画前 4 段；库与字段仍是 7 级。
+ * 主业行空 % Tot Rev 时企业坐标前加 ASCII '-'（节点坐标不加）。
+ * 闸门/名单 chrome 只画前 4 段并保留前导 '-'；库与字段仍是 7 级。
  * 库：class-3-coords/BICS-Classification/。不参与摆放。
  */
 /** Physical face edge length in Three.js meters (PlaneGeometry). */
@@ -211,10 +212,13 @@ export function formatCoord(coord, digits = 2) {
   return `(${s}, ${coord.x.toFixed(digits)}, ${coord.y.toFixed(digits)})`;
 }
 
-/** C-HOME / C-LIST chrome: first 4 of 7 hyphen groups. Storage stays 7×2. */
+/** C-HOME / C-LIST chrome: first 4 of 7 hyphen groups. Keep a leading '-'. */
 export function displayIndustryCoord(raw) {
   const s = String(raw || "").trim();
   if (!s) return "";
-  if (s.includes("-")) return s.split("-").slice(0, 4).join("-");
-  return s;
+  const signed = s.startsWith("-");
+  const core = signed ? s.slice(1) : s;
+  if (!core) return signed ? "-" : "";
+  const shown = core.includes("-") ? core.split("-").slice(0, 4).join("-") : core;
+  return signed ? `-${shown}` : shown;
 }

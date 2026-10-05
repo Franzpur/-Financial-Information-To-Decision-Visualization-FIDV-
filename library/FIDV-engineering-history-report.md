@@ -1,8 +1,8 @@
 # FIDV 工程发展史（队员入职读本）
 
 **Financial Information To Decision Visualization**  
-汇编日期：2026-10-04  
-依据：`library/worklog-001.md`、`library/worklog-002.md`、`agent_tasklist/DESIGN.md`、`ai-chain/CONCEPTS.md`  
+汇编日期：2026-10-05  
+依据：`library/worklog-001.md`、`library/worklog-002.md`、`library/worklog-003.md`、`agent_tasklist/DESIGN.md`、`ai-chain/CONCEPTS.md`  
 用途：打印或导出 PDF，向队员介绍工程从何而来、现在怎么跑、协作时听谁的。  
 **本册不是产品终审标准。** 改产品对照 `DESIGN.md`；改三维对照 `CONCEPTS.md`。
 
@@ -11,13 +11,13 @@
 
 ---
 
-## 1. 一句话
+## 1. 产品概述
 
 FIDV 是给金融工作者用的**决策可视化**工具：把大量行业与企业信息放进**同一套坐标**里看、移、点。第一版重心是人工智能相关科技行业、风险控制、债务风险，以及**以企业为节点**的传导。当前可运行的主视图是产业链立方体；门厅按 Bloomberg **BICS** 行业树下钻，四级可以打开公司名单。
 
 ---
 
-## 2. 设计三条（动手前过一遍）
+## 2. 三条设计理念
 
 摘自 `agent_tasklist/DESIGN.md`（来源：第一版产品理念 PDF）。
 
@@ -29,9 +29,9 @@ FIDV 是给金融工作者用的**决策可视化**工具：把大量行业与�
 
 ---
 
-## 3. 时间线（2026-09-25 → 2026-10-04）
+## 3. 时间线（2026-09-25 → 2026-10-05）
 
-流水编号见工作日志 #1–#87。下面按阶段压缩。
+流水编号见工作日志 #1–#94（003 自 #90）。下面按阶段压缩。
 
 ### 3.1 财务试读 → 立项立方体（09-25～09-26）
 
@@ -100,6 +100,14 @@ FIDV 是给金融工作者用的**决策可视化**工具：把大量行业与�
 - 换国不再整页刷新：`history.pushState` + 再拉名单，滚动位置保留（#86）。
 - 3 类坐标**库内仍 7×2**；门厅与名单 **只显示前 4 段**（藏掉后面三级补位 `-00-00-00`）（#87）。
 
+### 3.11 队员读本与 10-05 数据（10-05）
+
+- #88–#90 已在 GitHub：上市国筛选、可搜索下拉、页内换国、四段 chrome、业主改本读本标题（读本 / 产品概述 / 三条设计理念 / 未完成）。
+- #91 试写 L5–L7 拉数表 `pull-comms-eq-l5l7.xlsx`（Communications Equipment 19101010）；mnemonic 空，须上机 FLDS；未摄入。
+- #92 摄入 `DATA-SPACE/ICBC C/20261005/` 14 份 Staples L4 xlsx（文件名=L4；Agricultural & Producers → Agricultural Producers 12101010）。双 SRC 20261003+20261005。跳过旧 L1 Staples、pull-*、`~$`；Other Wholesalers - Staples 已摄入。成员约 117255。库 gitignore。
+- #93 `diff.xlsx`：In product = 门厅主业家数，不是表行数。Drop = 并入他主业 + 空%。Government 源表 25000 且 % 全空；diff Real=117982 与源表不符。未从库删除。
+- #94 空 % Tot Rev 仍进名单；空≠100；有数字仍赢；企业 `legalEntityCoord` 前缀「-」（chrome 保留负号 + 四段）；节点坐标无负号。门厅 All 98374；Government 约 25028。
+
 ---
 
 ## 4. 今天怎么打开
@@ -137,7 +145,7 @@ cd ai-chain && ./Open-AI-Chain.command
 | `ai-chain/` | 可运行产品（Flask 式 stdlib 服务 + 静态页） |
 | `ai-chain/CONCEPTS.md` | 切片/轴/抽出等冻结约定 |
 | `class-3-coords/BICS-Classification/` | BICS 2024 层级库 + 摄入脚本 |
-| `DATA-SPACE/` | 彭博导出邻接盘（928 旧表 + 20261003） |
+| `DATA-SPACE/` | 彭博导出邻接盘（928 旧表 + 20261003 + 20261005） |
 | `library/` | 工作日志与本报告 |
 
 ---
@@ -148,7 +156,7 @@ cd ai-chain && ./Open-AI-Chain.command
 |----|------|--------|
 | 1 类 | 位置坐标 `(s, x, y)` | 立方体里唯一摆放语言 |
 | 2 类 | 环上相对坐标 `ringCos` / `ringSin` | 切片内营收环，**不要叫 x/y** |
-| 3 类 | 行业坐标 `legalEntityCoord` | BICS；存储 7×2；门厅/名单只画前 4 段；立方体上不画 |
+| 3 类 | 行业坐标 `legalEntityCoord` | BICS；存储 7×2；门厅/名单只画前 4 段；空占比企业坐标可前缀「-」；节点坐标无负号；立方体上不画 |
 
 抽出：**焦点切片不动**，其余沿 −x 退一面宽并淡出。抽回用同一套缓动淡入。切层时镜头不要自己钻进立方体（除非按 C 回标准视角）。
 
@@ -159,10 +167,10 @@ cd ai-chain && ./Open-AI-Chain.command
 ## 7. 数据现状（队员勿当已修）
 
 - **层级**：`bics-equity-hierarchy-2024.json`（解析自表 2144414「BICS Equity Hierarchy 2024」）。
-- **成员**：20261003 各 L1 工作簿 → 本地 SQLite（gitignore）。英文 L2–L4 名对层级库。
-- **主业规则**：同一完整 ticker 取最大 `% Tot Rev`；缺占比不定主码。跨表重复是收入分段，不是重复身份。
-- **Consumer Staples**：6494 家，仅有 L1 列；摄入跳过。补拉表已写好，拷回有 L2–L4 后才能进库。
-- **Government**：约 25000 行，疑似终端上限；L2 近全 `#N/A`。
+- **成员**：20261003 各 L1 工作簿 + 20261005 Staples L4 → 本地 SQLite（gitignore）。英文 L2–L4 名对层级库。
+- **主业规则**：同一完整 ticker 取最大 `% Tot Rev`；空≠100；有数字仍赢。空占比可进名单，企业坐标前缀「-」。跨表重复是收入分段，不是重复身份。
+- **Consumer Staples**：已由 20261005 十四份 L4 表摄入（跳过旧 L1 表）。
+- **Government**：源表约 25000 行仍报截断；空%现可进名单（门厅约 25028）。
 - **BQLX.pdf**：彭博终端帮助，不是 FIDV 专用菜谱。
 - **上市地**：黄键交易所码 → ISO（`listing.py`）；未映射进 Unmapped。与立方体 `?country=` 分轴。
 - 立方体 `companies.json` 仍是早期产业链演示链，与四级名单不是同一张表。
@@ -193,12 +201,12 @@ cd ai-chain && ./Open-AI-Chain.command
 
 ---
 
-## 10. 未完成（给下一班）
+## 10. 未完成
 
-- Staples 补拉拷回后：改摄入 skip、重摄入、名单出现必需消费主业。
-- Government 截断与缺 `%`：不定主码，不上名单。
+- Government 源表约 25000 行截断，仍待完整源。
+- L5–L7 拉数字段 mnemonic 未确认（试表 `pull-comms-eq-l5l7.xlsx`）。
 - 债务/传导可视化按 DESIGN 重做，接到同一立方体，不要再做孤页。
-- 演示链 `companies.json` 与 BICS 四级成员如何挂到点球：尚未做。
+- 立方体 `companies.json` 尚未接到 BICS 四级成员。
 - 三维导出、自制图表：理念已写，产品未做。
 
 ---
@@ -207,4 +215,4 @@ cd ai-chain && ./Open-AI-Chain.command
 
 可用浏览器打开同目录 `FIDV-engineering-history-report.html`，选「打印」或「存储为 PDF」，纸张 A4。
 
-工作日志真源仍是 `worklog-001.md`（#1–#52）与 `worklog-002.md`（#53–#87）。本报告是给队员的压缩本，不以本报告改写旧日志行。
+工作日志真源仍是 `worklog-001.md`（#1–#52）、`worklog-002.md`（#53–#87）、`worklog-003.md`（#90 起）。本报告是给队员的压缩本，不以本报告改写旧日志行。
