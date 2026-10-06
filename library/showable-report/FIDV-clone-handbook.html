@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>FIDV 问题手册 · GitHub 克隆后分类空</title>
+<style>
+  :root {
+    --ink: #1a1f26;
+    --muted: #4a5560;
+    --rule: #c5ccd4;
+    --paper: #f7f5f0;
+  }
+  * { box-sizing: border-box; }
+  html { font-size: 11pt; }
+  body {
+    margin: 0 auto;
+    max-width: 180mm;
+    padding: 16mm 16mm 22mm;
+    color: var(--ink);
+    background: var(--paper);
+    font-family: "Iowan Old Style", "Palatino Linotype", Palatino, "Songti SC", "Noto Serif SC", serif;
+    line-height: 1.45;
+  }
+  h1 { font-size: 18pt; letter-spacing: 0.04em; margin: 0 0 0.35em; font-weight: 600; }
+  h2 { font-size: 12.5pt; margin: 1.35em 0 0.4em; border-bottom: 1px solid var(--rule); padding-bottom: 0.2em; }
+  p, li { margin: 0.32em 0; }
+  .lede { color: var(--muted); font-size: 10pt; }
+  .cover-meta { margin: 0.8em 0 1.4em; font-size: 10pt; color: var(--muted); }
+  .cover-meta div { margin: 0.15em 0; }
+  table { width: 100%; border-collapse: collapse; font-size: 9.5pt; margin: 0.5em 0 0.8em; page-break-inside: avoid; }
+  th, td { border: 1px solid var(--rule); padding: 0.28em 0.45em; text-align: left; vertical-align: top; }
+  th { background: #ece8e0; font-weight: 600; }
+  code { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 0.88em; }
+  pre {
+    background: #efece6;
+    border: 1px solid var(--rule);
+    padding: 0.65em 0.85em;
+    font-size: 9pt;
+    overflow: auto;
+    page-break-inside: avoid;
+  }
+  ul, ol { padding-left: 1.2em; }
+  .foot { margin-top: 1.8em; font-size: 9pt; color: var(--muted); }
+  .no-print { margin: 0 0 1em; font-size: 10pt; }
+  @media print {
+    body { max-width: none; padding: 12mm 14mm; background: white; }
+    .no-print { display: none; }
+    a { color: inherit; text-decoration: none; }
+  }
+  @page { size: A4; margin: 14mm 14mm 16mm; }
+</style>
+</head>
+<body>
+  <p class="no-print">浏览器打开本页 → 打印 → A4 纵向 → 存储为 PDF。关掉页眉网址。</p>
+
+  <h1>问题手册</h1>
+  <p class="lede">有格子、没有公司 · 给队员</p>
+  <div class="cover-meta">
+    <div>2026-10-06 · 接工作日志 #97–#99</div>
+    <div>本题只谈：首页已有 Communications 等分类格，但家数是 0，点进四级名单是空的。</div>
+  </div>
+
+  <h2>1. 现象</h2>
+  <p>从 GitHub 克隆完整仓库，用启动器打开首页：分类格子在，家数全是 0，点四级没有公司。</p>
+  <p>这不是网页坏了，也不是没连上网上的数据库。工程没有远程库。缺的是本机这份文件：<code>class-3-coords/BICS-Classification/bics_entities_20261003.db</code>。它不进 GitHub，要在本机用 Python 生成。</p>
+
+  <h2>2. 简要原因</h2>
+  <p>格子来自仓里的 JSON（已下载）。公司名单来自上面那份 <code>.db</code>（clone 不会带）。</p>
+  <p><code>ingest_20261003_entities.py</code> <strong>不是连接程序</strong>。它读取 <code>DATA-SPACE/</code> 里的 Excel，在本机<strong>写出</strong> <code>.db</code>。网页服务再打开这个文件。没跑过脚本，服务照样能开，只是没有公司可数。</p>
+
+  <h2>3. 原理</h2>
+  <p>Excel 是能对账的原表，进 GitHub。JSON 是分类标准，进 GitHub。SQLite 是脚本算过的查询切片（主业、空占比负号），故意不跟踪，避免仓里两套数。网页运行时不现场拆 Excel，所以要先 ingest 一次。</p>
+
+  <h2>4. 怎么运行（电脑终端）</h2>
+  <p>是的：在电脑的<strong>终端</strong>里输入命令（Mac：终端.app / Terminal；Windows：命令提示符或 PowerShell）。不要在浏览器地址栏里贴这些字。路径换成你克隆下来的文件夹（文件夹里应能看见 <code>Open-AI-Cube.command</code> 和 <code>DATA-SPACE</code>）。</p>
+  <p><strong>第 0 步</strong> 打开终端，进入仓库根目录。可以把文件夹从访达拖进终端窗口，或自己改路径：</p>
+<pre>cd /Users/你的用户名/路径/FIDV</pre>
+  <p>用 <code>ls</code> 看一眼：应列出 <code>ai-chain</code>、<code>class-3-coords</code>、<code>DATA-SPACE</code>。没有这些，说明 cd 还没进对地方。</p>
+  <p><strong>第 1 步</strong> 安装读 Excel 的库（每台电脑做一次）：</p>
+<pre>pip3 install openpyxl</pre>
+  <p>若提示 <code>pip3: command not found</code>，先安装 Python 3，或试 <code>python3 -m pip install openpyxl</code>。</p>
+  <p><strong>第 2 步</strong> 生成成员库（Excel 更新后也再跑一次）。仍在仓库根目录：</p>
+<pre>python3 class-3-coords/BICS-Classification/ingest_20261003_entities.py</pre>
+  <p>成功时终端会打印各 xlsx 的 <code>kept=</code>，最后一行类似 <code>wrote … bics_entities_20261003.db rows=…</code>。第一次可能要一两分钟。若报 <code>missing source dir</code>，是 <code>DATA-SPACE</code> 没下全，重新 clone 整个仓。</p>
+  <p><strong>第 3 步</strong> 重新开工程页。服务在启动时读一次库，ingest 之后必须重启：</p>
+  <ol>
+    <li>若终端里启动器还在跑：输入 <code>quit</code> 回车，或按 Ctrl+C。</li>
+    <li>再启动。Mac 可在访达里双击 <code>Open-AI-Cube.command</code>；或在同一终端输入：</li>
+  </ol>
+<pre>./Open-AI-Cube.command</pre>
+  <p>浏览器打开 <code>http://127.0.0.1:8787/</code>。格子上的家数应不再是 0，点四级应有公司名单。</p>
+  <p class="lede">不要用浏览器直接打开 html 文件。不要把 ingest 那行命令打进网页搜索框。</p>
+
+  <p class="foot">本页只讲「有格子、没有公司」。改产品对照 DESIGN.md。工作日志 #97–#99。</p>
+</body>
+</html>

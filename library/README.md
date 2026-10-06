@@ -1,10 +1,9 @@
 # library
 
-书记的工作区。记录性文档放这里。
+书记处工作区。
 
-工作日志分册，文件名 `worklog-xxx`，`xxx` 是三位编号，从 `worklog-001` 起。字数按文件字符计、不含空白。当前册超过 10000 字时，书记另开下一册，旧册不拆。流水序号全库连续。
-
-队员入职 / 可打印发展史：
-
-- [`FIDV-engineering-history-report.md`](./FIDV-engineering-history-report.md) 读本
-- [`FIDV-engineering-history-report.html`](./FIDV-engineering-history-report.html) 浏览器打开后打印或存 PDF
+| 位置 | 归属 |
+|------|------|
+| `worklog-xxx.md`（本目录） | **书记**。当前册超过 10000 字（去空白）另开下一册。流水序号全库连续。 |
+| [`bug-report/`](./bug-report/) | **运维**。运行问题 `ops-log-xxx.md`。 |
+| [`showable-report/`](./showable-report/) | **秘书**。报告、讲稿、手册、展出材料。仅在业主要文稿时新增。 |

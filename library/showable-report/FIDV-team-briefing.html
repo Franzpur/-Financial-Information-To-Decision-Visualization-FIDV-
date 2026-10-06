@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>FIDV 队员会 · 2026-10-06</title>
+<style>
+  :root {
+    --ink: #1a1f26;
+    --muted: #4a5560;
+    --rule: #c5ccd4;
+    --paper: #f7f5f0;
+    --fill: #ece8e0;
+  }
+  * { box-sizing: border-box; }
+  html { font-size: 11pt; }
+  body {
+    margin: 0 auto;
+    max-width: 277mm;
+    padding: 8mm 8mm 16mm;
+    color: var(--ink);
+    background: var(--paper);
+    font-family: "Iowan Old Style", "Palatino Linotype", Palatino, "Songti SC", "Noto Serif SC", serif;
+    line-height: 1.35;
+  }
+  .no-print { margin: 0 0 1em; font-size: 10pt; color: var(--muted); }
+  .slide {
+    min-height: 175mm;
+    padding: 8mm 10mm;
+    border: 1px solid var(--rule);
+    background: #fbf9f4;
+    page-break-after: always;
+    break-after: page;
+    display: flex;
+    flex-direction: column;
+  }
+  .slide:last-child { page-break-after: auto; }
+  h1 { font-size: 26pt; letter-spacing: 0.08em; margin: 0 0 0.3em; font-weight: 600; }
+  h2 { font-size: 16pt; margin: 0 0 0.6em; font-weight: 600; border-bottom: 1px solid var(--rule); padding-bottom: 0.2em; }
+  .lede { color: var(--muted); font-size: 12pt; }
+  .cover-meta { margin-top: auto; color: var(--muted); font-size: 10pt; }
+  .cover-meta div { margin: 0.15em 0; }
+  p, li { margin: 0.35em 0; }
+  ol, ul { padding-left: 1.2em; margin: 0.4em 0; }
+  table { width: 100%; border-collapse: collapse; font-size: 10pt; margin: 0.4em 0; }
+  th, td { border: 1px solid var(--rule); padding: 0.28em 0.5em; text-align: left; vertical-align: top; }
+  th { background: var(--fill); font-weight: 600; }
+  .shot {
+    display: block;
+    max-width: 100%;
+    max-height: 118mm;
+    margin: 0.3em auto 0.2em;
+    border: 1px solid var(--rule);
+  }
+  .cap { font-size: 9.5pt; color: var(--muted); text-align: center; margin: 0 0 0.4em; }
+  .blank {
+    flex: 1;
+    min-height: 28mm;
+    border: 1px dashed var(--rule);
+    background: #fff;
+    margin-top: 0.4em;
+  }
+  .cols { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; flex: 1; }
+  .cols h3 { font-size: 11pt; margin: 0 0 0.3em; }
+  .note { font-size: 10pt; color: var(--muted); }
+  code { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 0.88em; }
+  @media print {
+    body { max-width: none; padding: 0; background: white; }
+    .no-print { display: none; }
+    .slide { border: none; min-height: 180mm; }
+    a { color: inherit; text-decoration: none; }
+  }
+  @page { size: A4 landscape; margin: 10mm; }
+</style>
+</head>
+<body>
+  <p class="no-print">浏览器打开本页 → 打印 → 纸张 <strong>A4 横向</strong> → 存储为 PDF。关掉页眉网址。配图在 <code>library/showable-report/briefing/assets/</code>。依据：同目录 <code>First product discussion.pdf</code>、工程发展史、工作日志 #1–#95。</p>
+
+  <section class="slide">
+    <p class="lede">队员会</p>
+    <h1>FIDV</h1>
+    <p class="lede">Financial Information to Decision Visualization</p>
+    <p>金融信息如此之多，如何轻易了解最重要的信息从而做决定。方法是可视化。</p>
+    <p>计划书只讲一块：<strong>人工智能产业链债务风险</strong>。没功夫做太多。</p>
+    <div class="cover-meta">
+      <div>2026-10-06</div>
+      <div>启动：<code>./Open-AI-Cube.command</code> · http://127.0.0.1:8787/</div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <h2>今天怎么谈</h2>
+    <p>先做出一些东西再交流。一个人想东西比较自成体系——希望你们理解。</p>
+    <p>但不告知，会让人迷茫，也会磨掉一开始的热情。所以今天三件事：</p>
+    <ol>
+      <li><strong>已做</strong>什么</li>
+      <li><strong>未来</strong>做什么比较好</li>
+      <li><strong>让你们各自负责自己想做的事情</strong></li>
+    </ol>
+    <p class="note">不点名分工。末页留空给你们写。</p>
+  </section>
+
+  <section class="slide">
+    <h2>两条工作重点</h2>
+    <ol>
+      <li>找到能揭露人工智能产业链债务风险的指标、概念或方法，和对应的数据</li>
+      <li>把它们可视化</li>
+    </ol>
+    <p>新造一套「可靠财务指标」太难。好的指标既简洁又有逻辑，才有公信力。我们不完全懂会计条例，也不完全懂风险评估体系，做不出服众的指标。</p>
+    <p>所以后来潜心做<strong>可视化的基础</strong>：本地与 GitHub、前后端分离、分类体系、坐标体系。</p>
+  </section>
+
+  <section class="slide">
+    <h2>网页两块并行</h2>
+    <table>
+      <thead><tr><th></th><th>分类</th><th>立方体</th></tr></thead>
+      <tbody>
+        <tr><td>地址</td><td><code>/</code> 与 <code>/list?bics=</code></td><td><code>/cube</code></td></tr>
+        <tr><td>标准</td><td>彭博 BICS。库内七级；后三级还不能公式导出。现用四级。</td><td>切片是早期智能体按网上知识搭的，不是 BICS 门厅。</td></tr>
+        <tr><td>公司</td><td>点板块进名单；可按上市国筛</td><td>几个点球。喂过一点数据，指导少。</td></tr>
+      </tbody>
+    </table>
+    <p>页眉一枚 Decision cube 可以从分类进立方体。</p>
+  </section>
+
+  <section class="slide">
+    <h2>三类坐标，不要混名</h2>
+    <table>
+      <thead><tr><th>类</th><th>名字</th><th>干什么</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>位置坐标 <code>(s, x, y)</code></td><td>立方体里唯一摆放语言。电力在后（小 s），模型在前（大 s）。</td></tr>
+        <tr><td>2</td><td>相对坐标 ringCos / ringSin</td><td>切片上的营收环。圆心=该层营收最大。不要叫 x/y。</td></tr>
+        <tr><td>3</td><td>行业坐标 legalEntityCoord</td><td>BICS。存 7×2，如 <code>12-11-11-11-00-00-00</code>。门厅只画前 4 段。立方体上不画。</td></tr>
+      </tbody>
+    </table>
+    <p>空 <code>% Tot Rev</code> 不当 100。仍进名单时，企业坐标前加负号：<code>-50-11-12-10</code>。格子上的节点坐标不加负号。</p>
+  </section>
+
+  <section class="slide">
+    <h2>分类 · 门厅</h2>
+    <img class="shot" src="briefing/assets/04-gate-all.png" alt="BICS 一级门厅" />
+    <p class="cap">点板块找公司。约 98374 家（含空占比胜出）。Government 约 25028。四段坐标，如 12-00-00-00。</p>
+  </section>
+
+  <section class="slide">
+    <h2>分类 · 往下钻</h2>
+    <img class="shot" src="briefing/assets/01-gate-staples.png" alt="Consumer Staples 二级" />
+    <p class="cap">还没到四级时仍是分类格，不是立方体。Consumer Staples 已由 20261005 十四份 L4 表摄入。</p>
+  </section>
+
+  <section class="slide">
+    <h2>四级名单</h2>
+    <img class="shot" src="briefing/assets/02-list-mass.png" alt="Mass Merchants 名单" />
+    <p class="cap">一企一行。身份=完整 Member Ticker。主业=最大 % Tot Rev。3 类坐标只显示前 4 段。</p>
+  </section>
+
+  <section class="slide">
+    <h2>空占比：表要完全</h2>
+    <img class="shot" src="briefing/assets/03-list-central-banks.png" alt="Central Banks 含负号坐标" />
+    <p class="cap">有数字的仍赢（BOT 100%，坐标无负号）。空占比进名单，坐标前有「-」，占比列是 —。不把空填成 100。</p>
+  </section>
+
+  <section class="slide">
+    <h2>立方体 · 最初给你们看的那部分</h2>
+    <img class="shot" src="briefing/assets/05-cube.png" alt="产业链立方体" />
+    <p class="cap">切片 + 10 环营收 + 荧光点。点点来自早期演示链 companies.json，<strong>还不是</strong>门厅那张 BICS 公司表。空间是 s, x, y。</p>
+  </section>
+
+  <section class="slide">
+    <h2>文件与 Agent</h2>
+    <table>
+      <thead><tr><th>路径</th><th>认作</th></tr></thead>
+      <tbody>
+        <tr><td><code>Open-AI-Cube.command</code></td><td>启动本机网页（8787）</td></tr>
+        <tr><td><code>ai-chain/</code></td><td>可运行产品</td></tr>
+        <tr><td><code>class-3-coords/</code></td><td>BICS 2024 七级库</td></tr>
+        <tr><td><code>DATA-SPACE/</code></td><td>彭博导出与 BQL 手册</td></tr>
+        <tr><td><code>agents/</code> 与 <code>agent_tasklist/</code></td><td>子代理一一对应</td></tr>
+        <tr><td><code>library/</code></td><td>书记：worklog</td></tr>
+        <tr><td><code>library/showable-report/</code></td><td>秘书：读本与讲稿</td></tr>
+        <tr><td><code>library/bug-report/</code></td><td>运维：ops-log</td></tr>
+      </tbody>
+    </table>
+    <p>总参谋部 / 总监 / 书记<strong>平级，互不调用</strong>。电 → 总参谋部最先。总监对照三条理念。美工部、信息部可被总参谋部调度。新 agent 可以加，但要精简。</p>
+    <p class="note">我自己哪一门代码都不精通。大家不必有压力。</p>
+  </section>
+
+  <section class="slide">
+    <h2>机房坏消息 · 所以改工程导向</h2>
+    <p>彭博本月 API 调用量用完，申请类数据导不出。看还可以；静态还可以导。</p>
+    <p>任务本阶段是<strong>写计划书</strong>。数据的广度、精确度，现在不是最必要。数据活也可以少干——这是好事儿。</p>
+    <p>接下来大约 <strong>8～9 天</strong>叫<strong>工程导向</strong>。最终留三四天写计划书上交。</p>
+  </section>
+
+  <section class="slide">
+    <h2>未来 · 立方体四条不满</h2>
+    <table>
+      <thead><tr><th></th><th>意思</th></tr></thead>
+      <tbody>
+        <tr><td>不够好看</td><td>环喧宾夺主；切片多此一举；点球不明；主题偏暗，导出报告不友好；按钮仍多。</td></tr>
+        <tr><td>不够方便</td><td>点球太小；拖动麻烦；选中公司之间的联系怎么画；分类点到公司再进 cube 怎么切。</td></tr>
+        <tr><td>不够标准</td><td>先做 cube 后做分类。切片分类与公司是网上/AI 自搭，财务也多来自网，不是 BICS 门厅那套。</td></tr>
+        <tr><td>信息不够多</td><td>要集成化地展现。收入/支出关系与组成、资产负债、固定支出须有。旧利息本金表很占地方。</td></tr>
+      </tbody>
+    </table>
+    <p>分类后做，但 agent 工作流跑通后，门厅效果反而好一些。</p>
+  </section>
+
+  <section class="slide">
+    <h2>两条发展轴 · 请认领</h2>
+    <table>
+      <thead><tr><th>轴</th><th>要一起想的</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>可视化</td>
+          <td>在现框架上改，对准计划书。同一信息同一源、同一源同一库。分类 → cube 怎么跳。债务可视化应回同一立方体，不要孤页。</td>
+        </tr>
+        <tr>
+          <td>Teamwork</td>
+          <td>写了一串能不能提交 GitHub；要不要过 pull check。我查不了那么多代码。要不要副本库。需要一个方案把流程理清。</td>
+        </tr>
+      </tbody>
+    </table>
+    <p>你们还有新的，就问出来。我答不上来的，就是还要继续发展的地方。</p>
+  </section>
+
+  <section class="slide">
+    <h2>认领</h2>
+    <p class="note">自己写名字和题目。不预先点名。</p>
+    <div class="cols">
+      <div>
+        <h3>可视化</h3>
+        <div class="blank"></div>
+      </div>
+      <div>
+        <h3>Teamwork</h3>
+        <div class="blank"></div>
+      </div>
+      <div>
+        <h3>其它问题</h3>
+        <div class="blank"></div>
+      </div>
+    </div>
+  </section>
+</body>
+</html>

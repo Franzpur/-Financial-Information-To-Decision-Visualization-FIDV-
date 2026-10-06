@@ -146,7 +146,9 @@ cd ai-chain && ./Open-AI-Chain.command
 | `ai-chain/CONCEPTS.md` | 切片/轴/抽出等冻结约定 |
 | `class-3-coords/BICS-Classification/` | BICS 2024 层级库 + 摄入脚本 |
 | `DATA-SPACE/` | 彭博导出邻接盘（928 旧表 + 20261003 + 20261005） |
-| `library/` | 工作日志与本报告 |
+| `library/` | 书记：worklog |
+| `library/showable-report/` | 秘书：本报告与讲稿 |
+| `library/bug-report/` | 运维：ops-log |
 
 ---
 
