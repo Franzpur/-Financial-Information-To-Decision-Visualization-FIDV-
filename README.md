@@ -2,17 +2,19 @@
 
 To standardly visualize statistics to fit human perception, so managers can make decisions more easily.
 
+上传范围见 [`PUBLIC-PRIVATE.md`](./PUBLIC-PRIVATE.md)（公私隔离协议）：工程进仓；agent 与调度任务留在各人本机。
+
 ## Modules
 
 | Path | Description |
 |------|-------------|
 | [`agent_tasklist/DESIGN.md`](./agent_tasklist/DESIGN.md) | 第一版设计理念。设计前先读 |
-| [`agent_tasklist/AESTHETIC.md`](./agent_tasklist/AESTHETIC.md) | 美工部美学真源（色板、chrome、splash、图标） |
-| [`agent_tasklist/INFORMATION.md`](./agent_tasklist/INFORMATION.md) | 信息部数据真源（词条、乱缺、BQLX 公式） |
-| [`agents/`](./agents/) | 子代理：总监、总参谋部、书记处（书记 / 秘书 / 运维）、美工部、信息部 |
+| [`agent_tasklist/AESTHETIC.md`](./agent_tasklist/AESTHETIC.md) | 美学真源（色板、chrome、splash、图标） |
+| [`agent_tasklist/INFORMATION.md`](./agent_tasklist/INFORMATION.md) | 数据真源（词条、乱缺、BQLX 公式） |
+| `agents/` | 本机工作工具，不随仓。见 `PUBLIC-PRIVATE.md` |
 | [`class-3-coords/`](./class-3-coords/) | 3类坐标 / 行业坐标（BICS Equity Hierarchy 2024） |
 | [`ai-chain/`](./ai-chain/) | Decision view. Industry-chain cube. Firms are nodes on slices |
-| [`library/`](./library/) | 书记处工作区。worklog 在根下归书记；[`bug-report/`](./library/bug-report/) 归运维；[`showable-report/`](./library/showable-report/) 归秘书 |
+| [`library/`](./library/) | 工作日志、可打印读本与运维记录 |
 | [`ai-chain/CONCEPTS.md`](./ai-chain/CONCEPTS.md) | Concept library (ZH/EN): one name for slice, axes, pull |
 
 ### Run the AI chain cube

@@ -1,1 +1,0 @@
-../../agents/information-department.md

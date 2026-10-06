@@ -1,1 +1,0 @@
-../../agents/art-department.md

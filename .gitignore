@@ -4,3 +4,12 @@
 *.db-journal
 class-3-coords/BICS-Classification/bics_entities_20261003.db
 **/~$*
+
+# 公私隔离：工作工具不进仓（见 PUBLIC-PRIVATE.md）
+agents/
+.cursor/agents/
+.cursor/skills/
+agent_tasklist/*
+!agent_tasklist/DESIGN.md
+!agent_tasklist/AESTHETIC.md
+!agent_tasklist/INFORMATION.md
