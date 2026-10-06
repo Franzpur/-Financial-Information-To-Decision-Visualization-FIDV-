@@ -10,28 +10,35 @@
     --muted: #4a5560;
     --rule: #c5ccd4;
     --paper: #f7f5f0;
+    --fill: #ece8e0;
   }
   * { box-sizing: border-box; }
   html { font-size: 11pt; }
   body {
     margin: 0 auto;
     max-width: 180mm;
-    padding: 18mm 16mm 24mm;
+    padding: 16mm 16mm 22mm;
     color: var(--ink);
     background: var(--paper);
     font-family: "Iowan Old Style", "Palatino Linotype", Palatino, "Songti SC", "Noto Serif SC", serif;
     line-height: 1.45;
   }
-  h1 { font-size: 22pt; letter-spacing: 0.06em; margin: 0 0 0.4em; font-weight: 600; }
-  h2 { font-size: 13pt; margin: 1.6em 0 0.5em; page-break-after: avoid; border-bottom: 1px solid var(--rule); padding-bottom: 0.2em; }
+  .brand {
+    font-size: 22pt;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    margin: 0 0 0.1em;
+  }
+  h1 { font-size: 18pt; letter-spacing: 0.04em; margin: 0 0 0.35em; font-weight: 600; }
+  h2 { font-size: 12.5pt; margin: 1.35em 0 0.4em; page-break-after: avoid; border-bottom: 1px solid var(--rule); padding-bottom: 0.2em; }
   h3 { font-size: 11.5pt; margin: 1.1em 0 0.35em; page-break-after: avoid; }
-  p, li { margin: 0.35em 0; }
+  p, li { margin: 0.32em 0; }
   .lede { color: var(--muted); font-size: 10pt; }
-  .cover-meta { margin: 1.2em 0 2em; font-size: 10pt; color: var(--muted); }
-  .cover-meta div { margin: 0.2em 0; }
-  table { width: 100%; border-collapse: collapse; font-size: 9.5pt; margin: 0.6em 0 1em; page-break-inside: avoid; }
+  .cover-meta { margin: 0.8em 0 1.4em; font-size: 10pt; color: var(--muted); }
+  .cover-meta div { margin: 0.15em 0; }
+  table { width: 100%; border-collapse: collapse; font-size: 9.5pt; margin: 0.5em 0 0.8em; page-break-inside: avoid; }
   th, td { border: 1px solid var(--rule); padding: 0.28em 0.45em; text-align: left; vertical-align: top; }
-  th { background: #ece8e0; font-weight: 600; }
+  th { background: var(--fill); font-weight: 600; }
   code, .path { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 0.88em; }
   pre {
     background: #efece6;
@@ -41,9 +48,9 @@
     overflow: auto;
     page-break-inside: avoid;
   }
-  ul { padding-left: 1.2em; }
-  .foot { margin-top: 2.5em; font-size: 9pt; color: var(--muted); }
-  .no-print { margin: 0 0 1.2em; font-size: 10pt; }
+  ul, ol { padding-left: 1.2em; }
+  .foot { margin-top: 1.8em; font-size: 9pt; color: var(--muted); }
+  .no-print { margin: 0 0 1em; font-size: 10pt; }
   @media print {
     body { max-width: none; padding: 12mm 14mm; background: white; }
     .no-print { display: none; }
@@ -56,9 +63,10 @@
 </style>
 </head>
 <body>
-  <p class="no-print">浏览器打开本页 → 打印 → 存储为 PDF。正文与 Markdown 读本 <code>FIDV-engineering-history-report.md</code> 同内容。</p>
+  <p class="no-print">浏览器打开本页 → 打印 → 纸张 A4 纵向 → 存储为 PDF。关掉页眉网址。正文与 Markdown 读本 <code>FIDV-engineering-history-report.md</code> 同内容。</p>
 
-  <h1>FIDV 工程发展史</h1>
+  <p class="brand">FIDV</p>
+  <h1>工程发展史</h1>
   <p class="lede">Financial Information To Decision Visualization · 读本</p>
   <div class="cover-meta">
     <div>汇编日期：2026-10-05</div>
@@ -117,7 +125,7 @@
   <ul>
     <li><strong>总监</strong>：代码改完才审；通过不给建议；最多三审。</li>
     <li><strong>书记</strong>：每次谈话最后记 <code>library/worklog-xxx.md</code>；满约一万字换册；不决策。</li>
-    <li><strong>总参谋部</strong>：仅「报文 / 报 / 电 / M / Message」或直接呼出时规划，且必须第一个执行；不指挥总监与书记。</li>
+    <li><strong>总参谋部</strong>：写出「电总参谋部」（或报文 / 报 / M / Message）才规划，且必须第一个执行；单独「电」不派；不指挥总监与书记处。</li>
     <li>抽出：焦点切片留在原地，其余立方体向左（−x）退开并淡出（#44–#50）。</li>
   </ul>
 
@@ -223,8 +231,8 @@
 
   <h2>8. 协作时听谁的</h2>
   <ol>
-    <li>口令「电」（或报文/报/M/Message）→ 总参谋部最先，只出意志+任务单。</li>
-    <li>可调度美工部、信息部。总参谋部不能调度或改写总监、书记。</li>
+    <li>「电」+ 角色名点名任意子代理。单独「电」不派。报文/报/M/Message 仍只叫总参谋部，且必须最先。</li>
+    <li>可调度美工部、信息部。总参谋部不能调度或改写总监、书记处。</li>
     <li>父代理写代码、落盘。</li>
     <li>有代码改动 → 总监对照 DESIGN（至多三审）。</li>
     <li>书记最后记账。</li>

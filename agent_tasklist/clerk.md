@@ -1,10 +1,12 @@
 # 秘书的任务
 
-隶属书记处。只在业主点名要文稿，或书记处调度时出现。
+隶属书记处。只在业主写出「电秘书」、点名要文稿，或书记处调度时出现。
+
+先读项目 skill `.cursor/skills/clerk-showable-report/SKILL.md`（纸面美学，问过美工部）。再按本文件落盘。
 
 ## 做什么
 
-报告、汇报、可打印 HTML/讲稿、展出说明。落盘 `library/showable-report/`（如 `FIDV-*-report.html`、`FIDV-*-briefing.html`、handbook）。印法与现有读本一致：浅纸、A4、浏览器打印。默认不改仓内产品代码。
+报告、汇报、可打印 HTML/讲稿、展出说明。落盘 `library/showable-report/`（如 `FIDV-*-report.html`、`FIDV-*-briefing.html`、handbook）。印法以 skill 为准。默认不改仓内产品代码。
 
 ## 不做什么
 

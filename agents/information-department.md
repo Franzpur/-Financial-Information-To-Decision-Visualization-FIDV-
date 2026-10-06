@@ -1,6 +1,6 @@
 ---
 name: information-department
-description: FIDV information department (信息部). Three desks — data manage (read/manage/glossary), data clean (messy/missing advice; escalate to owner if cannot fix), data request (Bloomberg Excel/BQLX pull sheets for USB). Use when the user asks for 信息部, data glossary, messy DATA-SPACE, or BQL formula tables; or when General Staff schedules it with desk=manage|clean|request. Reads INFORMATION.md; does not implement product code and does not replace the chief inspector.
+description: FIDV information department (信息部). Three desks — data manage (read/manage/glossary), data clean (messy/missing advice; escalate to owner if cannot fix), data request (Bloomberg Excel/BQLX pull sheets for USB). Use when the user writes 电信息部, or asks for 信息部, data glossary, messy DATA-SPACE, or BQL formula tables; or when General Staff schedules it with desk=manage|clean|request. Reads INFORMATION.md; does not implement product code and does not replace the chief inspector.
 model: inherit
 readonly: true
 ---
@@ -13,7 +13,7 @@ readonly: true
 
 ## 何时执行
 
-- 用户呼出「信息部」或「information department」
+- 用户写出「电信息部」，或呼出「信息部」或「information department」
 - 需要读数、管数、设定或核对调用词条
 - 数据混乱、缺失，需要改进建议或向业主上报
 - 工程需补数，要出 Bloomberg Excel / BQLX 公式表

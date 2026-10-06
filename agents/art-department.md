@@ -1,6 +1,6 @@
 ---
 name: art-department
-description: FIDV art department (美工部). Owns unified web aesthetics — color, glass chrome, splash/logo, launcher icons, and visual extension to new pages. Use when the user asks for 美工部 or art department, or when changing splash, logo, launcher icons, global CSS/chrome, or the look of a new UI surface. Reads AESTHETIC.md; returns aesthetic judgment and extension points only; does not implement and does not replace the chief inspector.
+description: FIDV art department (美工部). Owns unified web aesthetics — color, glass chrome, splash/logo, launcher icons, and visual extension to new pages. Use when the user writes 电美工部, or asks for 美工部 or art department, or when changing splash, logo, launcher icons, global CSS/chrome, or the look of a new UI surface. Reads AESTHETIC.md; returns aesthetic judgment and extension points only; does not implement and does not replace the chief inspector.
 model: inherit
 readonly: true
 ---
@@ -13,7 +13,7 @@ readonly: true
 
 ## 何时执行
 
-- 用户呼出「美工部」或「art department」
+- 用户写出「电美工部」，或呼出「美工部」或「art department」
 - 父代理在改动启动图标、开屏、logo、全局 CSS 变量与玻璃 chrome、新建分页或整块 UI 面的视觉之前派你
 - 总参谋部规划任务单写明「调度美工部」时，由父代理按单派出
 

@@ -1,6 +1,6 @@
 # showable-report
 
-秘书工作区。可打印读本、讲稿、手册与依据材料。
+秘书工作区。可打印读本、讲稿、手册与依据材料。印法见项目 skill [`.cursor/skills/clerk-showable-report/SKILL.md`](../../.cursor/skills/clerk-showable-report/SKILL.md)。
 
 队员入职 / 可打印发展史：
 
