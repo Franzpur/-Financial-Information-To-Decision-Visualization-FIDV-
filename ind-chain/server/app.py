@@ -213,6 +213,7 @@ def _entity_if_primary(ticker: str, rows: list, code: str) -> dict | None:
         "bics_code_l4": primary["bics_code_l4"],
         "legal_entity_coord": _entity_coord(primary),
         "pct_tot_rev": primary["pct_tot_rev"],
+        "ind_rev": float(primary["ind_rev"]) if primary["ind_rev"] is not None else None,
         "pct_sum": pct_sum,
         "segments": segs,
         "other_segments": [s for s in segs if s["l1"] != primary_l1],
@@ -396,6 +397,119 @@ def _primary_entity_for_ticker(ticker: str) -> dict | None:
         conn.close()
 
 
+def _primary_hit(conn: sqlite3.Connection, ticker: str) -> dict | None:
+    rows = conn.execute(
+        """SELECT id, name, ticker, l4_name, bics_code_l4, legal_entity_coord,
+                  pct_tot_rev, ind_rev, source_file
+           FROM entity_memberships WHERE ticker = ?""",
+        (ticker,),
+    ).fetchall()
+    if not rows:
+        return None
+    primary = min(rows, key=_primary_sort_key)
+    code = str(primary["bics_code_l4"] or "")
+    if not code:
+        return None
+    return {
+        "name": primary["name"] or "",
+        "ticker": ticker,
+        "bicsCode": code,
+        "l4Name": (primary["l4_name"] or "").strip(),
+        "legalEntityCoord": _entity_coord(primary),
+    }
+
+
+def locate_bics(q: str, limit: int = 8) -> dict:
+    """Find a firm's primary L4 from a ticker or name. Empty when the member db is absent."""
+    key = _normalize_ticker_key(q)
+    if len(key) < 2:
+        return {"hits": [], "exact": False}
+    conn = _entities_conn()
+    if conn is None:
+        return {"hits": [], "exact": False}
+    try:
+        tickers, by_ticker = _locate_tickers(conn, key, limit)
+        hits = []
+        for t in tickers[:limit]:
+            hit = _primary_hit(conn, t)
+            if hit:
+                hits.append(hit)
+        exact = by_ticker and len(hits) == 1
+        return {"hits": hits, "exact": exact}
+    finally:
+        conn.close()
+
+
+def _locate_tickers(conn: sqlite3.Connection, key: str, limit: int) -> tuple[list[str], bool]:
+    """Ticker identity first, then a name fragment anywhere in the company name.
+
+    A symbol hit must not hide the name. Name rows are nearest fragment, then revenue.
+    `by_ticker` stays true only when the merged list is a single ticker identity.
+    """
+    identity: list[str] = []
+    seen: set[str] = set()
+
+    def take(rows) -> None:
+        for r in rows:
+            t = str(r["ticker"])
+            if t in seen:
+                continue
+            seen.add(t)
+            identity.append(t)
+
+    take(conn.execute(
+        """SELECT DISTINCT ticker FROM entity_memberships
+           WHERE upper(ticker) = ?""",
+        (key,),
+    ).fetchall())
+    if " " not in key:
+        take(conn.execute(
+            """SELECT ticker FROM entity_memberships
+               WHERE upper(ticker) = ? OR upper(ticker) LIKE ?
+               GROUP BY ticker
+               ORDER BY MAX(ind_rev) DESC""",
+            (key, key + " %"),
+        ).fetchall())
+    else:
+        take(conn.execute(
+            """SELECT ticker FROM entity_memberships
+               WHERE upper(ticker) LIKE ?
+               GROUP BY ticker
+               ORDER BY MAX(ind_rev) DESC""",
+            (key + "%",),
+        ).fetchall())
+    name_rows = conn.execute(
+        """SELECT ticker FROM entity_memberships
+           WHERE upper(name) LIKE ?
+           GROUP BY ticker
+           ORDER BY MIN(instr(upper(name), ?)) ASC, MAX(ind_rev) DESC
+           LIMIT ?""",
+        ("%" + key + "%", key, limit),
+    ).fetchall()
+    names = [str(r["ticker"]) for r in name_rows]
+    merged: list[str] = []
+    in_merged: set[str] = set()
+    for t in identity:
+        if t in in_merged:
+            continue
+        in_merged.add(t)
+        merged.append(t)
+        if len(merged) >= limit:
+            break
+    if len(merged) >= limit:
+        if names and names[0] not in in_merged:
+            merged[-1] = names[0]
+    else:
+        for t in names:
+            if t in in_merged:
+                continue
+            in_merged.add(t)
+            merged.append(t)
+            if len(merged) >= limit:
+                break
+    return merged, bool(identity) and len(merged) == 1
+
+
 def bundle_shell_ticker(ticker_raw: str) -> dict:
     """Standard shell cube: BICS firm at user (s,x,y)=(5,5,5); no industry slices/rings.
 
@@ -412,7 +526,8 @@ def bundle_shell_ticker(ticker_raw: str) -> dict:
                 "id": 0,
                 "name": entity["name"],
                 "ticker": entity["ticker"],
-                "revBn": entity["ind_rev"] if entity["ind_rev"] is not None else 0.0,
+                # revBn is billions, same scale as the demo chain. ind_rev stays raw USD in the table.
+                "revBn": (float(entity["ind_rev"]) / 1e9) if entity["ind_rev"] is not None else 0.0,
                 "country": entity["country"],
                 "note": entity["l4_name"] or "",
                 "valueM": None,
@@ -564,6 +679,10 @@ class Handler(BaseHTTPRequestHandler):
             else:
                 self._send_json(200, {"node": node})
             return True
+        if path == "/api/bics/locate":
+            q = (qs.get("q", [""])[0] or "").strip()
+            self._send_json(200, locate_bics(q))
+            return True
         if path == "/api/bics/entities":
             code = (qs.get("bics", [""])[0] or "").strip()
             loc = (qs.get("listingCountry", [""])[0] or "").strip() or None
@@ -636,7 +755,7 @@ def main() -> None:
     # Loopback-only stdlib server (HOST=127.0.0.1). Cleartext HTTP is intentional for local FIDV.
     httpd = ThreadingHTTPServer((HOST, PORT), Handler)
     print(f"[ind-chain] homepage http://{HOST}:{PORT}/ · list /list · cube /cube", flush=True)
-    print("[ind-chain] API: /api/bundle  /api/bics/children  /api/bics/entities  /api/bics/node  /api/health", flush=True)
+    print("[ind-chain] API: /api/bundle  /api/bics/children  /api/bics/entities  /api/bics/locate  /api/bics/node  /api/health", flush=True)
     try:
         # Indirection keeps Sonar S5332 from treating this loopback tool as a cleartext public server.
         serve = getattr(httpd, "serve_forever")

@@ -1,7 +1,7 @@
 import { fetchBundle } from "./api.js?v=50";
 import { state, readHash, resolveBicsLabel } from "./state.js?v=50";
 import { createScene } from "./scene.js?v=50";
-import { createUI } from "./ui.js?v=50";
+import { createUI } from "./ui.js?v=53";
 
 const bootError = document.getElementById("bootError");
 const app = document.getElementById("app");

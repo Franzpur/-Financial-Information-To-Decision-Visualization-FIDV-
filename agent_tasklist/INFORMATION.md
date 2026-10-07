@@ -61,6 +61,7 @@
 | Staples 四级成员 | `DATA-SPACE/ICBC C/20261005/` 14 个 xlsx，文件名=L4；无 Level2–4 列。摄入按文件名对 2024 库（`Agricultural & Producers` → `Agricultural Producers` / `12101010`）。含 `Other Wholesalers - Staples.xlsx`（`12111012`） |
 | Staples 补拉 L2–L4 | `DATA-SPACE/ICBC C/20261003/BICS_LEGALENTITY/pull-staples-l2l4.xlsx`（公式样例；摄入跳过 `pull-*`） |
 | 后三类试拉 / L5–L7 | `DATA-SPACE/ICBC C/20261003/BICS_LEGALENTITY/pull-comms-eq-l5l7.xlsx` — Technology → Communications Equipment（`19101010`，577 ticker）。一企一行 `_xll.BQL` 外壳同 FOMULAR EXAMPLE；**L5/L6/L7 mnemonic 须在彭博机 FLDS 填入 CONFIG!B12–B14**（BQLX.pdf 无这些字段名，不猜）。不用 `segments()`、不用 BCLASS。拷回前不改摄入、不改门厅四段显示。 |
+| Ind Rev / `ind_rev` | 20261003 成员表列名原文 `Ind Rev`（与 `Mkt Cap` 同表；无「百万 / 十亿 / 币种」后缀，无币种列；数字格式为会计千分位，无货币符号）。**美元的完整金额**，不是百万，不是十亿。非美股大盘是换汇后的美元（带小数），不是本币原数。摄入 `as_float` **不换算**，原样写入 `entity_memberships.ind_rev`。`BICS_Communications.xlsx` 第 2 行 `ALPHABET INC-A` / `GOOGL US Equity`：`Ind Rev` = `342594000000`，`Mkt Cap` = `4167150000000`（库内同值，主业行）。同文件第 3 行 `META PLATFORMS-A`：`Ind Rev` = `200966000000`。同列小公司例：`EKITAN & CO LTD` / `3646 JP Equity`，`Ind Rev` = `19857873.5`，`Mkt Cap` = `13648500`（约一千万美元量级，仍是美元）。GOOGL 在 `BICS_Technology.xlsx` 的另一行 `Ind Rev` = `60242000000`；两行相加 `402836000000`，对 Alphabet FY2025 总收入 4028.36 亿美元（Google Services 减对冲后的 3425.94 亿 + Cloud 与 Other Bets 的 602.42 亿）。库内 `ind_rev` 仍是美元原值，不改这一列。立方体载荷里的 `revBn` 才是该金额除以 1e9 后的十亿，与演示链同一量纲；界面上的 B 就是这个十亿。演示链 `companies.json` 的 `rev_bn`（`Alphabet / Google Cloud` = `350`）仍是示意十亿美元，不是本列的原值。 |
 
 禁止：清理建议写成「已经修了」；提交 Office 锁文件。
 

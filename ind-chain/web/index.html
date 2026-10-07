@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>FIDV — Industry gate</title>
-<link rel="stylesheet" href="/css/app.css?v=37" />
+<link rel="stylesheet" href="/css/app.css?v=41" />
 </head>
 <body class="home-body">
   <!-- [C-SPLASH] On C-HOME only; hold ~2s then fade ~4s -->
@@ -50,7 +50,15 @@
       </svg>
       </a>
       <p class="home-lede" id="homeLede">BICS industry coordinates · a level-4 cell opens the company list.</p>
-      <a class="home-cube" id="homeCubeLink" href="/cube">Decision cube</a>
+      <div class="home-locate">
+        <label class="list-filter-wrap" for="homeLocate">
+          <span class="visually-hidden">Search name or ticker</span>
+          <input class="list-filter" id="homeLocate" type="search" placeholder="Name or ticker" autocomplete="off" />
+        </label>
+        <div id="homeLocateResults" class="home-locate-results" hidden>
+          <p class="home-locate-empty">No matching company.</p>
+        </div>
+      </div>
     </header>
 
     <nav class="home-nations" id="nationList" aria-label="Listing country"></nav>
@@ -60,6 +68,6 @@
 
     <p class="home-note">Class-3 industry coordinates · Equity Hierarchy 2024 · L1–L3 board · L4 → company list</p>
   </main>
-  <script type="module" src="/js/home.js?v=37"></script>
+  <script type="module" src="/js/home.js?v=42"></script>
 </body>
 </html>

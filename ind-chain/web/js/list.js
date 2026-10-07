@@ -10,7 +10,6 @@ const trail = document.getElementById("listTrail");
 const lede = document.getElementById("listLede");
 const note = document.getElementById("listNote");
 const filterEl = document.getElementById("listFilter");
-const cubeLink = document.getElementById("homeCubeLink");
 
 let rows = [];
 
@@ -100,13 +99,24 @@ function rowHtml(e) {
   );
 }
 
+let byRevenue = false;
+
 function visibleRows(q) {
   const needle = q.trim().toLowerCase();
-  if (!needle) return rows;
-  return rows.filter((e) => {
-    const name = String(e.name || "").toLowerCase();
-    const ticker = String(e.ticker || "").toLowerCase();
-    return name.includes(needle) || ticker.includes(needle);
+  const matched = !needle
+    ? rows
+    : rows.filter((e) => {
+        const name = String(e.name || "").toLowerCase();
+        const ticker = String(e.ticker || "").toLowerCase();
+        return name.includes(needle) || ticker.includes(needle);
+      });
+  if (!byRevenue) return matched;
+  return [...matched].sort((a, b) => {
+    const aEmpty = a.ind_rev == null;
+    const bEmpty = b.ind_rev == null;
+    if (aEmpty !== bEmpty) return aEmpty ? 1 : -1;
+    if (!aEmpty && Number(a.ind_rev) !== Number(b.ind_rev)) return Number(b.ind_rev) - Number(a.ind_rev);
+    return String(a.name || "").toLowerCase().localeCompare(String(b.name || "").toLowerCase());
   });
 }
 
@@ -193,7 +203,6 @@ async function loadList() {
       code,
     );
     renderTotal(document.getElementById("listTotal"), data.count, data.totalCount, loc);
-    if (cubeLink) cubeLink.href = "/cube";
     document.title = node ? `FIDV — ${node.name}` : document.title;
     render(filterEl?.value || "");
     note.textContent = `${visibleRows(filterEl?.value || "").length} of ${rows.length} companies · primary L4 · click a row to open that company in the cube`;
@@ -203,7 +212,14 @@ async function loadList() {
   }
 }
 
+const presetQ = new URLSearchParams(location.search).get("q") || "";
+if (filterEl && presetQ) filterEl.value = presetQ;
 filterEl?.addEventListener("input", () => render(filterEl.value));
+document.getElementById("listSortRev")?.addEventListener("click", (e) => {
+  byRevenue = !byRevenue;
+  e.currentTarget.setAttribute("aria-pressed", byRevenue ? "true" : "false");
+  render(filterEl?.value || "");
+});
 loadList();
 window.addEventListener("popstate", () => {
   loadList().then(() => {

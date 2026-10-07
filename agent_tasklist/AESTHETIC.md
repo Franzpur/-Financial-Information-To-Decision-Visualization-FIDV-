@@ -49,7 +49,8 @@
 
 ### 工程首页（C-HOME）
 
-- `/`：BICS L1–L3 同一门厅。先 **C-SPLASH**（仅冷进 `/`），再字标同族 + **固定左上**坐标痕迹（`.home-trail-fixed`，`top:14px; left:20px`；钻入不挪位）+ 页眉一枚玻璃链 **Decision cube** + 一枚玻璃直角 **上市地下拉**（关闭面当前国名+角标数；打开后最上搜索、下列 All/各国+角标数）+ 页级公司总数（控件外 muted 一行）+ **相连规则矩形格**（格右上角收录数；格底行业坐标 **只画 4 段** muted tabular，不因变短改字号）。`--accent` 只用于 hover/focus 与字标下划线。无底栏 chip CTA。无新闻。
+- `/`：BICS L1–L3 同一门厅。先 **C-SPLASH**（仅冷进 `/`），再字标同族 + **固定左上**坐标痕迹（`.home-trail-fixed`，`top:14px; left:20px`；钻入不挪位）+ 一枚玻璃直角 **上市地下拉**（关闭面当前国名+角标数；打开后最上搜索、下列 All/各国+角标数）+ 页级公司总数（控件外 muted 一行）+ **相连规则矩形格**（格右上角收录数；格底行业坐标 **只画 4 段** muted tabular，不因变短改字号）。`--accent` 只用于 hover/focus 与字标下划线。无底栏 chip CTA。无新闻。
+- **定位输入贯穿 L1–L3**：字标 / lede 下一条细边输入，复用 `.list-filter`（`#homeLocate`，placeholder「Name or ticker」），不搬立方体 `.top-search`。同页下钻 L2/L3 仍留在页眉。框下 `#homeLocateResults` 以 `.home-locate` 为定位包含块**绝对定位**盖住下方门厅，不占文档流（`.home-nations`、`#homeTotal`、`#sectorList` 不因提示下移）。有命中与空态都覆盖：多名命中为 `--panel` 底上的共边细线行（`.home-locate-row`，不限元素类型；与上市地打开面同底，避免门厅字透出），一行公司名 `--text`、ticker 与四段行业坐标 `--muted` tabular；空态只留一条 `.home-locate-empty`（「No matching company.」）。有命中时容器内只放行。键盘当前项 `.home-locate-row.is-on` 与 hover / `:focus-visible` 同用 `--glass-strong` 底与 accent 内描边（描边内收，不撑开行高、不把下层格下推）。无第二套色、无圆角胶囊。冷开屏仍整幅盖住门厅。
 - **L4 格进 `/list?bics=`（C-LIST）**，不再下钻 L5–L7，也不因该格是叶而进立方体。浅于 L4 的叶仍可 `/cube?bics=`。
 - `/cube`：决策立方体冷启动，**无** splash。
 
@@ -58,8 +59,9 @@
 - `/list?bics=`：门厅同族（`home-body`、字标、`.home-trail-fixed`、上市地下拉），**无开屏**。名/ticker 筛（`.list-filter`）与国别搜索分属两控件。
 - 公司为细线行表（共边 1px `--stroke`，无胶囊）。一行一企。名 `--text`；ticker / 坐标 / 主业 L1 占比 `--muted` tabular。其他一级 + % 用名下 muted 字链（` · `），无 chip。窄屏旁注仍跟在名下。
 - 筛名/ticker：trail 下一条细边输入，不搬立方体顶栏搜索皮。
+- 表上右对齐一枚直角细边按钮 `#listSortRev`，可见文案 **Revenue**（收入序的外观控件）。玻璃底、`--stroke` 边、`--muted` 字；hover / `:focus-visible` 转为 `--glass-strong` 与 accent 内描边。非 chip、无页眉玻璃链、无页底第二条。
 - 空态一条 muted 短句。
-- 同一 L4 码保留进立方体：品牌头一枚玻璃链 **Decision cube** → `/cube?bics=`，与首页同一控件；无页底第二条、非 chip 条。
+- 进立方体只靠名单行（点公司）；无页眉玻璃链、无页底第二条、非 chip 条。
 
 ---
 
@@ -101,4 +103,4 @@
 | 总参谋部 | 可在规划中调度美工部；业主安排下可规划管理美工部角色文件；专知路径内美工部可改码；跨域交父代理；产品终裁仍归监理部 |
 | 书记 | 美工部不写 worklog |
 
-*Last updated: 2026-10-07 · 权知统一：专知路径内可改码。*
+*Last updated: 2026-10-08 · 权知统一：专知路径内可改码。*

@@ -45,11 +45,6 @@ function cubeHref() {
   return "/cube";
 }
 
-function bindCubeLink() {
-  const el = document.getElementById("homeCubeLink");
-  if (el) el.href = cubeHref();
-}
-
 function skipSplash() {
   return Boolean(currentBics()) || sessionStorage.getItem("fidvSplashSeen") === "1";
 }
@@ -81,6 +76,142 @@ function revealHome() {
   home.hidden = false;
   home.classList.remove("home-pending");
   home.classList.add("home-ready");
+}
+
+/** Pin the header locate field under the lede. No query and no navigation. */
+function mountHomeLocate() {
+  const brand = document.querySelector("#home .home-brand");
+  const lede = document.getElementById("homeLede");
+  const input = document.getElementById("homeLocate");
+  const results = document.getElementById("homeLocateResults");
+  if (!brand || !lede || !input || !results) return;
+  const slot = input.closest(".home-locate");
+  if (!slot || !slot.contains(results)) return;
+  if (slot.parentElement !== brand) brand.appendChild(slot);
+  if (lede.nextElementSibling !== slot) lede.after(slot);
+}
+
+function listLocateHref(bics, ticker) {
+  const p = new URLSearchParams();
+  p.set("bics", bics);
+  p.set("q", ticker);
+  return `/list?${p.toString()}`;
+}
+
+function wireHomeLocate() {
+  const input = document.getElementById("homeLocate");
+  const box = document.getElementById("homeLocateResults");
+  const slot = input?.closest(".home-locate");
+  if (!input || !box || !slot) return;
+  let timer = null;
+  let seq = 0;
+  let picked = null;
+  let hi = -1;
+
+  const suggestionRows = () => [...box.querySelectorAll(".home-locate-row")];
+
+  const paintHi = () => {
+    suggestionRows().forEach((el, i) => el.classList.toggle("is-on", i === hi));
+  };
+
+  const commitRow = (row) => {
+    const ticker = row?.dataset.ticker || "";
+    const bics = row?.dataset.bics || "";
+    if (!ticker || !bics) return;
+    clearTimeout(timer);
+    seq += 1;
+    hi = -1;
+    picked = { bics, ticker, label: ticker };
+    input.value = ticker;
+    box.hidden = true;
+    box.replaceChildren();
+    input.focus();
+  };
+
+  input.addEventListener("input", () => {
+    if (picked && input.value.trim() !== picked.label) picked = null;
+    hi = -1;
+    clearTimeout(timer);
+    const q = input.value.trim();
+    if (q.length < 2) {
+      box.hidden = true;
+      box.replaceChildren();
+      return;
+    }
+    const token = ++seq;
+    timer = setTimeout(async () => {
+      await searchLocate(token, q, () => seq, box);
+      hi = -1;
+    }, 220);
+  });
+
+  input.addEventListener("keydown", (e) => {
+    if (e.isComposing) return;
+    const open = !box.hidden && suggestionRows().length > 0;
+    if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+      if (!open) return;
+      e.preventDefault();
+      const n = suggestionRows().length;
+      if (hi < 0) hi = e.key === "ArrowDown" ? 0 : n - 1;
+      else if (e.key === "ArrowDown") hi = Math.min(n - 1, hi + 1);
+      else hi = Math.max(0, hi - 1);
+      paintHi();
+      return;
+    }
+    if (e.key !== "Enter") return;
+    e.preventDefault();
+    if (open && hi >= 0 && suggestionRows()[hi]) {
+      commitRow(suggestionRows()[hi]);
+      return;
+    }
+    if (!picked || input.value.trim() !== picked.label) return;
+    if (!picked.bics || !picked.ticker) return;
+    location.assign(listLocateHref(picked.bics, picked.ticker));
+  });
+
+  box.addEventListener("click", (e) => {
+    const row = e.target.closest(".home-locate-row");
+    if (!row) return;
+    commitRow(row);
+  });
+
+  document.addEventListener("pointerdown", (e) => {
+    if (slot.contains(e.target)) return;
+    box.hidden = true;
+    hi = -1;
+  });
+}
+
+async function searchLocate(token, q, current, box) {
+  if (!box) return;
+  let data;
+  try {
+    const res = await fetch(`/api/bics/locate?q=${encodeURIComponent(q)}`);
+    if (!res.ok) return;
+    data = await res.json();
+  } catch {
+    return;
+  }
+  if (token !== current()) return;
+  const hits = Array.isArray(data.hits) ? data.hits : [];
+  if (!hits.length) {
+    box.hidden = false;
+    box.innerHTML = `<p class="home-locate-empty">No matching company.</p>`;
+    return;
+  }
+  box.hidden = false;
+  box.innerHTML = hits
+    .map((h) => {
+      const coord = displayIndustryCoord(h.legalEntityCoord || "");
+      return (
+        `<button type="button" class="home-locate-row" data-bics="${escapeHtml(h.bicsCode || "")}" data-ticker="${escapeHtml(h.ticker || "")}">` +
+        `<span class="home-locate-name">${escapeHtml(h.name || "")}</span>` +
+        `<span class="home-locate-ticker">${escapeHtml(h.ticker || "")}</span>` +
+        `<span class="home-locate-coord">${escapeHtml(coord)}</span>` +
+        `</button>`
+      );
+    })
+    .join("");
 }
 
 function escapeHtml(s) {
@@ -242,7 +373,6 @@ async function loadBoard() {
 }
 
 async function bootHome() {
-  bindCubeLink();
   try {
     const loadPromise = loadBoard();
     if (skipSplash()) {
@@ -264,6 +394,8 @@ async function bootHome() {
   }
 }
 
+mountHomeLocate();
+wireHomeLocate();
 bootHome();
 window.addEventListener("popstate", () => {
   loadBoard().then(() => {

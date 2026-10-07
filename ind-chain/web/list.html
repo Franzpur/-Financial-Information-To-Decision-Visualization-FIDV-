@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>FIDV — Company list</title>
-<link rel="stylesheet" href="/css/app.css?v=37" />
+<link rel="stylesheet" href="/css/app.css?v=41" />
 </head>
 <body class="home-body">
   <nav class="home-trail-fixed" id="listTrail" aria-label="Coordinate path"></nav>
@@ -28,7 +28,6 @@
       </svg>
       </a>
       <p class="home-lede" id="listLede">Level-4 company list.</p>
-      <a class="home-cube" id="homeCubeLink" href="/cube">Decision cube</a>
       <label class="list-filter-wrap" for="listFilter">
         <span class="visually-hidden">Filter companies</span>
         <input class="list-filter" id="listFilter" type="search" placeholder="Filter name or ticker" autocomplete="off" />
@@ -37,11 +36,14 @@
 
     <nav class="home-nations" id="nationList" aria-label="Listing country"></nav>
     <p class="home-total" id="listTotal"></p>
+    <div class="list-tools">
+      <button type="button" class="list-sort" id="listSortRev">Revenue</button>
+    </div>
 
     <h1 class="visually-hidden">Company list</h1>
     <div class="list-table" id="listTable" aria-label="Companies in this class"></div>
     <p class="home-note" id="listNote"></p>
   </main>
-  <script type="module" src="/js/list.js?v=37"></script>
+  <script type="module" src="/js/list.js?v=40"></script>
 </body>
 </html>

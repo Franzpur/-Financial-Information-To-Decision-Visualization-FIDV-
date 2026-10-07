@@ -55,6 +55,16 @@ export function createUI(sceneApi) {
     return `${c.ring * 10}–${c.ring * 10 + 9.9} (ring ${c.ring})`;
   }
 
+  function formatRevenue(c) {
+    if (c.revBn == null) return "—";
+    const n = Number(c.revBn);
+    if (!Number.isFinite(n)) return "—";
+    const abs = Math.abs(n);
+    const digits = abs >= 1 ? 1 : 3;
+    const sign = n < 0 ? "-" : "";
+    return `${sign}$${abs.toFixed(digits)}B`;
+  }
+
   function renderDetail(c) {
     const region = state.countries[c.country] || c.country;
     const usTag = c.country === "US" ? "US" : "Non-US";
@@ -69,7 +79,7 @@ export function createUI(sceneApi) {
       <div class="kv">
         <span>Ticker</span><span>${c.ticker || "—"}</span>
         <span>Country</span><span>${region}</span>
-        <span>Revenue (approx.)</span><span>${c.revBn != null ? `$${c.revBn}B / yr` : "—"}</span>
+        <span>Revenue (approx.)</span><span>${formatRevenue(c)}</span>
         <span>Size score</span><span>${c.revScore != null ? c.revScore.toFixed(1) + " / 100" : "—"}</span>
         <span>Position (s, x, y)</span><span>${formatCoord(c.coord)}</span>
         ${ringRow}
