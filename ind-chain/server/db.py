@@ -1,4 +1,4 @@
-"""SQLite access for the AI industry-chain cube."""
+"""SQLite access for the Standard-Cube (ind-chain)."""
 from __future__ import annotations
 
 import math
@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
-DB_PATH = ROOT / "data" / "ai_chain.db"
+DB_PATH = ROOT / "data" / "ind_chain.db"
 DATA_DIR = ROOT / "data"
 
 SCHEMA = """
@@ -264,7 +264,7 @@ def get_company(conn: sqlite3.Connection, company_id: int) -> dict[str, Any] | N
 
 def meta() -> dict[str, Any]:
     return {
-        "title": "AI Industry Chain Cube",
+        "title": "Standard-Cube",
         "countries": COUNTRY_LABEL,
         "version": 1,
     }

@@ -2,7 +2,7 @@
 
 **Financial Information To Decision Visualization**  
 汇编日期：2026-10-05  
-依据：`library/worklog-001.md`、`library/worklog-002.md`、`library/worklog-003.md`、`agent_tasklist/DESIGN.md`、`ai-chain/CONCEPTS.md`  
+依据：`library/worklog-001.md`、`library/worklog-002.md`、`library/worklog-003.md`、`agent_tasklist/DESIGN.md`、`ind-chain/CONCEPTS.md`  
 用途：打印或导出 PDF，向队员介绍工程从何而来、现在怎么跑、协作时听谁的。  
 **本册不是产品终审标准。** 改产品对照 `DESIGN.md`；改三维对照 `CONCEPTS.md`。
 
@@ -114,10 +114,12 @@ FIDV 是给金融工作者用的**决策可视化**工具：把大量行业与�
 
 ```bash
 cd /Volumes/DATA/FIDV
-./Open-AI-Cube.command
+open Standard-Cube.app
 # 或
-cd ai-chain && ./Open-AI-Chain.command
+python3 ind-chain/scripts/launcher_gui.py
 ```
+
+访达双击 `Standard-Cube.app`（无 Terminal）。集成启动窗：**Open homepage** / **Restart** / **Quit**。
 
 浏览器：
 
@@ -129,7 +131,7 @@ cd ai-chain && ./Open-AI-Chain.command
 | `/list?bics=` | 四级公司名单 C-LIST（无开屏） |
 | `/cube` 或 `/cube?bics=` | 产业链立方体 C-CUBE（无开屏） |
 
-种子库 `ai-chain/data/ai_chain.db` 与四级成员库 `bics_entities_20261003.db` **不提交**；本机 seed / 摄入脚本生成。
+种子库 `ind-chain/data/ind_chain.db` 与四级成员库 `bics_entities_20261003.db` **不提交**；本机 seed / 摄入脚本生成。
 
 ---
 
@@ -142,8 +144,9 @@ cd ai-chain && ./Open-AI-Chain.command
 | `agent_tasklist/INFORMATION.md` | 数据词条、乱缺、拉数公式 |
 | `agent_tasklist/RULE.md` | 何时派哪个子代理 |
 | `agents/` | 角色说明书 |
-| `ai-chain/` | 可运行产品（Flask 式 stdlib 服务 + 静态页） |
-| `ai-chain/CONCEPTS.md` | 切片/轴/抽出等冻结约定 |
+| `ind-chain/` | 可运行产品 Standard-Cube（stdlib 服务 + 静态页；旧名 ai-chain） |
+| `ind-chain/CONCEPTS.md` | 切片/轴/抽出等冻结约定 |
+| `Standard-Cube.app` | 集成启动窗入口（无终端） |
 | `class-3-coords/BICS-Classification/` | BICS 2024 层级库 + 摄入脚本 |
 | `DATA-SPACE/` | 彭博导出邻接盘（928 旧表 + 20261003 + 20261005） |
 | `library/` | 书记：worklog |

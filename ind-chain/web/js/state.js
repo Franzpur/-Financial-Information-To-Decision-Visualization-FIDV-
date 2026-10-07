@@ -19,10 +19,16 @@ export const state = {
   hoverId: null, // [C-HOVER]
   d: 1, // [C-D] slice gap factor; meters = d·UNIT; UI % = 100·d
   helpOpen: false,
-  /** [C-HOME] BICS code from /cube?bics= — any level; context only until companies attach */
+  /** Optional breadcrumb context from URL (does not swap cube data). */
   bicsCode: null,
   bicsName: null,
   bicsLevel: null,
+  /** [C-LIST → C-CUBE] Member Ticker from /cube?ticker= */
+  openTicker: null,
+  /** True when shell bundle had no entity for openTicker */
+  openTickerMiss: false,
+  /** Standard shell mode (one firm at face center) */
+  shellCube: false,
 };
 
 export function visibleCompanies() {
@@ -35,10 +41,36 @@ export function passesFilter(c) {
   return true;
 }
 
+export function normalizeTickerKey(raw) {
+  return String(raw || "")
+    .trim()
+    .toUpperCase()
+    .replace(/\s+/g, " ");
+}
+
+/** Match Member Ticker (e.g. CEG US Equity) to demo-chain ticker (e.g. CEG). */
+export function companyByTicker(raw) {
+  const full = normalizeTickerKey(raw);
+  if (!full) return null;
+  const head = full.split(" ")[0];
+  const exact = state.companies.find((c) => normalizeTickerKey(c.ticker) === full);
+  if (exact) return exact;
+  const byHead = state.companies.find((c) => normalizeTickerKey(c.ticker) === head);
+  if (byHead) return byHead;
+  return (
+    state.companies.find((c) => {
+      const t = normalizeTickerKey(c.ticker);
+      return t && (full === t || full.startsWith(`${t} `));
+    }) || null
+  );
+}
+
 export function readHash() {
   const q = new URLSearchParams(location.search);
   const bics = q.get("bics");
   if (bics) state.bicsCode = bics;
+  const ticker = q.get("ticker");
+  if (ticker) state.openTicker = ticker;
 
   const h = new URLSearchParams(location.hash.replace(/^#/, ""));
   const slice = h.get("slice");
@@ -54,6 +86,17 @@ export function readHash() {
   if (id != null && id !== "") {
     const n = Number(id);
     if (Number.isInteger(n)) state.selectedId = n;
+  }
+
+  if (state.openTicker) {
+    const hit = companyByTicker(state.openTicker) || state.companies[0] || null;
+    if (hit) {
+      state.selectedId = hit.id;
+      state.focusLayer = hit.layer;
+      state.openTickerMiss = false;
+    } else {
+      state.openTickerMiss = true;
+    }
   }
 }
 

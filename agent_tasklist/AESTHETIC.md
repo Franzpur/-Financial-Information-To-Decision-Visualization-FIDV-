@@ -1,6 +1,6 @@
 # FIDV 美学真源（美工部）
 
-美工部判断网页与启动表层美学时，只以本文为准。产品是否服务金融决策，以 `DESIGN.md` 为准（总监）。概念与坐标以 `ai-chain/CONCEPTS.md` 为准。
+美工部判断网页与启动表层美学时，只以本文为准。产品是否服务金融决策，以 `DESIGN.md` 为准（总监）。概念与坐标以 `ind-chain/CONCEPTS.md` 为准。
 
 目标：把已落地的美学语言写成可复用真源，并在后续功能与分页中**延展同一语言**，不每页另起一套皮。
 
@@ -40,12 +40,12 @@
 - **进 `/cube`（含分类入口）不播开屏。**
 - 无转圈、无 Loading 长文案、不画视空间球。
 
-### 启动图标
+### 启动图标与集成启动窗
 
 - 暗底上三片纵切片 + accent 细线，与 splash 左标同族。
-- 源与产物：`ai-chain/assets/fidv-launcher-1024.png`、`fidv-launcher.icns`。
-- 施加：`ai-chain/scripts/set-command-icon.sh` → `Open-AI-Chain.command` 与根 `Open-AI-Cube.command`。
-- Git 不保证 resource fork；克隆后需重跑脚本。
+- 源与产物：`ind-chain/assets/fidv-launcher-1024.png`、`fidv-launcher.icns`。
+- 施加：`ind-chain/scripts/set-command-icon.sh` → 根 `Standard-Cube.app/Contents/Resources/AppIcon.icns`（访达双击 `.app`，无 Terminal）。
+- **集成启动窗**（`ind-chain/scripts/launcher_gui.py`）：tkinter 小窗，色用同一板（BG `#0b0d10`、PANEL `#14181e`、STROKE `#2a313c`、TEXT `#e8edf4`、MUTED `#9aa6b5`、ACCENT `#8be0c0`）。标题 **Standard-Cube**，副标 `ind-chain`。按钮：**Open homepage** / **Restart** / **Quit**。命令跑在后端。
 
 ### 工程首页（C-HOME）
 
@@ -77,15 +77,15 @@
 
 | 资产 | 路径 |
 |------|------|
-| 色板 / chrome / 首页 | `ai-chain/web/css/app.css`；`ai-chain/web/index.html`（C-HOME + C-SPLASH）；`ai-chain/web/js/home.js` |
-| 四级名单 | `ai-chain/web/list.html`；`ai-chain/web/js/list.js` |
-| 立方体壳 | `ai-chain/web/cube.html`（C-CUBE；无 splash） |
-| splash 时序 | `ai-chain/web/js/home.js`（hold ~2s → fade ~4s） |
-| 面板类名与 HUD 外观 | `ai-chain/web/js/ui.js`（视觉层） |
-| 启动图标 | `ai-chain/assets/fidv-launcher*` |
-| 图标脚本 | `ai-chain/scripts/set-command-icon.sh` |
-| 启动器附着面 | `ai-chain/Open-AI-Chain.command`、`Open-AI-Cube.command` |
-| 概念续工指针 | `ai-chain/CONCEPTS.md` §10（美学细节回指本文） |
+| 色板 / chrome / 首页 | `ind-chain/web/css/app.css`；`ind-chain/web/index.html`（C-HOME + C-SPLASH）；`ind-chain/web/js/home.js` |
+| 四级名单 | `ind-chain/web/list.html`；`ind-chain/web/js/list.js` |
+| 立方体壳 | `ind-chain/web/cube.html`（C-CUBE；无 splash） |
+| splash 时序 | `ind-chain/web/js/home.js`（hold ~2s → fade ~4s） |
+| 面板类名与 HUD 外观 | `ind-chain/web/js/ui.js`（视觉层） |
+| 启动图标 | `ind-chain/assets/fidv-launcher*` |
+| 图标脚本 | `ind-chain/scripts/set-command-icon.sh` |
+| 启动器附着面 | 根 `Standard-Cube.app` → `ind-chain/scripts/launcher_gui.py` |
+| 概念续工指针 | `ind-chain/CONCEPTS.md` §10（美学细节回指本文） |
 
 **不独占：** `coords.js`、抽出/焦点几何、`scene.js` 中服务坐标可读性的材质逻辑。
 

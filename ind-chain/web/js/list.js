@@ -80,14 +80,23 @@ function otherNote(e) {
   return `<span class="list-other">Also ${bits.join(" · ")}</span>`;
 }
 
+function cubeCompanyHref(ticker) {
+  const t = String(ticker || "").trim();
+  if (!t) return "/cube";
+  return `/cube?ticker=${encodeURIComponent(t)}`;
+}
+
 function rowHtml(e) {
+  const href = cubeCompanyHref(e.ticker);
+  const label = escapeHtml(e.name || e.ticker || "Open cube");
   return (
-    `<div class="list-row" role="row">` +
+    `<a class="list-row" role="row" href="${escapeHtml(href)}" title="Open decision cube for this company">` +
     `<span class="list-name">${escapeHtml(e.name || "")}${otherNote(e)}</span>` +
     `<span class="list-ticker">${escapeHtml(e.ticker || "")}</span>` +
     `<span class="list-coord">${escapeHtml(displayIndustryCoord(e.legal_entity_coord || e.bics_code_l4 || ""))}</span>` +
     `<span class="list-pct">${fmtPct(e.pct_tot_rev)}</span>` +
-    `</div>`
+    `<span class="visually-hidden">Open cube · ${label}</span>` +
+    `</a>`
   );
 }
 
@@ -117,7 +126,7 @@ function render(q) {
     `<span role="columnheader">Industry coord</span><span role="columnheader">L1 rev %</span>` +
     `</div>` +
     shown.map(rowHtml).join("");
-    note.textContent = `${shown.length} of ${rows.length} companies · primary L4 · 20261003`;
+  note.textContent = `${shown.length} of ${rows.length} companies · primary L4 · click a row to open that company in the cube`;
 }
 
 function renderTotal(el, count, total, country) {
@@ -184,9 +193,10 @@ async function loadList() {
       code,
     );
     renderTotal(document.getElementById("listTotal"), data.count, data.totalCount, loc);
-    if (cubeLink) cubeLink.href = `/cube?bics=${encodeURIComponent(code)}`;
+    if (cubeLink) cubeLink.href = "/cube";
     document.title = node ? `FIDV — ${node.name}` : document.title;
     render(filterEl?.value || "");
+    note.textContent = `${visibleRows(filterEl?.value || "").length} of ${rows.length} companies · primary L4 · click a row to open that company in the cube`;
   } catch (err) {
     note.textContent = "Failed to load companies. Is the server running?";
     console.error(err);

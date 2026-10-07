@@ -1,5 +1,5 @@
-# AI Chain Cube — Concept Target Library  
-# 产业链立方体 — 概念靶向库
+# Standard-Cube (ind-chain) — Concept Target Library  
+# 标准立方体 — 概念靶向库
 
 > **Purpose / 用途**  
 > Bilingual glossary of *agent-pointing* concepts for this module.  
@@ -7,7 +7,7 @@
 > 中英对照；封存、移植或隔久再开时，**先读本文再改三维/交互**。  
 >
 > **Canonical home / 真源**  
-> Repo: FIDV · path: `ai-chain/` · entry: `Open-AI-Chain.command` · port **8787**  
+> Repo: FIDV · path: `ind-chain/` · entry: `Standard-Cube.app` (GUI) · port **8787**  
 >
 > **Code tags / 代码标注**  
 > Comments use `[C-ID]` matching rows below (e.g. `[C-SLICE]`, `[C-STDVIEW]`).
@@ -78,7 +78,7 @@ User (s, x, y)   Three.js (under root)
 +x  (ring blue)  −Z  (USER_X_SIGN = -1)
 ```
 
-Position changes go through `ai-chain/web/js/coords.js` (`LAYOUT`, or an object's `{s, x, y}`). Scene code calls `applyCoord` / `applySliceCoord`.
+Position changes go through `ind-chain/web/js/coords.js` (`LAYOUT`, or an object's `{s, x, y}`). Scene code calls `applyCoord` / `applySliceCoord`.
 
 **Do not / 禁止**
 
@@ -165,10 +165,10 @@ Removed / 已废弃：旧「角视图 corner view」与 **V / Home** 绑定（�
 | **C-LAYER-DATA** | layer record | 层数据 | `layers.json` / API; order 0 Power → 10 Models |
 | **C-COMPANY** | company record | 公司 | `revBn`, `revScore`, `ring`, `ringCos`, `ringSin`, `country`, optional `valueM`, optional `legalEntityCoord` / industry code (empty until attached) |
 | **C-US / C-INTL** | US / non-US | 美 / 非美 | Colors cyan / orange (`#3cf0ff` / `#ffb020`) |
-| **C-HOME** | engineering home | 工程首页 | Gate at `/`: BICS **L1–L3** same board (`/?bics=`). Optional `?listingCountry=` (ISO or `UNMAPPED`) via a **searchable listing-country dropdown** (not a chip wall; not cube `?country=`). **Level-4** cell → **C-LIST**. Breadcrumb **fixed** top-left (`All / …`). Sector cells show **4-segment** industry coords (`displayIndustryCoord`) and subtree **company counts**. Header one **Decision cube** control → **C-CUBE**. Shallow leaves above L4 still `/cube?bics=`. Hosts **C-SPLASH** (cold `/` only). | `web/index.html`, `home.js`, `nations.js`, `GET /api/bics/children` |
-| **C-LIST** | L4 company list | 四级公司名单 | `/list?bics=<L4 compact>` plus optional `?listingCountry=`. One company per full **Member Ticker**, only if this L4 is its **primary** (numeric `% Tot Rev` wins; empty still gets a primary via the same sort, entity coord prefixed `-`). Industry coord column uses **4-segment** chrome (keeps leading `-`). Other L1 shares as annotations. Country from yellow-key (see **C-LISTING**). No splash. Same header **Decision cube** as C-HOME. | `web/list.html`, `list.js`, `GET /api/bics/entities` |
+| **C-HOME** | engineering home | 工程首页 | Gate at `/`: BICS **L1–L3** same board (`/?bics=`). Optional `?listingCountry=` (ISO or `UNMAPPED`) via a **searchable listing-country dropdown** (not a chip wall; not cube `?country=`). **Level-4** cell → **C-LIST**. Breadcrumb **fixed** top-left (`All / …`). Sector cells show **4-segment** industry coords (`displayIndustryCoord`) and subtree **company counts**. Header one **Decision cube** → **C-CUBE** overview (`/cube`). Hosts **C-SPLASH** (cold `/` only). | `web/index.html`, `home.js`, `nations.js`, `GET /api/bics/children` |
+| **C-LIST** | L4 company list | 四级公司名单 | `/list?bics=<L4 compact>` plus optional `?listingCountry=`. One company per full **Member Ticker**, only if this L4 is its **primary** (numeric `% Tot Rev` wins; empty still gets a primary via the same sort, entity coord prefixed `-`). Industry coord column uses **4-segment** chrome (keeps leading `-`). Other L1 shares as annotations. Country from yellow-key (see **C-LISTING**). No splash. Header **Decision cube** → overview `/cube`. **Row click** → `/cube?ticker=` (**company→cube**). | `web/list.html`, `list.js`, `GET /api/bics/entities` |
 | **C-LISTING** | listing country | 上市地 | ISO from Bloomberg yellow-key **exchange token** (second-last before `Equity`/`Corp`/…), mapped in `server/listing.py`. **Not** headquarters. **Not** an 8th industry axis. Unmapped venues stay **Unmapped**. Distinct from cube **C-US / C-INTL**. Changing country on C-HOME / C-LIST is in-page `history` + refetch — no document reload, no splash, keep board scroll. |
-| **C-CUBE** | decision cube SPA | 决策立方体页 | Full-bleed cube at `/cube`. Optional `?bics=` context only. **No splash.** Not the L4 click target. | `web/cube.html`, `main.js` |
+| **C-CUBE** | decision cube SPA | 决策立方体页 | Full-bleed cube. Bare `/cube` = demo AI chain (`GET /api/bundle`, 11 slices). **company→cube** `/cube?ticker=` = **standard shell**: **one slice only** (`layers[0]`); same face/rings; one BICS primary firm at face center **(s,x,y)=(0,5,5)** (`ringCos=ringSin=0`). Oral mid-stack 「s=5」 becomes single-slice `s=0` (no other industry walls). **class→cube**: header → overview only. No splash. L4 cells → C-LIST. | `web/cube.html`, `main.js`, `/api/bundle` |
 | **C-SPLASH** | splash | 开屏 | Only on **C-HOME**: FIDV wordmark → clear hold ~**2s** → fade ~**4s**. `/list` and `/cube` play no splash. | `#splash` in `index.html`, `home.js` |
 | **C-RING-SCORE** | ring score | 环分数 | Per-slice min–max → 0–100; **100 = exact center** |
 

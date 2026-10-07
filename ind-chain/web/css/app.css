@@ -531,9 +531,12 @@ p { margin: 0 0 10px; }
 .list-row {
   padding: 12px;
   font-size: 13px;
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
 }
-.list-row:hover,
-.list-row:focus-within {
+a.list-row:hover,
+a.list-row:focus-within {
   background: var(--glass-strong);
   outline: 1px solid var(--accent);
   outline-offset: -1px;

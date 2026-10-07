@@ -1,5 +1,8 @@
 __pycache__/
 *.pyc
 .DS_Store
+data/ind_chain.db
+data/ind_chain.db-journal
 data/ai_chain.db
 data/ai_chain.db-journal
+data/launcher-last.log

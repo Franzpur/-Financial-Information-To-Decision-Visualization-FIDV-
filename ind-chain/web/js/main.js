@@ -24,6 +24,10 @@ async function boot() {
     state.layers = bundle.layers;
     state.companies = bundle.companies;
     state.countries = bundle.meta?.countries || {};
+    state.shellCube = Boolean(bundle.meta?.shell);
+    if (bundle.meta?.shell && bundle.meta?.tickerFound === false) {
+      state.openTickerMiss = true;
+    }
 
     app.hidden = false;
 

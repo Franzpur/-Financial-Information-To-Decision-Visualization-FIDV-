@@ -44,4 +44,4 @@ python3 ingest_20261003_entities.py
 
 ## 与立方体
 
-见 `ai-chain/CONCEPTS.md` **C-COORD-3**。1类 `(s,x,y)`、2类 `ringCos`/`ringSin` 管位置；本库管行业归属。
+见 `ind-chain/CONCEPTS.md` **C-COORD-3**。1类 `(s,x,y)`、2类 `ringCos`/`ringSin` 管位置；本库管行业归属。

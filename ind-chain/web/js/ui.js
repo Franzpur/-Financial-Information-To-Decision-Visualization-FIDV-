@@ -243,6 +243,11 @@ export function createUI(sceneApi) {
           return;
         }
       }
+      if (state.openTickerMiss && state.openTicker) {
+        detail.innerHTML = `<p><strong>${state.openTicker}</strong> was not found in the BICS member library. The standard cube shell is empty — return to the list or try another ticker.</p>`;
+        updateStatus();
+        return;
+      }
       if (state.focusLayer != null) renderLayerRoster(state.focusLayer);
       else setDetailDefault();
       updateStatus();

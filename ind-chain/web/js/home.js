@@ -41,14 +41,13 @@ function listHref(bics, country) {
   return `/list?${p.toString()}`;
 }
 
-function cubeHref(code) {
-  const c = (code || "").trim();
-  return c ? `/cube?bics=${encodeURIComponent(c)}` : "/cube";
+function cubeHref() {
+  return "/cube";
 }
 
 function bindCubeLink() {
   const el = document.getElementById("homeCubeLink");
-  if (el) el.href = cubeHref(currentBics());
+  if (el) el.href = cubeHref();
 }
 
 function skipSplash() {
@@ -114,7 +113,7 @@ function trailHtml(ancestors, node, country) {
 
 function cellHref(node, country) {
   if (node.level === 4) return listHref(node.bicsCode, country);
-  if (node.isLeaf) return cubeHref(node.bicsCode);
+  if (node.isLeaf) return cubeHref();
   return gateHref(node.bicsCode, country);
 }
 
@@ -217,7 +216,7 @@ async function loadBoard() {
       return;
     }
     if (node?.isLeaf) {
-      location.replace(cubeHref(node.bicsCode));
+      location.replace(cubeHref());
       return;
     }
     const children = data.children || [];

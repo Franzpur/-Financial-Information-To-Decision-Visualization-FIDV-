@@ -14,10 +14,10 @@
 
 | 路径 | 性质 |
 |------|------|
-| `ai-chain/`（含 `CONCEPTS.md`、网页、服务、启动器、图标） | 工程 |
+| `ind-chain/`（含 `CONCEPTS.md`、网页、服务、GUI 启动器、图标） | 工程 |
 | `class-3-coords/`（层级 JSON、ingest、README；生成的 `.db` 仍不跟踪） | 工程 |
 | `DATA-SPACE/`（已跟踪的表与手册；`~$*`、实体 db 仍不跟踪） | 工程 |
-| `Open-AI-Cube.command`、根 `README.md` | 工程 |
+| `Standard-Cube.app`、根 `README.md` | 工程 |
 | `library/`：worklog、`showable-report/`、`bug-report/` | 队员读本与时间线，仍公开 |
 | `agent_tasklist/DESIGN.md` | 产品三持，工程真源 |
 | `agent_tasklist/AESTHETIC.md` | 色板 / chrome / splash，工程真源 |

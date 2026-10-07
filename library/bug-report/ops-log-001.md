@@ -9,4 +9,4 @@
 
 | # | 现象 | 原因 | 解法 | 路径 |
 |---|---|---|---|---|
-|1| GitHub 克隆后首页有分类格、家数 0、四级无公司 | 成员库 `bics_entities_20261003.db` gitignore，clone 不带；ingest 造库不是连库；`app.py` 按路径打开文件 | 终端进入仓库根目录：`pip3 install openpyxl` 后 `python3 class-3-coords/BICS-Classification/ingest_20261003_entities.py`；`quit` 再开 `./Open-AI-Cube.command` | `library/showable-report/FIDV-clone-handbook.html` |
+|1| GitHub 克隆后首页有分类格、家数 0、四级无公司 | 成员库 `bics_entities_20261003.db` gitignore，clone 不带；ingest 造库不是连库；`app.py` 按路径打开文件 | 终端进入仓库根目录：`pip3 install openpyxl` 后 `python3 class-3-coords/BICS-Classification/ingest_20261003_entities.py`；再开 `Standard-Cube.app`（Restart 或重新双击） | `library/showable-report/FIDV-clone-handbook.html` |

@@ -1,7 +1,10 @@
-/** API client for the AI Chain Cube backend. */
+/** API client for the Standard-Cube backend. */
 
 export async function fetchBundle() {
-  const res = await fetch("/api/bundle", { cache: "no-store" });
+  const url = new URL("/api/bundle", window.location.origin);
+  const ticker = new URLSearchParams(location.search).get("ticker");
+  if (ticker) url.searchParams.set("ticker", ticker);
+  const res = await fetch(url, { cache: "no-store" });
   if (!res.ok) throw new Error(`API /api/bundle failed (${res.status})`);
   return res.json();
 }

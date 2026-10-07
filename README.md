@@ -13,18 +13,22 @@ To standardly visualize statistics to fit human perception, so managers can make
 | [`agent_tasklist/INFORMATION.md`](./agent_tasklist/INFORMATION.md) | 数据真源（词条、乱缺、BQLX 公式） |
 | `agents/` | 本机工作工具，不随仓。见 `PUBLIC-PRIVATE.md` |
 | [`class-3-coords/`](./class-3-coords/) | 3类坐标 / 行业坐标（BICS Equity Hierarchy 2024） |
-| [`ai-chain/`](./ai-chain/) | Decision view. Industry-chain cube. Firms are nodes on slices |
+| [`ind-chain/`](./ind-chain/) | Decision view. Industry-chain cube (Standard-Cube). Firms are nodes on slices |
 | [`library/`](./library/) | 工作日志、可打印读本与运维记录 |
-| [`ai-chain/CONCEPTS.md`](./ai-chain/CONCEPTS.md) | Concept library (ZH/EN): one name for slice, axes, pull |
+| [`ind-chain/CONCEPTS.md`](./ind-chain/CONCEPTS.md) | Concept library (ZH/EN): one name for slice, axes, pull |
 
-### Run the AI chain cube
+### Run Standard-Cube
+
+访达双击 `Standard-Cube.app`（无终端；可执行文件为 Mach-O，不是 shell 脚本）。或：
 
 ```bash
-./Open-AI-Cube.command
+open Standard-Cube.app
 # or
-cd ai-chain && ./Open-AI-Chain.command
-# or
-cd ai-chain && python3 scripts/seed.py && python3 server/app.py
+python3 ind-chain/scripts/launcher_gui.py
+# or headless
+cd ind-chain && python3 scripts/seed.py && python3 server/app.py
 ```
 
-Then open http://127.0.0.1:8787/ (homepage). Cube: http://127.0.0.1:8787/cube
+若改过启动桩源码：`./ind-chain/scripts/build-standard-cube-app.sh`。须把 `.app` 留在仓根；需带 tkinter 的 Python 3。
+
+GUI: **Open homepage** / **Restart** / **Quit**. Then http://127.0.0.1:8787/ (homepage). Cube: http://127.0.0.1:8787/cube

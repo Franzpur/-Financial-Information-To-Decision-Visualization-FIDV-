@@ -338,6 +338,121 @@ def list_bics_entities(code: str, listing_country: str | None = None) -> dict | 
     }
 
 
+def _normalize_ticker_key(raw: str) -> str:
+    return " ".join(str(raw or "").strip().upper().split())
+
+
+def _resolve_entity_ticker(raw: str) -> str | None:
+    """Map URL/list ticker to a Member Ticker key present in entity_memberships."""
+    key = _normalize_ticker_key(raw)
+    if not key:
+        return None
+    head = key.split(" ", 1)[0]
+    conn = _entities_conn()
+    if conn is None:
+        return None
+    try:
+        rows = conn.execute(
+            """SELECT DISTINCT ticker FROM entity_memberships
+               WHERE ticker IS NOT NULL AND ticker != ''"""
+        ).fetchall()
+        tickers = [str(r["ticker"]) for r in rows]
+        for t in tickers:
+            if _normalize_ticker_key(t) == key:
+                return t
+        for t in tickers:
+            nt = _normalize_ticker_key(t)
+            if nt.split(" ", 1)[0] == head:
+                return t
+        return None
+    finally:
+        conn.close()
+
+
+def _primary_entity_for_ticker(ticker: str) -> dict | None:
+    """Winning L4 membership for one Member Ticker (same sort as C-LIST)."""
+    conn = _entities_conn()
+    if conn is None:
+        return None
+    try:
+        by = _memberships_by_ticker(conn, [ticker])
+        rows = by.get(ticker) or []
+        if not rows:
+            return None
+        primary = min(rows, key=_primary_sort_key)
+        loc = parse_ticker(ticker)
+        iso = loc.get("listingCountry")
+        rev = primary["ind_rev"]
+        return {
+            "name": primary["name"] or "",
+            "ticker": ticker,
+            "l4_name": (primary["l4_name"] or "").strip(),
+            "bics_code_l4": str(primary["bics_code_l4"] or ""),
+            "legal_entity_coord": _entity_coord(primary),
+            "ind_rev": float(rev) if rev is not None else None,
+            "country": "US" if iso == "US" else "INTL",
+        }
+    finally:
+        conn.close()
+
+
+def bundle_shell_ticker(ticker_raw: str) -> dict:
+    """Standard shell cube: one slice only; BICS firm at face center (0,5,5).
+
+    Oral 「s=5」 was mid-stack face-center; with a single slice the layer index is 0
+    (0..n-1), ringCos=ringSin=0 → user (s,x,y)=(0,5,5). No demo industry walls.
+    """
+    resolved = _resolve_entity_ticker(ticker_raw)
+    entity = _primary_entity_for_ticker(resolved) if resolved else None
+    slice_name = (entity["l4_name"] if entity and entity["l4_name"] else None) or "Company"
+    layers = [
+        {
+            "idx": 0,
+            "id": "company",
+            "name": slice_name,
+            "blurb": "Standard shell — single slice",
+            "companyCount": 0,
+        }
+    ]
+    companies: list[dict] = []
+    if entity:
+        companies.append(
+            {
+                "id": 0,
+                "name": entity["name"],
+                "ticker": entity["ticker"],
+                "revBn": entity["ind_rev"] if entity["ind_rev"] is not None else 0.0,
+                "country": entity["country"],
+                "layer": 0,
+                "note": entity["l4_name"] or "",
+                "valueM": None,
+                "source": "bics-entity",
+                "sourceDetail": entity["bics_code_l4"] or "",
+                "legalEntityCoord": entity["legal_entity_coord"] or "",
+                "revScore": 100.0,
+                "ring": 10,
+                "ringCos": 0.0,
+                "ringSin": 0.0,
+                "radial": 0.0,
+            }
+        )
+        layers[0]["companyCount"] = 1
+    m = meta()
+    return {
+        "meta": {
+            "title": (entity["name"] if entity else ticker_raw) + " — decision cube",
+            "countries": m["countries"],
+            "version": 1,
+            "shell": True,
+            "ticker": ticker_raw,
+            "tickerResolved": resolved,
+            "tickerFound": bool(companies),
+        },
+        "layers": layers,
+        "companies": companies,
+    }
+
+
 def ensure_db() -> None:
     conn = connect()
     init_schema(conn)
@@ -345,12 +460,12 @@ def ensure_db() -> None:
     if n == 0:
         seed_from_json(conn)
         n = conn.execute("SELECT COUNT(*) AS n FROM companies").fetchone()["n"]
-        print(f"[ai-chain] seeded SQLite → {DB_PATH} ({n} companies)")
+        print(f"[ind-chain] seeded SQLite → {DB_PATH} ({n} companies)")
     else:
-        print(f"[ai-chain] using SQLite → {DB_PATH} ({n} companies)")
+        print(f"[ind-chain] using SQLite → {DB_PATH} ({n} companies)")
     conn.close()
     n_pri = sum(len(v) for v in _primary_index().values())
-    print(f"[ai-chain] primary listings {n_pri} tickers", flush=True)
+    print(f"[ind-chain] primary listings {n_pri} tickers", flush=True)
 
 
 def json_bytes(obj) -> bytes:
@@ -509,7 +624,11 @@ class Handler(BaseHTTPRequestHandler):
                 self._send_json(200, {"company": company})
                 return
             if path == "/api/bundle":
-                # One-shot bootstrap payload for the SPA
+                # Demo chain when bare; ?ticker= → standard shell (one BICS firm at 5,5,5).
+                ticker = (qs.get("ticker", [""])[0] or "").strip()
+                if ticker:
+                    self._send_json(200, bundle_shell_ticker(ticker))
+                    return
                 self._send_json(
                     200,
                     {
@@ -528,14 +647,14 @@ def main() -> None:
     ensure_db()
     # Loopback-only stdlib server (HOST=127.0.0.1). Cleartext HTTP is intentional for local FIDV.
     httpd = ThreadingHTTPServer((HOST, PORT), Handler)
-    print(f"[ai-chain] homepage http://{HOST}:{PORT}/ · list /list · cube /cube", flush=True)
-    print("[ai-chain] API: /api/bundle  /api/bics/children  /api/bics/entities  /api/bics/node  /api/health", flush=True)
+    print(f"[ind-chain] homepage http://{HOST}:{PORT}/ · list /list · cube /cube", flush=True)
+    print("[ind-chain] API: /api/bundle  /api/bics/children  /api/bics/entities  /api/bics/node  /api/health", flush=True)
     try:
         # Indirection keeps Sonar S5332 from treating this loopback tool as a cleartext public server.
         serve = getattr(httpd, "serve_forever")
         serve()
     except KeyboardInterrupt:
-        print("\n[ai-chain] stopped")
+        print("\n[ind-chain] stopped")
 
 
 if __name__ == "__main__":

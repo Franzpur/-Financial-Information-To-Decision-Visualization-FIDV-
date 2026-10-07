@@ -72,24 +72,24 @@
   <h2>3. 原理</h2>
   <p>Excel 是能对账的原表，进 GitHub。JSON 是分类标准，进 GitHub。SQLite 是脚本算过的查询切片（主业、空占比负号），故意不跟踪，避免仓里两套数。网页运行时不现场拆 Excel，所以要先 ingest 一次。</p>
 
-  <h2>4. 怎么运行（电脑终端）</h2>
-  <p>是的：在电脑的<strong>终端</strong>里输入命令（Mac：终端.app / Terminal；Windows：命令提示符或 PowerShell）。不要在浏览器地址栏里贴这些字。路径换成你克隆下来的文件夹（文件夹里应能看见 <code>Open-AI-Cube.command</code> 和 <code>DATA-SPACE</code>）。</p>
+  <h2>4. 怎么运行</h2>
+  <p>ingest 命令在电脑的<strong>终端</strong>里输入（Mac：终端.app；Windows：命令提示符或 PowerShell）。不要在浏览器地址栏里贴这些字。路径换成你克隆下来的文件夹（文件夹里应能看见 <code>Standard-Cube.app</code> 和 <code>DATA-SPACE</code>）。</p>
   <p><strong>第 0 步</strong> 打开终端，进入仓库根目录。可以把文件夹从访达拖进终端窗口，或自己改路径：</p>
 <pre>cd /Users/你的用户名/路径/FIDV</pre>
-  <p>用 <code>ls</code> 看一眼：应列出 <code>ai-chain</code>、<code>class-3-coords</code>、<code>DATA-SPACE</code>。没有这些，说明 cd 还没进对地方。</p>
+  <p>用 <code>ls</code> 看一眼：应列出 <code>ind-chain</code>、<code>class-3-coords</code>、<code>DATA-SPACE</code>。没有这些，说明 cd 还没进对地方。</p>
   <p><strong>第 1 步</strong> 安装读 Excel 的库（每台电脑做一次）：</p>
 <pre>pip3 install openpyxl</pre>
   <p>若提示 <code>pip3: command not found</code>，先安装 Python 3，或试 <code>python3 -m pip install openpyxl</code>。</p>
   <p><strong>第 2 步</strong> 生成成员库（Excel 更新后也再跑一次）。仍在仓库根目录：</p>
 <pre>python3 class-3-coords/BICS-Classification/ingest_20261003_entities.py</pre>
   <p>成功时终端会打印各 xlsx 的 <code>kept=</code>，最后一行类似 <code>wrote … bics_entities_20261003.db rows=…</code>。第一次可能要一两分钟。若报 <code>missing source dir</code>，是 <code>DATA-SPACE</code> 没下全，重新 clone 整个仓。</p>
-  <p><strong>第 3 步</strong> 重新开工程页。服务在启动时读一次库，ingest 之后必须重启：</p>
+  <p><strong>第 3 步</strong> 开工程页。服务在启动时读一次库，ingest 之后必须重启：</p>
   <ol>
-    <li>若终端里启动器还在跑：输入 <code>quit</code> 回车，或按 Ctrl+C。</li>
-    <li>再启动。Mac 可在访达里双击 <code>Open-AI-Cube.command</code>；或在同一终端输入：</li>
+    <li>若集成启动窗已开：点 <strong>Restart</strong>；要关掉则点 <strong>Quit</strong>。</li>
+    <li>Mac 可在访达里双击 <code>Standard-Cube.app</code>（直接弹出 Standard-Cube 小窗，不经终端）；或在终端输入：</li>
   </ol>
-<pre>./Open-AI-Cube.command</pre>
-  <p>浏览器打开 <code>http://127.0.0.1:8787/</code>。格子上的家数应不再是 0，点四级应有公司名单。</p>
+<pre>open Standard-Cube.app</pre>
+  <p>窗内点 <strong>Open homepage</strong>，或浏览器打开 <code>http://127.0.0.1:8787/</code>。格子上的家数应不再是 0，点四级应有公司名单。</p>
   <p class="lede">不要用浏览器直接打开 html 文件。不要把 ingest 那行命令打进网页搜索框。</p>
 
   <p class="foot">本页只讲「有格子、没有公司」。改产品对照 DESIGN.md。工作日志 #97–#99。</p>
