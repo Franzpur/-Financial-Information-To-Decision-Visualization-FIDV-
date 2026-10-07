@@ -153,6 +153,16 @@ export function companyCoord(layer, ringCos, ringSin) {
   };
 }
 
+/** [C-CUBE] Company→cube shell: user position (5,5,5); not layer index. */
+export const SHELL_ANCHOR = {
+  s: FACE_SPAN / 2,
+  x: FACE_SPAN / 2,
+  y: FACE_SPAN / 2,
+};
+
+/** Virtual layer count for shell coord math (s∈[0,10], mid = 5). */
+export const SHELL_SPAN_LAYERS = 11;
+
 export function domainLabelCoord(layer, gap) {
   const g = Math.max(gap, D_EPS * UNIT);
   return {

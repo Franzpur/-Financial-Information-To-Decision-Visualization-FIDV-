@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>FIDV 代理组织架构</title>
+<style>
+  :root {
+    --ink: #1a1f26;
+    --muted: #4a5560;
+    --rule: #c5ccd4;
+    --paper: #f7f5f0;
+    --fill: #ece8e0;
+  }
+  * { box-sizing: border-box; }
+  html { font-size: 11pt; }
+  body {
+    margin: 0 auto;
+    max-width: 180mm;
+    padding: 16mm 16mm 22mm;
+    color: var(--ink);
+    background: var(--paper);
+    font-family: "Iowan Old Style", "Palatino Linotype", Palatino, "Songti SC", "Noto Serif SC", serif;
+    line-height: 1.45;
+  }
+  .mark {
+    font-size: 13pt;
+    letter-spacing: 0.08em;
+    font-weight: 600;
+    margin: 0 0 0.6em;
+  }
+  h1 { font-size: 18pt; letter-spacing: 0.04em; margin: 0 0 0.35em; font-weight: 600; }
+  h2 { font-size: 12.5pt; margin: 1.35em 0 0.4em; border-bottom: 1px solid var(--rule); padding-bottom: 0.2em; font-weight: 600; }
+  p, li { margin: 0.32em 0; }
+  .lede, .cover-meta { color: var(--muted); font-size: 10pt; }
+  .cover-meta { margin: 0.6em 0 1.1em; }
+  .cover-meta div { margin: 0.12em 0; }
+  table { width: 100%; border-collapse: collapse; font-size: 9.5pt; margin: 0.45em 0 0.7em; page-break-inside: avoid; }
+  th, td { border: 1px solid var(--rule); padding: 0.28em 0.45em; text-align: left; vertical-align: top; }
+  th:first-child, td:first-child { width: 22%; }
+  th { background: var(--fill); font-weight: 600; }
+  code { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 0.88em; }
+  .org { margin: 0.4em 0 0.2em; page-break-inside: avoid; }
+  .seat {
+    border: 1px solid var(--rule);
+    padding: 0.35em 0.55em;
+    text-align: center;
+  }
+  .seat strong { font-weight: 600; }
+  .seat span { display: block; color: var(--muted); font-size: 9pt; }
+  .stem {
+    width: 1px;
+    height: 0.7em;
+    background: var(--rule);
+    margin: 0 auto;
+  }
+  .peer {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0.55em;
+    align-items: start;
+  }
+  .col { min-width: 0; }
+  .dept { font-weight: 600; }
+  .sub {
+    border: 1px solid var(--rule);
+    border-top: 0;
+    padding: 0.28em 0.45em;
+    font-size: 9.5pt;
+  }
+  .sub:first-of-type { border-top: 1px solid var(--rule); margin-top: 0.45em; }
+  .note { font-size: 9.5pt; color: var(--muted); margin-top: 0.45em; }
+  .foot { margin-top: 1.6em; font-size: 9pt; color: var(--muted); }
+  .no-print { margin: 0 0 1em; font-size: 10pt; }
+  @media print {
+    body { max-width: none; padding: 0; background: white; }
+    .no-print { display: none; }
+    a { color: inherit; text-decoration: none; }
+  }
+  @page { size: A4; margin: 14mm 14mm 16mm; }
+</style>
+</head>
+<body>
+  <p class="no-print">浏览器打开本页 → 打印 → A4 纵向 → 存储为 PDF。关掉页眉网址。</p>
+
+  <p class="mark">FIDV</p>
+  <h1>代理组织架构</h1>
+  <p class="lede">部门权责与隶属 · 截至 2026-10-07</p>
+  <div class="cover-meta">
+    <div>三部门平级：总参谋部、监理部、档案部。美工部与信息部不是第四个部。</div>
+    <div>父代理是唯一派出者，也是跨域产品代码的写手。部门之间互不隶属、互不调度。</div>
+  </div>
+
+  <h2>1. 隶属</h2>
+  <div class="org">
+    <div class="seat"><strong>业主</strong><span>点名。单独的「电」不派任何人。</span></div>
+    <div class="stem"></div>
+    <div class="seat"><strong>父代理</strong><span>串流程。按单派出。跨域与未授权路径的默认写手。</span></div>
+    <div class="stem"></div>
+    <div class="peer">
+      <div class="col">
+        <div class="seat dept">总参谋部</div>
+        <div class="sub">参谋纪要官<span style="display:block">只对总参谋部</span></div>
+        <div class="sub">美工部</div>
+        <div class="sub">信息部<span style="display:block">管理 · 清理 · 请求</span></div>
+      </div>
+      <div class="col">
+        <div class="seat dept">监理部</div>
+        <div class="sub">工程测试属</div>
+        <div class="sub">代码质量属</div>
+        <div class="sub">理念贯彻属</div>
+      </div>
+      <div class="col">
+        <div class="seat dept">档案部</div>
+        <div class="sub">书记</div>
+        <div class="sub">秘书</div>
+        <div class="sub">运维</div>
+      </div>
+    </div>
+  </div>
+  <p class="note">三属只对监理部负责，由父代理按监理部的单并行派出。书记每次谈话最后出现，不经档案部转发。</p>
+
+  <h2>2. 三部门</h2>
+  <table>
+    <thead>
+      <tr><th>部门</th><th>职权</th><th>不做</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>总参谋部</td>
+        <td>读工作日志、概念与工程结构，把要求拆成意志和任务列表。可调度美工部、信息部、参谋纪要官。业主安排时，可改这些可调度角色的文件。一旦呼出，必须第一个执行。</td>
+        <td>不写产品代码。不调度、不指导、不改写监理部与档案部，含三属和书记、秘书、运维。</td>
+      </tr>
+      <tr>
+        <td>监理部</td>
+        <td>产品代码改完后的终裁。三属并列取证，监理部只写三监报告。三属都达标才通过；任一不达标，整单打回。上限三次。打回后三属整单重审。</td>
+        <td>不改设计，不写实现，不改文件。无代码改动则不审，不空转三属。通过时不另加建议。</td>
+      </tr>
+      <tr>
+        <td>档案部</td>
+        <td>调度书记、秘书、运维。工作区在 <code>library/</code>。秘书写可打印文稿；运维记运行故障。</td>
+        <td>不代替每次谈话末尾的书记。不写产品代码。不调度监理部、总参谋部、美工部、信息部。</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>3. 隶属各职</h2>
+  <table>
+    <thead>
+      <tr><th>职</th><th>隶属</th><th>权责</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>参谋纪要官</td>
+        <td>总参谋部</td>
+        <td>钉口语到概念、列未拍板、对照意志回流。只读，不改产品，不写通过或打回。只经总参谋部任务单派出。</td>
+      </tr>
+      <tr>
+        <td>美工部</td>
+        <td>受总参谋部调度</td>
+        <td>网页与启动表层美学。在美学专知路径内可改外观。不写通过或打回。</td>
+      </tr>
+      <tr>
+        <td>信息部</td>
+        <td>受总参谋部调度</td>
+        <td>读数、词条、乱缺建议、彭博公式表。在数据专知路径内可改数据工程。不改产品服务端，不写通过或打回。</td>
+      </tr>
+      <tr>
+        <td>工程测试属</td>
+        <td>监理部</td>
+        <td>这次改动能否打开、有没有阻断性报错。截图，看画面是不是这次要的结果。无界面则写明无影像面，并检查入口仍可打开。</td>
+      </tr>
+      <tr>
+        <td>代码质量属</td>
+        <td>监理部</td>
+        <td>四问：是否服务这次功能，是否简洁，是否与以往连贯，是否不外溢。任一为否，本属不达标。</td>
+      </tr>
+      <tr>
+        <td>理念贯彻属</td>
+        <td>监理部</td>
+        <td>只按设计理念三条判断：专业化、标准化、可操作化。不审能不能打开，不审是否外溢。</td>
+      </tr>
+      <tr>
+        <td>书记</td>
+        <td>档案部</td>
+        <td>每次谈话的最后一项。只记 <code>library/worklog-xxx.md</code>。不参与决策，不写报告。</td>
+      </tr>
+      <tr>
+        <td>秘书</td>
+        <td>档案部</td>
+        <td>业主要文稿或档案部调度时，写 <code>library/showable-report/</code>。不是每次谈话必派。</td>
+      </tr>
+      <tr>
+        <td>运维</td>
+        <td>档案部</td>
+        <td>故障已现或业主要记 bug 时，写 <code>library/bug-report/</code>。不是每次谈话必派。</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>4. 一次改码怎么走</h2>
+  <ol>
+    <li>父代理判定呼出。若是总参谋部，它最先执行，交出意志和任务列表。</li>
+    <li>按单调度美工部、信息部或参谋纪要官。专知内由该部改；跨域由父代理改。</li>
+    <li>有产品代码改动：父代理送监理部。监理部列出同一份材料。三属并行取证，互不看对方结论。</li>
+    <li>监理部写三监报告。通过则父代理可以宣布这一改完成。打回则按不达标的那一属已写的句子再改，三属整单重审，最多三次。</li>
+    <li>谈话最后派书记记工作日志。</li>
+  </ol>
+  <p>讨论和规划、还没改代码、也没点名监理部：不送三监。</p>
+
+  <h2>5. 写码权</h2>
+  <table>
+    <thead>
+      <tr><th>谁</th><th>可写</th><th>不可写</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>美工部</td>
+        <td>外观：样式、页面结构与 class、开屏与玻璃 chrome、启动器色板与图标。</td>
+        <td>坐标、抽出与焦点几何、产品数据流、启动器的进程与端口。</td>
+      </tr>
+      <tr>
+        <td>信息部</td>
+        <td>数据表、摄入脚本、词条、本机实体库。</td>
+        <td>产品服务端、立方体几何、美学文件。</td>
+      </tr>
+      <tr>
+        <td>父代理</td>
+        <td>坐标与产品逻辑，以及上面两行以外的路径。视觉和逻辑缠在同一文件时，整文件归父代理。</td>
+        <td>—</td>
+      </tr>
+      <tr>
+        <td>总参谋部、纪要官、档案部三部、监理部及三属</td>
+        <td>无产品改码权。</td>
+        <td>不因权知条款获得写产品的权力。</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>6. 怎么点名</h2>
+  <p>「电」加角色名。例如电总参谋部、电监理部、电档案部、电美工部、电信息部、电书记、电秘书、电运维。</p>
+  <p>总参谋部还可由「报文」「报」「M」「Message」或直接呼出。三属不单独点名开工，只在监理部送审时派出。参谋纪要官不单独接产品单。</p>
+  <table>
+    <thead>
+      <tr><th>旧称</th><th>现在</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>总监、chief inspector、产品理念监督、电总监</td><td>监理部。不再由一个人对照理念一次点头。</td></tr>
+      <tr><td>书记处、Secretariat、电书记处</td><td>档案部。职能仍是书记、秘书、运维。</td></tr>
+    </tbody>
+  </table>
+
+  <p class="foot">依据：<code>agents/README.md</code>、<code>agent_tasklist/RULE.md</code>、<code>POWER-KNOWLEDGE.md</code>。角色文件留在本机，不进公开仓。</p>
+</body>
+</html>

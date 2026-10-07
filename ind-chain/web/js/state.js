@@ -27,8 +27,10 @@ export const state = {
   openTicker: null,
   /** True when shell bundle had no entity for openTicker */
   openTickerMiss: false,
-  /** Standard shell mode (one firm at face center) */
+  /** Standard shell mode (one firm at user (5,5,5); no slices/rings) */
   shellCube: false,
+  /** Shell user anchor from bundle.meta.shellAnchor */
+  shellAnchor: null,
 };
 
 export function visibleCompanies() {
@@ -92,7 +94,11 @@ export function readHash() {
     const hit = companyByTicker(state.openTicker) || state.companies[0] || null;
     if (hit) {
       state.selectedId = hit.id;
-      state.focusLayer = hit.layer;
+      // Shell firms have no layer index — keep focusLayer null (not undefined).
+      state.focusLayer =
+        !state.shellCube && hit.layer != null && Number.isInteger(hit.layer)
+          ? hit.layer
+          : null;
       state.openTickerMiss = false;
     } else {
       state.openTickerMiss = true;

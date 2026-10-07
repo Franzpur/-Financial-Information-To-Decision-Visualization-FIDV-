@@ -5,8 +5,8 @@ import {
   writeHash,
   companyById,
   visibleCompanies,
-} from "./state.js";
-import { formatCoord } from "./coords.js";
+} from "./state.js?v=50";
+import { formatCoord } from "./coords.js?v=50";
 
 export function createUI(sceneApi) {
   const detail = document.getElementById("detail");
@@ -58,17 +58,21 @@ export function createUI(sceneApi) {
   function renderDetail(c) {
     const region = state.countries[c.country] || c.country;
     const usTag = c.country === "US" ? "US" : "Non-US";
-    const L = state.layers[c.layer];
+    const L = c.layer != null ? state.layers[c.layer] : null;
+    const ringRow = state.shellCube
+      ? ""
+      : `<span>Concentric ring</span><span>${ringLabel(c)}</span>`;
+    const metaBits = [L?.name || c.note || "", region, usTag].filter(Boolean).join(" | ");
     detail.innerHTML = `
       <h3>${c.name}</h3>
-      <div class="meta">${L?.name || ""} | ${region} | ${usTag}</div>
+      <div class="meta">${metaBits}</div>
       <div class="kv">
         <span>Ticker</span><span>${c.ticker || "—"}</span>
         <span>Country</span><span>${region}</span>
         <span>Revenue (approx.)</span><span>${c.revBn != null ? `$${c.revBn}B / yr` : "—"}</span>
         <span>Size score</span><span>${c.revScore != null ? c.revScore.toFixed(1) + " / 100" : "—"}</span>
         <span>Position (s, x, y)</span><span>${formatCoord(c.coord)}</span>
-        <span>Concentric ring</span><span>${ringLabel(c)}</span>
+        ${ringRow}
         <span>Alphabet link</span><span>${c.valueM != null ? `~$${c.valueM.toFixed(0)}M (GOOGL_SUPPLY)` : "Not in quantified supplier table"}</span>
         <span>Data source</span><span>${c.source || "—"}</span>
         <span>Source note</span><span>${c.sourceDetail || "—"}</span>

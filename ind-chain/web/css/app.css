@@ -125,9 +125,10 @@ p { margin: 0 0 10px; }
   position: absolute;
   z-index: 2;
   pointer-events: none;
-  background: var(--glass);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+  /* Solid glass — backdrop-filter blurs the WebGL cube/point into a “cloud”. */
+  background: var(--glass-strong);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
   border: 1px solid rgba(42, 49, 60, 0.45);
   border-radius: 12px;
   padding: 12px 14px;
@@ -762,13 +763,14 @@ a.list-row:focus-within {
     width: auto;
     transform: none;
   }
+  /* Keep detail as a right card — full-bleed bottom panel covered the shell point. */
   .float-detail {
-    top: auto;
-    bottom: 110px;
+    top: 64px;
+    bottom: auto;
     right: 14px;
-    left: 14px;
-    width: auto;
-    max-height: 32vh;
+    left: auto;
+    width: min(280px, calc(100% - 28px));
+    max-height: calc(100% - 160px);
   }
   .nav-hint {
     max-width: calc(100% - 28px);

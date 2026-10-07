@@ -397,23 +397,14 @@ def _primary_entity_for_ticker(ticker: str) -> dict | None:
 
 
 def bundle_shell_ticker(ticker_raw: str) -> dict:
-    """Standard shell cube: one slice only; BICS firm at face center (0,5,5).
+    """Standard shell cube: BICS firm at user (s,x,y)=(5,5,5); no industry slices/rings.
 
-    Oral 「s=5」 was mid-stack face-center; with a single slice the layer index is 0
-    (0..n-1), ringCos=ringSin=0 → user (s,x,y)=(0,5,5). No demo industry walls.
+    User s=5 is face-center depth (FACE_SPAN mid), not layer index 0. Shell mode
+    ships empty layers so the client skips C-SLICE walls and C-RING guides.
     """
     resolved = _resolve_entity_ticker(ticker_raw)
     entity = _primary_entity_for_ticker(resolved) if resolved else None
-    slice_name = (entity["l4_name"] if entity and entity["l4_name"] else None) or "Company"
-    layers = [
-        {
-            "idx": 0,
-            "id": "company",
-            "name": slice_name,
-            "blurb": "Standard shell — single slice",
-            "companyCount": 0,
-        }
-    ]
+    anchor = {"s": 5, "x": 5, "y": 5}
     companies: list[dict] = []
     if entity:
         companies.append(
@@ -423,20 +414,16 @@ def bundle_shell_ticker(ticker_raw: str) -> dict:
                 "ticker": entity["ticker"],
                 "revBn": entity["ind_rev"] if entity["ind_rev"] is not None else 0.0,
                 "country": entity["country"],
-                "layer": 0,
                 "note": entity["l4_name"] or "",
                 "valueM": None,
                 "source": "bics-entity",
                 "sourceDetail": entity["bics_code_l4"] or "",
                 "legalEntityCoord": entity["legal_entity_coord"] or "",
-                "revScore": 100.0,
-                "ring": 10,
-                "ringCos": 0.0,
-                "ringSin": 0.0,
-                "radial": 0.0,
+                "s": anchor["s"],
+                "x": anchor["x"],
+                "y": anchor["y"],
             }
         )
-        layers[0]["companyCount"] = 1
     m = meta()
     return {
         "meta": {
@@ -444,11 +431,12 @@ def bundle_shell_ticker(ticker_raw: str) -> dict:
             "countries": m["countries"],
             "version": 1,
             "shell": True,
+            "shellAnchor": anchor,
             "ticker": ticker_raw,
             "tickerResolved": resolved,
             "tickerFound": bool(companies),
         },
-        "layers": layers,
+        "layers": [],
         "companies": companies,
     }
 

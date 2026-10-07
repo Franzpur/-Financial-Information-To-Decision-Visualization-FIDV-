@@ -23,6 +23,7 @@
 | `agent_tasklist/AESTHETIC.md` | 色板 / chrome / splash，工程真源 |
 | `agent_tasklist/INFORMATION.md` | 数据词条，工程真源 |
 | `PUBLIC-PRIVATE.md` | 本协议，公开 |
+| `POWER-KNOWLEDGE.md` | 权知统一补充条款，公开 |
 
 ## 私（停跟踪，本机保留）
 
@@ -38,7 +39,7 @@
 
 ## 上传检查
 
-1. 只 `git add` 工程路径与本协议、`.gitignore`、根 README。
+1. 只 `git add` 工程路径与本协议、`POWER-KNOWLEDGE.md`、`.gitignore`、根 README。
 2. 不要把 `agents/`、`.cursor/`、以及 `agent_tasklist/` 里非三份真源的改动加入提交。
 3. 停跟踪用 `git rm --cached`，不要用不带 `--cached` 的 `git rm`。
 

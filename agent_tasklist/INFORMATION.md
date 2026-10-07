@@ -1,18 +1,21 @@
 # FIDV 数据真源（信息部）
 
-信息部判断数据目录、调用词条、乱缺与补数公式时，只以本文及三分部文件为准。产品是否服务金融决策，以 `DESIGN.md` 为准（总监）。立方体概念与坐标语义以 `ind-chain/CONCEPTS.md` 为准（信息部不改 C-*）。
+信息部判断数据目录、调用词条、乱缺与补数公式时，只以本文及三分部文件为准。产品是否服务金融决策，以 `DESIGN.md` 为准（理念贯彻属；终裁为监理部三监报告）。立方体概念与坐标语义以 `ind-chain/CONCEPTS.md` 为准（信息部不改 C-*）。
 
 目标：让业主、父代理、总参谋部用**同一套词条**找到数据；乱缺先建议、不能改则上报；补数走彭博机 Excel 公式，不在本仓连终端。
 
 ---
 
-## 1. 管辖
+## 1. 管辖（专知 = 改码权）
+
+信息部在 desk 任务明确实现时，**可直接改**下表数据工程路径（权知统一，见仓根 `POWER-KNOWLEDGE.md`）。**不**写 `ind-chain/server/*`，不改 C-* / CONCEPTS 语义，不改美学文件。
 
 | 面 | 路径 / 说明 |
 |----|-------------|
 | 原始表 | `DATA-SPACE/`（含 `ICBC C/20261003/`、`ICBC C/20261005/`） |
 | 层级库 | `class-3-coords/BICS-Classification/`（`bics-equity-hierarchy-2024.json`） |
-| 成员库 | `bics_entities_20261003.db`（gitignore；`ingest_20261003_entities.py` 生成） |
+| 摄入 / 构建 | 同目录 `ingest_*.py`、`build_bics_hierarchy.py`、数据向 README |
+| 成员库 | `bics_entities_20261003.db`（gitignore；本机生成） |
 | 词条 | 本文 §3 + `INFORMATION-manage.md` |
 | 缺口 | `INFORMATION-clean.md` |
 | 补数公式 | `INFORMATION-request.md`；产出落 `DATA-SPACE/` |
@@ -67,9 +70,9 @@
 
 | 角色 | 关系 |
 |------|------|
-| 总监 | 有 `ind-chain/` 代码改动时仍终审 DESIGN；信息部不写「通过/打回」 |
-| 总参谋部 | 可调度信息部；业主「电总参谋部」且安排管理时可规划改本角色文件；信息部仍只出方案不改仓 |
-| 美工部 | 平行；各管美学 / 数据 |
-| 书记处 | 信息部不写 worklog；报告类不由信息部撰写 |
+| 监理部 | 有产品代码改动时由父代理送三监报告终裁；信息部不写「通过/打回」 |
+| 总参谋部 | 可调度信息部；业主「电总参谋部」且安排管理时可规划改本角色文件；专知路径内信息部可改码；`ind-chain/` 应用逻辑仍归父代理 |
+| 美工部 | 平行；各管美学 / 数据（见 `POWER-KNOWLEDGE.md`） |
+| 档案部 | 信息部不写 worklog；报告类不由信息部撰写 |
 
-*Last updated: 2026-10-04 · 总参谋部立信息部。*
+*Last updated: 2026-10-07 · 权知统一：专知路径内可改码。*

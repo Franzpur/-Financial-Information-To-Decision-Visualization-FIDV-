@@ -2,7 +2,7 @@
 
 To standardly visualize statistics to fit human perception, so managers can make decisions more easily.
 
-上传范围见 [`PUBLIC-PRIVATE.md`](./PUBLIC-PRIVATE.md)（公私隔离协议）：工程进仓；agent 与调度任务留在各人本机。
+上传范围见 [`PUBLIC-PRIVATE.md`](./PUBLIC-PRIVATE.md)（公私隔离协议）：工程进仓；agent 与调度任务留在各人本机。写码权见 [`POWER-KNOWLEDGE.md`](./POWER-KNOWLEDGE.md)（权知统一：专知内美工/信息可改码；跨域仍父代理；终裁为监理部三监报告）。
 
 ## Modules
 
@@ -11,6 +11,7 @@ To standardly visualize statistics to fit human perception, so managers can make
 | [`agent_tasklist/DESIGN.md`](./agent_tasklist/DESIGN.md) | 第一版设计理念。设计前先读 |
 | [`agent_tasklist/AESTHETIC.md`](./agent_tasklist/AESTHETIC.md) | 美学真源（色板、chrome、splash、图标） |
 | [`agent_tasklist/INFORMATION.md`](./agent_tasklist/INFORMATION.md) | 数据真源（词条、乱缺、BQLX 公式） |
+| [`POWER-KNOWLEDGE.md`](./POWER-KNOWLEDGE.md) | 权知统一：专知 ↔ 改码权 |
 | `agents/` | 本机工作工具，不随仓。见 `PUBLIC-PRIVATE.md` |
 | [`class-3-coords/`](./class-3-coords/) | 3类坐标 / 行业坐标（BICS Equity Hierarchy 2024） |
 | [`ind-chain/`](./ind-chain/) | Decision view. Industry-chain cube (Standard-Cube). Firms are nodes on slices |
