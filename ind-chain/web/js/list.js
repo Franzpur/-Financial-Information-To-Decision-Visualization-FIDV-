@@ -220,7 +220,20 @@ document.getElementById("listSortRev")?.addEventListener("click", (e) => {
   e.currentTarget.setAttribute("aria-pressed", byRevenue ? "true" : "false");
   render(filterEl?.value || "");
 });
+function wireBackspaceUp() {
+  window.addEventListener("keydown", (e) => {
+    if (e.key !== "Backspace" || e.ctrlKey || e.metaKey || e.altKey || e.isComposing) return;
+    const el = document.activeElement;
+    if (el && (el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.isContentEditable)) return;
+    e.preventDefault();
+    const links = trail?.querySelectorAll("a");
+    const href = links?.length ? links[links.length - 1].getAttribute("href") : "";
+    if (href) location.assign(href);
+  });
+}
+
 loadList();
+wireBackspaceUp();
 window.addEventListener("popstate", () => {
   loadList().then(() => {
     const y = history.state?.scrollY;

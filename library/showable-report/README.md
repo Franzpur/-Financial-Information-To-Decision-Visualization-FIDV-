@@ -15,6 +15,10 @@
 
 - [`FIDV-agent-org-report.html`](./FIDV-agent-org-report.html) A4 纵向打印
 
+三部工作流自省（2026-10-08）：
+
+- [`FIDV-workflow-self-review.html`](./FIDV-workflow-self-review.html) A4 纵向打印
+
 队员会讲稿（2026-10-06）：
 
 - [`FIDV-team-briefing.html`](./FIDV-team-briefing.html) A4 横向打印；配图 `briefing/assets/`

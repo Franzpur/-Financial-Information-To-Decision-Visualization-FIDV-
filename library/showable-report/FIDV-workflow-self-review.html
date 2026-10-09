@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>FIDV 三部工作流自省</title>
+<style>
+  :root {
+    --ink: #1a1f26;
+    --muted: #4a5560;
+    --rule: #c5ccd4;
+    --paper: #f7f5f0;
+    --fill: #ece8e0;
+  }
+  * { box-sizing: border-box; }
+  html { font-size: 11pt; }
+  body {
+    margin: 0 auto;
+    max-width: 180mm;
+    padding: 16mm 16mm 22mm;
+    color: var(--ink);
+    background: var(--paper);
+    font-family: "Iowan Old Style", "Palatino Linotype", Palatino, "Songti SC", "Noto Serif SC", serif;
+    line-height: 1.45;
+  }
+  .mark {
+    font-size: 13pt;
+    letter-spacing: 0.08em;
+    font-weight: 600;
+    margin: 0 0 0.6em;
+  }
+  h1 { font-size: 18pt; letter-spacing: 0.04em; margin: 0 0 0.35em; font-weight: 600; }
+  h2 { font-size: 12.5pt; margin: 1.35em 0 0.4em; border-bottom: 1px solid var(--rule); padding-bottom: 0.2em; font-weight: 600; }
+  h3 { font-size: 11pt; margin: 0.9em 0 0.25em; font-weight: 600; }
+  p, li { margin: 0.32em 0; }
+  ol, ul { padding-left: 1.2em; }
+  .lede, .cover-meta { color: var(--muted); font-size: 10pt; }
+  .cover-meta { margin: 0.6em 0 1.1em; }
+  .quote { margin: 0.6em 0; }
+  table { width: 100%; border-collapse: collapse; font-size: 9.5pt; margin: 0.45em 0 0.7em; page-break-inside: avoid; }
+  th, td { border: 1px solid var(--rule); padding: 0.28em 0.45em; text-align: left; vertical-align: top; }
+  th { background: var(--fill); font-weight: 600; }
+  code { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 0.88em; }
+  .foot { margin-top: 1.6em; font-size: 9pt; color: var(--muted); }
+  .no-print { margin: 0 0 1em; font-size: 10pt; }
+  @media print {
+    body { max-width: none; padding: 0; background: white; }
+    .no-print { display: none; }
+    a { color: inherit; text-decoration: none; }
+  }
+  @page { size: A4; margin: 14mm 14mm 16mm; }
+</style>
+</head>
+<body>
+<p class="no-print">浏览器打开本页，打印，存成 PDF。打印前关掉页眉里的网址。</p>
+<p class="mark">FIDV</p>
+<h1>三部工作流自省</h1>
+<p class="lede">总参谋部、监理部、档案部并列交回。这是自省，不是故障记录，也不是改组方案。</p>
+<div class="cover-meta">
+  <div>2026-10-08</div>
+  <div>材料：工作日志 #119–#140，以及三部任务真源</div>
+</div>
+
+<h2>缘起</h2>
+<p class="quote">电总参谋部、电监理部、电档案部，这是一个自省要求，我想你们告诉我你们在工作流中是否会遇到一些问题，是否需要一些技能，扩展，skill，mcp，你们的组织形式等等，你们联合写一份报告给我。</p>
+<p>三部平级，互不调度。下面三节是各自的原文，不并成一条共同结论。</p>
+
+<h2>总参谋部</h2>
+<p>依据工作日志 #119–#140，以及总参谋部任务与权知约定。本部门只交自己这段。</p>
+
+<h3>工作流中的问题</h3>
+<ol>
+  <li>查因写在跑起来之前。启动器无活动，根因是 macOS 可执行标记错误，执行时才写入日志。壳报错的根因是立方体模块未破缓存。上一轮把调用写成不存在的名字，真名要等下一轮报错才看见。任务要求先读日志、概念和结构，不要求先对报错符号做只读检索。本职只读、不改产品，运行画面不在规划这一步。</li>
+  <li>没钉死的词会停工，或由执行端代选。搜索框里写入哪一串没有钉死，纪要列出选项之后，执行端选用了 ticker。泛化搜索扩到名单和立方体时，两处并法没有选定，那一部分当轮就没有改。口令清楚才能做完。</li>
+  <li>意志写到量纲，没写到界面上那一句，打回落在执行端。营收那一轮，界面上的 B 要三次审查才通过。更早也有概念句未改完、开屏时长与「简洁」冲突、业主改口后才通过的记录。本职不能指挥监理部。能写进意志的，是要改掉的那句界面文字。</li>
+  <li>耗时主要在串行专班，不在改动大小。删一枚页眉按钮大约 9 分钟，一次通过。只改一个服务文件、不派专班，11 分钟，一次通过。点选填入搜索框 47 分钟，其中有纪要、美工和审查。用满三次审查是这条规则的成本。</li>
+</ol>
+
+<h3>技能、扩展、skill、MCP</h3>
+<p>不需要新的 MCP，也不需要编辑器扩展。日志里没有一件事是因为缺这些而停的。浏览器查看已在执行端和工程测试侧。本职查因时用得上的是仓库内只读检索，不是新服务。不需要再给总参谋部包一层技能文件。纸面规格属于档案侧。再包一层，缩短不了那种串行。也不需要第二个参谋，或改动三部平级。</p>
+
+<h3>组织形式</h3>
+<p>有用的地方：三部平级之后，规划不审自己的规划。权知表把信息、外观和跨域改动分开。口令清楚时可以不派专班。纪要官减轻了口语锚点在回合之间漂走。</p>
+<p>碍事的地方：必须第一个执行，任务单不能写监理部和档案部。业主本句同时点了三部，联合报告不能由本职派写报告的人。只规划不改产品，查因的根因不在这一步。每次开读工作日志的篇幅没有减轻。</p>
+
+<h2>监理部</h2>
+<p>交回原文：</p>
+<p>无代码改动，不审。</p>
+<p>这句话就是监理部对本问的全部交回。任务真源写明：点名监理部而没有代码 diff 时，只回这一句，不派三属，不给建议。真源没有允许在这句之外再写工作流问题、技能、扩展、skill、MCP 或组织形式。</p>
+<p>因此，监理部对「问题 / 技能与 MCP / 组织形式」三块均未另交文字。</p>
+
+<h2>档案部</h2>
+<p>依据工作日志四册，以及档案部、书记、秘书、运维的任务真源。只读当前册会漏掉秘书和运维的调度记录，所以这次追溯读了四册。没有超出这些记录去编事故。</p>
+
+<h3>工作流中的问题</h3>
+<ol>
+  <li>秘书、运维的席位文件在，独立调度多次没有落地。立三席之后，日志写过「无秘书 / 运维子代理，由父代理落盘」。点名秘书时，任务类型里仍没有秘书，父代理按纸面规格改文件。运行记录是主代理写入故障日志，没有运维子代理。组织架构那份报告也是「无子代理」，由主代理落盘。档案部只交规划，席位要父代理再调。规划写了调度秘书，若没有对应类型，活仍回到父代理。本次这份读本同样如此。</li>
+  <li>秘书缺材料就写「未提供」。另外两部的原文不在档案部手里，必须由父代理送入。送不齐，秘书不能补写。</li>
+  <li>执行时长是业主要记的，用来看一次工作是否过长。已记下的有约 3 分钟、约 9 分钟、31 分钟、47 分钟、11 分钟、15 分钟，以及不足 1 分钟。档案部只报这些数。</li>
+  <li>分册在起作用：满一万字另开下一册，现有四册，旧行不改。这不是故障。副作用是自省不能只看当前册。</li>
+</ol>
+
+<h3>技能、扩展、skill、MCP</h3>
+<p>不需要新的 MCP，也不需要再开一份 skill。工作日志里没有「因为没有 MCP 或没有 skill 而停工」的记录。秘书已有纸面规格。卡住的是调度入口，不是纸面规格不够。书记的行格式、运维的现象与解法表都在任务真源里。公私隔离之后，角色文件和技能停止跟踪，纸面报告仍随工程推送。队员能拿到已印的读本，拿不到下一次写读本的规格。这是已记录的隔离结果。</p>
+
+<h3>组织形式</h3>
+<p>有用的地方：三部平级，档案部不指挥另外两部。图书馆拆开之后，书记只追加工作日志，秘书只写可打印文稿，运维只写运行记录。读本、讲稿、手册归秘书。书记固定为谈话最后一项，不经档案部转发，记账不混进报告。秘书不是每次谈话都出现。</p>
+<p>碍事的地方：档案部只有规划权，三席都要父代理再派一次。书记可以独立出现；秘书和运维多次没有作为子代理出现。角色文案要同时改两处真源，漏一处就会两套说法。本次不改这些文件。</p>
+
+<h2>对照</h2>
+<table>
+  <thead>
+    <tr><th>所问</th><th>总参谋部</th><th>监理部</th><th>档案部</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>工作流中的问题</td>
+      <td>查因晚于运行；一词多义会停工或被代选；界面原句没写进意志就会被打回；时间耗在串行专班。</td>
+      <td>未另交。无代码则不审。</td>
+      <td>秘书与运维常常到不了独立席位；材料必须由父代理送入；时长已有记录；分册使自省不能只看当前册。</td>
+    </tr>
+    <tr>
+      <td>技能、扩展、skill、MCP</td>
+      <td>不需要新增。</td>
+      <td>未另交。</td>
+      <td>不需要新增。缺的是调度入口，不是纸面规格。</td>
+    </tr>
+    <tr>
+      <td>组织形式</td>
+      <td>平级和权知有用。不能派另外两部，查因又不在规划这一步。</td>
+      <td>未另交。点名而无 diff，规程只允许一句。</td>
+      <td>图书馆分席有用。只有规划权，秘书与运维要父代理再派。</td>
+    </tr>
+  </tbody>
+</table>
+
+<p class="foot">三部原文分节并列。本页不提出改角色或改产品的方案。</p>
+</body>
+</html>

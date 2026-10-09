@@ -100,7 +100,6 @@ export function createScene(viewport, hooks = {}) {
     meshes: [],
     byId: new Map(),
     boxHelper: null,
-    shellFace: null,
     axesGroup: null,
     keys: new Set(),
     raycaster: new THREE.Raycaster(),
@@ -120,6 +119,8 @@ export function createScene(viewport, hooks = {}) {
   resize(ctx, viewport);
   window.addEventListener("resize", () => resize(ctx, viewport));
 
+  const faceQuat = new THREE.Quaternion();
+  const parentQuat = new THREE.Quaternion();
   function tick() {
     requestAnimationFrame(tick);
     // Farther orbit radius → higher angular speed so on-screen spin matches Q/E better
@@ -136,6 +137,14 @@ export function createScene(viewport, hooks = {}) {
     lerpVisibility(ctx);
     lerpPullOut(ctx);
     controls.update();
+    for (const mesh of ctx.meshes) {
+      faceQuat.copy(camera.quaternion);
+      if (mesh.parent) {
+        mesh.parent.getWorldQuaternion(parentQuat);
+        faceQuat.premultiply(parentQuat.invert());
+      }
+      mesh.quaternion.copy(faceQuat);
+    }
     renderer.render(scene, camera);
   }
   tick();
@@ -191,52 +200,8 @@ function placeSliceGroup(g, i) {
 }
 
 function pointRadius(_c) {
-  // Shell: sized for overview-ish framing (~8–12 m) so the firm reads as a clear球.
+  // Shell: sized for overview-ish framing (~8–12 m) so the firm reads as a clear ring.
   return state.shellCube ? 0.28 : 0.022;
-}
-
-/** Thick user-cube edges (WebGL ignores Line linewidth). Shell spatial anchor only. */
-function addShellWireCube(ctx) {
-  const gap = gapNow();
-  const n = N_LAYERS();
-  const group = new THREE.Group();
-  const t = 0.032;
-  const mat = new THREE.MeshBasicMaterial({
-    color: 0xc8e0f8,
-    toneMapped: false,
-  });
-  const F = FACE_SPAN;
-  const zAxis = new THREE.Vector3(0, 0, 1);
-  const addEdge = (a, b) => {
-    const pa = v3(coordToLocal(a, n, gap));
-    const pb = v3(coordToLocal(b, n, gap));
-    const dir = pb.clone().sub(pa);
-    const len = dir.length();
-    if (len < 1e-6) return;
-    const mesh = new THREE.Mesh(new THREE.BoxGeometry(t, t, len), mat);
-    mesh.position.copy(pa).add(pb).multiplyScalar(0.5);
-    mesh.quaternion.setFromUnitVectors(zAxis, dir.normalize());
-    mesh.renderOrder = 2;
-    group.add(mesh);
-  };
-  // 12 edges of user [0,F]³ — readable cube without slice walls / rings.
-  const corners = [
-    [0, 0],
-    [0, F],
-    [F, 0],
-    [F, F],
-  ];
-  for (const [x, y] of corners) addEdge({ s: 0, x, y }, { s: F, x, y });
-  for (const [s, y] of corners) addEdge({ s, x: 0, y }, { s, x: F, y });
-  for (const [s, x] of corners) addEdge({ s, x, y: 0 }, { s, x, y: F });
-  // Mid-face square at s = F/2 (anchor depth).
-  const mid = F / 2;
-  addEdge({ s: mid, x: 0, y: 0 }, { s: mid, x: F, y: 0 });
-  addEdge({ s: mid, x: F, y: 0 }, { s: mid, x: F, y: F });
-  addEdge({ s: mid, x: F, y: F }, { s: mid, x: 0, y: F });
-  addEdge({ s: mid, x: 0, y: F }, { s: mid, x: 0, y: 0 });
-  ctx.root.add(group);
-  ctx.shellFace = group;
 }
 
 function wrapLabelLines(ctx2d, text, maxWidth) {
@@ -343,11 +308,8 @@ function buildCube(ctx) {
   ctx.meshes = [];
   ctx.byId.clear();
   ctx.boxHelper = null;
-  ctx.shellFace = null;
 
-  // [C-CUBE] Shell: no C-SLICE walls, no C-RING guides — firm at (5,5,5) + thick wire cube.
-  if (state.shellCube) addShellWireCube(ctx);
-
+  // [C-CUBE] Shell: no C-SLICE walls, no C-RING guides, no thick bars — firm at (5,5,5). Outer frame is the thin Box3Helper only.
   if (!state.shellCube) {
     state.layers.forEach((L, i) => {
       const g = new THREE.Group();
@@ -430,14 +392,15 @@ function buildCube(ctx) {
     const r = pointRadius(c);
     // Shell: BasicMaterial — Standard+emissive reads as a soft fog blob at overview.
     const material = state.shellCube
-      ? new THREE.MeshBasicMaterial({
+        ? new THREE.MeshBasicMaterial({
           color,
           transparent: false,
           depthWrite: true,
           opacity: 1,
           toneMapped: false,
+          side: THREE.DoubleSide,
         })
-      : new THREE.MeshStandardMaterial({
+        : new THREE.MeshStandardMaterial({
           color,
           roughness: 0.22,
           metalness: 0.05,
@@ -446,8 +409,9 @@ function buildCube(ctx) {
           transparent: false,
           depthWrite: true,
           opacity: 1,
+          side: THREE.DoubleSide,
         });
-    const mesh = new THREE.Mesh(new THREE.SphereGeometry(r, 20, 16), material);
+    const mesh = new THREE.Mesh(new THREE.RingGeometry(r * 0.775, r, 64), material);
     mesh.userData.companyId = c.id;
     mesh.renderOrder = 5;
 
@@ -497,17 +461,8 @@ function layoutPlanes(ctx) {
     g.userData.exitX = stay != null && i !== stay ? exit : 0;
     placeSliceGroup(g, i);
   });
-  // Shell points + thick wire live on root — rebuild wire when d (gap) changes.
+  // Shell company points live on root — re-place when d (gap) changes.
   if (state.shellCube) {
-    if (ctx.shellFace) {
-      ctx.root.remove(ctx.shellFace);
-      ctx.shellFace.traverse((o) => {
-        o.geometry?.dispose?.();
-        o.material?.dispose?.();
-      });
-      ctx.shellFace = null;
-      addShellWireCube(ctx);
-    }
     state.companies.forEach((c) => {
       const mesh = ctx.byId.get(c.id);
       if (!mesh) return;

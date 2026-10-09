@@ -394,8 +394,21 @@ async function bootHome() {
   }
 }
 
+function wireBackspaceUp() {
+  window.addEventListener("keydown", (e) => {
+    if (e.key !== "Backspace" || e.ctrlKey || e.metaKey || e.altKey || e.isComposing) return;
+    const el = document.activeElement;
+    if (el && (el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.isContentEditable)) return;
+    e.preventDefault();
+    const links = document.getElementById("homeTrail")?.querySelectorAll("a");
+    const href = links?.length ? links[links.length - 1].getAttribute("href") : "";
+    if (href) location.assign(href);
+  });
+}
+
 mountHomeLocate();
 wireHomeLocate();
+wireBackspaceUp();
 bootHome();
 window.addEventListener("popstate", () => {
   loadBoard().then(() => {

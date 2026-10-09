@@ -1,6 +1,6 @@
 import { fetchBundle } from "./api.js?v=50";
 import { state, readHash, resolveBicsLabel } from "./state.js?v=50";
-import { createScene } from "./scene.js?v=50";
+import { createScene } from "./scene.js?v=53";
 import { createUI } from "./ui.js?v=53";
 
 const bootError = document.getElementById("bootError");
@@ -51,11 +51,23 @@ async function boot() {
     bootError.hidden = true;
     sceneApi.resize();
     requestAnimationFrame(() => sceneApi.resize());
+    wireShellBackspace();
   } catch (err) {
     app.hidden = true;
     showError(err);
     throw err;
   }
+}
+
+function wireShellBackspace() {
+  window.addEventListener("keydown", (e) => {
+    if (e.key !== "Backspace" || e.ctrlKey || e.metaKey || e.altKey || e.isComposing) return;
+    const el = document.activeElement;
+    if (el && (el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.isContentEditable)) return;
+    e.preventDefault();
+    const detail = state.shellCube ? state.companies[0]?.sourceDetail : "";
+    if (detail) location.assign("/list?bics=" + encodeURIComponent(detail));
+  });
 }
 
 boot();
