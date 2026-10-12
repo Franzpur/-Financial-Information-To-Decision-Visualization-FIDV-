@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>FIDV 计划书 · 第十七届工行杯 · 科技金融</title>
+<style>
+  :root {
+    --ink: #1a1f26;
+    --muted: #4a5560;
+    --rule: #c5ccd4;
+    --paper: #f7f5f0;
+    --fill: #ece8e0;
+  }
+  * { box-sizing: border-box; }
+  html { font-size: 11pt; }
+  body {
+    margin: 0 auto;
+    max-width: 180mm;
+    padding: 16mm 16mm 22mm;
+    color: var(--ink);
+    background: var(--paper);
+    font-family: "Iowan Old Style", "Palatino Linotype", Palatino, "Songti SC", "Noto Serif SC", serif;
+    line-height: 1.45;
+  }
+  h1 { font-size: 18pt; letter-spacing: 0.04em; margin: 0.2em 0 0.35em; font-weight: 600; }
+  h2 { font-size: 12.5pt; margin: 1.35em 0 0.4em; border-bottom: 1px solid var(--rule); padding-bottom: 0.2em; font-weight: 600; }
+  p, li { margin: 0.32em 0; }
+  .lede, .cover-meta { color: var(--muted); font-size: 10pt; }
+  .cover-mark {
+    margin: 0.15em 0 0;
+    font-size: 28pt;
+    font-weight: 600;
+    letter-spacing: 0.07em;
+    line-height: 1.1;
+  }
+  .cover-meta { margin: 0.8em 0 1.2em; }
+  .cover-meta div { margin: 0.15em 0; }
+  table { width: 100%; border-collapse: collapse; font-size: 9.5pt; margin: 0.5em 0 0.8em; page-break-inside: avoid; }
+  th, td { border: 1px solid var(--rule); padding: 0.28em 0.45em; text-align: left; vertical-align: top; }
+  th { background: var(--fill); font-weight: 600; }
+  code { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 0.88em; }
+  pre {
+    background: #efece6;
+    border: 1px solid var(--rule);
+    padding: 0.65em 0.85em;
+    font-size: 9pt;
+    line-height: 1.4;
+    overflow: auto;
+    page-break-inside: avoid;
+  }
+  ul, ol { padding-left: 1.2em; }
+  a { color: inherit; }
+  .foot { margin-top: 1.8em; font-size: 9pt; color: var(--muted); }
+  .no-print { margin: 0 0 1em; font-size: 10pt; color: var(--muted); }
+  @media print {
+    body { max-width: none; padding: 0; background: white; }
+    .no-print { display: none; }
+    a { color: inherit; text-decoration: none; }
+  }
+  @page { size: A4; margin: 14mm 14mm 16mm; }
+</style>
+</head>
+<body>
+  <p class="no-print">浏览器打开本页 → 打印 → 存 PDF → 关掉页眉网址。</p>
+
+  <p class="cover-mark">FIDV</p>
+  <h1>计划书</h1>
+  <p class="lede">Financial Information to Decision Visualization · 大量信息下的金融风险可视化辅助工具</p>
+  <div class="cover-meta">
+    <div>第十七届「工行杯」全国大学生金融科技创新大赛</div>
+    <div>方向：科技金融</div>
+    <div>日期：2026-10-09</div>
+    <div>提交物：计划书一份</div>
+  </div>
+
+  <h2>摘要</h2>
+  <p>FIDV 第一版只做一件事：帮金融工作者在大量信息里做判断。行业上注重人工智能相关的科技行业，判断上注重风险控制与债务风险，画面上以企业为节点。本计划对应大赛公布的十个方向中的科技金融，不把其余方向写成要做的内容。</p>
+  <p>本机已经有可打开的演示，地址是 <code>http://127.0.0.1:8787/</code>。一级到三级是同一块行业看板，四级格进入公司名单，名单中的一行进入该公司的立方体。首页搜索可以把公司名的中间片段命中，并把 ticker 写进框，再打开该公司主归属的四级名单。</p>
+  <p>设计里已经写明、演示里还没有的一步，是以企业为节点看债务风险怎么传导。现在的立方体能把一家公司放进行业坐标里查看，还不是一张债务传染图。把同一套查找扩到名单框和立方体搜索框的并法，尚未拍板。</p>
+
+  <h2>赛题与方向</h2>
+  <p>赛事事实以下表为准，口径来自大赛官网 <a href="https://www.gonghangbei.com/">https://www.gonghangbei.com/</a> 大赛介绍页，2026-10-09 所见。官网没有给出计划书的章节模板。业主说明本次提交的是这一份计划书。</p>
+  <table>
+    <thead>
+      <tr><th>项</th><th>官网所写</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>名称</td><td>第十七届「工行杯」全国大学生金融科技创新大赛</td></tr>
+      <tr><td>主办</td><td>中国工商银行股份有限公司</td></tr>
+      <tr><td>承办</td><td>三人行未来科技集团股份有限公司</td></tr>
+      <tr><td>主题</td><td>「数智银行、创见未来」</td></tr>
+      <tr><td>公布的方向</td><td>科技金融、绿色金融、普惠金融、养老金融、数字金融，以及金融安全服务、特色金融服务、财富管理服务、青年群体服务、开放创新服务</td></tr>
+      <tr><td>参赛</td><td>境内外高校在校本科、硕士、博士；个人或团队，团队不超过 3 人，指定队长</td></tr>
+      <tr><td>公布赛程</td><td>2026 年 5 月启动；宣讲、报名及作品提交 2026 年 5–9 月；省赛 2026 年 10 月；全国半决赛 11 月；总决赛 12 月。细节以公众号为准</td></tr>
+      <tr><td>奖励与原创</td><td>进入全国半决赛、总决赛的主创可获工行实习机会。特等奖 2 万元/组，一等奖 1 万，二等奖 5 千，三等奖 3 千。作品须原创</td></tr>
+    </tbody>
+  </table>
+  <p>本文撰写日是 2026-10-09，落在公布赛程中的省赛月份。介绍页没有写明这一天报名是否仍受理。本文只记录公布赛程，不把报名写成仍然开放，也不把提交写成已经错过。是否受理以主办方通知为准。</p>
+  <p>本计划只取科技金融。取这一向的理由只来自第一版设计，不另起一套说法：第一版帮金融工作者在大量信息里做判断；行业上注重人工智能相关科技行业；判断上注重风险控制与债务风险；可视化以企业为节点。其余九个方向是大赛公布的范围，不是本计划的工作内容。</p>
+
+  <h2>要解决的判断</h2>
+  <p>金融工作者面对的是大量公司与大量分类，而不是一张已经收好的结论。第一版要帮他做的判断是：在人工智能相关的科技行业里，一家公司落在哪一段行业，风险控制时先看什么。风险类型先看债务风险。可视化先把企业当成节点，而不是把行业画成一块与公司脱离的说明。</p>
+  <p>这个判断分成已经能看的一半，和还不能看的一半。已经能看的，是公司所在的行业坐标、主归属名单，以及立方体里的这一个企业节点。还不能看的，是债务风险怎样从这一个节点传到另一个节点。后一半写在下一节「还没做的那一步」，不写成已经完成。</p>
+
+  <h2>已有演示</h2>
+  <p>演示已经可以在本机打开，不是尚未开工的设想。评委在装有本仓库与本机数据的电脑上，按 <code>ind-chain/README.md</code> 的跑法启动，再用浏览器进入首页。</p>
+  <p>启动文件与 <code>ind-chain/</code> 同级，名为 <code>Standard-Cube.app</code>。三种开法：</p>
+  <ol>
+    <li>访达双击 <code>Standard-Cube.app</code>。集成窗打开后，点 Open homepage。Restart 会重新生成库并重载服务。Quit 停止服务并关闭窗口。</li>
+    <li>在 <code>ind-chain/</code> 目录执行：</li>
+  </ol>
+<pre>python3 scripts/launcher_gui.py</pre>
+  <ol start="3">
+    <li>不要窗口时，仍在 <code>ind-chain/</code> 目录执行：</li>
+  </ol>
+<pre>python3 scripts/seed.py &amp;&amp; python3 server/app.py</pre>
+  <p>然后打开 <code>http://127.0.0.1:8787/</code>。不要用浏览器直接打开仓库里的 html 文件。页眉没有进入立方体的按钮。地址 <code>http://127.0.0.1:8787/cube</code> 仍是一条演示用产业链，只能直接敲这个地址打开，不是从看板点进去的路径。</p>
+  <p>评委从首页往下走的路径如下。</p>
+  <table>
+    <thead>
+      <tr><th>步骤</th><th>画面</th><th>地址</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>1</td><td>一级到三级是同一块行业看板。格子上是四段行业坐标和该支下的公司家数。冷启动首页会先显示 FIDV 字标，停约 2 秒，再淡出约 4 秒，然后才是看板。</td><td><code>http://127.0.0.1:8787/</code><br /><code>/?bics=</code> 为二、三级</td></tr>
+      <tr><td>2</td><td>点四级格，进入该四级的公司名单。一行一个完整成员 ticker，且这一级须是它的主归属。</td><td><code>/list?bics=</code> 加四级代码</td></tr>
+      <tr><td>3</td><td>点名单中的一行，进入该公司的立方体。标准壳体不铺行业切片墙，这一家放在用户坐标 (5, 5, 5)。</td><td><code>/cube?ticker=</code></td></tr>
+    </tbody>
+  </table>
+  <p>路径上的四个概念，各用概念库里的一句：</p>
+  <ul>
+    <li>C-HOME：工程首页在 <code>/</code>，BICS 一级到三级是同一块看板，四级格进入四级公司名单。</li>
+    <li>C-LIST：四级公司名单在 <code>/list?bics=</code>，一行一家主归属公司；点行进入该公司立方体。</li>
+    <li>C-CUBE：从名单进入的是决策立方体页上的标准壳体，一家主归属公司放在用户坐标 (5, 5, 5)；裸地址 <code>/cube</code> 才是演示产业链。</li>
+    <li>C-POINT：公司点是贴在切片上、正对相机的环，环心与切片共面。</li>
+  </ul>
+  <p>首页搜索在一级到三级这块看板上，提示盖在页面上，不另开一页。输入至少两个字符后才列出匹配。上下键移动选中。Enter 把该条的 ticker 写进框，此时不跳转；再按一次 Enter，打开该公司主归属的四级名单，地址形如 <code>/list?bics=&lt;四级&gt;&amp;q=&lt;ticker&gt;</code>。用鼠标点中一条，效果与第一次 Enter 相同，只写入 ticker。公司名的匹配允许片段出现在名称中间，不要求从名称开头对齐。</p>
+  <p>四级名单可以用 Revenue 按主业行营收排序。排序用的是库里的美元原值，空值排在后面；再按一次回到原先的顺序。这一页不另换一套金额单位，库里的列不改写。立方体详情上的 B 是十亿美元：壳体上的数字由这笔原值除以十亿得到，只发生在立方体所用的数据里。</p>
+  <p>Backspace 在焦点不在输入框时，沿面包屑升一级：看板上回到上一级行业，名单上回到三级看板，公司立方体上回到该公司主归属的四级名单。焦点在输入框里时，Backspace 只删字。</p>
+  <p>企业点是正对视角的环，不是实心球。公司壳体上那组很宽的发光方条已经去掉，外框仍是细线。</p>
+  <p>行业坐标来自 BICS（Bloomberg BICS Equity Hierarchy 2024）。成员表来自本机 DATA-SPACE 的彭博拉取，在本机生成成员库之后由页面读取。这不是工商银行核心系统的对接，演示里也没有行内客户或信贷数据。</p>
+
+  <h2>坐标怎么承担判断</h2>
+  <p>设计要求同一概念只用一个名字，并且能用一根线、一个面、一个坐标说清。没有统一坐标，就没有可操作的视图。本演示里和判断有关的坐标是两套，名字不混用。</p>
+  <p>行业坐标是第三类坐标，来自 BICS，字段名仍是 <code>legalEntityCoord</code>。看板和名单用它回答：这家公司的主归属落在哪一段行业。它不参与立方体里的前后左右。立方体里的位置只用用户坐标 <code>(s, x, y)</code>。从名单点进公司时，壳体把这一家放在 (5, 5, 5)，让评委看见一个企业节点，而不是一整墙行业切片。</p>
+  <p>公司点（C-POINT）是正对视角的环。判断因此先落在三件已经能指认的事情上：这是哪一家，主归属的行业坐标是哪一段，以及它在立方体里是哪一个节点。债务风险是否以及如何从该节点传到其他节点，这两套坐标都还没有被用来画出来。</p>
+
+  <h2>还没做的那一步</h2>
+  <p>设计已经写明，可视化要看以企业为节点的风险扩散与传导，风险类型注重债务风险。演示还停在前一步：立方体能把一家公司放进行业坐标里查看，能在壳体里放下这一个节点，还不是一张债务传染图。</p>
+  <p>计划中的下一步就是这一步。仍以企业为节点，沿已有的行业坐标与立方体里的节点，看债务风险怎样从一家传到另一家。设计写明了要看的关系，没有写连线规则、阈值或专用数据字段。这些在动手之前仍要先写进设计。本文不把这一步写成已经做完，也不补一套尚未写明的算法。</p>
+  <p>另有一件相关、同样还没做完的事。首页查找已经能按公司名片段和 ticker 命中。把这套查找扩到四级名单上的筛选框，以及立方体页的搜索框，两处并法业主尚未拍板。计划只记录未拍板，不在这里选定其中一种。</p>
+
+  <h2>与工行场景的距离</h2>
+  <p>大赛主题是「数智银行、创见未来」。本演示可以拿来看科技行业里的企业节点：行业范围按设计落在人工智能相关的科技行业，路径是 BICS 看板、主归属名单和该公司立方体。</p>
+  <p>数据停在本机。行业分类是 BICS 层级，公司行是 DATA-SPACE 里的彭博拉取。尚未接入工商银行内部系统，不能代替行内的客户、信贷或风险数据。计划不把「可以查看公开分类下的公司节点」写成「已经接进行内系统」。</p>
+
+  <h2>原创与未提供事项</h2>
+  <p>大赛要求作品须原创。本计划描述的是本仓库里已经可以打开的演示，以及设计里已经写明、演示尚未做到的债务传导。文中不把公开的 BICS 分类标准或彭博拉取表说成自行发明的数据源。</p>
+  <p>下列事项材料里没有，本文不编：</p>
+  <table>
+    <thead>
+      <tr><th>事项</th><th>状态</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>学校</td><td>未提供</td></tr>
+      <tr><td>队伍成员、队长</td><td>未提供</td></tr>
+      <tr><td>指导教师</td><td>未提供</td></tr>
+      <tr><td>联系方式</td><td>未提供</td></tr>
+      <tr><td>市场规模、用户数、营收预测、专利</td><td>未提供</td></tr>
+    </tbody>
+  </table>
+  <p>官网没有计划书章节模板。本次按业主说明，只交这一份计划书。</p>
+
+  <p class="foot">依据：<code>agent_tasklist/DESIGN.md</code>；<code>ind-chain/README.md</code> 的开头与跑法；<code>ind-chain/CONCEPTS.md</code> 的 C-HOME、C-LIST、C-CUBE、C-POINT。行业坐标的层级说明另见 <code>class-3-coords/BICS-Classification/README.md</code>（BICS Equity Hierarchy 2024；不参与立方体摆放）。赛事口径：<a href="https://www.gonghangbei.com/">https://www.gonghangbei.com/</a> 大赛介绍页，2026-10-09 所见。</p>
+</body>
+</html>

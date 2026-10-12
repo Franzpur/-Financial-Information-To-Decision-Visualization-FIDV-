@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>头部投行的画图逻辑</title>
+<style>
+:root { --ink:#1a1f26; --muted:#4a5560; --rule:#c5ccd4; --paper:#f7f5f0; --fill:#ece8e0; }
+@page { size: A4; margin: 14mm 14mm 16mm; }
+* { box-sizing: border-box; }
+body {
+  margin: 0 auto; padding: 16mm 16mm 22mm; max-width: 180mm;
+  color: var(--ink); background: var(--paper);
+  font-family: "Iowan Old Style", "Palatino Linotype", Palatino, "Songti SC", "Noto Serif SC", serif;
+  font-size: 11pt; line-height: 1.45;
+}
+h1 { font-size: 18pt; font-weight: 600; letter-spacing: 0.04em; margin: 0.2em 0 0.3em; }
+.brand { letter-spacing: 0.07em; font-size: 13pt; margin: 0; }
+h2 { font-size: 12.5pt; border-bottom: 1px solid var(--rule); padding-bottom: 0.15em; margin-top: 1.35em; }
+p { margin: 0.45em 0; }
+.cover-meta, figcaption { color: var(--muted); }
+.cover-meta { font-size: 10pt; }
+.no-print { font-size: 10pt; color: var(--muted); border-bottom: 1px solid var(--rule); padding-bottom: 0.6em; margin-bottom: 1em; }
+table { width: 100%; border-collapse: collapse; font-size: 9.5pt; margin: 0.6em 0 1em; page-break-inside: avoid; }
+th, td { border: 1px solid var(--rule); padding: 0.28em 0.45em; text-align: left; vertical-align: top; }
+th { background: var(--fill); font-weight: 600; }
+figure { margin: 0.85em 0 1.15em; page-break-inside: avoid; }
+figure img { width: 100%; height: auto; border: 1px solid var(--rule); }
+figcaption { font-size: 9.5pt; margin-top: 0.28em; }
+code { font-family: "SF Mono", ui-monospace, Menlo, Consolas, monospace; font-size: 0.86em; }
+@media print {
+  body { background: white; }
+  .no-print { display: none; }
+  a { color: inherit; text-decoration: none; }
+}
+</style>
+</head>
+<body>
+<p class="no-print">浏览器打开此页 → 打印 → 存 PDF → 关掉页眉里的网址。</p>
+<p class="brand">FIDV</p>
+<h1>头部投行的画图逻辑</h1>
+<p class="cover-meta">内阁报告 · 2026-10-09 · 用来对照可视化工程 · 不含 Bloomberg Intelligence</p>
+
+<h2>这份报告要做什么</h2>
+<p>目的是看头部投行分析公司时怎样画图、图和判断怎样咬合，再决定 FIDV 的立方体该守住什么、该补哪一种并读。材料是去掉 Bloomberg Intelligence 之后留下的 91 份：瑞银、摩根大通、巴克莱、德银。图从这些研报的原页裁出。</p>
+<p>FIDV 第一版已经有的画面是：企业是切片上的环，环的位置由营收在本切片里的相对高低决定，名单上的收入排序用同一笔营收。设计上还要服务债务风险和以企业为节点的传导，这一步还没有画出来。下面的习惯都对着这个画面说。</p>
+
+<h2>他们一条图只问一个问题</h2>
+<p>瑞银和摩根大通的正文图带 Figure 编号。编号写明口径：谁的资本开支、哪一年、估计还是共识、毛额还是净额。一页上可以叠三四张，每张仍只问一句。快评和会议日记很少新画一张图，新事实留在句子里。</p>
+<p>立方体上的环现在也只问一句：这家公司的营收在本行业切片里站在哪里。这条和投行的习惯一致，应当守住。资本开支、积压、评级、兆瓦如果写进环的半径，一张图就开始同时回答好几句，读者无法知道环变大是因为收入，还是因为别的量。</p>
+<figure><img src="figures/0151.png" alt="云资本开支与英伟达数据中心收入并置"><figcaption>一页里有多张图，每张有自己的编号和口径。堆叠柱问开支落在谁身上；旁边的柱问开支和芯片收入是否同向。它们并读，不并成一根柱。</figcaption></figure>
+
+<h2>比较画在同一张图里</h2>
+<p>估计和共识、毛资本开支和净资本开支、当前估计和「还应达到的水平」，都画成同一坐标上的两列或两种颜色。读者不用记住上一页的数字再心算差额。公司用稳定的颜色穿过各年，同一家公司在 2018 和 2028 估计年是同一种色。</p>
+<p>FIDV 的上市地颜色已经有固定语义。公司之间的区分如果要加，应是另一套稳定标记，不借用上市地的颜色去表示买入或超配。两家卖方的分歧也不合成一种颜色：瑞银对 Alphabet 维持中性，摩根大通维持超配，这是两句判断，不是环的深浅。</p>
+<figure><img src="figures/0111.png" alt="毛资本开支与净资本开支"><figcaption>毛额和净额分列。两句可以同时成立：开支很大，现金开支没有看上去那么大。合成一个数会把这两句涂平。</figcaption></figure>
+<figure><img src="figures/0240.png" alt="共识资本开支强度"><figcaption>共识单独成图，和卖方自己的估计并排。差额留在两张图之间，不先减成一个「上修幅度」再只显示结果。</figcaption></figure>
+
+<h2>论点用路径，截面用来归档</h2>
+<p>他们用来下判断的图几乎都有年份：历史加上两三年估计。单一年的柱子用来归档，例如财务摘要、股价走势，放在文末，不承担这篇的新论点。风险出现在路径分叉的地方：开支的增量下来了，芯片收入的柱子还高。</p>
+<p>立方体是一个截面。名单按营收排序也是一个截面。截面回答「此刻谁大」。投行把「还在不在加」画成路径。路径若要进产品，是和环并读的另一条线，线的名字和营收分开。用这条线替换环，截面就没有了。</p>
+<figure><img src="figures/0066.png" alt="积压按年披露"><figcaption>积压按年排开。已签义务和当季收入是前后两句，图把年份留着，让人看见义务先于收入。</figcaption></figure>
+<figure><img src="figures/0100.png" alt="长期增长框架"><figcaption>长期框架和某一个季度分开画。一个季度的点回答不了路径。</figcaption></figure>
+<figure><img src="figures/0106.png" alt="长期每股收益框架"><figcaption>收入路径和每股收益路径再分开。增速不直接当成利润。</figcaption></figure>
+
+<h2>名字分开，尺度可以相同</h2>
+<p>积压、资本开支、收入都可以用十亿美元。他们仍给每个量自己的标题。积压约 5100 亿美元和当季云收入不是同一个数，也不放进同一根柱子的同一截。</p>
+<p>FIDV 里已经定过：界面上的 B 就是十亿，营收环用的是行业营收。积压如果以后出现，名字用积压，尺度仍可以是 B，不把积压加进营收再去排环。同一概念一个名字。营收环继续只吃营收。</p>
+<figure><img src="figures/0015.png" alt="云收入结构"><figcaption>收入再拆开。一个云增速旁边仍留着结构，避免一个总数把结构吃掉。</figcaption></figure>
+<figure><img src="figures/0098.png" alt="基础设施年化运行率"><figcaption>积压被收成可以和收入比较的速度。比较发生在两列之间，积压本身没有被改名叫收入。</figcaption></figure>
+
+<h2>问法变了，坐标就变</h2>
+<p>设备公司画份额和运行率，不画云厂商的积压。存储画谁拿走了高带宽内存的销售。托管画地点和兆瓦，点的大小是 IT 负荷，颜色分开已租和潜在。数据中心的近端产能可以是一张现场照片。这些都不是把公司环画得更大。</p>
+<p>FIDV 的坐标是行业切片上的位置。问法从「营收谁大」换成「电在哪、份额在谁」时，投行会换一张图。产品的约束是：新的问法仍要落在统一的三维坐标里，可以移动、可以导出，而不是在立方体旁边贴一张拆出去的地图。电力若要进立方体，它是一个已命名的坐标或一条已命名的线，不是一张外挂的底图。在这个坐标还没有之前，环不代替它。</p>
+<figure><img src="figures/0135.png" alt="出口与数据中心的季节性"><figcaption>月度回落画在季节性旁边。单独一个下跌的点，在他们的图里不足以写成需求转折。</figcaption></figure>
+<figure><img src="figures/0159.png" alt="晶圆设备份额"><figcaption>设备层用份额和运行率。问题换成「谁在供」，图就不再用云收入的柱。</figcaption></figure>
+<figure><img src="figures/0858.png" alt="高带宽内存份额"><figcaption>存储层用销售份额。短缺被画成谁拿走了供给。</figcaption></figure>
+<figure><img src="figures/0929.png" alt="电力管道"><figcaption>托管层用地点和电力管道。负荷和电是这张图的量，收入不是。</figcaption></figure>
+<figure><img src="figures/0143.png" alt="数据中心现场"><figcaption>产能也可以是现场。这张图不进入立方体的坐标，它说明投行在问「建到哪了」时会离开财务柱。</figcaption></figure>
+
+<h2>对可视化工程的用法</h2>
+<table>
+<thead><tr><th>投行的画法</th><th>立方体上对应的用法</th></tr></thead>
+<tbody>
+<tr><td>一条图只问一句，快评不新画图</td><td>环继续只表示营收在切片上的位置。一句新事实先进名单或详情的文字，不先发明一种新几何。</td></tr>
+<tr><td>两列并排，差额留给读者</td><td>第二个量用第二条已命名的线，和环放在同一空间里并读。不先减成一个综合分，再只用分去决定环的大小。</td></tr>
+<tr><td>论点是路径，截面用来归档</td><td>环和收入排序保留为截面。路径是另外一条线，不替换环。</td></tr>
+<tr><td>同尺度，不同名字</td><td>B 仍然只表示十亿。积压、资本开支若出现，各自留名，不加进营收环。</td></tr>
+<tr><td>问法变了就换坐标</td><td>份额、兆瓦、地点在进入产品时，必须是统一坐标上的位置或线。贴一张地图在立方体旁边，不符合「信息堆在同一个空间里」。</td></tr>
+<tr><td>两家卖方保持两句</td><td>中性与超配不合成环的颜色。上市地的颜色继续只表示上市地。</td></tr>
+</tbody>
+</table>
+<p>债务风险和传导是第一版要点名的判断，现在还没有画成节点之间的线。投行留下的股权图把资金争论写成资本开支路径和回报是否跟上，不把债务画进营收柱。所以传导若要做，是企业节点之间的另一条线，线的名字是债务或义务，不是把营收环涂成风险色。</p>
+
+<h2>这份对照没有做的事</h2>
+<p>没有改立方体的代码。没有把文末的股价走势和满页财务模型当成论点图。没有把 Bloomberg Intelligence 的利差曲线请回来充当「风险图」。那些图问的是债券价格，和这条股权画图逻辑不是同一套坐标。</p>
+</body></html>

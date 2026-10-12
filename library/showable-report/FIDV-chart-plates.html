@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>制图展开</title>
+<style>
+:root {
+  --ink: #1a1f26;
+  --muted: #4a5560;
+  --rule: #c5ccd4;
+  --paper: #f7f5f0;
+  --fill: #ece8e0;
+}
+@page { size: A4; margin: 14mm 14mm 16mm; }
+* { box-sizing: border-box; }
+body {
+  margin: 0 auto;
+  padding: 16mm 16mm 22mm;
+  max-width: 180mm;
+  color: var(--ink);
+  background: var(--paper);
+  font-family: "Iowan Old Style", "Palatino Linotype", Palatino, "Songti SC", "Noto Serif SC", serif;
+  font-size: 11pt;
+  line-height: 1.45;
+}
+.brand { letter-spacing: 0.07em; font-size: 11pt; margin: 0 0 0.4em; }
+h1 { font-size: 18pt; font-weight: 600; letter-spacing: 0.04em; margin: 0 0 0.2em; }
+.cover-meta { color: var(--muted); font-size: 10pt; margin: 0 0 1.2em; }
+figure { margin: 0 0 1.1em; page-break-inside: avoid; }
+img { width: 100%; height: auto; display: block; border: 1px solid var(--rule); }
+figcaption { color: var(--muted); font-size: 9.5pt; margin-top: 0.28em; }
+.no-print { color: var(--muted); font-size: 9.5pt; margin: 0 0 1em; }
+a { color: inherit; text-decoration: none; }
+@media print {
+  body { background: white; padding: 0; }
+  .no-print { display: none; }
+}
+</style>
+</head>
+<body>
+<p class="no-print">浏览器打开此页 → 打印 → 存 PDF → 关掉页眉里的网址。</p>
+<p class="brand">FIDV</p>
+<h1>制图展开</h1>
+<p class="cover-meta">2026-10-09</p>
+
+<figure>
+<img src="chart-plates/01-capex-stack.png" alt="云资本开支堆叠">
+<figcaption>云资本开支按公司堆叠。问支出落在谁身上。</figcaption>
+</figure>
+<figure>
+<img src="chart-plates/02-capex-vs-revenue.png" alt="开支与数据中心收入">
+<figcaption>开支与英伟达数据中心收入并置。问是否同向。</figcaption>
+</figure>
+<figure>
+<img src="chart-plates/03-consensus-intensity.png" alt="共识资本开支强度">
+<figcaption>共识资本开支强度单独成图，与卖方估计并排。</figcaption>
+</figure>
+<figure>
+<img src="chart-plates/04-capex-path.png" alt="另一期云资本开支">
+<figcaption>另一期的开支堆叠。先堆支出，再问芯片收入能不能跟上。</figcaption>
+</figure>
+<figure>
+<img src="chart-plates/05-jpm-gross-capex.png" alt="资本开支估计">
+<figcaption>资本开支写成还要上升的路径。</figcaption>
+</figure>
+<figure>
+<img src="chart-plates/06-gross-vs-net.png" alt="毛资本开支与净资本开支">
+<figcaption>毛资本开支与净资本开支分列。</figcaption>
+</figure>
+<figure>
+<img src="chart-plates/07-backlog.png" alt="收入积压">
+<figcaption>积压按披露时点排开。已签义务先于当季收入。</figcaption>
+</figure>
+<figure>
+<img src="chart-plates/08-cloud-stack.png" alt="云收入结构">
+<figcaption>云收入按结构拆开，不收成一个增速。</figcaption>
+</figure>
+<figure>
+<img src="chart-plates/09-run-rate.png" alt="基础设施年化运行率">
+<figcaption>基础设施年化运行率。积压收成可以和收入比较的速度。</figcaption>
+</figure>
+<figure>
+<img src="chart-plates/10-season.png" alt="出口月度季节性">
+<figcaption>出口月度变动对照季节。单独一个下跌不写成需求转折。</figcaption>
+</figure>
+<figure>
+<img src="chart-plates/11-export-gap.png" alt="收入与出口的差额">
+<figcaption>数据中心收入与台湾出口的差额。用来核对脉冲。</figcaption>
+</figure>
+<figure>
+<img src="chart-plates/12-gpu-mix.png" alt="GPU 出货量与结构">
+<figcaption>出货量按代际拆开。</figcaption>
+</figure>
+<figure>
+<img src="chart-plates/13-cowos.png" alt="CoWoS 产能份额">
+<figcaption>CoWoS 产能份额。供给是这组需求判断的下半张。</figcaption>
+</figure>
+<figure>
+<img src="chart-plates/14-oci-path.png" alt="长期增长框架">
+<figcaption>长期增长框架与卖方估计并排。路径，不是单季的点。</figcaption>
+</figure>
+<figure>
+<img src="chart-plates/15-eps-path.png" alt="长期每股收益框架">
+<figcaption>每股收益路径与收入路径分开。</figcaption>
+</figure>
+<figure>
+<img src="chart-plates/16-wfe-share.png" alt="晶圆设备份额">
+<figcaption>晶圆设备份额与运行率。问的是谁在供。</figcaption>
+</figure>
+<figure>
+<img src="chart-plates/17-logic-wfe.png" alt="代工与逻辑设备份额">
+<figcaption>代工与逻辑的设备份额。</figcaption>
+</figure>
+<figure>
+<img src="chart-plates/18-hbm.png" alt="高带宽内存份额">
+<figcaption>高带宽内存的销售份额。短缺画成谁拿走了供给。</figcaption>
+</figure>
+<figure>
+<img src="chart-plates/19-hut8.png" alt="Hut 8 数据中心足迹">
+<figcaption>Hut 8 的数据中心足迹。</figcaption>
+</figure>
+<figure>
+<img src="chart-plates/20-terawulf.png" alt="TeraWulf 数据中心足迹">
+<figcaption>TeraWulf 的数据中心足迹。已租和在建放在地点上。</figcaption>
+</figure>
+<figure>
+<img src="chart-plates/21-cipher.png" alt="得州电力管道">
+<figcaption>得州电力管道。这层的量是电。</figcaption>
+</figure>
+<figure>
+<img src="chart-plates/22-fairwater.png" alt="Fairwater 现场">
+<figcaption>Fairwater 亚特兰大现场。产能画成工地。</figcaption>
+</figure>
+</body>
+</html>

@@ -16,6 +16,7 @@ To standardly visualize statistics to fit human perception, so managers can make
 | [`class-3-coords/`](./class-3-coords/) | 3类坐标 / 行业坐标（BICS Equity Hierarchy 2024） |
 | [`ind-chain/`](./ind-chain/) | Decision view. Industry-chain cube (Standard-Cube). Firms are nodes on slices |
 | [`library/`](./library/) | 工作日志、可打印读本与运维记录 |
+| [`cabinet/`](./cabinet/) | 内阁整理数据、图件、新闻、分析报告；可打印报告在 `cabinet/reports/` |
 | [`ind-chain/CONCEPTS.md`](./ind-chain/CONCEPTS.md) | Concept library (ZH/EN): one name for slice, axes, pull |
 
 ### Run Standard-Cube

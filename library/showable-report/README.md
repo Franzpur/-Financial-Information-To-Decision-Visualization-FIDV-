@@ -2,6 +2,14 @@
 
 秘书工作区。可打印读本、讲稿、手册与依据材料。印法见项目 skill [`.cursor/skills/clerk-showable-report/SKILL.md`](../../.cursor/skills/clerk-showable-report/SKILL.md)。
 
+制图展开（2026-10-09）：
+
+- [`FIDV-chart-plates.html`](./FIDV-chart-plates.html) A4 纵向打印。配图 `chart-plates/`
+
+工行杯计划书（2026-10-09）：
+
+- [`FIDV-icbc-cup-plan.html`](./FIDV-icbc-cup-plan.html) A4 纵向打印。方向：科技金融
+
 队员入职 / 可打印发展史：
 
 - [`FIDV-engineering-history-report.md`](./FIDV-engineering-history-report.md) 读本

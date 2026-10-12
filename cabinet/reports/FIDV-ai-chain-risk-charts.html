@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>AI产业链及其风险：不含 Bloomberg Intelligence</title>
+<style>
+:root { --ink:#1a1f26; --muted:#4a5560; --rule:#c5ccd4; --paper:#f7f5f0; --fill:#ece8e0; }
+@page { size: A4; margin: 14mm 14mm 16mm; }
+* { box-sizing: border-box; }
+body {
+  margin: 0 auto; padding: 16mm 16mm 22mm; max-width: 180mm;
+  color: var(--ink); background: var(--paper);
+  font-family: "Iowan Old Style", "Palatino Linotype", Palatino, "Songti SC", "Noto Serif SC", serif;
+  font-size: 11pt; line-height: 1.45;
+}
+h1 { font-size: 18pt; font-weight: 600; letter-spacing: 0.04em; margin: 0.2em 0 0.3em; }
+.brand { letter-spacing: 0.07em; font-size: 13pt; margin: 0; }
+h2 { font-size: 12.5pt; border-bottom: 1px solid var(--rule); padding-bottom: 0.15em; margin-top: 1.35em; }
+p { margin: 0.45em 0; }
+.lede, .cover-meta, figcaption { color: var(--muted); }
+.cover-meta { font-size: 10pt; }
+.no-print { font-size: 10pt; color: var(--muted); border-bottom: 1px solid var(--rule); padding-bottom: 0.6em; margin-bottom: 1em; }
+table { width: 100%; border-collapse: collapse; font-size: 9.5pt; margin: 0.6em 0 1em; page-break-inside: avoid; }
+th, td { border: 1px solid var(--rule); padding: 0.28em 0.45em; text-align: left; vertical-align: top; }
+th { background: var(--fill); font-weight: 600; }
+figure { margin: 0.85em 0 1.15em; page-break-inside: avoid; }
+figure img { width: 100%; height: auto; border: 1px solid var(--rule); }
+figcaption { font-size: 9.5pt; margin-top: 0.28em; }
+code { font-family: "SF Mono", ui-monospace, Menlo, Consolas, monospace; font-size: 0.86em; }
+@media print {
+  body { background: white; }
+  .no-print { display: none; }
+  a { color: inherit; text-decoration: none; }
+}
+</style>
+</head>
+<body>
+<p class="no-print">浏览器打开此页 → 打印 → 存 PDF → 关掉页眉里的网址。</p>
+<p class="brand">FIDV</p>
+<h1>AI产业链及其风险</h1>
+<p class="cover-meta">内阁报告 · 2026-10-09 · 不含 Bloomberg Intelligence · 图从留下的研报原页裁出</p>
+
+<h2>拿掉了什么</h2>
+<p><code>BB_Research_Docs_Commitments/</code> 里 44 份是 Bloomberg Intelligence。这一夹整份退出。上一份分析用它们做的事也退出：租约调整后的债务存量、利差对期限的曲线、降级风险里的债券池、贷款价值比，都不再作为这份结论的依据。</p>
+<p>留下 91 份。作者是瑞银、摩根大通、巴克莱、德银。其中一份与 9 月 10 日瑞银甲骨文《AI Bends the Growth Curve Higher》重复。股权作者自己写下的融资句子仍然留着，例如甲骨文 2026 年的筹资说明、Alphabet 的股权增发。那是他们的文字，不是彭博情报的信用短笺。</p>
+
+<h2>结论</h2>
+<p>这组研报把需求写成还在，把限制写成供给。内存、电力、设备和机架交付，比订单消失更常被写成瓶颈。云的变现已经被积压和增速画出来。还开着的争论是资本开支还要加多少，以及这些开支的回报能不能在利润率和自由现金流里看见。</p>
+<p>卖方之间的分歧主要在 Alphabet，不在需求有没有。瑞银承认搜索和云的变现，同时把 2026 年资本开支指引远高于原先预期写成风险收益上的保留，评级维持中性。摩根大通同期维持超配，并把大规模资本开支写成从强势位置出发。甲骨文两边后来都是买入或超配：增长加速被写成已经发生，资金需求被写成还在争论，但不再用信用短笺的曲线来收束。</p>
+<p>产业链因此分成三层。上面是英伟达和云厂商的订单与积压。中间是晶圆设备、存储和出口。下面是电力和托管，时间闸门是拿到电，不是拿到意向订单。</p>
+
+<table>
+<thead><tr><th>层</th><th>这组研报怎么写</th><th>风险被放在哪里</th></tr></thead>
+<tbody>
+<tr><td>需求与积压</td><td>英伟达积压口径在 GTC 从先前的 5000 亿美元（不含 Hopper，2025–2026）改写成 2025–2027 年 1 万亿美元以上。台湾出口的月度回落被反复写成季节性正常化。</td><td>毛利率。内存涨价被写成近端压力。需求本身不被写成已经打断。</td></tr>
+<tr><td>云的变现</td><td>Alphabet 云积压从 2025 年四季度约 2400 亿美元，到 2026 年一季度约 4600 亿美元，再到二季度约 5100 亿美元。甲骨文 9 月当季收入增速约 30%，云基础设施恒定汇率约 120%，新增约 850 兆瓦。</td><td>资本开支还要上修多少，自由现金流何时跟上。瑞银对 Alphabet 更保留，摩根大通维持超配。</td></tr>
+<tr><td>电力与托管</td><td>瑞银首次覆盖五家托管股（HUT、WULF、APLD、CORZ、CIFR）给买入。已租容量约 5 吉瓦，合同收入约 1250 亿美元，另有约 12 吉瓦的扩展。</td><td>交付和杠杆。电够不够，比需求叙事更接近这层的风险。</td></tr>
+</tbody>
+</table>
+
+<h2>需求：月度波动被画成季节</h2>
+<p>瑞银对英伟达全年维持买入。1 月 CES 之后，需求被写成足以推动 2026 和 2027 自然年盈利上修。2 月业绩指引收入 780 亿美元，高于该分析师听到的市场期待，积压看到 2027 年，存货采购承诺环比接近翻倍。3 月 GTC 把积压口径从先前 5000 亿美元（不含 Hopper，覆盖 2025–2026）更新为 2025–2027 年 1 万亿美元以上。按瑞银自己远高于市场的模型，这张新图对应的 2027 年数据中心收入仍比他们的模型低约 600 亿美元，但他们认为交期还够，新订单还能加进去。会场侧记里，新云厂商各代 GPU 利用率被说成满载。</p>
+<p>台湾出口月度数据多次低于季节性。瑞银每次都把回落写成正常化，不写成需求转折。德银 8 月 31 日的半导体会议纪要写的是全行业：公司谈基本面稳，投资者更悲观，悲观来自周期见顶、DRAM 价格和内存墙。纪要里的句子是，AI 计算需求没有放慢；投资者当时假设 2027 年超大规模云资本开支约 1.2 万亿到 1.5 万亿美元，高于 2026 年约 8000 亿美元；限制在内存，其次在电力。</p>
+<p>8 月英伟达业绩后，瑞银写道公司开始对 2027 自然年给出更明确的指引，即便内存涨价压毛利率，指引下的每股收益仍高于 16 美元。9 月回购授权增加 1500 亿美元、至 2350 亿美元，对瑞银 2027 自然年每股收益估计只增加约 0.08 美元。</p>
+<figure><img src="figures/0135.png" alt="台湾出口与英伟达数据中心的季节性"><figcaption>瑞银把英伟达数据中心和台湾出口（扣除笔记本）画成季节性。月度跌幅在这张图里不是需求转折。</figcaption></figure>
+<figure><img src="figures/0136.png" alt="英伟达数据中心收入与台湾出口的差额"><figcaption>同一组笔记里，收入和出口的差额被单独画出来，用来核对脉冲，不用来改需求判断。</figcaption></figure>
+<figure><img src="figures/0146.png" alt="英伟达 GPU 出货量与结构"><figcaption>出货量按代际拆开。需求被画成结构变化，不是一根总销量。</figcaption></figure>
+<figure><img src="figures/0162.png" alt="瑞银 GPU 预测"><figcaption>GPU 预测图。供给和代际，是这组笔记里需求判断的下半张图。</figcaption></figure>
+
+<h2>资本开支还在堆高</h2>
+<p>留下的图几乎都在做同一件事：把云厂商的资本开支叠在一起，再把英伟达数据中心收入放在旁边。瑞银的堆叠里，2026 到 2028 估计年的柱子明显高于 2025。增量支出和英伟达收入在较远的年份不再同向：支出的增量回落时，收入柱仍高。股权笔记把风险画成支出还会不会继续抬高芯片收入。</p>
+<p>Alphabet 是这张图里最清楚的分歧。2 月瑞银的一季快评写下 2026 年资本开支指引 1750 亿到 1800 亿美元，当时共识约 1180 亿美元，瑞银自己原先约 1250 亿美元。积压和搜索超预期被承认。6 月拟议约 800 亿美元股权融资，伯克希尔约 100 亿美元参与。瑞银把稀释和 2027 年以后可能更高的资本开支写成负面，把伯克希尔入股写成对资本开支回报的背书，评级仍是中性。摩根大通 2 月把同一轮资本开支写成从强势位置出发，维持超配；4 月底目标价从 395 美元调到 460 美元；7 月业绩后目标价改到 420 美元，仍写逢低买入。</p>
+<figure><img src="figures/0151.png" alt="瑞银超大规模云资本开支与英伟达数据中心收入"><figcaption>瑞银：云资本开支堆叠，以及开支与英伟达数据中心收入、GPU 和 ASIC 的并置。2026–2028 估计年的柱子是这组笔记的主图。</figcaption></figure>
+<figure><img src="figures/0240.png" alt="美国四大云厂商共识资本开支强度"><figcaption>共识侧的资本开支强度。和上一张估计图并排，才看得出卖方有没有跑在共识前面。</figcaption></figure>
+<figure><img src="figures/0230.png" alt="瑞银超大规模云资本开支"><figcaption>另一期的资本开支估计。同一张习惯反复出现：先堆支出，再问芯片收入能不能跟上。</figcaption></figure>
+<figure><img src="figures/0108.png" alt="摩根大通资本开支估计"><figcaption>摩根大通的资本开支估计。超配的前提下，开支被画成还要上升的路径，不是已经见顶的路径。</figcaption></figure>
+<figure><img src="figures/0111.png" alt="摩根大通毛资本开支与净资本开支"><figcaption>毛资本开支和净资本开支分开。股权笔记用这张图处理「开支很大」和「现金开支没有看上去那么大」这两句同时成立的情况。</figcaption></figure>
+
+<h2>云的积压已经能点名</h2>
+<p>Alphabet 的云积压是这组里最完整的一条序列。瑞银 4 月一季度快评写下约 4600 亿美元，对比 2025 年四季度约 2400 亿美元，云收入增速约 63%。7 月二季度快评写下约 5100 亿美元，对比一季度约 4620 亿美元，云利润率从 32% 到 36%。瑞银因此认为每股收益在 2026 年下半年仍能增长，同时在随后的正式点评里把资本开支强度上调和招聘写成利润率的拖累。4 月一条快评写 Alphabet 拟向 Anthropic 投资 100 亿美元，另有 300 亿美元视目标而定，并类比 AWS 的吉瓦级容量，认为有可能再增加约 1000 亿美元云积压。这是可能性，不是已披露的积压。</p>
+<p>微软全年买入。1 月季报后 Azure 恒定汇率约增 38%，略低于该分析师所说的 39% 市场期待，M365 也没有给到他们的估计。7 月底季报后，Azure 实际与指引约 43% 和 45%，高于约 41% 和 42% 的期待，并且资本开支指引没有再上调。瑞银把这组结果写成更干净的公式：云增速上来，资本开支不再跟着加。威斯康星和亚特兰大的 Fairwater 数据中心被写成 Azure 的近端产能，笔记里用了现场照片。</p>
+<figure><img src="figures/0066.png" alt="收入积压披露"><figcaption>积压按年披露。云的变现在股权笔记里先写成已经签下的义务，再写成当季收入。</figcaption></figure>
+<figure><img src="figures/0015.png" alt="Google Cloud 收入结构"><figcaption>Google Cloud 的收入结构。积压之外，他们仍把收入拆开，避免只用一个增速。</figcaption></figure>
+<figure><img src="figures/0098.png" alt="基础设施业务年化运行率"><figcaption>超大规模云基础设施业务的年化运行率。用来把积压收成可以和收入比较的速度。</figcaption></figure>
+<figure><img src="figures/0143.png" alt="亚特兰大 Fairwater 现场"><figcaption>瑞银在亚特兰大 Fairwater 的现场照片。微软这条线上，产能被画成工地，不是债券。</figcaption></figure>
+
+<h2>甲骨文：增长写清楚了，资金仍是他们自己的争论</h2>
+<p>瑞银对甲骨文从 1 月到 9 月维持买入。1 月的题目是股价自 9 月中旬高点回落约 41%，以及 OpenAI 叙事。2 月公司在发债前说明 2026 年筹资约 450 亿到 500 亿美元，债务与股权大致各半，并承诺维持投资级。瑞银把这次说明写成融资风险缓和。6 月业绩后，瑞银认为盘后下跌过重，资本开支高峰被写成在望。8 月股价在 5 月季报后再跌约 27%，作者列出的担忧包括 AI 基础设施资本开支、回报率、大型数据中心新债的信贷市场紧张，以及在建站点延期。9 月一季度：收入增速约 30%，一年前约 11%；云基础设施恒定汇率约增 120%，作者原先假设增速持平；新增约 850 兆瓦；2027 财年资本开支指引重申 900 亿到 950 亿美元，美元资本开支高峰在 2027 或 2028 财年；200 亿美元增发完成，并重申本自然年不再额外融资；GPU 续约和转售价格上浮 20% 以上。负面是 2027 财年收入指引没有上调。</p>
+<p>摩根大通 3 月 9 日仍是中性。3 月 11 日改为超配，当时股价 149.40 美元，12 月目标价从 230 美元降到 210 美元。升级理由是大跌之后预期已经很悲观，以及加速开始兑现。9 月一季度点评维持超配，12 月 2027 年目标价 200 美元。标题里的两句是：三位数的基础设施增速，再加上 260 亿美元积压，把收入路径写实了；资金仍是争论点。</p>
+<p>这份结论停在这里。甲骨文的租约总规模、调整后债务在信用发行人里的位置、信用违约互换，来自已经拿掉的那 44 份，不再写入。</p>
+<figure><img src="figures/0100.png" alt="摩根大通与甲骨文长期增长框架"><figcaption>摩根大通把甲骨文云基础设施的长期增长框架和自己的估计放在一起。超配写的是路径，不是这一季的单点。</figcaption></figure>
+<figure><img src="figures/0106.png" alt="摩根大通与甲骨文长期每股收益框架"><figcaption>同一组笔记里的每股收益框架。增长路径和每股收益路径分两张图，避免用收入增速直接代替利润。</figcaption></figure>
+
+<h2>供给和电：订单下面的两层</h2>
+<p>应用材料全年买入。2 月系统和晶圆设备的语气被写成与同业相近，系统业务指引至少同比增长 20%。5 月的题目是晶圆设备超级周期，增长主要卡在供应链能转多快，并写下约 27 美元每股收益的路径。8 月指引平淡、毛利率评论偏弱，买入仍在。这层的风险是交付速度和利润率，不是需求消失。</p>
+<p>存储在留下的笔记里是短缺，不是过剩。摩根大通 9 月首次覆盖海力士 ADR，超配，目标价 245 美元，当时价格 185.55 美元。英飞凌汽车业务的客户被写成因为数据中心挤占供给而补库存。德银纪要把内存和电力写成瓶颈，和这两条是同一方向。</p>
+<p>托管是瑞银 9 月 22 日首次覆盖的五家：HUT、WULF、APLD、CORZ、CIFR，都是买入。已租容量约 5 吉瓦，合同收入约 1250 亿美元，扩展机会另约 12 吉瓦。他们估计 2028 到 2030 年全球新数据中心容量约 260 吉瓦。股价大致反映已签约资产。风险写成早期、有杠杆，以及能不能把电力管道变成长期合同。图是地图和兆瓦，不是收入柱。</p>
+<p>阿卡迈不在这五家里。摩根大通维持中性，目标价调到 167 美元。Anthropic 的 116 亿美元、多年 CPU 合同使 2026 年已签容量合同达到 144 亿美元。可见度上来了，资本开支相对收入的时点仍是限制。2027 年调整后每股收益估计从 7.29 美元降到 6.06 美元。</p>
+<figure><img src="figures/0159.png" alt="晶圆设备份额"><figcaption>头部设备公司的季度晶圆设备份额。超级周期在这张图里是份额和运行率，不是一句需求。</figcaption></figure>
+<figure><img src="figures/0160.png" alt="代工与逻辑晶圆设备份额"><figcaption>代工和逻辑的设备份额。应用材料这条线用份额图支持先进逻辑还能多拿，不用云厂商的积压图。</figcaption></figure>
+<figure><img src="figures/0858.png" alt="高带宽内存市场份额"><figcaption>高带宽内存的销售份额。存储被画成谁拿走了短缺。</figcaption></figure>
+<figure><img src="figures/0912.png" alt="Hut 8 数据中心分布"><figcaption>Hut 8 的数据中心分布。托管覆盖用足迹图开篇。</figcaption></figure>
+<figure><img src="figures/0916.png" alt="TeraWulf 数据中心分布"><figcaption>TeraWulf 的分布。已租和在建被放在地点上。</figcaption></figure>
+<figure><img src="figures/0929.png" alt="Cipher 在得州的电力管道"><figcaption>Cipher 在得州的电力管道。这层的风险被画成电，不是画成云收入增速。</figcaption></figure>
+
+<h2>这份结论没有做的事</h2>
+<p>没有把瑞银的中性和摩根大通的超配合成一个评级。没有把英伟达的积压口径换成公司已确认的 2027 年收入。没有把托管合同收入写成云厂商已经付清的现金。没有把德银纪要里投资者假设的 1.2 万亿到 1.5 万亿美元资本开支写成公司指引。</p>
+<p>Bloomberg Intelligence 那 44 份仍在 <code>cabinet/BB_Research_Docs_Commitments/</code>，只是不再进入这份结论。</p>
+</body></html>
