@@ -21,3 +21,5 @@
 |195| 公私隔离协议里 worklog 是必然要交的。 | 已写明 PUBLIC-PRIVATE 上传检查：library/worklog* 每次必交；并 push 4a2d843（含积压 #194）。无子代理。复杂度 1。执行 未提供。 |
 |196| 电总参谋部：切片外浅框超出 0～10，d=0 更明显，去掉。 | 意志：整层去掉 Box3Helper 外线框。主代理：删 syncFrame/placeFrame/framePad。三监通过。未提交。复杂度 2。执行 未提供。 |
 |197| 系统通知：8787 后台服务 exit 143。 | 143 为进程被结束；已重新拉起 ind-chain 8787。未改产品代码。无子代理。复杂度 0。执行 未提供。 |
+|198| 电总参谋部：sonar提出的problem，解决之。 | 意志：消 SonarLint。主代理：cube.html 去 ARIA listbox/option/slider、原生 d range+label；app.py 拆 NVDA/实体/API 降认知复杂度；三监第2次通过。未提交（外框改动仍同树）。复杂度 6。执行 未提供。 |
+|199| 系统通知：8787 两次重启任务 exit 143。 | 143 为换进程时被结束；现 8787 仍在听（健康 200）。未改代码。无子代理。复杂度 0。执行 未提供。 |
