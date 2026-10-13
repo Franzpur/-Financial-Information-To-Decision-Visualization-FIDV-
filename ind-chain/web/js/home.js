@@ -45,6 +45,11 @@ function cubeHref() {
   return "/cube";
 }
 
+/** Alt locate token: bare demo cube (not company→cube). */
+function isDemoCubeQuery(q) {
+  return String(q || "").trim().toLowerCase() === "/cube";
+}
+
 function skipSplash() {
   return Boolean(currentBics()) || sessionStorage.getItem("fidvSplashSeen") === "1";
 }
@@ -115,6 +120,12 @@ function wireHomeLocate() {
   };
 
   const commitRow = (row) => {
+    if (row?.dataset.href === cubeHref()) {
+      clearTimeout(timer);
+      seq += 1;
+      location.assign(cubeHref());
+      return;
+    }
     const ticker = row?.dataset.ticker || "";
     const bics = row?.dataset.bics || "";
     if (!ticker || !bics) return;
@@ -136,6 +147,12 @@ function wireHomeLocate() {
     if (q.length < 2) {
       box.hidden = true;
       box.replaceChildren();
+      return;
+    }
+    if (isDemoCubeQuery(q)) {
+      seq += 1;
+      paintDemoCubeRow(box);
+      hi = -1;
       return;
     }
     const token = ++seq;
@@ -160,6 +177,13 @@ function wireHomeLocate() {
     }
     if (e.key !== "Enter") return;
     e.preventDefault();
+    if (isDemoCubeQuery(input.value) && open) {
+      const row = hi >= 0 ? suggestionRows()[hi] : suggestionRows()[0];
+      if (row) {
+        commitRow(row);
+        return;
+      }
+    }
     if (open && hi >= 0 && suggestionRows()[hi]) {
       commitRow(suggestionRows()[hi]);
       return;
@@ -182,8 +206,24 @@ function wireHomeLocate() {
   });
 }
 
+function paintDemoCubeRow(box) {
+  if (!box) return;
+  box.hidden = false;
+  box.innerHTML =
+    `<button type="button" class="home-locate-row" data-href="${escapeHtml(cubeHref())}">` +
+    `<span class="home-locate-name">Demo cube</span>` +
+    `<span class="home-locate-ticker">/cube</span>` +
+    `<span class="home-locate-coord">bare demo chain</span>` +
+    `</button>`;
+}
+
 async function searchLocate(token, q, current, box) {
   if (!box) return;
+  if (isDemoCubeQuery(q)) {
+    if (token !== current()) return;
+    paintDemoCubeRow(box);
+    return;
+  }
   let data;
   try {
     const res = await fetch(`/api/bics/locate?q=${encodeURIComponent(q)}`);

@@ -31,18 +31,20 @@
 |----|----|----|----------------|-------------------------|
 | **C-CUBE** | industry-chain cube | 产业链立方体 | Whole 3D stack of slices along **s** | `buildCube`, `root` |
 | **C-SLICE** | slice / layer / plane | 切片 / 层 / 平面 | One YZ wall = one industry stage; index `i` = user **s\*** | `planeGroups[i]`, `state.layers[i]`, `state.focusLayer` |
-| **C-POINT** | company point / ring | 点球 / 公司点 | One company on a slice; camera-facing ring; **center coplanar** with slice | `ctx.meshes`, `ctx.byId` |
+| **C-POINT** | company point / ring | 点球 / 公司点 | One company on a slice; ring **parallel and coplanar** with the slice face (YZ, same as C-SLICE); **not** camera billboard | `ctx.meshes`, `ctx.byId` |
 | **C-RING** | concentric ring | 同心环 / 营收环 | In-slice radius from revenue score 0–100; ring 10 = exact center | `revScore`, `ring`, ring guides |
 | **C-SUPPLY** | optional supply field | 可选供应字段 | Optional `valueM` on a company record may still come from legacy tables. **Not drawn** as a gold ring; no Alphabet-only filter. | `valueM` |
 | **C-LABEL** | coplanar label | 共面标签 | Domain/company text glued to slice (not billboard) | `isDomainLabel`, company label planes |
 | **C-EDGE** | slice edge | 切片描边 | Slice outline in resting blue (`COLORS.EDGE`); focus does not recolor it | `isSliceEdge` |
+| **C-REV-LINK** | named revenue line | 收入线 | **NVDA chain** (`/cube?ticker=NVDA`): **dynamic** **C-SLICE** walls — one slice per distinct primary **BICS L4** among center + peers; slice `name` = L4 classification name (e.g. SLB `13101111` → Oilfield Services & Equipment). Peers are real **C-POINT**s on their L4 slice. Edges are **point-to-point** (`COLORS.EDGE`) from NVDA to each peer; label shows spend% (supplier) or rev% (customer) when known. Data: `data/nvda-revenue-links.json` (tickers only; no demo `layerId` bridge). Fan/sector shell draw abolished for NVDA. Other `?ticker=` shells stay empty-wall. Updated 2026-10-13. | `buildRevenueLinks`, `bundle_nvda_chain` |
+
 | **C-AXES** | user axes | 用户坐标轴 | **s/y/x** in ring-matched ice/steel blues from user origin | `rebuildAxes`, `axesGroup` |
 | **C-COORD** | position coordinate `(s, x, y)` | 1类坐标 / 位置坐标 | User coordinate. The only placement language in the cube. `x` and `y` mean only this. Edit `LAYOUT` or an object's coord; do not place with raw Three XYZ | `coords.js`, `applyCoord`, `applySliceCoord` |
 
 **Synonyms to normalize / 口语归一**
 
 - 切片 = slice = layer = 层 = plane（无常驻层列表；切层靠点面 / `[` `]` / 搜索）  
-- 点球 = 点 = 正对相机的环 = company point  
+- 点球 = 点 = 与切片共面的环 = company point  
 - 环 = concentric ring（营收尺度；不是供应商金环；金环视觉已废）  
 - 布局坐标 = 用户坐标 = 1类坐标 = 位置坐标 `(s, x, y)`  
 - 环上坐标 = 2类坐标 = 相对坐标 `ringCos` / `ringSin`  
@@ -95,8 +97,8 @@ Position changes go through `ind-chain/web/js/coords.js` (`LAYOUT`, or an object
 | **C-SELECT** | selected company | 选中公司 | `state.selectedId` | Detail panel; stronger emissive. Esc clears this first. |
 | **C-HOVER** | hover | 悬停 | `state.hoverId` | Tooltip only. |
 | **C-DIM** | off-focus fade | 离焦淡出 / 抽回淡入 | — | Non-focus slices fade to opacity 0. Retract fades back to resting opacity on the same lerp as exit. Materials stay `transparent` while fading. |
-| **C-FILTER** | filter mode | 过滤 | `state.filterMode` | `all` / `us` / `intl`. |
-| **C-D** | slice gap factor | 切片间距 d | `state.d` | Default **1** (= 100%). Meters between slices = `d · UNIT`. UI slider 0%–200% → `d ∈ [0, 2]`. Replaces former explode toggle. |
+| **C-FILTER** | filter mode | 过滤 | `state.filterMode` | `all` / `us` / `intl`. Cube chrome: top-left **Filter** face + dropdown (All / US only / Non-US only); not HUD filter chips. |
+| **C-D** | slice gap factor | 切片间距 d | `state.d` | Default **1** (= 100%). Meters between slices = `d · UNIT`. UI 0%–200% → `d ∈ [0, 2]`; bottom-right glass box; **inverted-triangle is the drag handle** (not decoration); snaps near **25 / 50 / 75 / 100 / 125 / 150 / 175 / 200%** (±4%). No bottom status line. |
 
 **Esc hierarchy / Esc 分层** `[C-ESC]`  
 1) clear **select** → 2) clear **focus** → keep camera.
@@ -111,12 +113,13 @@ Position changes go through `ind-chain/web/js/coords.js` (`LAYOUT`, or an object
 | **C-RETRACT** | retract | 抽回 | Focus cleared; the cube eases back along **+x** and fades in on the same timing as exit fade-out (`lerpPullOut` + `lerpVisibility`). **Camera must not auto-yaw toward origin.** | `focusSlice` toggle / `clearFocus` |
 | **C-PULL-ZONE** | pull-frame hit zone | 抽出点击区 | Square∖disk on slice face: inside 1×1 square, **outside** outermost concentric ring. Misses inside the ring do **not** toggle focus. Tested in user `(s, x, y)`. | `isPullFrameHit`, `LAYOUT.ringRadius` |
 | **C-FOCUS-ACT** | focus slice | 聚焦切片 | Set `focusLayer`; the slice stays, the cube exits. Via plane click, `[` `]`, or pick/search a company on that slice. No permanent layer-list chrome. | `focusSlice` |
-| **C-PICK** | pick company | 点选公司 | Raycast the company ring → select + focus its layer. Plane toggle only if hit is in **C-PULL-ZONE**. | `pick`, `selectCompany` |
-| **C-STDVIEW** | standard view | 标准视角 | Snap camera to canonical pose for current focus state. Hotkey **C** / button / middle-click. | `goStandardView`, `standardPose` |
-| **C-RESET** | reset view | 重置 | Clear focus/select; go standard overview pose. | `resetCamera` |
+| **C-PICK** | pick company | 点选公司 | Raycast the company ring → select + focus its layer. Plane toggle only if hit is in **C-PULL-ZONE**. Ring pick / roster row: camera held; right detail only. Search-result pick → **C-STDVIEW** then **C-COMPANY-ZOOM**. | `pick`, `selectCompany` |
+| **C-COMPANY-ZOOM** | company focus stage | 公司放大聚焦 | `#viewport.company-zoom` + `#companyFocus` | **Search-open path only** (after C-STDVIEW). Plane / roster select does not open it. If `bondSchedule` exists, bottom sparkline (time × $bn). Close via ×, blank glass, or Esc. | `enterCompanyZoom`, `bondChart.js` |
+| **C-STDVIEW** | standard view | 标准视角 | Snap camera to canonical pose for current focus state. Hotkey **C** / middle-click (no HUD button). Search-result pick also runs it before **C-COMPANY-ZOOM**. | `goStandardView`, `standardPose` |
+| **C-RESET** | reset view | 重置 | Clear focus/select; go standard overview pose. Code path only (`resetCamera`); no HUD button. Layered clear for users: **Esc** then **C** as needed. | `resetCamera` |
 
 **Camera rule / 相机约定** `[C-CAM-HOLD]`  
-Changing or clearing slice focus **must not** animate orbit target into the cube interior. Only **C-STDVIEW** / **C-RESET** / explicit pick framing may move the camera.
+Changing or clearing slice focus **must not** animate orbit target into the cube interior. Only **C-STDVIEW** / **C-RESET** may move the camera. Company pick holds the camera; a **search-result** pick runs **C-STDVIEW** to the company's focused slice.
 
 **View space / 视空间** `[C-VIEW-SPACE]`  
 Orbit dolly (wheel / **R·F**) clamps at `controls.maxDistance = LAYOUT.viewSpace.radius · UNIT`. Standard poses stay inside the ball (`‖overview‖≈38 < 200`). This edition limits distance to `target`, not a hard shell about the origin after pan.
@@ -151,7 +154,9 @@ Removed / 已废弃：旧「角视图 corner view」与 **V / Home** 绑定（�
 | **[ / ]** | prev/next focus slice | **C-FOCUS-ACT** + **C-PULL** |
 | **Esc** | layered clear | **C-ESC** |
 | **?** | help overlay | Default **closed**; chrome is floating over the full-bleed cube (no solid sidebars) |
-| HUD **d** slider | slice spacing 0%–200% | **C-D** |
+| Bottom-right **d** box | slice spacing 0%–200% + 25% snaps | **C-D** |
+| Top-left **Filter** dropdown | `all` / `us` / `intl` | **C-FILTER** |
+| Top-right **Home** | engineering homepage `/` | — |
 | Click slice **frame** (square∖ring) | focus/toggle that slice | **C-FOCUS-ACT** / **C-PULL-ZONE** |
 | Double-click empty | clear focus | **C-RETRACT** path |
 | Click company point | select | **C-PICK** |
@@ -165,10 +170,10 @@ Removed / 已废弃：旧「角视图 corner view」与 **V / Home** 绑定（�
 | **C-LAYER-DATA** | layer record | 层数据 | `layers.json` / API; order 0 Power → 10 Models |
 | **C-COMPANY** | company record | 公司 | `revBn`, `revScore`, `ring`, `ringCos`, `ringSin`, `country`, optional `valueM`, optional `legalEntityCoord` / industry code (empty until attached). `revBn` is billions of USD in both chains, and the detail label B is that billion. Demo-chain `revBn` is illustrative. Shell `revBn` is membership `ind_rev` (raw USD, not rewritten) divided by 1e9 only in the cube payload. |
 | **C-US / C-INTL** | US / non-US | 美 / 非美 | Colors cyan / orange (`#3cf0ff` / `#ffb020`) |
-| **C-HOME** | engineering home | 工程首页 | Gate at `/`: BICS **L1–L3** same board (`/?bics=`). Optional `?listingCountry=` (ISO or `UNMAPPED`) via a **searchable listing-country dropdown** (not a chip wall; not cube `?country=`). **Level-4** cell → **C-LIST**. Breadcrumb **fixed** top-left (`All / …`). Sector cells show **4-segment** industry coords (`displayIndustryCoord`) and subtree **company counts**. No header cube link. Header search (L1 and the same page’s L2/L3) lists matches in an overlay. Up/down moves the highlight. Enter writes that ticker into the box and does not navigate; Enter again opens the firm’s primary **C-LIST** row (`/list?bics=<L4>&q=<ticker>`). A click does the same write. Backspace (focus not in a field) assigns the last breadcrumb link: level-1 node → / (keep listingCountry); level 2 → its level-1 ?bics=; level 3 → its level-2 ?bics=; no bics stays. Hosts **C-SPLASH** (cold `/` only). | `web/index.html`, `home.js`, `nations.js`, `GET /api/bics/children` |
+| **C-HOME** | engineering home | 工程首页 | Gate at `/`: BICS **L1–L3** same board (`/?bics=`). Optional `?listingCountry=` (ISO or `UNMAPPED`) via a **searchable listing-country dropdown** (not a chip wall; not cube `?country=`). **Level-4** cell → **C-LIST**. Breadcrumb **fixed** top-left (`All / …`). Sector cells show **4-segment** industry coords (`displayIndustryCoord`) and subtree **company counts**. No header cube link. Header search (L1 and the same page’s L2/L3) lists matches in an overlay. Up/down moves the highlight. Enter writes that ticker into the box and does not navigate; Enter again opens the firm’s primary **C-LIST** row (`/list?bics=<L4>&q=<ticker>`). A click does the same write. **Alt locate:** typing `/cube` (trim, case-insensitive) yields one demo-cube row; click or Enter assigns bare **C-CUBE** (`/cube`, no `?ticker=`). Backspace (focus not in a field) assigns the last breadcrumb link: level-1 node → / (keep listingCountry); level 2 → its level-1 ?bics=; level 3 → its level-2 ?bics=; no bics stays. Hosts **C-SPLASH** (cold `/` only). | `web/index.html`, `home.js`, `nations.js`, `GET /api/bics/children` |
 | **C-LIST** | L4 company list | 四级公司名单 | `/list?bics=<L4 compact>` plus optional `?listingCountry=`. One company per full **Member Ticker**, only if this L4 is its **primary** (numeric `% Tot Rev` wins; empty still gets a primary via the same sort, entity coord prefixed `-`). Industry coord column uses **4-segment** chrome (keeps leading `-`). Other L1 shares as annotations. Country from yellow-key (see **C-LISTING**). No splash. No header cube link. Optional `?q=` prefills the on-page name/ticker filter (this page only). **Revenue** toggles a sort by the primary row’s `ind_rev` (raw USD, empty last); the default order stays `% Tot Rev` then name. No second money unit on this page. **Row click** → `/cube?ticker=` (**company→cube**). Backspace (focus not in the filter) assigns that last breadcrumb link (the level-3 board). | `web/list.html`, `list.js`, `GET /api/bics/entities` |
 | **C-LISTING** | listing country | 上市地 | ISO from Bloomberg yellow-key **exchange token** (second-last before `Equity`/`Corp`/…), mapped in `server/listing.py`. **Not** headquarters. **Not** an 8th industry axis. Unmapped venues stay **Unmapped**. Distinct from cube **C-US / C-INTL**. Changing country on C-HOME / C-LIST is in-page `history` + refetch — no document reload, no splash, keep board scroll. |
-| **C-CUBE** | decision cube SPA | 决策立方体页 | Full-bleed cube. Bare `/cube` = demo AI chain (`GET /api/bundle`, 11 slices + rings). **company→cube** `/cube?ticker=` = **standard shell**: **no** industry slice walls, **no** ring guides; one BICS primary firm at user **(s,x,y)=(5,5,5)** (`shellAnchor`; layer index ≠ s). No header **class→cube**. The in-app entrance is the list row (**company→cube**). Bare `/cube` remains the demo chain, by direct address only. Backspace (focus not in the search) on /cube?ticker= assigns /list?bics= from the shell firm’s sourceDetail; bare /cube and a missing ticker stay. Escape still clears selection, then focus. No splash. L4 cells → C-LIST. | `web/cube.html`, `main.js`, `/api/bundle` |
+| **C-CUBE** | decision cube SPA | 决策立方体页 | Full-bleed cube. Bare `/cube` = demo AI chain (`GET /api/bundle`, 11 slices + rings). **company→cube** `/cube?ticker=` = **standard shell**: **no** industry slice walls, **no** ring guides; one BICS primary firm at user **(s,x,y)=(5,5,5)** (`shellAnchor`; layer index ≠ s). No header **class→cube**. In-app entrances: list row (**company→cube**); **C-HOME** locate alt `/cube` → bare demo chain. Bare `/cube` also still works by direct address. Backspace (focus not in the search) on /cube?ticker= assigns /list?bics= from the shell firm’s sourceDetail; bare /cube and a missing ticker stay. Escape still clears selection, then focus. No splash. L4 cells → C-LIST. **NVDA** `?ticker=NVDA` builds **dynamic BICS-L4 slices** (one per distinct L4 among center+peers; name=L4) + peer **C-POINT**s + point-to-point **C-REV-LINK** (not the empty shell). Other tickers stay shell. Bare `/cube` has no revenue links. | `web/cube.html`, `main.js`, `/api/bundle` |
 | **C-SPLASH** | splash | 开屏 | Only on **C-HOME**: FIDV wordmark → clear hold ~**2s** → fade ~**4s**. `/list` and `/cube` play no splash. | `#splash` in `index.html`, `home.js` |
 | **C-RING-SCORE** | ring score | 环分数 | Per-slice min–max → 0–100; **100 = exact center** |
 
@@ -205,7 +210,7 @@ Removed / 已废弃：旧「角视图 corner view」与 **V / Home** 绑定（�
 
 1. 1类坐标 / 位置坐标 is **`(s, x, y)`**, not raw Three XYZ. `x` and `y` mean only this. Move things by editing coordinates in `coords.js`. 2类坐标 / 相对坐标 is `ringCos` / `ringSin`. 3类坐标 / 行业坐标 is `legalEntityCoord`（BICS **存储** 7×2，库在 `class-3-coords/BICS-Classification/`；企业主业空占比时名单坐标加 `-`；**闸门与名单 chrome 只画前 4 段并保留前导 `-`**），不参与摆放。  
 2. Focus keeps the slice. The rest of the cube exits along user **−x** (left) only, by `cubeExitX`. Do not call 「左」 **−s**. Do not move the focused slice.  
-3. Focus change / retract → **hold camera** (`C-CAM-HOLD`).  
+3. Focus change / retract → **hold camera** (`C-CAM-HOLD`). Exception: search-result pick → **C-STDVIEW** on the company's slice, then **C-COMPANY-ZOOM** (bond sparkline when `bondSchedule` is present).  
 4. Standard overview / focused poses stay as §5 until explicitly revised.  
 5. Dimmed points need `transparent: true` or opacity is ignored.  
 6. Labels stay **coplanar** on the slice (no CSS2D billboard).  
@@ -226,7 +231,7 @@ Removed / 已废弃：旧「角视图 corner view」与 **V / Home** 绑定（�
 | `web/list.html` + `list.js` | **C-LIST** L4 company table (no splash) |
 | `web/cube.html` + `web/css/app.css` | **C-CUBE** full-bleed cube; floating chrome; **no splash**; aesthetics → `agent_tasklist/AESTHETIC.md` |
 | `web/js/main.js` | Cube boot only; reads `?bics=` |
-| `assets/fidv-launcher*` + `scripts/set-command-icon.sh` | Launcher icons（美工部管辖） |
+| `assets/fidv-launcher*` + `scripts/set-command-icon.sh` | Launcher icons（美工部管辖）；**Logo** 三框比例与明暗两用 → `agent_tasklist/AESTHETIC.md`「Logo 标准」 |
 | `GET /api/bics/children` | C-COORD-3 children of `parent` (empty = L1) |
 | `GET /api/bics/entities` | member companies whose primary L4 is `?bics=`（含空 `% Tot Rev` 胜出；此时 `legal_entity_coord` 带 `-`） |
 | `GET /api/bics/node` | One BICS node by `code` (any level) |

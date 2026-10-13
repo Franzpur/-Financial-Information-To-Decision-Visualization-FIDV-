@@ -32,9 +32,42 @@
 - **浮动 chrome**：搜索置顶、详情右浮、HUD 底浮；玻璃 + 轻 `backdrop-filter`；空白处 pointer-events 透给 canvas。
 - **帮助默认关**：`?` 打开，不常驻挡视野。
 
+### Logo 标准（业主说「logo」即按此开发）
+
+产品 splash / home 左标矢量真源：`ind-chain/web/index.html` 内 `.splash-logo` 三框。纸面同族反相：`library/showable-report/assets/sfc-logo-frames-paper.svg`（封面 `SFC-plan-cover.html` 已对齐）。
+
+**理念一句话：** 层次感来自三枚竖向圆角矩形**错位相套** + **递减透明度**（前实后虚），不是左右并排实心色块。
+
+| 量 | 值 | 说明 |
+|----|-----|------|
+| 单框 | `width=18` `height=44` `rx=1.5` | 竖向圆角矩形；宽高比勿改 |
+| 起始 x | `8` / `22` / `36` | 步距 **14**；勿改步距或错位量 |
+| 纵位 | `y=14`（三框同 y） | 与 splash `viewBox="0 0 280 72"` 对齐 |
+| opacity | `0.95` / `0.55` / `0.28` | 前→后递减；fill=`none` |
+| stroke | `stroke-width≈1.25`，`stroke-linejoin=round` | 描边框，非填充块 |
+
+**明暗两用色**
+
+| 面 | stroke | 底 |
+|----|--------|-----|
+| 暗底（产品 splash / home / 启动图标族） | `#e8edf4`（`--text` 族） | 工程 `--bg` 或同族暗底 |
+| 纸面反相 | `#1a1f26`（纸面 `--ink`） | 与纸同色透明；矢量直绘 |
+
+**组与露出**
+
+- 可与右侧 **FIDV** 衬线字标（Iowan / Palatino / Georgia 栈）+ `--accent` 底线同组（splash / home）。
+- **单独露出**时只保留三框（纸面封面、仅标露出等），不另起第二套皮。
+- 启动图标 `ind-chain/assets/fidv-launcher*` 同族；纸面只用同族反相矢量。
+
+**禁止**
+
+- 勿改步距 **14**、单框 **18×44**、`rx=1.5`，或把相套错位改成并排色块。
+- 勿用低分辨率反色位图放大当纸面 / 印刷源；纸面从矢量按上表反相 stroke。
+- 勿另起第二套 logo 几何或吉祥物替代三框。
+
 ### 字标与开屏（C-SPLASH）
 
-- 居中 **FIDV** 衬线字标（Iowan / Palatino / Georgia 栈）+ 左侧三片薄切片意象 + accent 细线。
+- 居中 **FIDV** 字标 + 左侧 **Logo 标准**三框 + accent 细线（几何见上节；现稿勿擅自改形）。
 - 入场：约 **0.4s** 轻淡入（`splash-in`）。
 - **仅挂在工程首页 `/`（C-HOME）**：清晰态维持约 **2s**，再 **约 4s** opacity 淡出（JS fade fallback **4200ms**）。开屏期实心 `--bg` 盖住门厅，避免与 `.home-logo` 双标叠影；淡出后再露格阵。`?bics=` 下钻不重播。
 - **进 `/cube`（含分类入口）不播开屏。**
@@ -42,7 +75,7 @@
 
 ### 启动图标与集成启动窗
 
-- 暗底上三片纵切片 + accent 细线，与 splash 左标同族。
+- 暗底上 **Logo 标准**三框同族 + accent 细线（与 splash 左标同族，非另皮）。
 - 源与产物：`ind-chain/assets/fidv-launcher-1024.png`、`fidv-launcher.icns`。
 - 施加：`ind-chain/scripts/set-command-icon.sh` → 根 `Standard-Cube.app/Contents/Resources/AppIcon.icns`（访达双击 `.app`，无 Terminal）。
 - **集成启动窗**（`ind-chain/scripts/launcher_gui.py`）：tkinter 小窗，色用同一板（BG `#0b0d10`、PANEL `#14181e`、STROKE `#2a313c`、TEXT `#e8edf4`、MUTED `#9aa6b5`、ACCENT `#8be0c0`）。标题 **Standard-Cube**，副标 `ind-chain`。按钮：**Open homepage** / **Restart** / **Quit**。命令跑在后端。
@@ -69,7 +102,7 @@
 
 1. **先复用 token**：新面只用上表 CSS 变量，不引入第二套色名。
 2. **浮于工程区**：新面板默认玻璃浮层，不恢复实心双栏。
-3. **一字标族**：品牌露出用 FIDV 字标或切片意象，不另做吉祥物。
+3. **一字标族**：品牌露出用 **Logo 标准**三框（可加 FIDV 字标 + accent 底线）；不另做吉祥物、不另起第二套皮。
 4. **动效克制**：以 opacity / 轻微 scale 为主；不为装饰加粒子或 3D logo。
 5. **语义色不动**：US / 非美 / 环导读色变更须同时过 CONCEPTS，不单走美工部。
 
@@ -89,6 +122,7 @@
 | 启动图标 | `ind-chain/assets/fidv-launcher*` |
 | 图标脚本 | `ind-chain/scripts/set-command-icon.sh` |
 | 启动器附着面 | 根 `Standard-Cube.app` 图标资源；`launcher_gui.py` 色板与窗体外观 |
+| Logo 几何真源 | `ind-chain/web/index.html`（`.splash-logo` 三框）；纸面同族 `library/showable-report/assets/sfc-logo-frames-paper.svg`（秘书纸面附着；几何以本文 Logo 标准为准） |
 | 概念续工指针 | `ind-chain/CONCEPTS.md` §10（美学细节回指本文） |
 
 **不独占：** `coords.js`、抽出/焦点几何、`scene.js` 中服务坐标可读性的材质逻辑；启动器进程与端口逻辑。
@@ -103,4 +137,4 @@
 | 总参谋部 | 可在规划中调度美工部；业主安排下可规划管理美工部角色文件；专知路径内美工部可改码；跨域交父代理；产品终裁仍归监理部 |
 | 书记 | 美工部不写 worklog |
 
-*Last updated: 2026-10-08 · 权知统一：专知路径内可改码。*
+*Last updated: 2026-10-13 · Logo 标准写入：三框错位相套比例与明暗两用；权知统一：专知路径内可改码。*

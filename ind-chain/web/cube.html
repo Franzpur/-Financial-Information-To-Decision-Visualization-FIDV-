@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Standard-Cube</title>
-<link rel="stylesheet" href="/css/app.css?v=50" />
+<link rel="stylesheet" href="/css/app.css?v=54" />
 <script type="importmap">
 {
   "imports": {
@@ -19,11 +19,26 @@
 
 <div id="app" hidden>
   <div id="viewport">
+    <div class="cube-filter" id="cubeFilter">
+      <button type="button" class="cube-filter-face" id="cubeFilterFace" aria-expanded="false" aria-haspopup="listbox" aria-controls="cubeFilterPanel" title="Filter companies">
+        <span id="cubeFilterLabel">All</span>
+        <span class="cube-filter-caret" aria-hidden="true">▾</span>
+      </button>
+      <div class="cube-filter-panel" id="cubeFilterPanel" role="listbox" hidden>
+        <button type="button" class="cube-filter-opt" role="option" data-filter="all">All</button>
+        <button type="button" class="cube-filter-opt" role="option" data-filter="us">US only</button>
+        <button type="button" class="cube-filter-opt" role="option" data-filter="intl">Non-US only</button>
+      </div>
+    </div>
+
     <div class="top-search">
       <label class="visually-hidden" for="search">Search company or ticker</label>
       <input id="search" type="search" placeholder="Search company or ticker…" autocomplete="off" />
       <div id="results"></div>
     </div>
+
+    <a class="cube-home chip" href="/" title="Engineering homepage">Home</a>
+    <button type="button" id="helpToggle" class="help-toggle" title="Toggle controls help (?)">?</button>
 
     <aside id="detailPanel" class="float-panel float-detail" aria-label="Industry detail">
       <div id="detail">
@@ -32,7 +47,13 @@
       <p class="note foot">Data via <code>/api/bundle</code>.</p>
     </aside>
 
-    <button type="button" id="helpToggle" class="help-toggle" title="Toggle controls help (?)">?</button>
+    <aside id="companyFocus" class="company-focus" hidden aria-hidden="true" aria-label="Company detail">
+      <button type="button" id="companyFocusClose" class="company-focus-close" title="Close" aria-label="Close company detail">×</button>
+      <div id="companyFocusInner" class="company-focus-inner">
+        <div id="companyFocusBody" class="company-focus-body"></div>
+      </div>
+    </aside>
+
     <div id="navHint" class="nav-hint hidden">
       <strong>Controls</strong><br />
       Left-drag pan · Right-drag orbit (fine) · Scroll zoom · Middle-click standard<br />
@@ -40,27 +61,35 @@
       Click plane / <kbd>[</kbd><kbd>]</kbd> focus slice · double-click empty clears · <kbd>Esc</kbd> layered clear<br />
       <kbd>C</kbd> / middle-click standard view · <kbd>?</kbd> help<br /><br />
       <strong>Space</strong><br />
-      Power (back, <strong>−s</strong>) → models (front, <strong>+s</strong>). User axes <strong>(s, x, y)</strong>: <strong>+x</strong> right, <strong>−x</strong> left, <strong>+y</strong> up, <strong>−y</strong> down; face <strong>x,y∈[0,10]</strong>; <strong>1 s = 1 x = 1 y</strong>. View space radius <strong>200</strong>. Slice spacing <strong>d</strong> (default 100% = current gap; drag 0%–200%). Revenue rings: outer = 0–9.9; near-center = 90–99.9; <strong>100 = exact center</strong>.
+      Power (back, <strong>−s</strong>) → models (front, <strong>+s</strong>). User axes <strong>(s, x, y)</strong>: <strong>+x</strong> right, <strong>−x</strong> left, <strong>+y</strong> up, <strong>−y</strong> down; face <strong>x,y∈[0,10]</strong>; <strong>1 s = 1 x = 1 y</strong>. View space radius <strong>200</strong>. Slice spacing <strong>d</strong> (default 100% = current gap; drag 0%–200%, snaps near 25% steps). Revenue rings: outer = 0–9.9; near-center = 90–99.9; <strong>100 = exact center</strong>.
     </div>
-    <div id="statusBar" class="status-bar">All slices · 0 companies</div>
     <div id="hoverTip" class="hover-tip" hidden></div>
     <div class="hud">
-      <a class="chip" href="/" title="Engineering homepage">Home</a>
       <span class="hud-legend" aria-hidden="true"><span class="dot us"></span><span class="dot intl"></span></span>
-      <button class="chip active" data-filter="all">All</button>
-      <button class="chip" data-filter="us">US only</button>
-      <button class="chip" data-filter="intl">Non-US only</button>
-      <button class="chip" id="standardView">Standard (C)</button>
-      <button class="chip" id="resetCam">Reset view</button>
-      <label class="d-control" title="Slice spacing d (0%–200%)">
+    </div>
+
+    <div class="d-box" id="dBox" title="Slice spacing d (0%–200%; snaps near 25% steps)">
+      <div class="d-box-head">
         <span class="d-label">d</span>
-        <input id="gapD" type="range" min="0" max="200" step="1" value="100" />
         <span id="gapDPct" class="d-pct">100%</span>
-      </label>
+      </div>
+      <div class="d-track-wrap" id="gapDTrack">
+        <div
+          class="d-thumb"
+          id="gapDThumb"
+          role="slider"
+          tabindex="0"
+          aria-valuemin="0"
+          aria-valuemax="200"
+          aria-valuenow="100"
+          aria-label="Slice spacing d"
+        ></div>
+        <input id="gapD" type="range" min="0" max="200" step="1" value="100" tabindex="-1" aria-hidden="true" />
+      </div>
     </div>
   </div>
 </div>
 
-<script type="module" src="/js/main.js?v=57"></script>
+<script type="module" src="/js/main.js?v=73"></script>
 </body>
 </html>

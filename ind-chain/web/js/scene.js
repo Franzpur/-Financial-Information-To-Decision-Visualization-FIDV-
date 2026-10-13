@@ -6,7 +6,7 @@
  */
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-import { COLORS, state, passesFilter, companyById } from "./state.js?v=50";
+import { COLORS, state, passesFilter, companyById } from "./state.js?v=51";
 import {
   FACE,
   FACE_SPAN,
@@ -137,14 +137,18 @@ export function createScene(viewport, hooks = {}) {
     lerpVisibility(ctx);
     lerpPullOut(ctx);
     controls.update();
-    for (const mesh of ctx.meshes) {
+    // [C-POINT] Company rings stay coplanar with the slice (fixed YZ); do not billboard.
+    // [C-REV-LINK] Midpoint cards still face the camera.
+    for (const item of ctx.revenueLinkObjs || []) {
+      if (!item.label) continue;
       faceQuat.copy(camera.quaternion);
-      if (mesh.parent) {
-        mesh.parent.getWorldQuaternion(parentQuat);
+      if (item.label.parent) {
+        item.label.parent.getWorldQuaternion(parentQuat);
         faceQuat.premultiply(parentQuat.invert());
       }
-      mesh.quaternion.copy(faceQuat);
+      item.label.quaternion.copy(faceQuat);
     }
+    placeRevenueLinks(ctx);
     renderer.render(scene, camera);
   }
   tick();
@@ -157,7 +161,7 @@ export function createScene(viewport, hooks = {}) {
     goStandardView: () => goStandardView(ctx, true),
     focusSlice: (i) => focusSlice(ctx, i),
     clearFocus: () => clearFocus(ctx),
-    selectCompany: (id) => selectCompany(ctx, id),
+    selectCompany: (id, opts) => selectCompany(ctx, id, opts || {}),
     framingDistance: () => framingDistance(),
     /** Call after unhiding #app — resize while display:none yields a 1×1 canvas (cloud blur). */
     resize: () => resize(ctx, viewport),
@@ -201,7 +205,10 @@ function placeSliceGroup(g, i) {
 
 function pointRadius(_c) {
   // Shell: sized for overview-ish framing (~8–12 m) so the firm reads as a clear ring.
-  return state.shellCube ? 0.28 : 0.022;
+  // Chain (C-REV-LINK): slightly larger than bare demo so peers read at overview.
+  if (state.shellCube) return 0.28;
+  if ((state.revenueLinks || []).length) return 0.055;
+  return 0.022;
 }
 
 function wrapLabelLines(ctx2d, text, maxWidth) {
@@ -301,11 +308,118 @@ function shellCompanyCoord(c) {
   };
 }
 
+
+function makeRevenueCardTexture(name, pctLine) {
+  const canvas = document.createElement("canvas");
+  canvas.width = 1024;
+  canvas.height = 128;
+  const ctx2d = canvas.getContext("2d");
+  ctx2d.clearRect(0, 0, canvas.width, canvas.height);
+  ctx2d.font = "600 44px ui-sans-serif, system-ui, PingFang SC, sans-serif";
+  ctx2d.textAlign = "center";
+  ctx2d.textBaseline = "middle";
+  [String(name || ""), String(pctLine || "")].forEach((line, i) => {
+    const x = canvas.width / 2;
+    const y = 36 + i * 58;
+    ctx2d.lineJoin = "round";
+    ctx2d.lineWidth = 8;
+    ctx2d.strokeStyle = "rgba(8, 12, 18, 0.92)";
+    ctx2d.strokeText(line, x, y);
+    ctx2d.fillStyle = "rgba(245, 252, 255, 0.98)";
+    ctx2d.fillText(line, x, y);
+  });
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.needsUpdate = true;
+  tex.colorSpace = THREE.SRGBColorSpace;
+  return tex;
+}
+
+function makeCameraTextPlane(map, width, height) {
+  return new THREE.Mesh(
+    new THREE.PlaneGeometry(width, height),
+    new THREE.MeshBasicMaterial({
+      map,
+      transparent: true,
+      depthWrite: false,
+      side: THREE.DoubleSide,
+    })
+  );
+}
+
+function placeRevenueLinks(ctx) {
+  const items = ctx.revenueLinkObjs;
+  if (!items || !items.length) return;
+  ctx.root.updateMatrixWorld(true);
+  const Wa = new THREE.Vector3();
+  const Wb = new THREE.Vector3();
+  const mid = new THREE.Vector3();
+  items.forEach((item) => {
+    const a = ctx.byId.get(item.fromId);
+    const b = ctx.byId.get(item.toId);
+    if (!a || !b || !item.line) return;
+    a.getWorldPosition(Wa);
+    b.getWorldPosition(Wb);
+    const la = ctx.root.worldToLocal(Wa.clone());
+    const lb = ctx.root.worldToLocal(Wb.clone());
+    const pos = item.line.geometry.attributes.position;
+    pos.setXYZ(0, la.x, la.y, la.z);
+    pos.setXYZ(1, lb.x, lb.y, lb.z);
+    pos.needsUpdate = true;
+    item.line.geometry.computeBoundingSphere();
+    if (item.label) {
+      mid.copy(la).add(lb).multiplyScalar(0.5);
+      item.label.position.copy(mid);
+      item.label.quaternion.copy(ctx.camera.quaternion);
+    }
+  });
+}
+
+function buildRevenueLinks(ctx) {
+  ctx.revenueLinkObjs = [];
+  const links = state.revenueLinks;
+  if (state.shellCube || !Array.isArray(links) || !links.length) return;
+  links.forEach((link) => {
+    if (!link || (link.side !== "supplier" && link.side !== "customer")) return;
+    const fromId = link.fromId;
+    const toId = link.toId;
+    if (fromId == null || toId == null) return;
+    if (!ctx.byId.has(fromId) || !ctx.byId.has(toId)) return;
+    const line = new THREE.Line(
+      new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), new THREE.Vector3()]),
+      new THREE.LineBasicMaterial({
+        color: COLORS.EDGE,
+        transparent: true,
+        opacity: 0.72,
+        depthWrite: false,
+      })
+    );
+    line.userData.isRevenueLink = true;
+    line.renderOrder = 4;
+    ctx.root.add(line);
+    const pct = Number(link.pct);
+    const pctLine = Number.isFinite(pct)
+      ? pct.toFixed(2) + "% " + (link.side === "supplier" ? "NVDA spend" : "NVDA rev")
+      : link.side === "supplier"
+        ? "supplier"
+        : "customer";
+    const label = makeCameraTextPlane(
+      makeRevenueCardTexture(link.name || "", pctLine),
+      1.15,
+      0.18
+    );
+    label.userData.isRevenueLabel = true;
+    label.renderOrder = 7;
+    ctx.root.add(label);
+    ctx.revenueLinkObjs.push({ side: link.side, fromId, toId, line, label });
+  });
+}
+
 function buildCube(ctx) {
   const { root } = ctx;
   while (root.children.length) root.remove(root.children[0]);
   ctx.planeGroups = [];
   ctx.meshes = [];
+  ctx.revenueLinkObjs = [];
   ctx.byId.clear();
   ctx.boxHelper = null;
 
@@ -412,6 +526,8 @@ function buildCube(ctx) {
           side: THREE.DoubleSide,
         });
     const mesh = new THREE.Mesh(new THREE.RingGeometry(r * 0.775, r, 64), material);
+    // Same face as C-SLICE / C-LABEL: RingGeometry XY → YZ (parallel + coplanar with slice).
+    mesh.rotation.y = Math.PI / 2;
     mesh.userData.companyId = c.id;
     mesh.renderOrder = 5;
 
@@ -448,6 +564,7 @@ function buildCube(ctx) {
     ctx.byId.set(c.id, mesh);
   });
 
+  buildRevenueLinks(ctx);
   layoutPlanes(ctx);
   queueVisibilityTargets(ctx);
 }
@@ -477,6 +594,7 @@ function layoutPlanes(ctx) {
   }
   syncFrame(ctx);
   rebuildAxes(ctx);
+  placeRevenueLinks(ctx);
 }
 
 /** [C-COORD] Wire cube around user (s, x, y) from the padded unit cube. */
@@ -780,11 +898,22 @@ function stepCamAnim(ctx) {
 }
 
 
+function isEditableFocus() {
+  const el = document.activeElement;
+  if (!el || el === document.body || el === document.documentElement) return false;
+  const tag = el.tagName;
+  if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return true;
+  if (el.isContentEditable) return true;
+  return Boolean(el.closest?.("[contenteditable='true'], [contenteditable='']"));
+}
+
+export const STDVIEW_MS = 520;
+
 /** [C-STDVIEW] Snap to standardPose for current focus state. */
 function goStandardView(ctx, animate = true) {
   const { pos, target } = standardPose(ctx);
   ctx.camAnim = null;
-  if (animate) startCamAnim(ctx, pos, target, 520);
+  if (animate) startCamAnim(ctx, pos, target, STDVIEW_MS);
   else {
     ctx.camera.position.copy(pos);
     ctx.controls.target.copy(target);
@@ -850,7 +979,7 @@ function clearFocus(ctx) {
   ctx.hooks.onClear?.();
 }
 
-function selectCompany(ctx, id) {
+function selectCompany(ctx, id, opts = {}) {
   const c = companyById(id);
   if (!c) return;
   state.selectedId = id;
@@ -858,31 +987,33 @@ function selectCompany(ctx, id) {
     state.focusLayer = c.layer;
     ctx.exitStayLayer = c.layer;
   }
-  // Shell already uses C-STDVIEW on (5,5,5). Do not retarget the camera —
-  // the legacy (world.x, world.y*0.35, 0) framing dumps the view into fog.
-  if (!state.shellCube) {
-    const mesh = ctx.byId.get(id);
-    if (mesh?.userData.coord) {
-      const base = mesh.userData.coord;
-      const world = userToWorld(ctx, { s: base.s, x: base.x, y: base.y });
-      const toTarget = new THREE.Vector3(world.x, world.y * 0.35, 0);
-      startCamAnim(ctx, ctx.camera.position.clone(), toTarget, 420);
-    }
-  }
+  ctx.camAnim = null;
+  // Keep OrbitControls on: left=pan, right=orbit (never leave enabled=false).
+  ctx.controls.enabled = true;
   queueVisibilityTargets(ctx);
-  ctx.hooks.onSelect?.(c);
+  if (!state.shellCube && opts.standardView) {
+    goStandardView(ctx, true);
+    ctx.hooks.onSelect?.(c, { standardView: true });
+    return;
+  }
+  ctx.hooks.onSelect?.(c, {});
 }
 
 function queueVisibilityTargets(ctx) {
+  const chainMode = !state.shellCube && (state.revenueLinks || []).length > 0;
   state.companies.forEach((c) => {
     const mesh = ctx.byId.get(c.id);
     if (!mesh) return;
     const show = passesFilter(c);
+    // [C-REV-LINK] Chain keeps every peer lit across slices so point-to-point edges stay readable.
     const onFocus =
-      state.shellCube || state.focusLayer == null || c.layer === state.focusLayer;
+      state.shellCube ||
+      chainMode ||
+      state.focusLayer == null ||
+      c.layer === state.focusLayer;
     mesh.visible = show;
     if (mesh.userData.label) {
-      mesh.userData.label.visible = state.shellCube
+      mesh.userData.label.visible = state.shellCube || chainMode
         ? show
         : show && state.focusLayer != null && c.layer === state.focusLayer;
     }
@@ -919,6 +1050,13 @@ function queueVisibilityTargets(ctx) {
     mat.depthWrite = false;
     mesh.renderOrder = onFocus ? 8 : 4;
     if (mesh.userData.label) mesh.userData.label.renderOrder = onFocus ? 10 : 4;
+  });
+  (ctx.revenueLinkObjs || []).forEach((item) => {
+    const a = companyById(item.fromId);
+    const b = companyById(item.toId);
+    const showLink = Boolean(a && b && passesFilter(a) && passesFilter(b));
+    if (item.line) item.line.visible = showLink;
+    if (item.label) item.label.visible = showLink;
   });
 
   ctx.planeGroups.forEach((g, i) => {
@@ -979,6 +1117,10 @@ function lerpVisibility(ctx) {
 }
 
 function applyKeyboard(ctx) {
+  if (isEditableFocus()) {
+    ctx.keys.clear();
+    return;
+  }
   const { keys, camera, controls, root } = ctx;
   const yawSpeed = 0.035;
   if (keys.has("q")) root.rotation.y += yawSpeed;

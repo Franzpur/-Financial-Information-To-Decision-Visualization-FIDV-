@@ -17,6 +17,7 @@ sys.path.insert(0, str(ROOT / "server"))
 from listing import country_label, parse_ticker  # noqa: E402
 from db import (  # noqa: E402
     DB_PATH,
+    assign_rings,
     connect,
     get_company,
     init_schema,
@@ -27,6 +28,7 @@ from db import (  # noqa: E402
 )
 
 WEB_ROOT = ROOT / "web"
+NVDA_REVENUE_LINKS = ROOT / "data" / "nvda-revenue-links.json"
 BICS_JSON = ROOT.parent / "class-3-coords" / "BICS-Classification" / "bics-equity-hierarchy-2024.json"
 ENTITIES_DB = ROOT.parent / "class-3-coords" / "BICS-Classification" / "bics_entities_20261003.db"
 HOST = "127.0.0.1"
@@ -510,6 +512,276 @@ def _locate_tickers(conn: sqlite3.Connection, key: str, limit: int) -> tuple[lis
     return merged, bool(identity) and len(merged) == 1
 
 
+def _load_nvda_revenue_doc() -> dict | None:
+    if not NVDA_REVENUE_LINKS.is_file():
+        return None
+    try:
+        data = json.loads(NVDA_REVENUE_LINKS.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return None
+    return data if isinstance(data, dict) else None
+
+
+def _is_nvda_ticker(raw: str | None) -> bool:
+    if not raw:
+        return False
+    return _normalize_ticker_key(raw).split(" ", 1)[0] == "NVDA"
+
+
+def _layer_index_by_id(layers: list[dict], layer_id: str) -> int | None:
+    for i, L in enumerate(layers):
+        if str(L.get("id") or "") == layer_id:
+            return i
+    return None
+
+
+def _entity_by_member_ticker(ticker: str) -> dict | None:
+    """Prefer exact Member Ticker; fall back to resolver head match."""
+    raw = (ticker or "").strip()
+    if not raw:
+        return None
+    hit = _primary_entity_for_ticker(raw)
+    if hit:
+        return hit
+    resolved = _resolve_entity_ticker(raw)
+    if resolved and resolved != raw:
+        return _primary_entity_for_ticker(resolved)
+    return None
+
+
+_UNRESOLVED_L4 = "unresolved"
+
+
+def _peer_l4_key(ent: dict | None) -> tuple[str, str]:
+    """Return (compact L4 code, display name). Unresolved peers share one slice."""
+    if not ent:
+        return _UNRESOLVED_L4, "Unresolved"
+    code = str(ent.get("bics_code_l4") or "").strip()
+    name = str(ent.get("l4_name") or "").strip()
+    if not code:
+        return _UNRESOLVED_L4, "Unresolved"
+    return code, name or code
+
+
+def _order_nvda_l4_slices(
+    center_code: str | None,
+    supplier_codes: set[str],
+    customer_codes: set[str],
+) -> list[str]:
+    """s-order: supplier L4s → center L4 → customer L4s; same side sorted by code.
+
+    A code that appears on both sides is kept once in the supplier block.
+    Center's L4 is inserted once between the two blocks.
+    """
+    sup = sorted(c for c in supplier_codes if c and c != center_code)
+    cust = sorted(
+        c for c in customer_codes if c and c != center_code and c not in supplier_codes
+    )
+    out: list[str] = []
+    out.extend(sup)
+    if center_code:
+        out.append(center_code)
+    out.extend(cust)
+    return out
+
+
+def bundle_nvda_chain(ticker_raw: str) -> dict:
+    """NVDA supply-chain cube: dynamic BICS-L4 C-SLICE walls + point-to-point C-REV-LINK.
+
+    Slice count = distinct primary L4 codes among center + peers. Slice name = L4 name.
+    """
+    doc = _load_nvda_revenue_doc() or {}
+    peers = doc.get("peers") if isinstance(doc.get("peers"), list) else []
+
+    center_ticker = str(doc.get("centerTicker") or "NVDA US Equity")
+    center_ent = _entity_by_member_ticker(center_ticker) or _entity_by_member_ticker("NVDA")
+    center_code, center_l4_name = _peer_l4_key(center_ent)
+
+    # Resolve peers once; collect L4 membership by side.
+    resolved_peers: list[dict] = []
+    supplier_codes: set[str] = set()
+    customer_codes: set[str] = set()
+    l4_names: dict[str, str] = {}
+    if center_code != _UNRESOLVED_L4:
+        l4_names[center_code] = center_l4_name
+
+    for row in peers:
+        if not isinstance(row, dict):
+            continue
+        side = row.get("side")
+        if side not in ("supplier", "customer"):
+            continue
+        name = str(row.get("name") or "").strip()
+        ticker = str(row.get("ticker") or "").strip()
+        if not name and not ticker:
+            continue
+        country = row.get("country") if row.get("country") in ("US", "INTL") else "INTL"
+        ent = _entity_by_member_ticker(ticker) if ticker else None
+        l4_code, l4_name = _peer_l4_key(ent)
+        l4_names[l4_code] = l4_name if l4_code != _UNRESOLVED_L4 else "Unresolved"
+        if side == "supplier":
+            supplier_codes.add(l4_code)
+        else:
+            customer_codes.add(l4_code)
+        pct = row.get("spendPct") if side == "supplier" else row.get("revPct")
+        resolved_peers.append(
+            {
+                "side": side,
+                "name": name,
+                "ticker": ticker,
+                "country": country,
+                "ent": ent,
+                "l4_code": l4_code,
+                "pct": pct,
+            }
+        )
+
+    ordered_codes = _order_nvda_l4_slices(center_code, supplier_codes, customer_codes)
+    if not ordered_codes:
+        ordered_codes = [center_code or _UNRESOLVED_L4]
+        l4_names.setdefault(ordered_codes[0], center_l4_name or "Unresolved")
+
+    layers_meta: list[dict] = []
+    for i, code in enumerate(ordered_codes):
+        layers_meta.append(
+            {
+                "idx": i,
+                "id": code,
+                "name": l4_names.get(code) or code,
+                "blurb": f"BICS L4 {code}" if code != _UNRESOLVED_L4 else "No entity match",
+                "companyCount": 0,
+            }
+        )
+
+    companies: list[dict] = []
+    ticker_to_id: dict[str, int] = {}
+    next_id = 0
+
+    def add_company(
+        *,
+        name: str,
+        ticker: str,
+        layer_id: str,
+        country: str,
+        rev_bn: float,
+        note: str,
+        source_detail: str,
+        legal: str,
+    ) -> int:
+        nonlocal next_id
+        key = _normalize_ticker_key(ticker) or name
+        if key in ticker_to_id:
+            return ticker_to_id[key]
+        li = _layer_index_by_id(layers_meta, layer_id)
+        if li is None:
+            li = _layer_index_by_id(layers_meta, _UNRESOLVED_L4)
+        if li is None:
+            li = 0
+        cid = next_id
+        next_id += 1
+        companies.append(
+            {
+                "id": cid,
+                "name": name,
+                "ticker": ticker,
+                "revBn": float(rev_bn),
+                "country": "US" if country == "US" else "INTL",
+                "layer": int(li),
+                "note": note,
+                "valueM": None,
+                "source": "nvda-revenue-links",
+                "sourceDetail": source_detail,
+                "legalEntityCoord": legal,
+            }
+        )
+        ticker_to_id[key] = cid
+        return cid
+
+    if center_ent:
+        nvda_id = add_company(
+            name=center_ent["name"] or "NVIDIA",
+            ticker=center_ent["ticker"],
+            layer_id=center_code,
+            country=center_ent["country"],
+            rev_bn=(float(center_ent["ind_rev"]) / 1e9)
+            if center_ent.get("ind_rev") is not None
+            else 100.0,
+            note=center_ent.get("l4_name") or "AI accelerators",
+            source_detail=center_ent.get("bics_code_l4") or "",
+            legal=center_ent.get("legal_entity_coord") or "",
+        )
+    else:
+        nvda_id = add_company(
+            name="NVIDIA",
+            ticker="NVDA US Equity",
+            layer_id=center_code,
+            country="US",
+            rev_bn=100.0,
+            note="AI accelerators",
+            source_detail="",
+            legal="",
+        )
+
+    revenue_links: list[dict] = []
+    for row in resolved_peers:
+        ent = row["ent"]
+        display_name = (ent["name"] if ent and ent.get("name") else row["name"]) or row["ticker"]
+        display_ticker = (ent["ticker"] if ent and ent.get("ticker") else row["ticker"]) or display_name
+        pct = row["pct"]
+        if ent and ent.get("ind_rev") is not None:
+            rev_bn = float(ent["ind_rev"]) / 1e9
+        elif isinstance(pct, (int, float)):
+            rev_bn = max(float(pct), 0.1)
+        else:
+            rev_bn = 1.0
+        peer_id = add_company(
+            name=display_name,
+            ticker=display_ticker,
+            layer_id=row["l4_code"],
+            country=ent["country"] if ent else row["country"],
+            rev_bn=rev_bn,
+            note=(ent.get("l4_name") if ent else "") or row["l4_code"],
+            source_detail=(ent.get("bics_code_l4") if ent else "") or "",
+            legal=(ent.get("legal_entity_coord") if ent else "") or "",
+        )
+        link = {
+            "side": row["side"],
+            "fromId": nvda_id,
+            "toId": peer_id,
+            "name": display_name,
+            "country": "US" if (ent["country"] if ent else row["country"]) == "US" else "INTL",
+        }
+        if isinstance(pct, (int, float)):
+            link["pct"] = float(pct)
+        revenue_links.append(link)
+
+    companies = assign_rings(companies)
+    counts: dict[int, int] = {}
+    for c in companies:
+        counts[c["layer"]] = counts.get(c["layer"], 0) + 1
+    for L in layers_meta:
+        L["companyCount"] = counts.get(L["idx"], 0)
+
+    m = meta()
+    return {
+        "meta": {
+            "title": "NVIDIA — supply chain cube",
+            "countries": m["countries"],
+            "version": 1,
+            "shell": False,
+            "nvdaChain": True,
+            "ticker": ticker_raw,
+            "tickerResolved": center_ent["ticker"] if center_ent else center_ticker,
+            "tickerFound": True,
+            "layerIds": [L["id"] for L in layers_meta],
+            "sliceMode": "bics-l4",
+        },
+        "layers": layers_meta,
+        "companies": companies,
+        "revenueLinks": revenue_links,
+    }
+
+
 def bundle_shell_ticker(ticker_raw: str) -> dict:
     """Standard shell cube: BICS firm at user (s,x,y)=(5,5,5); no industry slices/rings.
 
@@ -553,6 +825,8 @@ def bundle_shell_ticker(ticker_raw: str) -> dict:
         },
         "layers": [],
         "companies": companies,
+        # Empty-wall shell: no fan / no C-REV-LINK (NVDA uses bundle_nvda_chain instead).
+        "revenueLinks": [],
     }
 
 
@@ -731,10 +1005,13 @@ class Handler(BaseHTTPRequestHandler):
                 self._send_json(200, {"company": company})
                 return
             if path == "/api/bundle":
-                # Demo chain when bare; ?ticker= → standard shell (one BICS firm at 5,5,5).
+                # Demo chain when bare; NVDA → slice+link chain; other ?ticker= → shell.
                 ticker = (qs.get("ticker", [""])[0] or "").strip()
                 if ticker:
-                    self._send_json(200, bundle_shell_ticker(ticker))
+                    if _is_nvda_ticker(ticker):
+                        self._send_json(200, bundle_nvda_chain(ticker))
+                    else:
+                        self._send_json(200, bundle_shell_ticker(ticker))
                     return
                 self._send_json(
                     200,

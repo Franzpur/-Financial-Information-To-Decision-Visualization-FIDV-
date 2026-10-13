@@ -1,46 +1,45 @@
-/** UI panels. Concepts: ../CONCEPTS.md ([C-STDVIEW], [C-FOCUS], …). */
+/** UI panels. Concepts: ../CONCEPTS.md ([C-STDVIEW], [C-FOCUS], [C-COMPANY-ZOOM], …). */
 import {
   state,
   passesFilter,
   writeHash,
   companyById,
-  visibleCompanies,
-} from "./state.js?v=50";
+} from "./state.js?v=51";
 import { formatCoord } from "./coords.js?v=50";
+import { bondChartHtml } from "./bondChart.js?v=1";
+import { STDVIEW_MS } from "./scene.js?v=64";
+
+const ZOOM_MS = 450;
 
 export function createUI(sceneApi) {
   const detail = document.getElementById("detail");
   const results = document.getElementById("results");
-  const statusBar = document.getElementById("statusBar");
   const hoverTip = document.getElementById("hoverTip");
   const navHint = document.getElementById("navHint");
   const helpToggle = document.getElementById("helpToggle");
+  const viewport = document.getElementById("viewport");
+  const companyFocus = document.getElementById("companyFocus");
+  const companyFocusBody = document.getElementById("companyFocusBody");
+  const companyFocusClose = document.getElementById("companyFocusClose");
   let searchTimer = null;
+  let zoomToken = 0;
+  let zoomOpen = false;
+  let zoomExitTimer = null;
+  let pendingZoomTimer = null;
 
   // Layer list chrome removed — focus via plane click / [ ] / search / right float roster.
   function renderLayers() {}
   function syncLayerActive() {}
 
+  function cancelPendingZoom() {
+    if (pendingZoomTimer != null) {
+      clearTimeout(pendingZoomTimer);
+      pendingZoomTimer = null;
+    }
+  }
+
   function updateStatus() {
-    const vis = visibleCompanies();
-    if (state.selectedId != null) {
-      const c = companyById(state.selectedId);
-      const L = c ? state.layers[c.layer] : null;
-      statusBar.textContent = c
-        ? `Selected · ${c.name}${c.ticker ? " (" + c.ticker + ")" : ""} · ${L?.name || ""} · Esc clears selection`
-        : `Selected · Esc clears`;
-      return;
-    }
-    if (state.focusLayer != null) {
-      const L = state.layers[state.focusLayer];
-      const n = vis.filter((c) => c.layer === state.focusLayer).length;
-      statusBar.textContent = `Slice ${state.focusLayer + 1}: ${L.name} · slice stays · cube exits −x (left) · ${n} visible · C face-on · Esc clears`;
-    } else {
-      const gate = state.bicsCode
-        ? ` · BICS L${state.bicsLevel || "?"} ${state.bicsCode}${state.bicsName ? " " + state.bicsName : ""}`
-        : "";
-      statusBar.textContent = `All slices · ${vis.length} visible · C standard · click plane or [ ] to focus${gate}`;
-    }
+    /* Bottom status line removed — detail / focus chrome carry state. */
   }
 
   function setDetailDefault() {
@@ -65,7 +64,7 @@ export function createUI(sceneApi) {
     return `${sign}$${abs.toFixed(digits)}B`;
   }
 
-  function renderDetail(c) {
+  function detailMarkup(c) {
     const region = state.countries[c.country] || c.country;
     const usTag = c.country === "US" ? "US" : "Non-US";
     const L = c.layer != null ? state.layers[c.layer] : null;
@@ -73,7 +72,7 @@ export function createUI(sceneApi) {
       ? ""
       : `<span>Concentric ring</span><span>${ringLabel(c)}</span>`;
     const metaBits = [L?.name || c.note || "", region, usTag].filter(Boolean).join(" | ");
-    detail.innerHTML = `
+    return `
       <h3>${c.name}</h3>
       <div class="meta">${metaBits}</div>
       <div class="kv">
@@ -89,6 +88,74 @@ export function createUI(sceneApi) {
         <span>Role note</span><span>${c.note || "—"}</span>
       </div>
     `;
+  }
+
+  function renderDetail(c) {
+    detail.innerHTML = detailMarkup(c);
+  }
+
+  /** [C-COMPANY-ZOOM] Search-open path only: enter while a slice is focused (2D). */
+  function enterCompanyZoom(c) {
+    if (!companyFocus || !viewport || !c) return;
+    if (state.focusLayer == null) return;
+    cancelPendingZoom();
+    if (zoomExitTimer != null) {
+      clearTimeout(zoomExitTimer);
+      zoomExitTimer = null;
+    }
+    zoomToken += 1;
+    companyFocusBody.innerHTML = detailMarkup(c) + bondChartHtml(c.bondSchedule);
+    companyFocus.hidden = false;
+    companyFocus.setAttribute("aria-hidden", "false");
+    renderDetail(c);
+    requestAnimationFrame(() => {
+      if (state.focusLayer == null || state.selectedId !== c.id) return;
+      viewport.classList.add("company-zoom");
+      companyFocus.classList.add("is-open");
+      zoomOpen = true;
+    });
+  }
+
+  function exitCompanyZoom() {
+    cancelPendingZoom();
+    if (!companyFocus || !viewport) return;
+    if (!zoomOpen && companyFocus.hidden) return;
+    const token = ++zoomToken;
+    viewport.classList.remove("company-zoom");
+    companyFocus.classList.remove("is-open");
+    zoomOpen = false;
+    if (zoomExitTimer != null) clearTimeout(zoomExitTimer);
+    zoomExitTimer = setTimeout(() => {
+      zoomExitTimer = null;
+      if (token !== zoomToken) return;
+      companyFocus.hidden = true;
+      companyFocus.setAttribute("aria-hidden", "true");
+      companyFocusBody.innerHTML = "";
+    }, ZOOM_MS);
+  }
+
+  function scheduleCompanyZoom(c, delayMs) {
+    cancelPendingZoom();
+    const id = c.id;
+    pendingZoomTimer = setTimeout(() => {
+      pendingZoomTimer = null;
+      if (state.selectedId !== id || state.focusLayer == null) return;
+      enterCompanyZoom(c);
+    }, delayMs);
+  }
+
+  if (companyFocusClose) {
+    companyFocusClose.addEventListener("click", (e) => {
+      e.stopPropagation();
+      sceneApi.clearFocus();
+    });
+  }
+  if (companyFocus) {
+    companyFocus.addEventListener("click", (e) => {
+      if (e.target.closest(".company-focus-inner")) return;
+      if (e.target.closest(".company-focus-close")) return;
+      sceneApi.clearFocus();
+    });
   }
 
   function renderLayerRoster(layerIdx) {
@@ -126,44 +193,162 @@ export function createUI(sceneApi) {
     });
   }
 
-  document.querySelectorAll(".chip[data-filter]").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      state.filterMode = btn.dataset.filter;
-      document.querySelectorAll(".chip[data-filter]").forEach((b) =>
-        b.classList.toggle("active", b === btn)
-      );
-      sceneApi.applyVisibility();
-      updateStatus();
-      writeHash();
-      if (state.focusLayer != null) renderLayerRoster(state.focusLayer);
-    });
-  });
+  const FILTER_LABELS = {
+    all: "All",
+    us: "US only",
+    intl: "Non-US only",
+  };
+  const cubeFilter = document.getElementById("cubeFilter");
+  const cubeFilterFace = document.getElementById("cubeFilterFace");
+  const cubeFilterPanel = document.getElementById("cubeFilterPanel");
+  const cubeFilterLabel = document.getElementById("cubeFilterLabel");
 
-  document.getElementById("resetCam").addEventListener("click", () => {
-    sceneApi.resetCamera();
-    syncLayerActive();
-    setDetailDefault();
+  function syncFilterUI() {
+    const mode = state.filterMode;
+    if (cubeFilterLabel) {
+      cubeFilterLabel.textContent = FILTER_LABELS[mode] || FILTER_LABELS.all;
+    }
+    cubeFilterPanel?.querySelectorAll(".cube-filter-opt").forEach((b) => {
+      const on = b.dataset.filter === mode;
+      b.classList.toggle("is-on", on);
+      b.setAttribute("aria-selected", on ? "true" : "false");
+    });
+  }
+
+  function setCubeFilterOpen(open) {
+    if (!cubeFilter || !cubeFilterFace || !cubeFilterPanel) return;
+    cubeFilter.classList.toggle("is-open", open);
+    cubeFilterFace.setAttribute("aria-expanded", open ? "true" : "false");
+    cubeFilterPanel.hidden = !open;
+  }
+
+  function applyFilterMode(mode) {
+    if (!["all", "us", "intl"].includes(mode)) return;
+    state.filterMode = mode;
+    syncFilterUI();
+    setCubeFilterOpen(false);
+    sceneApi.applyVisibility();
     updateStatus();
     writeHash();
+    if (state.focusLayer != null) renderLayerRoster(state.focusLayer);
+  }
+
+  syncFilterUI();
+  cubeFilterFace?.addEventListener("click", (e) => {
+    e.stopPropagation();
+    setCubeFilterOpen(cubeFilterPanel?.hidden !== false);
+  });
+  cubeFilterPanel?.addEventListener("click", (e) => {
+    const opt = e.target.closest(".cube-filter-opt");
+    if (!opt) return;
+    applyFilterMode(opt.dataset.filter);
+  });
+  document.addEventListener("pointerdown", (e) => {
+    if (!cubeFilter || cubeFilterPanel?.hidden) return;
+    if (cubeFilter.contains(e.target)) return;
+    setCubeFilterOpen(false);
   });
 
-  // [C-STDVIEW]
-  document.getElementById("standardView").addEventListener("click", () => {
-    sceneApi.goStandardView();
-  });
-
+  const D_SNAPS = [25, 50, 75, 100, 125, 150, 175, 200];
+  const D_SNAP_EPS = 4;
   const gapD = document.getElementById("gapD");
   const gapDPct = document.getElementById("gapDPct");
+  const gapDThumb = document.getElementById("gapDThumb");
+  const gapDTrack = document.getElementById("gapDTrack");
+
+  function snapDPct(pct) {
+    const n = Number(pct);
+    for (const s of D_SNAPS) {
+      if (Math.abs(n - s) <= D_SNAP_EPS) return s;
+    }
+    return Math.max(0, Math.min(200, Math.round(n)));
+  }
+
+  function placeDThumb(pct) {
+    if (!gapDThumb || !gapD) return;
+    const min = Number(gapD.min) || 0;
+    const max = Number(gapD.max) || 200;
+    const t = max === min ? 0 : (pct - min) / (max - min);
+    gapDThumb.style.left = `${t * 100}%`;
+    gapDThumb.setAttribute("aria-valuenow", String(pct));
+  }
+
+  function applyDPct(rawPct) {
+    const snapped = snapDPct(rawPct);
+    gapD.value = String(snapped);
+    state.d = snapped / 100;
+    gapDPct.textContent = `${snapped}%`;
+    placeDThumb(snapped);
+    sceneApi.layoutPlanes();
+    return snapped;
+  }
+
+  function pctFromClientX(clientX) {
+    if (!gapDTrack) return Math.round(state.d * 100);
+    const rect = gapDTrack.getBoundingClientRect();
+    const min = Number(gapD.min) || 0;
+    const max = Number(gapD.max) || 200;
+    const t = rect.width <= 0 ? 0 : Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+    return min + t * (max - min);
+  }
+
   function syncGapDUI() {
     const pct = Math.round(state.d * 100);
     gapD.value = String(pct);
     gapDPct.textContent = `${pct}%`;
+    placeDThumb(pct);
   }
   syncGapDUI();
-  gapD.addEventListener("input", () => {
-    state.d = Number(gapD.value) / 100;
-    gapDPct.textContent = `${gapD.value}%`;
-    sceneApi.layoutPlanes();
+
+  // Drag the inverted triangle itself (native range is visual track only).
+  let dDragging = false;
+  function onDPointerMove(e) {
+    if (!dDragging) return;
+    applyDPct(pctFromClientX(e.clientX));
+  }
+  function onDPointerUp(e) {
+    if (!dDragging) return;
+    dDragging = false;
+    gapDThumb?.classList.remove("is-dragging");
+    try {
+      gapDThumb?.releasePointerCapture?.(e.pointerId);
+    } catch {
+      /* ignore */
+    }
+    window.removeEventListener("pointermove", onDPointerMove);
+    window.removeEventListener("pointerup", onDPointerUp);
+    window.removeEventListener("pointercancel", onDPointerUp);
+  }
+  gapDThumb?.addEventListener("pointerdown", (e) => {
+    if (e.button != null && e.button !== 0) return;
+    e.preventDefault();
+    e.stopPropagation();
+    dDragging = true;
+    gapDThumb.classList.add("is-dragging");
+    gapDThumb.setPointerCapture?.(e.pointerId);
+    applyDPct(pctFromClientX(e.clientX));
+    window.addEventListener("pointermove", onDPointerMove);
+    window.addEventListener("pointerup", onDPointerUp);
+    window.addEventListener("pointercancel", onDPointerUp);
+  });
+  gapDTrack?.addEventListener("pointerdown", (e) => {
+    if (e.target === gapDThumb) return;
+    if (e.button != null && e.button !== 0) return;
+    e.preventDefault();
+    applyDPct(pctFromClientX(e.clientX));
+  });
+  gapDThumb?.addEventListener("keydown", (e) => {
+    const cur = Math.round(state.d * 100);
+    let next = null;
+    if (e.key === "ArrowLeft" || e.key === "ArrowDown") next = cur - 1;
+    else if (e.key === "ArrowRight" || e.key === "ArrowUp") next = cur + 1;
+    else if (e.key === "PageDown") next = cur - 25;
+    else if (e.key === "PageUp") next = cur + 25;
+    else if (e.key === "Home") next = 0;
+    else if (e.key === "End") next = 200;
+    if (next == null) return;
+    e.preventDefault();
+    applyDPct(next);
   });
 
   navHint.classList.toggle("hidden", !state.helpOpen);
@@ -185,7 +370,9 @@ export function createUI(sceneApi) {
           const b = document.createElement("button");
           b.type = "button";
           b.textContent = `${c.name}${c.ticker ? "  " + c.ticker : ""}`;
-          b.addEventListener("click", () => sceneApi.selectCompany(c.id));
+          b.addEventListener("click", () =>
+            sceneApi.selectCompany(c.id, { standardView: true })
+          );
           results.appendChild(b);
         });
     }, 120);
@@ -197,6 +384,16 @@ export function createUI(sceneApi) {
   });
   window.addEventListener("keydown", (e) => {
     if (e.key === "?" || (e.key === "/" && e.shiftKey)) {
+      const ae = document.activeElement;
+      if (
+        ae &&
+        (ae.tagName === "INPUT" ||
+          ae.tagName === "TEXTAREA" ||
+          ae.tagName === "SELECT" ||
+          ae.isContentEditable)
+      ) {
+        return;
+      }
       e.preventDefault();
       helpToggle.click();
     }
@@ -219,20 +416,34 @@ export function createUI(sceneApi) {
       hoverTip.style.left = `${local.x}px`;
       hoverTip.style.top = `${local.y}px`;
     },
-    onSelect(c) {
+    onSelect(c, meta = {}) {
       syncLayerActive();
-      renderDetail(c);
       updateStatus();
       writeHash();
+      results.innerHTML = "";
+      hoverTip.hidden = true;
+      // Search path only: standard view then [C-COMPANY-ZOOM] (+ bond chart when present).
+      // Plane pick / layer roster stay owner-side: right detail, no zoom.
+      if (meta.standardView && state.focusLayer != null) {
+        exitCompanyZoom();
+        renderLayerRoster(state.focusLayer);
+        scheduleCompanyZoom(c, STDVIEW_MS);
+        return;
+      }
+      exitCompanyZoom();
+      renderDetail(c);
     },
     onFocusChange() {
       syncLayerActive();
+      exitCompanyZoom();
       if (state.focusLayer != null) renderLayerRoster(state.focusLayer);
+      else setDetailDefault();
       updateStatus();
       writeHash();
     },
     onClear() {
       syncLayerActive();
+      exitCompanyZoom();
       setDetailDefault();
       updateStatus();
       writeHash();
@@ -240,14 +451,14 @@ export function createUI(sceneApi) {
     },
     onReset() {
       syncLayerActive();
+      exitCompanyZoom();
       setDetailDefault();
       updateStatus();
       writeHash();
     },
     hydrateFromHash() {
-      document.querySelectorAll(".chip[data-filter]").forEach((b) => {
-        b.classList.toggle("active", b.dataset.filter === state.filterMode);
-      });
+      syncFilterUI();
+      syncGapDUI();
       syncLayerActive();
       sceneApi.applyVisibility();
       if (state.selectedId != null) {

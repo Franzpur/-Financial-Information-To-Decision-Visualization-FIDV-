@@ -13,3 +13,6 @@ agent_tasklist/*
 !agent_tasklist/DESIGN.md
 !agent_tasklist/AESTHETIC.md
 !agent_tasklist/INFORMATION.md
+
+# 交叉整合部：队员下载件与功能对比报告不进仓（见 POWER-KNOWLEDGE.md）
+cross-integration/

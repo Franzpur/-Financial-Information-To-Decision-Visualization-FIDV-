@@ -31,6 +31,8 @@ export const state = {
   shellCube: false,
   /** Shell user anchor from bundle.meta.shellAnchor */
   shellAnchor: null,
+  /** [C-REV-LINK] Point-to-point edges; peers are real C-POINT companies on demo slices. */
+  revenueLinks: [],
 };
 
 export function visibleCompanies() {

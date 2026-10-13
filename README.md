@@ -2,7 +2,7 @@
 
 To standardly visualize statistics to fit human perception, so managers can make decisions more easily.
 
-上传范围见 [`PUBLIC-PRIVATE.md`](./PUBLIC-PRIVATE.md)（公私隔离协议）：工程进仓；agent 与调度任务留在各人本机。写码权见 [`POWER-KNOWLEDGE.md`](./POWER-KNOWLEDGE.md)（权知统一：专知内美工/信息可改码；跨域仍父代理；终裁为监理部三监报告）。
+上传范围见 [`PUBLIC-PRIVATE.md`](./PUBLIC-PRIVATE.md)（公私隔离协议）：工程进仓；agent 与调度任务留在各人本机。写码权见 [`POWER-KNOWLEDGE.md`](./POWER-KNOWLEDGE.md)（权知统一：专知内美工/信息可改码；交叉整合部仅在总参谋部调度且任务写明实现时合并产品代码；其余跨域仍父代理；终裁为监理部三监报告）。
 
 ## Modules
 

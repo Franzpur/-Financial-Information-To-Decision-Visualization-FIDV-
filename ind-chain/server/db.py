@@ -1,6 +1,7 @@
 """SQLite access for the Standard-Cube (ind-chain)."""
 from __future__ import annotations
 
+import json
 import math
 import sqlite3
 from pathlib import Path
@@ -30,7 +31,8 @@ CREATE TABLE IF NOT EXISTS companies (
   note TEXT,
   value_m REAL,
   source TEXT,
-  source_detail TEXT
+  source_detail TEXT,
+  bond_schedule TEXT
 );
 
 CREATE INDEX IF NOT EXISTS idx_companies_layer ON companies(layer_index);
@@ -56,6 +58,9 @@ def connect(db_path: Path | None = None) -> sqlite3.Connection:
 
 def init_schema(conn: sqlite3.Connection) -> None:
     conn.executescript(SCHEMA)
+    cols = {row[1] for row in conn.execute("PRAGMA table_info(companies)")}
+    if "bond_schedule" not in cols:
+        conn.execute("ALTER TABLE companies ADD COLUMN bond_schedule TEXT")
     conn.commit()
 
 
@@ -85,8 +90,6 @@ def _source_fields(layer_index: int, value_m: float | None) -> tuple[str, str]:
 
 
 def seed_from_json(conn: sqlite3.Connection, data_dir: Path | None = None) -> None:
-    import json
-
     d = data_dir or DATA_DIR
     layers = json.loads((d / "layers.json").read_text())
     companies = json.loads((d / "companies.json").read_text())
@@ -100,11 +103,14 @@ def seed_from_json(conn: sqlite3.Connection, data_dir: Path | None = None) -> No
         )
     for c in companies:
         src, detail = _source_fields(c["layer_index"], c.get("value_m"))
+        bond = c.get("bond_schedule")
+        bond_txt = json.dumps(bond) if bond is not None else None
         conn.execute(
             """
             INSERT INTO companies
-              (id, name, rev_bn, ticker, country, layer_index, note, value_m, source, source_detail)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+              (id, name, rev_bn, ticker, country, layer_index, note, value_m,
+               source, source_detail, bond_schedule)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
                 c["id"],
@@ -117,6 +123,7 @@ def seed_from_json(conn: sqlite3.Connection, data_dir: Path | None = None) -> No
                 c.get("value_m"),
                 src,
                 detail,
+                bond_txt,
             ),
         )
     conn.commit()
@@ -189,7 +196,26 @@ def assign_rings(companies: list[dict[str, Any]]) -> list[dict[str, Any]]:
 
 
 def row_company(r: sqlite3.Row) -> dict[str, Any]:
-    return {
+    keys = r.keys()
+    bond_raw = r["bond_schedule"] if "bond_schedule" in keys else None
+    bond_schedule = None
+    if bond_raw:
+        try:
+            rows = json.loads(bond_raw)
+        except (TypeError, json.JSONDecodeError):
+            rows = None
+        if isinstance(rows, list):
+            bond_schedule = [
+                {
+                    "year": item.get("year"),
+                    "principalBn": item.get("principal_bn"),
+                    "interestBn": item.get("interest_bn"),
+                    "totalBn": item.get("total_bn"),
+                }
+                for item in rows
+                if isinstance(item, dict)
+            ]
+    out = {
         "id": r["id"],
         "name": r["name"],
         "revBn": r["rev_bn"],
@@ -203,6 +229,9 @@ def row_company(r: sqlite3.Row) -> dict[str, Any]:
         # 3类坐标 / 行业坐标（C-COORD-3）。BICS 7×2 连字符；库见 class-3-coords。待填。
         "legalEntityCoord": "",
     }
+    if bond_schedule is not None:
+        out["bondSchedule"] = bond_schedule
+    return out
 
 
 def list_layers(conn: sqlite3.Connection) -> list[dict[str, Any]]:

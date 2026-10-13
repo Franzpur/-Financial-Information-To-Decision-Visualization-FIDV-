@@ -1,7 +1,7 @@
 import { fetchBundle } from "./api.js?v=50";
-import { state, readHash, resolveBicsLabel } from "./state.js?v=50";
-import { createScene } from "./scene.js?v=53";
-import { createUI } from "./ui.js?v=53";
+import { state, readHash, resolveBicsLabel } from "./state.js?v=51";
+import { createScene } from "./scene.js?v=64";
+import { createUI } from "./ui.js?v=58";
 
 const bootError = document.getElementById("bootError");
 const app = document.getElementById("app");
@@ -25,6 +25,7 @@ async function boot() {
     state.countries = bundle.meta?.countries || {};
     state.shellCube = Boolean(bundle.meta?.shell);
     state.shellAnchor = bundle.meta?.shellAnchor || null;
+    state.revenueLinks = Array.isArray(bundle.revenueLinks) ? bundle.revenueLinks : [];
     if (bundle.meta?.shell && bundle.meta?.tickerFound === false) {
       state.openTickerMiss = true;
     }
@@ -32,7 +33,7 @@ async function boot() {
     const viewport = document.getElementById("viewport");
     let ui;
     const sceneApi = createScene(viewport, {
-      onSelect: (c) => ui?.onSelect(c),
+      onSelect: (c, meta) => ui?.onSelect(c, meta || {}),
       onFocusChange: () => ui?.onFocusChange(),
       onClear: () => ui?.onClear(),
       onReset: () => ui?.onReset(),

@@ -948,5 +948,197 @@
     "layer_index": 10,
     "note": "Enterprise AI data platform.",
     "value_m": null
+  },
+  {
+    "id": 95,
+    "name": "Demo Company",
+    "rev_bn": 3.2,
+    "ticker": "DEMO",
+    "country": "US",
+    "layer_index": 10,
+    "note": "Synthetic showcase firm for FIDV demos (not a live issuer).",
+    "value_m": null,
+    "bond_schedule": [
+      {
+        "year": 2026,
+        "principal_bn": 0,
+        "interest_bn": 0.1532,
+        "total_bn": 0.1532
+      },
+      {
+        "year": 2027,
+        "principal_bn": 0,
+        "interest_bn": 0.1532,
+        "total_bn": 0.1532
+      },
+      {
+        "year": 2028,
+        "principal_bn": 0.25,
+        "interest_bn": 0.1532,
+        "total_bn": 0.4032
+      },
+      {
+        "year": 2029,
+        "principal_bn": 0,
+        "interest_bn": 0.1436,
+        "total_bn": 0.1436
+      },
+      {
+        "year": 2030,
+        "principal_bn": 0.35,
+        "interest_bn": 0.1436,
+        "total_bn": 0.4936
+      },
+      {
+        "year": 2031,
+        "principal_bn": 0,
+        "interest_bn": 0.129,
+        "total_bn": 0.129
+      },
+      {
+        "year": 2032,
+        "principal_bn": 0.3,
+        "interest_bn": 0.129,
+        "total_bn": 0.429
+      },
+      {
+        "year": 2033,
+        "principal_bn": 0,
+        "interest_bn": 0.1169,
+        "total_bn": 0.1169
+      },
+      {
+        "year": 2034,
+        "principal_bn": 0,
+        "interest_bn": 0.1169,
+        "total_bn": 0.1169
+      },
+      {
+        "year": 2035,
+        "principal_bn": 0.45,
+        "interest_bn": 0.1169,
+        "total_bn": 0.5669
+      },
+      {
+        "year": 2036,
+        "principal_bn": 0,
+        "interest_bn": 0.0967,
+        "total_bn": 0.0967
+      },
+      {
+        "year": 2037,
+        "principal_bn": 0,
+        "interest_bn": 0.0967,
+        "total_bn": 0.0967
+      },
+      {
+        "year": 2038,
+        "principal_bn": 0.4,
+        "interest_bn": 0.0967,
+        "total_bn": 0.4967
+      },
+      {
+        "year": 2039,
+        "principal_bn": 0,
+        "interest_bn": 0.0795,
+        "total_bn": 0.0795
+      },
+      {
+        "year": 2040,
+        "principal_bn": 0,
+        "interest_bn": 0.0795,
+        "total_bn": 0.0795
+      },
+      {
+        "year": 2041,
+        "principal_bn": 0.35,
+        "interest_bn": 0.0795,
+        "total_bn": 0.4295
+      },
+      {
+        "year": 2042,
+        "principal_bn": 0,
+        "interest_bn": 0.0627,
+        "total_bn": 0.0627
+      },
+      {
+        "year": 2043,
+        "principal_bn": 0,
+        "interest_bn": 0.0627,
+        "total_bn": 0.0627
+      },
+      {
+        "year": 2044,
+        "principal_bn": 0.3,
+        "interest_bn": 0.0627,
+        "total_bn": 0.3627
+      },
+      {
+        "year": 2045,
+        "principal_bn": 0,
+        "interest_bn": 0.0489,
+        "total_bn": 0.0489
+      },
+      {
+        "year": 2046,
+        "principal_bn": 0,
+        "interest_bn": 0.0489,
+        "total_bn": 0.0489
+      },
+      {
+        "year": 2047,
+        "principal_bn": 0,
+        "interest_bn": 0.0489,
+        "total_bn": 0.0489
+      },
+      {
+        "year": 2048,
+        "principal_bn": 0.4,
+        "interest_bn": 0.0489,
+        "total_bn": 0.4489
+      },
+      {
+        "year": 2049,
+        "principal_bn": 0,
+        "interest_bn": 0.0289,
+        "total_bn": 0.0289
+      },
+      {
+        "year": 2050,
+        "principal_bn": 0,
+        "interest_bn": 0.0289,
+        "total_bn": 0.0289
+      },
+      {
+        "year": 2051,
+        "principal_bn": 0,
+        "interest_bn": 0.0289,
+        "total_bn": 0.0289
+      },
+      {
+        "year": 2052,
+        "principal_bn": 0.35,
+        "interest_bn": 0.0289,
+        "total_bn": 0.3789
+      },
+      {
+        "year": 2053,
+        "principal_bn": 0,
+        "interest_bn": 0.0118,
+        "total_bn": 0.0118
+      },
+      {
+        "year": 2054,
+        "principal_bn": 0,
+        "interest_bn": 0.0118,
+        "total_bn": 0.0118
+      },
+      {
+        "year": 2055,
+        "principal_bn": 0.25,
+        "interest_bn": 0.0118,
+        "total_bn": 0.2618
+      }
+    ]
   }
 ]

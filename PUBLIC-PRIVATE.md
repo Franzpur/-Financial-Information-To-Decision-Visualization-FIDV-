@@ -32,6 +32,7 @@
 | `agents/` | 角色说明书 |
 | `agent_tasklist/` 除上表三份真源以外的文件（含 `RULE.md`、调度任务、三分部） | 任务与权力 |
 | `.cursor/agents/`、`.cursor/skills/` | 本机 Cursor 工具 |
+| `cross-integration/` | 队员下载件与功能对比报告，不进仓 |
 
 历史 commit 里曾经进过仓的 agent 文仍在旧版本里。不改写历史，不 force push。本机文件不删。
 
@@ -40,7 +41,7 @@
 ## 上传检查
 
 1. 只 `git add` 工程路径与本协议、`POWER-KNOWLEDGE.md`、`.gitignore`、根 README。
-2. 不要把 `agents/`、`.cursor/`、以及 `agent_tasklist/` 里非三份真源的改动加入提交。
+2. 不要把 `agents/`、`.cursor/`、`cross-integration/`、以及 `agent_tasklist/` 里非三份真源的改动加入提交。
 3. 停跟踪用 `git rm --cached`，不要用不带 `--cached` 的 `git rm`。
 
 ## Pull

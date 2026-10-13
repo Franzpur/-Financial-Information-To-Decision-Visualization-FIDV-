@@ -260,9 +260,10 @@ def main() -> None:
         print("missing hierarchy JSON", HIER_JSON, file=sys.stderr)
         sys.exit(1)
     by_name, by_code, staples_l4 = load_hierarchy()
-    if DB_OUT.exists():
-        DB_OUT.unlink()
-    conn = sqlite3.connect(DB_OUT)
+    tmp_out = DB_OUT.with_name(DB_OUT.name + ".tmp")
+    if tmp_out.exists():
+        tmp_out.unlink()
+    conn = sqlite3.connect(tmp_out)
     cur = conn.cursor()
     cur.execute(
         """CREATE TABLE entity_memberships (
@@ -299,6 +300,7 @@ def main() -> None:
         "SELECT COUNT(DISTINCT bics_code_l4) FROM entity_memberships"
     ).fetchone()[0]
     conn.close()
+    tmp_out.replace(DB_OUT)
     print(f"wrote {DB_OUT} rows={total_ok} reject={total_rej} l4_codes={n_codes}")
 
 
