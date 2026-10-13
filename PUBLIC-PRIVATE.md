@@ -41,8 +41,9 @@
 ## 上传检查
 
 1. 只 `git add` 工程路径与本协议、`POWER-KNOWLEDGE.md`、`.gitignore`、根 README。
-2. 不要把 `agents/`、`.cursor/`、`cross-integration/`、以及 `agent_tasklist/` 里非三份真源的改动加入提交。
-3. 停跟踪用 `git rm --cached`，不要用不带 `--cached` 的 `git rm`。
+2. **`library/worklog*` 每次上传都必交**（含本轮书记刚追加的行）。谈完就推时，先记 worklog 再 `git add`；若推送后又记了一条，立刻再交再推，不把 worklog 留在本机。
+3. 不要把 `agents/`、`.cursor/`、`cross-integration/`、以及 `agent_tasklist/` 里非三份真源的改动加入提交。
+4. 停跟踪用 `git rm --cached`，不要用不带 `--cached` 的 `git rm`。
 
 ## Pull
 
