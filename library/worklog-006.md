@@ -18,3 +18,4 @@
 |192| 电总参谋部：圆环改与切片平行共面，不要随视角转。 | 意志：C-POINT 共面固定朝向，取消 billboard。主代理：scene.js 建环 rotation.y=PI/2，tick 不再对 meshes faceToCamera；CONCEPTS 已改。三监通过。未提交。复杂度 3。执行 未提供。 |
 |193| 把这些改动都上传到 GitHub。 | 任务：按公私隔离提交工程并 push main。主代理 push → e88308b（NVDA 动态 L4 切片+共面环等）。未交 Partner Work、.vscode、cabinet 大件。无子代理。复杂度 2。执行 未提供。 |
 |194| cabinet和library的报告可以上传。 | 已 push fcd46f5：柜 ICBC-Elliot / modular-interface 的 md+html，以及 worklog-006。Partner Work、.vscode 仍未交。无子代理。复杂度 1。执行 未提供。 |
+|195| 公私隔离协议里 worklog 是必然要交的。 | 已写明 PUBLIC-PRIVATE 上传检查：library/worklog* 每次必交；并 push 4a2d843（含积压 #194）。无子代理。复杂度 1。执行 未提供。 |
