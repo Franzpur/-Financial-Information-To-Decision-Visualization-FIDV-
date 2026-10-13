@@ -19,3 +19,5 @@
 |193| 把这些改动都上传到 GitHub。 | 任务：按公私隔离提交工程并 push main。主代理 push → e88308b（NVDA 动态 L4 切片+共面环等）。未交 Partner Work、.vscode、cabinet 大件。无子代理。复杂度 2。执行 未提供。 |
 |194| cabinet和library的报告可以上传。 | 已 push fcd46f5：柜 ICBC-Elliot / modular-interface 的 md+html，以及 worklog-006。Partner Work、.vscode 仍未交。无子代理。复杂度 1。执行 未提供。 |
 |195| 公私隔离协议里 worklog 是必然要交的。 | 已写明 PUBLIC-PRIVATE 上传检查：library/worklog* 每次必交；并 push 4a2d843（含积压 #194）。无子代理。复杂度 1。执行 未提供。 |
+|196| 电总参谋部：切片外浅框超出 0～10，d=0 更明显，去掉。 | 意志：整层去掉 Box3Helper 外线框。主代理：删 syncFrame/placeFrame/framePad。三监通过。未提交。复杂度 2。执行 未提供。 |
+|197| 系统通知：8787 后台服务 exit 143。 | 143 为进程被结束；已重新拉起 ind-chain 8787。未改产品代码。无子代理。复杂度 0。执行 未提供。 |
