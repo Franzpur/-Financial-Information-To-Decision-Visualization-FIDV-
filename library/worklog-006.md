@@ -16,3 +16,4 @@
 |190| 系统通知：先前 Force kill PID 1240 启服务任务 exit 137。 | 137 为强杀预期；现 8787 仍在听（健康 200）。未改代码。无子代理。复杂度 0。执行 未提供。 |
 |191| 电总参谋部：鼠标转视角/移动不见；切片名应随公司 BICS L4 动态，勿用 demo power 等。 | 意志：恢复 orbit/pan；NVDA 链按上下游去重 L4 动态建片并以 L4 名命名。主代理：scene.js 选中后 controls.enabled=true；bundle_nvda_chain 动态 L4（供→中→客）；JSON 去 layerId；SLB→13101111 Oilfield Services & Equipment；约 16 片。三监第2次通过。未提交。复杂度 7。执行 未提供。 |
 |192| 电总参谋部：圆环改与切片平行共面，不要随视角转。 | 意志：C-POINT 共面固定朝向，取消 billboard。主代理：scene.js 建环 rotation.y=PI/2，tick 不再对 meshes faceToCamera；CONCEPTS 已改。三监通过。未提交。复杂度 3。执行 未提供。 |
+|193| 把这些改动都上传到 GitHub。 | 任务：按公私隔离提交工程并 push main。主代理 push → e88308b（NVDA 动态 L4 切片+共面环等）。未交 Partner Work、.vscode、cabinet 大件。无子代理。复杂度 2。执行 未提供。 |

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>模块化与接口方案</title>
+<style>
+:root {
+  --paper: #f7f5f0;
+  --ink: #1a1f26;
+  --muted: #4a5560;
+  --rule: #c5ccd4;
+  --fill: #ece8e0;
+}
+@page { size: A4; margin: 14mm 14mm 16mm; }
+* { box-sizing: border-box; }
+body {
+  margin: 0 auto;
+  padding: 16mm 16mm 22mm;
+  max-width: 180mm;
+  color: var(--ink);
+  background: var(--paper);
+  font-family: "Iowan Old Style", "Palatino Linotype", Palatino, "Songti SC", "Noto Serif SC", serif;
+  font-size: 11pt;
+  line-height: 1.45;
+}
+h1 { font-size: 18pt; font-weight: 600; letter-spacing: 0.04em; margin: 0.2em 0 0.3em; }
+.brand { letter-spacing: 0.07em; font-size: 13pt; margin: 0; }
+h2 { font-size: 12.5pt; border-bottom: 1px solid var(--rule); padding-bottom: 0.15em; margin-top: 1.35em; page-break-after: avoid; }
+h3 { font-size: 11.5pt; font-weight: 600; margin: 1.05em 0 0.25em; page-break-after: avoid; }
+p { margin: 0.45em 0; }
+.cover-meta { color: var(--muted); font-size: 10pt; }
+.no-print { font-size: 10pt; color: var(--muted); border-bottom: 1px solid var(--rule); padding-bottom: 0.6em; margin-bottom: 1em; }
+ul, ol { margin: 0.35em 0 0.7em; padding-left: 1.3em; }
+li { margin: 0.22em 0; }
+table { width: 100%; border-collapse: collapse; font-size: 9.5pt; margin: 0.6em 0 1em; page-break-inside: avoid; }
+th, td { border: 1px solid var(--rule); padding: 0.28em 0.45em; text-align: left; vertical-align: top; }
+th { background: var(--fill); font-weight: 600; }
+code, pre { font-family: "SF Mono", ui-monospace, Menlo, Consolas, monospace; }
+code { font-size: 0.86em; }
+pre { background: #efece6; border: 1px solid var(--rule); padding: 0.55em 0.7em; font-size: 9pt; line-height: 1.4; page-break-inside: avoid; }
+@media print {
+  body { background: white; }
+  .no-print { display: none; }
+  a { color: inherit; text-decoration: none; }
+}
+</style>
+</head>
+<body>
+<p class="no-print">浏览器打开 → 打印 → 存 PDF → 关掉页眉网址。</p>
+<p class="brand">FIDV</p>
+<h1>模块化与接口方案</h1>
+<p class="cover-meta">内阁读本 · 2026-10-13 · 供以后审阅</p>
+
+<p>2026-10-13。业主原话：「电内阁，好的我明白了，现在我有一个想法，我觉得这个项目最后必须做到模块化，不同功能通过特定接口连接，以达到风险隔离的目的，你给我提出一个模块化与接口方案。」</p>
+<p>上一份整合建议在 <code>cabinet/ICBC-Elliot-integration-advice.md</code>。业主已明白那一份。本文件不重选边，不改那一份。</p>
+<p>目的写死：<strong>风险隔离</strong>。不同功能通过特定接口连接。一块失败，别的模块只看见接口上约定的空、缺或旧值，各自继续。一块失败不得拖垮另一块。</p>
+<p>方案接在现有工程上：<code>ind-chain/</code>（概念在 <code>ind-chain/CONCEPTS.md</code>，路由在 <code>ind-chain/README.md</code> 的 API 表），行业库在 <code>class-3-coords/BICS-Classification/</code>。仍是一个本机进程 <code>127.0.0.1:8787</code>，仍是 <code>/</code>、<code>/list</code>、<code>/cube</code> 这三处入口。不另起一套服务，不把 FIDV 写成与现有页面无关的微服务说明书。</p>
+<p>这是方案，不是实施。</p>
+
+<h2>不采用</h2>
+<ol>
+<li>模块化是代码与数据的边界，不是把一个三维空间拆成多张互不相通的页面。<code>agent_tasklist/DESIGN.md</code> 要求一维、二维、三维在同一个三维空间，信息在这个空间里堆叠。首页、名单、立方体仍是同一产品的入口。人从名单点进 <code>/cube?ticker=</code>，进入的是同一套用户坐标 <code>(s, x, y)</code>。不采用按页面各做一个孤立应用。</li>
+<li>公司节点仍是正对相机的环（C-POINT）。营收环（C-RING）只表示环分数，环心与切片共面。债务若日后要画，是企业节点之间的命名连线。不把营收环涂成风险颜色。本方案给债务留接口名，债务图没有做好。</li>
+<li>美 / 非美色只表示上市地。立方体上只有 <code>COLORS.US</code>（<code>#3cf0ff</code>）与 <code>COLORS.INTL</code>（<code>#ffb020</code>），读的是公司的 <code>country</code>（<code>US</code> 或 <code>INTL</code>）。不采用用这套颜色同时表示风险。</li>
+</ol>
+
+<h2>接口在现有路径上</h2>
+<p>模块之间只走下面这些口。口上没有的字段，调用方当不存在。谁也不打开对方的内部文件，谁也不改对方的几何。</p>
+<table>
+<thead>
+<tr><th>现有路径</th><th>归哪一块</th><th>接口名</th></tr>
+</thead>
+<tbody>
+<tr><td><code>GET /api/bics/children</code>、<code>/api/bics/node</code>、<code>/api/bics/l1</code></td><td>行业层级</td><td>行业节点</td></tr>
+<tr><td><code>GET /api/bics/locate</code>、<code>/api/bics/entities</code></td><td>成员库</td><td>主业成员</td></tr>
+<tr><td>首页格子上的公司个数</td><td>成员库，由首页按 <code>bicsCode</code> 拼到节点上</td><td>主业计数</td></tr>
+<tr><td><code>/</code> 上的定位与 L1–L3 板（<code>home.js</code>）</td><td>首页定位</td><td>只调用上三口，再把人送到名单</td></tr>
+<tr><td><code>/list?bics=</code>（<code>list.js</code>）</td><td>名单</td><td>只调用主业成员；行点击送到壳层</td></tr>
+<tr><td>不带 <code>ticker</code> 的 <code>GET /api/bundle</code>，以及 <code>/api/layers</code>、<code>/api/companies</code>、<code>/api/companies/:id</code></td><td>演示库</td><td>演示链</td></tr>
+<tr><td><code>GET /api/bundle?ticker=</code></td><td>壳层</td><td>公司壳</td></tr>
+<tr><td><code>ind-chain/data/nvda-revenue-links.json</code> 挂到壳层的 <code>revenueLinks</code></td><td>收入线</td><td>收入线</td></tr>
+<tr><td><code>web/js/coords.js</code></td><td>坐标</td><td>位置</td></tr>
+<tr><td><code>main.js</code> 写入 <code>state.js</code>，<code>scene.js</code> / <code>ui.js</code> 只读这些字段</td><td>立方体场景</td><td>场景交接</td></tr>
+<tr><td>今天没有任何路由</td><td>债务</td><td>债务线（预留，未挂上）</td></tr>
+</tbody>
+</table>
+<p>立方体页的 <code>api.js</code> 只按地址取 bundle：地址上有 <code>ticker</code> 就走公司壳，没有就走演示链。首页、名单不经过 <code>api.js</code>，也不取立方体几何。</p>
+<p>摆放只经过坐标模块。场景调用 <code>applyCoord</code> / <code>applySliceCoord</code>。不在场景里写 Three.js 原始坐标。</p>
+
+<h2>行业层级</h2>
+<p>独占 <code>class-3-coords/BICS-Classification/bics-equity-hierarchy-2024.json</code> 里的节点。镜像 <code>bics_hierarchy.db</code> 若在，也只归这里；产品读节点以 JSON 为准。</p>
+<p>交出的接口叫 <strong>行业节点</strong>。路径是 <code>GET /api/bics/children?parent=</code>（空 parent 为 L1）、<code>GET /api/bics/node?code=</code>、<code>GET /api/bics/l1</code>。</p>
+<p>接口上只过：<code>bicsCode</code>、<code>name</code>、<code>nameZh</code>、<code>definition</code>、<code>legalEntityCoord</code>、<code>level</code>、<code>isLeaf</code>、<code>parentCode</code>，以及 children 包里的 <code>parent</code>、<code>ancestors</code>、<code>children</code>。公司个数不在这张字段表里。</p>
+<p>失败时，调用方看见缺：parent 未知为 404 <code>unknown bics parent</code>；文件缺失则 children 为空。首页格子可以没有，名单与壳层不改去演示链找公司。</p>
+<p>不得打开 <code>bics_entities_20261003.db</code>、<code>ind_chain.db</code>、收入线 JSON。不得改环、切线或相机。</p>
+<p>今天 <code>bics_children</code> 的响应里还夹着公司数。方案把数字划给成员库的主业计数。计数失败时，节点仍可返回，个数为 0 或缺。</p>
+
+<h2>成员库</h2>
+<p>独占 <code>class-3-coords/BICS-Classification/bics_entities_20261003.db</code> 的表 <code>entity_memberships</code>。摄入可以读 DATA-SPACE 里的 xlsx，可以读行业节点的公开字段（<code>bicsCode</code>、<code>name</code>）做对照。摄入不改层级文件。</p>
+<p>交出的读接口叫 <strong>主业成员</strong>。</p>
+<ul>
+<li><code>GET /api/bics/locate?q=</code> 只过 <code>hits[].name</code>、<code>ticker</code>、<code>bicsCode</code>、<code>l4Name</code>、<code>legalEntityCoord</code>，以及 <code>exact</code>。</li>
+<li><code>GET /api/bics/entities?bics=</code> 只过主业行：<code>name</code>、<code>ticker</code>、<code>l1_name</code>、<code>l4_name</code>、<code>bics_code_l4</code>、<code>legal_entity_coord</code>、<code>pct_tot_rev</code>、<code>ind_rev</code>、<code>pct_sum</code>、<code>segments</code>、<code>other_segments</code>，以及上市地 <code>listingCountry</code>（含名单已在用的未映射标记）。主业排序与现在相同：有数字的 <code>% Tot Rev</code> 优先，空占比仍可胜出，此时企业坐标前加 <code>-</code>。</li>
+</ul>
+<p>交给首页拼板的叫 <strong>主业计数</strong>：<code>companyCount</code>、<code>totalCount</code>、<code>listingCountries</code>、<code>unmappedCount</code>、<code>listingCountry</code>。只按行业码前缀和上市地过滤后的个数，按 <code>bicsCode</code> 与节点对齐。</p>
+<p>不交出：<code>source_file</code>、<code>mkt_cap</code>、xlsx 路径、行 id。</p>
+<p>交出的写接口叫 <strong>替换成员库</strong>。新库写完整之后才替换活库。读侧保持只读打开（现有 <code>file:…?mode=ro</code>）。写入失败时，首页、名单、壳层看见的仍是替换前那一份旧库。</p>
+<p>库文件不在时：locate 为 <code>{hits: [], exact: false}</code>；entities 为 <code>[]</code>；壳层 <code>companies</code> 为 <code>[]</code> 且 <code>tickerFound</code> 为 false。这三处都不得改读演示库。</p>
+<p>不得打开 <code>ind_chain.db</code> 或收入线文件。不得改环、切线或相机。</p>
+<p>现行 <code>class-3-coords/BICS-Classification/ingest_20261003_entities.py</code> 在写入前会删掉活库。替换成员库这条要求尚未落在该脚本上。未点名之前不改它。</p>
+
+<h2>首页定位</h2>
+<p>独占 <code>ind-chain/web/index.html</code>、<code>web/js/home.js</code>，以及上市地下拉（<code>nations.js</code>）。开屏只在这一页。</p>
+<p>它调用行业节点、主业计数、主业成员的 locate。它不拥有三维场景。</p>
+<p>它把人送去的地址：L4 格子到 <code>/list?bics=</code>；定位框写入 ticker 后再按 Enter，到 <code>/list?bics=&lt;主业 L4&gt;&amp;q=&lt;ticker&gt;</code>。页眉没有立方体按钮。裸立方体只按地址进入。</p>
+<p>失败时：locate 无命中，浮层是空的，板还在。行业节点缺失，这一屏没有格子，不打开裸 <code>/cube</code>。主业计数缺失，格子还在，数字为 0 或缺。</p>
+<p>不得引入 <code>scene.js</code>。不得读成员库文件、演示库文件或收入线文件。不得把定位失败画成演示链。</p>
+
+<h2>名单</h2>
+<p>独占 <code>ind-chain/web/list.html</code>、<code>web/js/list.js</code>。</p>
+<p>它只调用主业成员 <code>GET /api/bics/entities</code>。行业坐标在页面上只显示前 4 段，并保留前导 <code>-</code>（<code>displayIndustryCoord</code>）。可选 <code>?q=</code> 只预填本页的名称或 ticker 过滤。按下收入排序时，只按主业行 <code>ind_rev</code> 的美元原值降序，空值在后。</p>
+<p>它把人送去的地址：一行点击到 <code>/cube?ticker=</code>。退格回到面包屑上一级板。</p>
+<p>失败时：<code>entities</code> 为空就是空表。祖先面包屑在行业节点还在时仍显示。不把 <code>companies.json</code> 里的公司填进表。</p>
+<p>不得请求不带 <code>ticker</code> 的 <code>/api/bundle</code>。不得读收入线文件。不得画环。</p>
+
+<h2>演示库</h2>
+<p>独占 <code>ind-chain/data/layers.json</code>、<code>ind-chain/data/companies.json</code>，以及由 seed 生成的 <code>ind-chain/data/ind_chain.db</code>。</p>
+<p>交出的接口叫 <strong>演示链</strong>。路径是不带 <code>ticker</code> 的 <code>GET /api/bundle</code>，以及 <code>GET /api/layers</code>、<code>GET /api/companies</code>、<code>GET /api/companies/:id</code>。</p>
+<p>接口上只过：<code>meta</code>（无 <code>shell</code>）、<code>layers</code>，以及公司的 <code>id</code>、<code>name</code>、<code>revBn</code>、<code>ticker</code>、<code>country</code>、<code>layer</code>、<code>note</code>、<code>valueM</code>、<code>source</code>、<code>sourceDetail</code>、<code>legalEntityCoord</code>、<code>revScore</code>、<code>ring</code>、<code>ringCos</code>、<code>ringSin</code>。环位置在服务端算好，浏览器不因过滤重算环。<code>country</code> 只供美 / 非美色，含义是上市地。</p>
+<p>只从裸地址 <code>/cube</code> 进入。首页和名单不调用这口。</p>
+<p>失败时：这份库打不开，裸立方体启动失败，画布按场景模块藏起。首页、名单、带 <code>ticker</code> 的公司壳不改走这份载荷，也不因它失败而关掉。</p>
+<p>不得打开成员库或收入线文件来补公司。不得把 <code>country</code> 写成风险。</p>
+
+<h2>壳层</h2>
+<p>独占带 <code>ticker</code> 的 bundle 形状（现有 <code>bundle_shell_ticker</code>）。一家公司放在用户坐标 <code>(s, x, y) = (5, 5, 5)</code>。<code>layers</code> 恒为 <code>[]</code>，因此没有行业切片墙，也没有营收环导引。</p>
+<p>交出的接口叫 <strong>公司壳</strong>。路径是 <code>GET /api/bundle?ticker=</code>。</p>
+<p>接口上只过：</p>
+<ul>
+<li><code>meta.shell</code> 为 true，<code>meta.shellAnchor</code> 为 <code>{s:5, x:5, y:5}</code>，以及 <code>meta.ticker</code>、<code>meta.tickerResolved</code>、<code>meta.tickerFound</code>、<code>meta.countries</code>、<code>meta.title</code>、<code>meta.version</code></li>
+<li><code>layers</code> 为 <code>[]</code></li>
+<li><code>companies</code> 为空，或一条：<code>id</code>、<code>name</code>、<code>ticker</code>、<code>revBn</code>（成员库 <code>ind_rev</code> 除以 1e9）、<code>country</code>（上市地收成 <code>US</code> 或 <code>INTL</code>）、<code>note</code>（L4 名）、<code>valueM</code> 为 null、<code>source</code> 为 <code>bics-entity</code>、<code>sourceDetail</code>（主业 L4 码）、<code>legalEntityCoord</code>、<code>s</code>、<code>x</code>、<code>y</code>（等于锚点）</li>
+<li><code>revenueLinks</code> 由收入线填入，可以是 <code>[]</code></li>
+</ul>
+<p>这一条不依赖演示库能否打开。公司身份只来自成员库的主业行。</p>
+<p>失败时：成员库没有这家，看见 <code>tickerFound</code> false、<code>companies</code> 为 <code>[]</code>、<code>layers</code> 仍为 <code>[]</code>、<code>shell</code> 仍为 true。收入线文件缺失，看见 <code>revenueLinks</code> 为 <code>[]</code>，已经解析到的那一家仍在。两种失败都不得退回整条演示链，不得改发不带 <code>ticker</code> 的 bundle。</p>
+<p>不得读场景里的 mesh。不得把这家公司放进演示库的层号。</p>
+<p>现行 <code>_api</code> 在分出 ticker 之前会先连接演示库。公司壳不依赖演示库，这条要求尚未落在该函数上。未点名之前不改它。</p>
+
+<h2>收入线</h2>
+<p>独占 <code>ind-chain/data/nvda-revenue-links.json</code> 里的 <code>links</code>。同文件的 <code>held</code> 留在文件内，不进入接口。</p>
+<p>交出的接口叫 <strong>收入线</strong>。只挂在公司壳的 <code>revenueLinks</code> 上。解析到的 ticker 词首是 <code>NVDA</code>、文件能读、行合格，才有元素。其他壳层一律 <code>[]</code>。</p>
+<p>接口上只过：<code>side</code>（<code>supplier</code> 或 <code>customer</code>）、<code>name</code>、<code>pct</code>、<code>country</code>（<code>US</code> 或 <code>INTL</code>）。<code>pct</code> 在供应商侧来自文件里的 <code>spendPct</code>，在客户侧来自 <code>revPct</code>。</p>
+<p>场景只在 <code>shellCube</code> 且数组非空时画。对手方仍是正对相机的环，圆心在切线所对的扇区上，不是 <code>state.companies</code> 里的公司，不能点选。线用切片描边色 <code>COLORS.EDGE</code>。这套颜色不表示风险。<code>held</code> 里的名字不画。</p>
+<p>失败时：文件不在、读失败、JSON 坏、或没有合格的 <code>links</code>，别人看见 <code>[]</code>。壳层仍是这一家公司（解析到了就是一个环）。不得退回整条演示链，不得改画裸立方体的十一层切片。</p>
+<p>不得读成员库的内部列。不得改公司环的半径或颜色。不得把 <code>held</code> 画出来当成已经完成的全链。</p>
+
+<h2>坐标</h2>
+<p>独占 <code>ind-chain/web/js/coords.js</code> 的 <code>LAYOUT</code>、单位、<code>companyCoord</code>、<code>displayIndustryCoord</code>。场景里的摆放只调用这里的 <code>applyCoord</code> / <code>applySliceCoord</code>。</p>
+<p>交出的接口叫 <strong>位置</strong>。字段只有 <code>{s, x, y}</code>。相对坐标 <code>ringCos</code>、<code>ringSin</code> 不叫 x、y，由 <code>companyCoord</code> 投影成位置。行业坐标只经 <code>displayIndustryCoord</code> 给首页和名单显示前 4 段并保留前导 <code>-</code>，不参与摆放。</p>
+<p>失败时：某个对象没有位置，场景不摆它。不得用演示链的层号补上，不得改写 Three.js 原始坐标补上。</p>
+<p>其他模块不得改 mesh 的世界坐标。不得把行业坐标或风险读成位置。</p>
+
+<h2>立方体场景</h2>
+<p>独占 <code>scene.js</code> 的几何、相机、点选，<code>ui.js</code> 的浮层，<code>main.js</code> 的启动。<code>state.js</code> 只做这一页的交接，不是给首页或名单改几何的后门。</p>
+<p>它读入的就是 <strong>场景交接</strong>：<code>main.js</code> 从公司壳或演示链写入 <code>state</code> 的 <code>layers</code>、<code>companies</code>、<code>countries</code>、<code>shellCube</code>、<code>shellAnchor</code>、<code>revenueLinks</code>。壳层没有这家公司时还有 <code>openTickerMiss</code>。面包屑名称若需要，只读行业节点 <code>GET /api/bics/node</code> 的公开字段，不据此更换 <code>companies</code>。</p>
+<p>公司节点只画成正对相机的环。环的半径来自营收尺度（演示链用 <code>revScore</code>；壳层点沿用现有壳层半径）。颜色只来自 <code>country</code> 的美 / 非美，含义是上市地。</p>
+<p>失败时：<code>fetchBundle</code> 或 <code>createScene</code> 抛错，<code>#app</code> 保持隐藏，错误条留在页面上，点击不把这句错误清掉。不得把没建成的画布交给人。</p>
+<p>收入线为 <code>[]</code> 且 <code>shell</code> 为真时，画面仍是壳层：没有切片墙；公司解析到了就是一个环，没有就是空锚点。不得在此时装上演示链的层。</p>
+<p>不得打开 sqlite、数据 JSON 或 DATA-SPACE。不得改那些文件。不得按风险给环上色。</p>
+
+<h2>债务线（预留，未建成）</h2>
+<p>独占：无。现在没有路径，没有文件，没有几何。</p>
+<p>接口名叫 <strong>债务线</strong>。今天不挂在 <code>GET /api/bundle</code> 上，<code>state</code> 里也没有这份字段。</p>
+<p>以后若点名要画：只在企业节点之间加命名连线。节点仍是正对相机的环。科目与字段到那时再定。本方案不填一套债的数字，也不把折线写成已经可看。</p>
+<p>现在其他模块看见的是缺。环、收入线、壳层、演示链保持原样。</p>
+<p>不得把营收环涂成风险颜色。不得把收入线文件改读成债务。不得为债务另开一页。</p>
+
+<h2>三处失败各自停下</h2>
+<ol>
+<li>收入线文件缺失时，公司壳仍是这一家公司，<code>revenueLinks</code> 为 <code>[]</code>。不得退回整条演示链。</li>
+<li>成员库写入失败时，旧库还在。locate、名单、壳层继续读替换前那一份。</li>
+<li>立方体场景没建成时，藏起 <code>#app</code>。人看见的是错误条，不是没建成的画布。</li>
+</ol>
+
+<h2>未点名之前</h2>
+<p>不改 <code>ind-chain</code>，不改产品代码，不改 <code>class-3-coords</code> 里的摄入脚本。内阁不否决，不代替实施。要落成代码，须业主另行点名。</p>
+</body>
+</html>
