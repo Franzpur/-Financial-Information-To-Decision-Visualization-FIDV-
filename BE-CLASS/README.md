@@ -1,4 +1,4 @@
-# class-3-coords
+# BE-CLASS
 
 第三类坐标：**行业坐标**（C-COORD-3）。Bloomberg BICS Equity Hierarchy 2024。
 

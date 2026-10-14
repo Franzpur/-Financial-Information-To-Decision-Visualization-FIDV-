@@ -13,24 +13,24 @@ To standardly visualize statistics to fit human perception, so managers can make
 | [`agent_tasklist/INFORMATION.md`](./agent_tasklist/INFORMATION.md) | 数据真源（词条、乱缺、BQLX 公式） |
 | [`POWER-KNOWLEDGE.md`](./POWER-KNOWLEDGE.md) | 权知统一：专知 ↔ 改码权 |
 | `agents/` | 本机工作工具，不随仓。见 `PUBLIC-PRIVATE.md` |
-| [`class-3-coords/`](./class-3-coords/) | 3类坐标 / 行业坐标（BICS Equity Hierarchy 2024） |
-| [`ind-chain/`](./ind-chain/) | Decision view. Industry-chain cube (Standard-Cube). Firms are nodes on slices |
+| [`BE-CLASS/`](./BE-CLASS/) | 3类坐标 / 行业坐标（BICS Equity Hierarchy 2024） |
+| [`Ind-Chain/`](./Ind-Chain/) | Decision view. Industry-chain cube (Standard-Financial-Charting). Firms are nodes on slices |
 | [`library/`](./library/) | 工作日志、可打印读本与运维记录 |
 | [`cabinet/`](./cabinet/) | 内阁整理数据、图件、新闻、分析报告；可打印报告在 `cabinet/reports/` |
-| [`ind-chain/CONCEPTS.md`](./ind-chain/CONCEPTS.md) | Concept library (ZH/EN): one name for slice, axes, pull |
+| [`Ind-Chain/CONCEPTS.md`](./Ind-Chain/CONCEPTS.md) | Concept library (ZH/EN): one name for slice, axes, pull |
 
-### Run Standard-Cube
+### Run Standard-Financial-Charting
 
-访达双击 `Standard-Cube.app`（无终端；可执行文件为 Mach-O，不是 shell 脚本）。或：
+访达双击 `Standard-Financial-Charting.app`（无终端；可执行文件为 Mach-O，不是 shell 脚本）。或：
 
 ```bash
-open Standard-Cube.app
+open Standard-Financial-Charting.app
 # or
-python3 ind-chain/scripts/launcher_gui.py
+python3 Ind-Chain/scripts/launcher_gui.py
 # or headless
-cd ind-chain && python3 scripts/seed.py && python3 server/app.py
+cd Ind-Chain && python3 scripts/seed.py && python3 server/app.py
 ```
 
-若改过启动桩源码：`./ind-chain/scripts/build-standard-cube-app.sh`。须把 `.app` 留在仓根；需带 tkinter 的 Python 3。
+若改过启动桩源码：`./Ind-Chain/scripts/build-standard-financial-charting-app.sh`。须把 `.app` 留在仓根；需带 tkinter 的 Python 3。
 
 GUI: **Open homepage** / **Restart** / **Quit**. Then http://127.0.0.1:8787/ (homepage). Cube: http://127.0.0.1:8787/cube

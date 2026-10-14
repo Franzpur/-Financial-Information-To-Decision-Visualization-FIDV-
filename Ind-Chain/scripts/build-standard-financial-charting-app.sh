@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-# Rebuild Standard-Cube.app native stub (Launch Services requires Mach-O, not a shell script).
+# Rebuild Standard-Financial-Charting.app native stub (Launch Services requires Mach-O, not a shell script).
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 REPO="$(cd "$ROOT/.." && pwd)"
-SRC="$ROOT/scripts/standard-cube-stub.c"
-APP="$REPO/Standard-Cube.app"
-OUT="$APP/Contents/MacOS/Standard-Cube"
+SRC="$ROOT/scripts/standard-financial-charting-stub.c"
+APP="$REPO/Standard-Financial-Charting.app"
+OUT="$APP/Contents/MacOS/Standard-Financial-Charting"
 ICNS_SRC="$ROOT/assets/fidv-launcher.icns"
 ICNS_DST="$APP/Contents/Resources/AppIcon.icns"
 
@@ -25,17 +25,17 @@ if [[ ! -f "$APP/Contents/Info.plist" ]]; then
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-	<string>Standard-Cube</string>
+	<string>Standard-Financial-Charting</string>
 	<key>CFBundleExecutable</key>
-	<string>Standard-Cube</string>
+	<string>Standard-Financial-Charting</string>
 	<key>CFBundleIconFile</key>
 	<string>AppIcon</string>
 	<key>CFBundleIdentifier</key>
-	<string>local.fidv.Standard-Cube</string>
+	<string>local.fidv.Standard-Financial-Charting</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>Standard-Cube</string>
+	<string>Standard-Financial-Charting</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
@@ -78,4 +78,4 @@ chmod +x "$OUT"
 codesign --force --deep -s - "$APP" >/dev/null 2>&1 || true
 /usr/bin/touch "$APP"
 
-echo "[ind-chain] built $OUT ($(file -b "$OUT"))"
+echo "[Ind-Chain] built $OUT ($(file -b "$OUT"))"

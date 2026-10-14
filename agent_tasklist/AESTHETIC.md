@@ -1,6 +1,6 @@
 # FIDV 美学真源（美工部）
 
-美工部判断网页与启动表层美学时，只以本文为准。产品是否服务金融决策，以 `DESIGN.md` 为准（理念贯彻属；终裁为监理部三监报告）。概念与坐标以 `ind-chain/CONCEPTS.md` 为准。
+美工部判断网页与启动表层美学时，只以本文为准。产品是否服务金融决策，以 `DESIGN.md` 为准（理念贯彻属；终裁为监理部三监报告）。概念与坐标以 `Ind-Chain/CONCEPTS.md` 为准。
 
 目标：把已落地的美学语言写成可复用真源，并在后续功能与分页中**延展同一语言**，不每页另起一套皮。
 
@@ -34,7 +34,7 @@
 
 ### Logo 标准（业主说「logo」即按此开发）
 
-产品 splash / home 左标矢量真源：`ind-chain/web/index.html` 内 `.splash-logo` 三框。纸面同族反相：`library/showable-report/assets/sfc-logo-frames-paper.svg`（封面 `SFC-plan-cover.html` 已对齐）。
+产品 splash / home 左标矢量真源：`Ind-Chain/web/index.html` 内 `.splash-logo` 三框。纸面同族反相：`library/showable-report/assets/sfc-logo-frames-paper.svg`（封面 `SFC-plan-cover.html` 已对齐）。
 
 **理念一句话：** 层次感来自三枚竖向圆角矩形**错位相套** + **递减透明度**（前实后虚），不是左右并排实心色块。
 
@@ -57,7 +57,7 @@
 
 - 可与右侧 **FIDV** 衬线字标（Iowan / Palatino / Georgia 栈）+ `--accent` 底线同组（splash / home）。
 - **单独露出**时只保留三框（纸面封面、仅标露出等），不另起第二套皮。
-- 启动图标 `ind-chain/assets/fidv-launcher*` 同族；纸面只用同族反相矢量。
+- 启动图标 `Ind-Chain/assets/fidv-launcher*` 同族；纸面只用同族反相矢量。
 
 **禁止**
 
@@ -76,9 +76,9 @@
 ### 启动图标与集成启动窗
 
 - 暗底上 **Logo 标准**三框同族 + accent 细线（与 splash 左标同族，非另皮）。
-- 源与产物：`ind-chain/assets/fidv-launcher-1024.png`、`fidv-launcher.icns`。
-- 施加：`ind-chain/scripts/set-command-icon.sh` → 根 `Standard-Cube.app/Contents/Resources/AppIcon.icns`（访达双击 `.app`，无 Terminal）。
-- **集成启动窗**（`ind-chain/scripts/launcher_gui.py`）：tkinter 小窗，色用同一板（BG `#0b0d10`、PANEL `#14181e`、STROKE `#2a313c`、TEXT `#e8edf4`、MUTED `#9aa6b5`、ACCENT `#8be0c0`）。标题 **Standard-Cube**，副标 `ind-chain`。按钮：**Open homepage** / **Restart** / **Quit**。命令跑在后端。
+- 源与产物：`Ind-Chain/assets/fidv-launcher-1024.png`、`fidv-launcher.icns`。
+- 施加：`Ind-Chain/scripts/set-command-icon.sh` → 根 `Standard-Financial-Charting.app/Contents/Resources/AppIcon.icns`（访达双击 `.app`，无 Terminal）。
+- **集成启动窗**（`Ind-Chain/scripts/launcher_gui.py`）：tkinter 小窗，色用同一板（BG `#0b0d10`、PANEL `#14181e`、STROKE `#2a313c`、TEXT `#e8edf4`、MUTED `#9aa6b5`、ACCENT `#8be0c0`）。标题 **Standard-Financial-Charting**，副标 `Ind-Chain`。按钮：**Open homepage** / **Restart** / **Quit**。命令跑在后端。
 
 ### 工程首页（C-HOME）
 
@@ -114,16 +114,16 @@
 
 | 资产 | 路径 |
 |------|------|
-| 色板 / chrome / 首页 | `ind-chain/web/css/app.css`；`ind-chain/web/index.html`（C-HOME + C-SPLASH）；`ind-chain/web/js/home.js` |
-| 四级名单 | `ind-chain/web/list.html`；`ind-chain/web/js/list.js` |
-| 立方体壳 | `ind-chain/web/cube.html`（C-CUBE；无 splash） |
-| splash 时序 | `ind-chain/web/js/home.js`（hold ~2s → fade ~4s） |
-| 面板类名与 HUD 外观 | `ind-chain/web/js/ui.js`（视觉层） |
-| 启动图标 | `ind-chain/assets/fidv-launcher*` |
-| 图标脚本 | `ind-chain/scripts/set-command-icon.sh` |
-| 启动器附着面 | 根 `Standard-Cube.app` 图标资源；`launcher_gui.py` 色板与窗体外观 |
-| Logo 几何真源 | `ind-chain/web/index.html`（`.splash-logo` 三框）；纸面同族 `library/showable-report/assets/sfc-logo-frames-paper.svg`（秘书纸面附着；几何以本文 Logo 标准为准） |
-| 概念续工指针 | `ind-chain/CONCEPTS.md` §10（美学细节回指本文） |
+| 色板 / chrome / 首页 | `Ind-Chain/web/css/app.css`；`Ind-Chain/web/index.html`（C-HOME + C-SPLASH）；`Ind-Chain/web/js/home.js` |
+| 四级名单 | `Ind-Chain/web/list.html`；`Ind-Chain/web/js/list.js` |
+| 立方体壳 | `Ind-Chain/web/cube.html`（C-CUBE；无 splash） |
+| splash 时序 | `Ind-Chain/web/js/home.js`（hold ~2s → fade ~4s） |
+| 面板类名与 HUD 外观 | `Ind-Chain/web/js/ui.js`（视觉层） |
+| 启动图标 | `Ind-Chain/assets/fidv-launcher*` |
+| 图标脚本 | `Ind-Chain/scripts/set-command-icon.sh` |
+| 启动器附着面 | 根 `Standard-Financial-Charting.app` 图标资源；`launcher_gui.py` 色板与窗体外观 |
+| Logo 几何真源 | `Ind-Chain/web/index.html`（`.splash-logo` 三框）；纸面同族 `library/showable-report/assets/sfc-logo-frames-paper.svg`（秘书纸面附着；几何以本文 Logo 标准为准） |
+| 概念续工指针 | `Ind-Chain/CONCEPTS.md` §10（美学细节回指本文） |
 
 **不独占：** `coords.js`、抽出/焦点几何、`scene.js` 中服务坐标可读性的材质逻辑；启动器进程与端口逻辑。
 

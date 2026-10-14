@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Standard-Cube integrated launcher — seed/serve/restart/quit without a terminal console."""
+"""Standard-Financial-Charting integrated launcher — seed/serve/restart/quit without a terminal console."""
 from __future__ import annotations
 
 import contextlib
@@ -17,7 +17,7 @@ def _alert(message: str) -> None:
             [
                 "/usr/bin/osascript",
                 "-e",
-                f'display alert "Standard-Cube" message "{message}" as critical',
+                f'display alert "Standard-Financial-Charting" message "{message}" as critical',
             ],
             check=False,
             stdout=subprocess.DEVNULL,
@@ -30,7 +30,7 @@ try:
     from tkinter import font as tkfont
 except ImportError:
     _alert("tkinter is required. Install Python 3 with Tcl/Tk, then retry.")
-    print("tkinter is required for Standard-Cube launcher", file=sys.stderr)
+    print("tkinter is required for Standard-Financial-Charting launcher", file=sys.stderr)
     sys.exit(1)
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -50,7 +50,7 @@ class Launcher:
     def __init__(self) -> None:
         self.proc: subprocess.Popen | None = None
         self.root = tk.Tk()
-        self.root.title("Standard-Cube")
+        self.root.title("Standard-Financial-Charting")
         self.root.configure(bg=BG)
         self.root.resizable(False, False)
         self.root.protocol("WM_DELETE_WINDOW", self.quit_app)
@@ -63,8 +63,8 @@ class Launcher:
         frame = tk.Frame(self.root, bg=BG, padx=20, pady=18)
         frame.pack(fill="both", expand=True)
 
-        tk.Label(frame, text="Standard-Cube", fg=TEXT, bg=BG, font=title_font).pack(anchor="w")
-        tk.Label(frame, text="ind-chain", fg=MUTED, bg=BG, font=muted_font).pack(anchor="w", pady=(0, 4))
+        tk.Label(frame, text="Standard-Financial-Charting", fg=TEXT, bg=BG, font=title_font).pack(anchor="w")
+        tk.Label(frame, text="Ind-Chain", fg=MUTED, bg=BG, font=muted_font).pack(anchor="w", pady=(0, 4))
         tk.Frame(frame, bg=ACCENT, height=1).pack(fill="x", pady=(2, 10))
 
         self.status = tk.StringVar(value="Stopped")

@@ -1,7 +1,7 @@
 /*
- * Native CFBundleExecutable for Standard-Cube.app.
+ * Native CFBundleExecutable for Standard-Financial-Charting.app.
  * macOS Launch Services rejects shell scripts as app executables (kLSNoExecutableErr).
- * Build: ./scripts/build-standard-cube-app.sh
+ * Build: ./scripts/build-standard-financial-charting-app.sh
  */
 #include <limits.h>
 #include <mach-o/dyld.h>
@@ -13,7 +13,7 @@
 static void alert(const char *msg) {
   char cmd[2300];
   snprintf(cmd, sizeof(cmd),
-           "/usr/bin/osascript -e 'display alert \"Standard-Cube\" message \"%s\" as critical' "
+           "/usr/bin/osascript -e 'display alert \"Standard-Financial-Charting\" message \"%s\" as critical' "
            ">/dev/null 2>&1",
            msg);
   system(cmd);
@@ -49,7 +49,7 @@ int main(int argc, char **argv) {
     resolved[sizeof(resolved) - 1] = '\0';
   }
 
-  /* .../Standard-Cube.app/Contents/MacOS/Standard-Cube → repo root */
+  /* .../Standard-Financial-Charting.app/Contents/MacOS/Standard-Financial-Charting → repo root */
   if (path_dirname(resolved) != 0 || path_dirname(resolved) != 0 ||
       path_dirname(resolved) != 0 || path_dirname(resolved) != 0) {
     alert("Bad app layout.");
@@ -57,9 +57,9 @@ int main(int argc, char **argv) {
   }
 
   char gui[PATH_MAX];
-  snprintf(gui, sizeof(gui), "%s/ind-chain/scripts/launcher_gui.py", resolved);
+  snprintf(gui, sizeof(gui), "%s/Ind-Chain/scripts/launcher_gui.py", resolved);
   if (access(gui, R_OK) != 0) {
-    alert("Missing launcher_gui.py. Keep Standard-Cube.app in the FIDV repo root.");
+    alert("Missing launcher_gui.py. Keep Standard-Financial-Charting.app in the FIDV repo root.");
     return 1;
   }
   if (chdir(resolved) != 0) {
@@ -91,7 +91,7 @@ int main(int argc, char **argv) {
   }
 
   char logpath[PATH_MAX];
-  snprintf(logpath, sizeof(logpath), "%s/ind-chain/data/launcher-last.log", resolved);
+  snprintf(logpath, sizeof(logpath), "%s/Ind-Chain/data/launcher-last.log", resolved);
   FILE *lf = fopen(logpath, "w");
   if (lf) {
     fprintf(lf, "exe=%s\nrepo=%s\npy=%s\ngui=%s\n", exe, resolved, py, gui);

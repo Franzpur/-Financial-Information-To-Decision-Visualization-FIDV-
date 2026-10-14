@@ -20,7 +20,7 @@
  * Bloomberg BICS Equity Hierarchy 2024；产品格式 7×2 连字符（右补 00）。
  * 主业行空 % Tot Rev 时企业坐标前加 ASCII '-'（节点坐标不加）。
  * 闸门/名单 chrome 只画前 4 段并保留前导 '-'；库与字段仍是 7 级。
- * 库：class-3-coords/BICS-Classification/。不参与摆放。
+ * 库：BE-CLASS/BICS-Classification/。不参与摆放。
  */
 /** Physical face edge length in Three.js meters (PlaneGeometry). */
 export const FACE = 4.2;

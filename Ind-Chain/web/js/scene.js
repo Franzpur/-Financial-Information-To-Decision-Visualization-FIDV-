@@ -1,5 +1,5 @@
 /**
- * Standard-Cube — Three.js scene.
+ * Standard-Financial-Charting — Three.js scene.
  * Concept targets: ../CONCEPTS.md  (tags [C-SLICE], [C-PULL], [C-STDVIEW], …)
  * Layout lives in user (s, x, y). See coords.js [C-COORD] / [C-MAP].
  * Three.js positions are produced only by applyCoord / applySliceCoord.

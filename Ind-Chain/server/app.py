@@ -36,8 +36,8 @@ WEB_ROOT = ROOT / "web"
 # W1 narrow mouth: repo-root modules/ only (graph + paper HTML). Not a general static mount.
 MODULES_ROOT = (ROOT.parent / "modules").resolve()
 NVDA_REVENUE_LINKS = ROOT / "data" / "nvda-revenue-links.json"
-BICS_JSON = ROOT.parent / "class-3-coords" / "BICS-Classification" / "bics-equity-hierarchy-2024.json"
-ENTITIES_DB = ROOT.parent / "class-3-coords" / "BICS-Classification" / "bics_entities_20261003.db"
+BICS_JSON = ROOT.parent / "BE-CLASS" / "BICS-Classification" / "bics-equity-hierarchy-2024.json"
+ENTITIES_DB = ROOT.parent / "BE-CLASS" / "BICS-Classification" / "bics_entities_20261003.db"
 HOST = "127.0.0.1"
 PORT = 8787
 _MODULES_SUFFIXES = {".html", ".json", ".css", ".js"}
@@ -986,12 +986,12 @@ def ensure_db() -> None:
     if n == 0:
         seed_from_json(conn)
         n = conn.execute("SELECT COUNT(*) AS n FROM companies").fetchone()["n"]
-        print(f"[ind-chain] seeded SQLite → {DB_PATH} ({n} companies)")
+        print(f"[Ind-Chain] seeded SQLite → {DB_PATH} ({n} companies)")
     else:
-        print(f"[ind-chain] using SQLite → {DB_PATH} ({n} companies)")
+        print(f"[Ind-Chain] using SQLite → {DB_PATH} ({n} companies)")
     conn.close()
     n_pri = sum(len(v) for v in _primary_index().values())
-    print(f"[ind-chain] primary listings {n_pri} tickers", flush=True)
+    print(f"[Ind-Chain] primary listings {n_pri} tickers", flush=True)
 
 
 def json_bytes(obj) -> bytes:
@@ -1097,7 +1097,7 @@ class Handler(BaseHTTPRequestHandler):
             self._api(path, qs)
             return
 
-        # Static assets under web/ only (W1 A1: no escape to data/, DATA-SPACE, chain docs).
+        # Static assets under web/ only (W1 A1: no escape to data/, BE-DATA, chain docs).
         rel = path.lstrip("/")
         web_root = WEB_ROOT.resolve()
         candidate = (WEB_ROOT / rel).resolve()
@@ -1224,12 +1224,12 @@ def main() -> None:
     ensure_db()
     # Loopback-only stdlib server (HOST=127.0.0.1). Cleartext HTTP is intentional for local FIDV.
     httpd = ThreadingHTTPServer((HOST, PORT), Handler)
-    print(f"[ind-chain] homepage http://{HOST}:{PORT}/ · list /list · cube /cube · modules /modules/", flush=True)
-    print("[ind-chain] API: /api/bundle  /api/bics/children  /api/bics/entities  /api/bics/locate  /api/bics/node  /api/health", flush=True)
+    print(f"[Ind-Chain] homepage http://{HOST}:{PORT}/ · list /list · cube /cube · modules /modules/", flush=True)
+    print("[Ind-Chain] API: /api/bundle  /api/bics/children  /api/bics/entities  /api/bics/locate  /api/bics/node  /api/health", flush=True)
     try:
         httpd.serve_forever()
     except KeyboardInterrupt:
-        print("\n[ind-chain] stopped")
+        print("\n[Ind-Chain] stopped")
 
 
 if __name__ == "__main__":

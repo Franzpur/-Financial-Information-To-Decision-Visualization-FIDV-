@@ -1,4 +1,4 @@
-# Standard-Cube (ind-chain) — Concept Target Library  
+# Standard-Financial-Charting (Ind-Chain) — Concept Target Library  
 # 标准立方体 — 概念靶向库
 
 > **Purpose / 用途**  
@@ -7,7 +7,7 @@
 > 中英对照；封存、移植或隔久再开时，**先读本文再改三维/交互**。  
 >
 > **Canonical home / 真源**  
-> Repo: FIDV · path: `ind-chain/` · entry: `Standard-Cube.app` (GUI) · port **8787**  
+> Repo: FIDV · path: `Ind-Chain/` · entry: `Standard-Financial-Charting.app` (GUI) · port **8787**  
 >
 > **Code tags / 代码标注**  
 > Comments use `[C-ID]` matching rows below (e.g. `[C-SLICE]`, `[C-STDVIEW]`).
@@ -70,7 +70,7 @@
 | **C-MAP** | user → Three | 用户→引擎映射 | `coordToLocal` / `userToWorld`: `X += s·gap`, `Y += y·UNIT`, `Z += USER_X_SIGN·x·UNIT`, then `root.localToWorld` (honors Q/E yaw). `UNIT = FACE/10`; `gap = d·UNIT`. |
 | **C-COORD** | position coordinate | 1类坐标 / 位置坐标 | User `(s, x, y)`. The only placement in the cube. `x` and `y` mean only this pair. Stay slices (pinned ∪ focus) keep place; non-stay **hide in place** (no −x park). Company `coord` is the face position. |
 | **C-COORD-2** | relative coordinate | 2类坐标 / 相对坐标 | Ring placement `ringCos` / `ringSin`. Not called `x` or `y`. `companyCoord` projects them into 位置坐标. **NVDA chain:** global half-disks — supplier `ringCos>0` → **x&lt;5**, customer `ringCos&lt;0` → **x&gt;5**; magnitude tracks link strength to NVIDIA. |
-| **C-COORD-3** | industry coordinate | 3类坐标 / 行业坐标 | One industry code per company (optional). **Authoritative:** Bloomberg BICS Equity Hierarchy 2024 compact `bicsCode` (length `2×level`, levels 1–7). **Product field** `legalEntityCoord`: stored as fixed **7×2** hyphenated segments, right-pad `00` for shallow leaves (e.g. leaf L4 → `10-10-13-12-00-00-00`). **If the winning membership has empty `% Tot Rev`**, the **entity** coord in list API is `'-'` + that 7×2 (e.g. `-50-12-10-10-00-00-00`); hierarchy **node** coords stay unsigned. **Gate / list chrome shows the first 4 groups only** and **keeps a leading `-`** (`-50-12-10-10`); L5–L7 including pad `00` are hidden, not deleted. Empty `%` is not 100. May hang a non-leaf code (= coarser class). Library: `class-3-coords/BICS-Classification/`. **Not a position, not drawn on the cube.** |
+| **C-COORD-3** | industry coordinate | 3类坐标 / 行业坐标 | One industry code per company (optional). **Authoritative:** Bloomberg BICS Equity Hierarchy 2024 compact `bicsCode` (length `2×level`, levels 1–7). **Product field** `legalEntityCoord`: stored as fixed **7×2** hyphenated segments, right-pad `00` for shallow leaves (e.g. leaf L4 → `10-10-13-12-00-00-00`). **If the winning membership has empty `% Tot Rev`**, the **entity** coord in list API is `'-'` + that 7×2 (e.g. `-50-12-10-10-00-00-00`); hierarchy **node** coords stay unsigned. **Gate / list chrome shows the first 4 groups only** and **keeps a leading `-`** (`-50-12-10-10`); L5–L7 including pad `00` are hidden, not deleted. Empty `%` is not 100. May hang a non-leaf code (= coarser class). Library: `BE-CLASS/BICS-Classification/`. **Not a position, not drawn on the cube.** |
 
 ```
 User (s, x, y)   Three.js (under root)
@@ -80,7 +80,7 @@ User (s, x, y)   Three.js (under root)
 +x  (ring blue)  −Z  (USER_X_SIGN = -1)
 ```
 
-Position changes go through `ind-chain/web/js/coords.js` (`LAYOUT`, or an object's `{s, x, y}`). Scene code calls `applyCoord` / `applySliceCoord`.
+Position changes go through `Ind-Chain/web/js/coords.js` (`LAYOUT`, or an object's `{s, x, y}`). Scene code calls `applyCoord` / `applySliceCoord`.
 
 **Do not / 禁止**
 
@@ -178,7 +178,7 @@ Removed / 已废弃：旧「角视图 corner view」与 **V / Home** 绑定（�
 | **C-LIST** | L4 company list | 四级公司名单 | `/list?bics=<L4 compact>` plus optional `?listingCountry=`. One company per full **Member Ticker**, only if this L4 is its **primary** (numeric `% Tot Rev` wins; empty still gets a primary via the same sort, entity coord prefixed `-`). Industry coord column uses **4-segment** chrome (keeps leading `-`). Other L1 shares as annotations. Country from yellow-key (see **C-LISTING**). No splash. No header cube link. Optional `?q=` prefills the on-page name/ticker filter (this page only). **Revenue** toggles a sort by the primary row’s `ind_rev` (raw USD, empty last); the default order stays `% Tot Rev` then name. No second money unit on this page. **Row click** → `/cube?ticker=` (**company→cube**). Backspace (focus not in the filter) assigns that last breadcrumb link (the level-3 board). | `web/list.html`, `list.js`, `GET /api/bics/entities` |
 | **C-LISTING** | listing country | 上市地 | ISO from Bloomberg yellow-key **exchange token** (second-last before `Equity`/`Corp`/…), mapped in `server/listing.py`. **Not** headquarters. **Not** an 8th industry axis. Unmapped venues stay **Unmapped**. Distinct from cube **C-US / C-INTL**. Changing country on C-HOME / C-LIST is in-page `history` + refetch — no document reload, no splash, keep board scroll. |
 | **C-CUBE** | decision cube SPA | 决策立方体页 | Full-bleed cube. Bundle **`meta.mode`**: `demo` \| `shell` \| `chain` (`BE-BUNDLE` / `bundle_dispatch`). Bare `/cube` = **demo** (演示库). `?ticker=` = **shell** unless ticker matches a **chain registry** instance (today NVDA → **chain** template; not a permanent HTTP `if NVDA` architecture). Shell: empty walls, firm at (5,5,5). Chain: dynamic BICS-L4 slices + C-REV-LINK. FE HTTP only via `web/js/api.js` (**FE-API**). | `bundle_dispatch`, `web/js/api.js`, `web/cube.html` |
-| **W1** | FE/BE open rights | 前后端打开权 | Browser (FE) only HTTP JSON + static under `web/`; server (BE) alone opens DBs, chain docs, DATA-SPACE. Single process `127.0.0.1:8787` allowed. Repo-root `modules/` is a narrow read-only mouth (`/modules/`), not a general static mount. | `server/app.py`, `modules/graph.json` |
+| **W1** | FE/BE open rights | 前后端打开权 | Browser (FE) only HTTP JSON + static under `web/`; server (BE) alone opens DBs, chain docs, BE-DATA. Single process `127.0.0.1:8787` allowed. Repo-root `modules/` is a narrow read-only mouth (`/modules/`), not a general static mount. | `server/app.py`, `modules/graph.json` |
 | **C-SPLASH** | splash | 开屏 | Only on **C-HOME**: FIDV wordmark → clear hold ~**2s** → fade ~**4s**. `/list` and `/cube` play no splash. | `#splash` in `index.html`, `home.js` |
 | **C-RING-SCORE** | ring score | 环分数 | Per-slice min–max → 0–100; **100 = exact center** |
 
@@ -216,7 +216,7 @@ Removed / 已废弃：旧「角视图 corner view」与 **V / Home** 绑定（�
 
 ## 9. Frozen rules / 冻结约定（续做勿回退）
 
-1. 1类坐标 / 位置坐标 is **`(s, x, y)`**, not raw Three XYZ. `x` and `y` mean only this. Move things by editing coordinates in `coords.js`. 2类坐标 / 相对坐标 is `ringCos` / `ringSin`. 3类坐标 / 行业坐标 is `legalEntityCoord`（BICS **存储** 7×2，库在 `class-3-coords/BICS-Classification/`；企业主业空占比时名单坐标加 `-`；**闸门与名单 chrome 只画前 4 段并保留前导 `-`**），不参与摆放。  
+1. 1类坐标 / 位置坐标 is **`(s, x, y)`**, not raw Three XYZ. `x` and `y` mean only this. Move things by editing coordinates in `coords.js`. 2类坐标 / 相对坐标 is `ringCos` / `ringSin`. 3类坐标 / 行业坐标 is `legalEntityCoord`（BICS **存储** 7×2，库在 `BE-CLASS/BICS-Classification/`；企业主业空占比时名单坐标加 `-`；**闸门与名单 chrome 只画前 4 段并保留前导 `-`**），不参与摆放。  
 2. Stay = pinned ∪ {focus}. Stay slices keep their place. Non-stay **hide in place** (no −x residual park). Do not call 「左」 **−s**. Do not move stay slices.  
 3. Focus change / retract → **hold camera** (`C-CAM-HOLD`). Exception: search-result pick → **C-STDVIEW** on the company's slice, then **C-COMPANY-ZOOM** (bond sparkline when `bondSchedule` is present).  
 4. Standard overview / focused poses stay as §5 until explicitly revised.  

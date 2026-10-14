@@ -2,76 +2,88 @@
   "version": 1,
   "updated": "2026-10-14",
   "title": "FIDV module graph (W1 track)",
-  "note": "Machine source of truth for module inventory and edges. Edit this file, then run python3 modules/bake_static.py to refresh modules/index.html (static; file:// OK; no fetch). Architecture: FE two modules (fe-decision 决策路径 · fe-cube 立方体面) + BE one module; FE-API (region fe-api) sits outside both FE frames as contract hub. Optional module.region is consumed by bake with fallback. Edge colors by side pair (FE内翠绿 #00a86b / BE内天青 #5dade2 / 跨侧亮红 #e02020); dash by type. Routing: channel + edge-slot orthogonal polylines (no cross / no coincide). Cross-side data contract is only FE-API→BE-HTTP (plus BE-HTTP→MODULES-TRACK narrow mouth). Direct page→data-module contract edges (GATE→BICS-HIER, LIST→ENTITY, CUBE-BOOT→BUNDLE) removed 2026-10-14: they duplicated the API path and read as if the browser opened library modules.",
+  "note": "Machine source of truth for module inventory and edges. Edit this file, then run python3 modules/bake_static.py to refresh modules/index.html (static; file:// OK; no fetch). Architecture: FE two modules (fe-decision 决策路径 · fe-cube 立方体面) + BE one module; FE-API (region fe-api) sits outside both FE frames as contract hub. Optional module.region is consumed by bake with fallback. Edge colors by side pair (FE内翠绿 #00a86b / BE内天青 #5dade2 / 跨侧亮红 #e02020); dash by type. Routing: channel + edge-slot orthogonal polylines (no cross / no coincide). Cross-side data contract is only FE-API→BE-HTTP (plus BE-HTTP→MODULES-TRACK narrow mouth). Direct page→data-module contract edges (BOARD→BICS-HIER, LIST→ENTITY, OPENCUBE→BUNDLE) removed 2026-10-14: they duplicated the API path and read as if the browser opened library modules.",
   "modules": [
     {
       "id": "FE-NAV",
+      "zh": "导航",
       "side": "FE",
       "region": "fe-decision",
       "role": "Route assignment across home / list / cube"
     },
     {
-      "id": "FE-GATE",
+      "id": "FE-BOARD",
+      "zh": "展板",
       "side": "FE",
       "region": "fe-decision",
       "role": "BICS L1–L3 gate board"
     },
     {
       "id": "FE-LIST",
+      "zh": "列表",
       "side": "FE",
       "region": "fe-decision",
       "role": "L4 company list"
     },
     {
-      "id": "FE-CUBE-BOOT",
+      "id": "FE-OPENCUBE",
+      "zh": "跳转制图台",
       "side": "FE",
       "region": "fe-cube",
       "role": "Cube page boot; consumes bundle"
     },
     {
-      "id": "FE-LISTING-UI",
+      "id": "FE-LISTAREA",
+      "zh": "列表属地",
       "side": "FE",
       "region": "fe-decision",
       "role": "Listing-country control UI"
     },
     {
-      "id": "FE-STATE",
+      "id": "FE-ACTION",
+      "zh": "操作",
       "side": "FE",
       "region": "fe-cube",
       "role": "Cube session state"
     },
     {
-      "id": "FE-COORD",
+      "id": "FE-COORDONE",
+      "zh": "摆放坐标",
       "side": "FE",
       "region": "fe-cube",
       "role": "Sole world placement from object/sxy"
     },
     {
       "id": "FE-SCENE",
+      "zh": "场景",
       "side": "FE",
       "region": "fe-cube",
       "role": "Three scene; consumes precomputed rings"
     },
     {
-      "id": "FE-CHROME",
+      "id": "FE-PANEL",
+      "zh": "面板",
       "side": "FE",
       "region": "fe-cube",
       "role": "Floating cube chrome"
     },
     {
-      "id": "FE-FOCUS-STAGE",
+      "id": "FE-FOCUS",
+      "zh": "聚焦",
       "side": "FE",
       "region": "fe-cube",
       "role": "Focus / staging overlays"
     },
     {
       "id": "FE-API",
+      "zh": "接口",
       "side": "FE",
       "region": "fe-api",
       "role": "Single HTTP base for gate / list / cube"
     },
     {
       "id": "FE-AESTHETIC",
+      "zh": "前端设计",
       "side": "FE",
       "region": "fe-cube",
       "role": "Cross-cutting glass / paper tokens"
@@ -134,7 +146,7 @@
       "id": "BE-INGEST",
       "side": "BE",
       "region": "be",
-      "role": "DATA-SPACE ingest scripts (offline)"
+      "role": "BE-DATA ingest scripts (offline)"
     },
     {
       "id": "MODULES-TRACK",
@@ -146,21 +158,21 @@
   "edges": [
     {
       "from": "FE-NAV",
-      "to": "FE-GATE",
+      "to": "FE-BOARD",
       "type": "calls"
     },
     {
-      "from": "FE-GATE",
+      "from": "FE-BOARD",
       "to": "FE-LIST",
       "type": "calls"
     },
     {
       "from": "FE-LIST",
-      "to": "FE-CUBE-BOOT",
+      "to": "FE-OPENCUBE",
       "type": "calls"
     },
     {
-      "from": "FE-GATE",
+      "from": "FE-BOARD",
       "to": "FE-API",
       "type": "calls"
     },
@@ -170,7 +182,7 @@
       "type": "calls"
     },
     {
-      "from": "FE-CUBE-BOOT",
+      "from": "FE-OPENCUBE",
       "to": "FE-API",
       "type": "calls"
     },
@@ -180,48 +192,48 @@
       "type": "contract"
     },
     {
-      "from": "FE-GATE",
-      "to": "FE-LISTING-UI",
+      "from": "FE-BOARD",
+      "to": "FE-LISTAREA",
       "type": "depends"
     },
     {
       "from": "FE-LIST",
-      "to": "FE-LISTING-UI",
+      "to": "FE-LISTAREA",
       "type": "depends"
     },
     {
-      "from": "FE-CUBE-BOOT",
-      "to": "FE-STATE",
+      "from": "FE-OPENCUBE",
+      "to": "FE-ACTION",
       "type": "depends"
     },
     {
-      "from": "FE-CUBE-BOOT",
-      "to": "FE-COORD",
+      "from": "FE-OPENCUBE",
+      "to": "FE-COORDONE",
       "type": "depends"
     },
     {
-      "from": "FE-CUBE-BOOT",
+      "from": "FE-OPENCUBE",
       "to": "FE-SCENE",
       "type": "depends"
     },
     {
-      "from": "FE-CUBE-BOOT",
-      "to": "FE-CHROME",
+      "from": "FE-OPENCUBE",
+      "to": "FE-PANEL",
       "type": "depends"
     },
     {
       "from": "FE-SCENE",
-      "to": "FE-COORD",
+      "to": "FE-COORDONE",
       "type": "calls"
     },
     {
       "from": "FE-SCENE",
-      "to": "FE-FOCUS-STAGE",
+      "to": "FE-FOCUS",
       "type": "depends"
     },
     {
       "from": "FE-AESTHETIC",
-      "to": "FE-GATE",
+      "to": "FE-BOARD",
       "type": "depends"
     },
     {
@@ -231,7 +243,7 @@
     },
     {
       "from": "FE-AESTHETIC",
-      "to": "FE-CHROME",
+      "to": "FE-PANEL",
       "type": "depends"
     },
     {

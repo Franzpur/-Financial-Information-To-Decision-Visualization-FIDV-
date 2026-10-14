@@ -1,4 +1,4 @@
-"""SQLite access for the Standard-Cube (ind-chain)."""
+"""SQLite access for the Standard-Financial-Charting (Ind-Chain)."""
 from __future__ import annotations
 
 import json
@@ -229,7 +229,7 @@ def row_company(r: sqlite3.Row) -> dict[str, Any]:
         "valueM": r["value_m"],
         "source": r["source"],
         "sourceDetail": r["source_detail"],
-        # 3类坐标 / 行业坐标（C-COORD-3）。BICS 7×2 连字符；库见 class-3-coords。待填。
+        # 3类坐标 / 行业坐标（C-COORD-3）。BICS 7×2 连字符；库见 BE-CLASS。待填。
         "legalEntityCoord": "",
     }
     if bond_schedule is not None:
@@ -296,7 +296,7 @@ def get_company(conn: sqlite3.Connection, company_id: int) -> dict[str, Any] | N
 
 def meta() -> dict[str, Any]:
     return {
-        "title": "Standard-Cube",
+        "title": "Standard-Financial-Charting",
         "countries": COUNTRY_LABEL,
         "version": 1,
     }

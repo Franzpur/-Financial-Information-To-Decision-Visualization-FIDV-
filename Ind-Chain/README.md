@@ -1,4 +1,4 @@
-# Standard-Cube (ind-chain)
+# Standard-Financial-Charting (Ind-Chain)
 
 Modular 3D industry-chain explorer backed by SQLite.
 
@@ -7,7 +7,7 @@ Modular 3D industry-chain explorer backed by SQLite.
 ## Layout
 
 ```
-ind-chain/
+Ind-Chain/
   data/           layers.json, companies.json (source of truth)
   server/         db.py (schema + queries), app.py (HTTP API + static)
   CONCEPTS.md     bilingual concept target library (agent continuity)
@@ -16,14 +16,14 @@ ind-chain/
   scripts/launcher_gui.py   integrated GUI (Open / Restart / Quit)
 ```
 
-Root entry: `../Standard-Cube.app` → native Mach-O stub → `scripts/launcher_gui.py` (no Terminal).
-Rebuild stub: `./scripts/build-standard-cube-app.sh`.
+Root entry: `../Standard-Financial-Charting.app` → native Mach-O stub → `scripts/launcher_gui.py` (no Terminal).
+Rebuild stub: `./scripts/build-standard-financial-charting-app.sh`.
 
 ## Run
 
 ```bash
 # from repo root — Finder double-click, or:
-open ../Standard-Cube.app
+open ../Standard-Financial-Charting.app
 # or
 python3 scripts/launcher_gui.py
 # or headless
@@ -36,7 +36,7 @@ Open http://127.0.0.1:8787/ — **engineering homepage** (BICS L1). The header s
 
 GUI buttons: **Open homepage**, **Restart** (re-seed + reload server), **Quit** (stop server and close).
 
-Finder / Dock icon: `assets/fidv-launcher.icns` → `Standard-Cube.app/Contents/Resources/AppIcon.icns`. After replacing the asset, sync with:
+Finder / Dock icon: `assets/fidv-launcher.icns` → `Standard-Financial-Charting.app/Contents/Resources/AppIcon.icns`. After replacing the asset, sync with:
 
 ```bash
 ./scripts/set-command-icon.sh

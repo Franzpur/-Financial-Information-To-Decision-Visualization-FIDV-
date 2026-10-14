@@ -23,7 +23,7 @@ async function boot() {
     state.layers = Array.isArray(bundle.layers) ? bundle.layers : [];
     state.companies = Array.isArray(bundle.companies) ? bundle.companies : [];
     state.countries = bundle.meta?.countries || {};
-    // FE-CUBE-BOOT: meta.mode is the discriminant (demo | shell | chain).
+    // FE-OPENCUBE: meta.mode is the discriminant (demo | shell | chain).
     const mode = bundle.meta?.mode;
     state.shellCube = mode === "shell" || (mode == null && Boolean(bundle.meta?.shell));
     state.shellAnchor = bundle.meta?.shellAnchor || null;

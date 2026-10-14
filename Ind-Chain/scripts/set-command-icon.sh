@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-# Sync FIDV launcher icon into Standard-Cube.app.
-# Source of truth remains ind-chain/assets/fidv-launcher.icns.
+# Sync FIDV launcher icon into Standard-Financial-Charting.app.
+# Source of truth remains Ind-Chain/assets/fidv-launcher.icns.
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 REPO="$(cd "$ROOT/.." && pwd)"
 ICNS="$ROOT/assets/fidv-launcher.icns"
-APP="$REPO/Standard-Cube.app"
+APP="$REPO/Standard-Financial-Charting.app"
 DEST="$APP/Contents/Resources/AppIcon.icns"
 
 if [[ ! -f "$ICNS" ]]; then
@@ -24,4 +24,4 @@ cp "$ICNS" "$DEST"
 /usr/bin/touch "$APP"
 /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -f "$APP" >/dev/null 2>&1 || true
 
-echo "[ind-chain] icon synced → Standard-Cube.app"
+echo "[Ind-Chain] icon synced → Standard-Financial-Charting.app"

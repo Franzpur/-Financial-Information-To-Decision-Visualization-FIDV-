@@ -1,6 +1,6 @@
 # FIDV 数据真源（信息部）
 
-信息部判断数据目录、调用词条、乱缺与补数公式时，只以本文及三分部文件为准。产品是否服务金融决策，以 `DESIGN.md` 为准（理念贯彻属；终裁为监理部三监报告）。立方体概念与坐标语义以 `ind-chain/CONCEPTS.md` 为准（信息部不改 C-*）。
+信息部判断数据目录、调用词条、乱缺与补数公式时，只以本文及三分部文件为准。产品是否服务金融决策，以 `DESIGN.md` 为准（理念贯彻属；终裁为监理部三监报告）。立方体概念与坐标语义以 `Ind-Chain/CONCEPTS.md` 为准（信息部不改 C-*）。
 
 目标：让业主、父代理、总参谋部用**同一套词条**找到数据；乱缺先建议、不能改则上报；补数走彭博机 Excel 公式，不在本仓连终端。
 
@@ -8,19 +8,19 @@
 
 ## 1. 管辖（专知 = 改码权）
 
-信息部在 desk 任务明确实现时，**可直接改**下表数据工程路径（权知统一，见仓根 `POWER-KNOWLEDGE.md`）。**不**写 `ind-chain/server/*`，不改 C-* / CONCEPTS 语义，不改美学文件。
+信息部在 desk 任务明确实现时，**可直接改**下表数据工程路径（权知统一，见仓根 `POWER-KNOWLEDGE.md`）。**不**写 `Ind-Chain/server/*`，不改 C-* / CONCEPTS 语义，不改美学文件。
 
 | 面 | 路径 / 说明 |
 |----|-------------|
-| 原始表 | `DATA-SPACE/`（含 `ICBC C/20261003/`、`ICBC C/20261005/`） |
-| 层级库 | `class-3-coords/BICS-Classification/`（`bics-equity-hierarchy-2024.json`） |
+| 原始表 | `BE-DATA/`（含 `ICBC C/20261003/`、`ICBC C/20261005/`） |
+| 层级库 | `BE-CLASS/BICS-Classification/`（`bics-equity-hierarchy-2024.json`） |
 | 摄入 / 构建 | 同目录 `ingest_*.py`、`build_bics_hierarchy.py`、数据向 README |
 | 成员库 | `bics_entities_20261003.db`（gitignore；本机生成） |
 | 词条 | 本文 §3 + `INFORMATION-manage.md` |
 | 缺口 | `INFORMATION-clean.md` |
-| 补数公式 | `INFORMATION-request.md`；产出落 `DATA-SPACE/` |
+| 补数公式 | `INFORMATION-request.md`；产出落 `BE-DATA/` |
 
-不独占：立方体 `ind-chain/data/companies.json` 演示链、C-CUBE 几何。不提交 `~$*.xlsx`。不要把 `BQLX.pdf` 当成 FIDV 拉数说明书。
+不独占：立方体 `Ind-Chain/data/companies.json` 演示链、C-CUBE 几何。不提交 `~$*.xlsx`。不要把 `BQLX.pdf` 当成 FIDV 拉数说明书。
 
 ---
 
@@ -40,13 +40,13 @@
 
 | 调用词条（口语） | 指向 |
 |------------------|------|
-| 20261003 / 四级企业表 | `DATA-SPACE/ICBC C/20261003/BICS_LEGALENTITY/*.xlsx`（跳过旧 Staples L1、`pull-*`） |
-| 20261005 / Staples 四级 | `DATA-SPACE/ICBC C/20261005/*.xlsx`（一叶一文件） |
-| BQL 指导 / BQLX | `DATA-SPACE/ICBC C/20261003/BQLX.pdf`（117 页终端帮助，2026-10-03） |
-| 公式样例 | `DATA-SPACE/ICBC C/20261003/BICS_LEGALENTITY/FOMULAR EXAMPLE.xlsx` |
-| BICS 层级 / C-COORD-3 库 | `class-3-coords/BICS-Classification/bics-equity-hierarchy-2024.json` |
-| 四级成员库 | `class-3-coords/BICS-Classification/bics_entities_20261003.db` |
-| 摄入 | `python3 class-3-coords/BICS-Classification/ingest_20261003_entities.py` |
+| 20261003 / 四级企业表 | `BE-DATA/ICBC C/20261003/BICS_LEGALENTITY/*.xlsx`（跳过旧 Staples L1、`pull-*`） |
+| 20261005 / Staples 四级 | `BE-DATA/ICBC C/20261005/*.xlsx`（一叶一文件） |
+| BQL 指导 / BQLX | `BE-DATA/ICBC C/20261003/BQLX.pdf`（117 页终端帮助，2026-10-03） |
+| 公式样例 | `BE-DATA/ICBC C/20261003/BICS_LEGALENTITY/FOMULAR EXAMPLE.xlsx` |
+| BICS 层级 / C-COORD-3 库 | `BE-CLASS/BICS-Classification/bics-equity-hierarchy-2024.json` |
+| 四级成员库 | `BE-CLASS/BICS-Classification/bics_entities_20261003.db` |
+| 摄入 | `python3 BE-CLASS/BICS-Classification/ingest_20261003_entities.py` |
 | 四级名单 API | `GET /api/bics/entities?bics=<L4 compact>` — 仅**主业 L4**；身份=完整 Member Ticker；含空占比胜出。可选 `listingCountry=` |
 | 主业 | 同一 ticker 最大有数 `pct_tot_rev`（空不当 100）；并列：`ind_rev` → `bics_code_l4` → `source_file` → `id`。全空时仍由后四键定一条主业 L4，**进门厅/名单** |
 | 空占比企业坐标 | 胜出行 `pct` 空：名单 `legal_entity_coord` = `-` + 无符号 7×2。有数胜出不加 `-`。层级节点坐标始终无符号 |
@@ -58,9 +58,9 @@
 | 权威码 | `bicsCode`，长度 `2×level` |
 | 产品坐标 | 层级节点 `legalEntityCoord` 无符号 7×2；企业空占比胜出时名单字段前加 `-` |
 | Staples 旧 L1 表 | `BICS_Comsumer Staples.xlsx` — **仅 L1，不摄入** |
-| Staples 四级成员 | `DATA-SPACE/ICBC C/20261005/` 14 个 xlsx，文件名=L4；无 Level2–4 列。摄入按文件名对 2024 库（`Agricultural & Producers` → `Agricultural Producers` / `12101010`）。含 `Other Wholesalers - Staples.xlsx`（`12111012`） |
-| Staples 补拉 L2–L4 | `DATA-SPACE/ICBC C/20261003/BICS_LEGALENTITY/pull-staples-l2l4.xlsx`（公式样例；摄入跳过 `pull-*`） |
-| 后三类试拉 / L5–L7 | `DATA-SPACE/ICBC C/20261003/BICS_LEGALENTITY/pull-comms-eq-l5l7.xlsx` — Technology → Communications Equipment（`19101010`，577 ticker）。一企一行 `_xll.BQL` 外壳同 FOMULAR EXAMPLE；**L5/L6/L7 mnemonic 须在彭博机 FLDS 填入 CONFIG!B12–B14**（BQLX.pdf 无这些字段名，不猜）。不用 `segments()`、不用 BCLASS。拷回前不改摄入、不改门厅四段显示。 |
+| Staples 四级成员 | `BE-DATA/ICBC C/20261005/` 14 个 xlsx，文件名=L4；无 Level2–4 列。摄入按文件名对 2024 库（`Agricultural & Producers` → `Agricultural Producers` / `12101010`）。含 `Other Wholesalers - Staples.xlsx`（`12111012`） |
+| Staples 补拉 L2–L4 | `BE-DATA/ICBC C/20261003/BICS_LEGALENTITY/pull-staples-l2l4.xlsx`（公式样例；摄入跳过 `pull-*`） |
+| 后三类试拉 / L5–L7 | `BE-DATA/ICBC C/20261003/BICS_LEGALENTITY/pull-comms-eq-l5l7.xlsx` — Technology → Communications Equipment（`19101010`，577 ticker）。一企一行 `_xll.BQL` 外壳同 FOMULAR EXAMPLE；**L5/L6/L7 mnemonic 须在彭博机 FLDS 填入 CONFIG!B12–B14**（BQLX.pdf 无这些字段名，不猜）。不用 `segments()`、不用 BCLASS。拷回前不改摄入、不改门厅四段显示。 |
 | Ind Rev / `ind_rev` | 20261003 成员表列名原文 `Ind Rev`（与 `Mkt Cap` 同表；无「百万 / 十亿 / 币种」后缀，无币种列；数字格式为会计千分位，无货币符号）。**美元的完整金额**，不是百万，不是十亿。非美股大盘是换汇后的美元（带小数），不是本币原数。摄入 `as_float` **不换算**，原样写入 `entity_memberships.ind_rev`。`BICS_Communications.xlsx` 第 2 行 `ALPHABET INC-A` / `GOOGL US Equity`：`Ind Rev` = `342594000000`，`Mkt Cap` = `4167150000000`（库内同值，主业行）。同文件第 3 行 `META PLATFORMS-A`：`Ind Rev` = `200966000000`。同列小公司例：`EKITAN & CO LTD` / `3646 JP Equity`，`Ind Rev` = `19857873.5`，`Mkt Cap` = `13648500`（约一千万美元量级，仍是美元）。GOOGL 在 `BICS_Technology.xlsx` 的另一行 `Ind Rev` = `60242000000`；两行相加 `402836000000`，对 Alphabet FY2025 总收入 4028.36 亿美元（Google Services 减对冲后的 3425.94 亿 + Cloud 与 Other Bets 的 602.42 亿）。库内 `ind_rev` 仍是美元原值，不改这一列。立方体载荷里的 `revBn` 才是该金额除以 1e9 后的十亿，与演示链同一量纲；界面上的 B 就是这个十亿。演示链 `companies.json` 的 `rev_bn`（`Alphabet / Google Cloud` = `350`）仍是示意十亿美元，不是本列的原值。 |
 
 禁止：清理建议写成「已经修了」；提交 Office 锁文件。
@@ -72,7 +72,7 @@
 | 角色 | 关系 |
 |------|------|
 | 监理部 | 有产品代码改动时由父代理送三监报告终裁；信息部不写「通过/打回」 |
-| 总参谋部 | 可调度信息部；业主「电总参谋部」且安排管理时可规划改本角色文件；专知路径内信息部可改码；`ind-chain/` 应用逻辑仍归父代理 |
+| 总参谋部 | 可调度信息部；业主「电总参谋部」且安排管理时可规划改本角色文件；专知路径内信息部可改码；`Ind-Chain/` 应用逻辑仍归父代理 |
 | 美工部 | 平行；各管美学 / 数据（见 `POWER-KNOWLEDGE.md`） |
 | 档案部 | 信息部不写 worklog；报告类不由信息部撰写 |
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Map DATA-SPACE BICS member workbooks onto L4 hierarchy codes.
+"""Map BE-DATA BICS member workbooks onto L4 hierarchy codes.
 
 Sources: 20261003 L1 workbooks (with Level4 columns) and 20261005 Staples
 one-file-per-L4 workbooks (L4 from filename). Skips the old L1-only Staples
@@ -23,8 +23,8 @@ HERE = Path(__file__).resolve().parent
 REPO = HERE.parents[1]
 HIER_JSON = HERE / "bics-equity-hierarchy-2024.json"
 SRC_DIRS = (
-    REPO / "DATA-SPACE" / "ICBC C" / "20261003" / "BICS_LEGALENTITY",
-    REPO / "DATA-SPACE" / "ICBC C" / "20261005",
+    REPO / "BE-DATA" / "ICBC C" / "20261003" / "BICS_LEGALENTITY",
+    REPO / "BE-DATA" / "ICBC C" / "20261005",
 )
 DB_OUT = HERE / "bics_entities_20261003.db"
 

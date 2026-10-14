@@ -5,7 +5,7 @@ Exhibition layout v3 (bus-style, short straight edges)
   left  : 淡黄 后端   — BE-HTTP is a tall bus bar on the zone's right edge;
                        its children sit in two columns to its left.
   middle: FE-API      — a tall contract bar *outside* every frame, between BE and FE.
-  right : 淡绿 决策路径 (NAV→LIST + LISTING-UI) over 淡蓝 立方体面 (CUBE-BOOT→AESTHETIC).
+  right : 淡绿 决策路径 (NAV→LIST + LISTAREA) over 淡蓝 立方体面 (OPENCUBE→AESTHETIC).
 
 Everything is routed from named ports on node sides; the geometry checker
 (hard) proves 0 cross, 0 overlap, 0 line-through-box, 0 tight-parallel, ports
@@ -24,7 +24,8 @@ GRAPH_PATH = ROOT / "graph.json"
 OUT_PATH = ROOT / "index.html"
 
 # ───────────────────────── geometry ─────────────────────────
-NW, NH = 98, 28          # standard node
+NW, NH = 98, 28          # standard node (BE)
+NHF = 36                 # FE node: id line + 中文 line
 BAR_W = 30               # hub bars (BE-HTTP, FE-API)
 TIP = 1.5                # arrow tip stops this far outside the target box
 CH_X = 450               # (documentation only)
@@ -57,26 +58,26 @@ NODES: dict[str, tuple[float, float, float, float]] = {
     "BE-NVDA-LINKS": (XC_C, BE_NVDA, NW, NH),
     "MODULES-TRACK": (XC_B, BE_NVDA, NW, NH),
     "FE-API": (X_API, 166, BAR_W, 156),
-    "FE-NAV": (XC_L, R_NAV, NW, NH),
-    "FE-GATE": (XC_L, R_GATE, NW, NH),
-    "FE-LIST": (XC_L, R_LIST, NW, NH),
-    "FE-LISTING-UI": (XC_R, R_LUI, NW, NH),
-    "FE-CUBE-BOOT": (XC_L, R1, NW, NH),
-    "FE-AESTHETIC": (XC_R, R1, NW, NH),
-    "FE-STATE": (XC_L, R2, NW, NH),
-    "FE-CHROME": (XC_R, R2, NW, NH),
-    "FE-SCENE": (XC_L, R3, NW, NH),
-    "FE-COORD": (XC_R, R3, NW, NH),
-    "FE-FOCUS-STAGE": (XC_L, R4, NW, NH),
+    "FE-NAV": (XC_L, R_NAV, NW, NHF),
+    "FE-BOARD": (XC_L, R_GATE, NW, NHF),
+    "FE-LIST": (XC_L, R_LIST, NW, NHF),
+    "FE-LISTAREA": (XC_R, R_LUI, NW, NHF),
+    "FE-OPENCUBE": (XC_L, R1, NW, NHF),
+    "FE-AESTHETIC": (XC_R, R1, NW, NHF),
+    "FE-ACTION": (XC_L, R2, NW, NHF),
+    "FE-PANEL": (XC_R, R2, NW, NHF),
+    "FE-SCENE": (XC_L, R3, NW, NHF),
+    "FE-COORDONE": (XC_R, R3, NW, NHF),
+    "FE-FOCUS": (XC_L, R4, NW, NHF),
 }
 
 HUBS = {"BE-HTTP", "FE-API"}
 
 REGION_FALLBACK = {
-    "FE-NAV": "fe-decision", "FE-GATE": "fe-decision", "FE-LIST": "fe-decision",
-    "FE-LISTING-UI": "fe-decision",
-    "FE-CUBE-BOOT": "fe-cube", "FE-STATE": "fe-cube", "FE-COORD": "fe-cube",
-    "FE-SCENE": "fe-cube", "FE-CHROME": "fe-cube", "FE-FOCUS-STAGE": "fe-cube",
+    "FE-NAV": "fe-decision", "FE-BOARD": "fe-decision", "FE-LIST": "fe-decision",
+    "FE-LISTAREA": "fe-decision",
+    "FE-OPENCUBE": "fe-cube", "FE-ACTION": "fe-cube", "FE-COORDONE": "fe-cube",
+    "FE-SCENE": "fe-cube", "FE-PANEL": "fe-cube", "FE-FOCUS": "fe-cube",
     "FE-AESTHETIC": "fe-cube",
     "FE-API": "fe-api",
     "BE-HTTP": "be", "BE-BUNDLE": "be", "BE-DEMO-DB": "be", "BE-SHELL": "be",
@@ -151,53 +152,53 @@ def build_routes() -> dict[str, list[tuple[float, float]]]:
     def add(a: str, b: str, t: str, pts):
         r[f"{a}|{b}|{t}"] = [(float(x), float(y)) for x, y in pts]
 
-    # ── FE spine: NAV → GATE → LIST → CUBE-BOOT (straight down) ──
-    add("FE-NAV", "FE-GATE", "calls", [B("FE-NAV"), tipT(T("FE-GATE"))])
-    add("FE-GATE", "FE-LIST", "calls", [B("FE-GATE"), tipT(T("FE-LIST"))])
-    add("FE-LIST", "FE-CUBE-BOOT", "calls", [B("FE-LIST"), tipT(T("FE-CUBE-BOOT"))])
+    # ── FE spine: NAV → BOARD → LIST → OPENCUBE (straight down) ──
+    add("FE-NAV", "FE-BOARD", "calls", [B("FE-NAV"), tipT(T("FE-BOARD"))])
+    add("FE-BOARD", "FE-LIST", "calls", [B("FE-BOARD"), tipT(T("FE-LIST"))])
+    add("FE-LIST", "FE-OPENCUBE", "calls", [B("FE-LIST"), tipT(T("FE-OPENCUBE"))])
 
     # ── FE → API bar (straight left across the gutter) ──
-    for fe in ("FE-GATE", "FE-LIST"):
+    for fe in ("FE-BOARD", "FE-LIST"):
         add(fe, "FE-API", "calls", [L(fe), tipR(R_pt_api(fe))])
-    add("FE-CUBE-BOOT", "FE-API", "calls",
-        [L("FE-CUBE-BOOT", -6), tipR((box("FE-API")[2], NODES["FE-CUBE-BOOT"][1] - 6))])
+    add("FE-OPENCUBE", "FE-API", "calls",
+        [L("FE-OPENCUBE", -6), tipR((box("FE-API")[2], NODES["FE-OPENCUBE"][1] - 6))])
 
     # ── contract: API bar → HTTP bar ──
     y_c = (R_GATE + R_LIST) // 2
     add("FE-API", "BE-HTTP", "contract",
         [(box("FE-API")[0], y_c), tipR((box("BE-HTTP")[2], y_c))])
 
-    # ── decision zone: LISTING-UI (gap channel x=518, disjoint spans) ──
+    # ── decision zone: LISTAREA (gap channel x=518, disjoint spans) ──
     xl_r = XC_L + NW / 2          # right edge of FE left column
     xr_r = XC_R + NW / 2          # right edge of FE right column
-    gx = xl_r + 20                # LISTING-UI channel
-    ch_in, ch_out = xl_r + 12, xl_r + 26   # BOOT gap channels (inner / outer)
-    ch_left = XC_L - NW / 2 - 16  # BOOT→SCENE left channel
+    gx = xl_r + 20                # LISTAREA channel
+    ch_in, ch_out = xl_r + 12, xl_r + 26   # OPENCUBE gap channels (inner / outer)
+    ch_left = XC_L - NW / 2 - 16  # OPENCUBE→SCENE left channel
     wrap_in, wrap_out = xr_r + 12, xr_r + 22   # AESTHETIC wrap channels
-    add("FE-GATE", "FE-LISTING-UI", "depends",
-        [R("FE-GATE", 6), (gx, R_GATE + 6), (gx, R_LUI - 5), tipL(L("FE-LISTING-UI", -5))])
-    add("FE-LIST", "FE-LISTING-UI", "depends",
-        [R("FE-LIST", -6), (gx, R_LIST - 6), (gx, R_LUI + 5), tipL(L("FE-LISTING-UI", 5))])
+    add("FE-BOARD", "FE-LISTAREA", "depends",
+        [R("FE-BOARD", 6), (gx, R_GATE + 6), (gx, R_LUI - 5), tipL(L("FE-LISTAREA", -5))])
+    add("FE-LIST", "FE-LISTAREA", "depends",
+        [R("FE-LIST", -6), (gx, R_LIST - 6), (gx, R_LUI + 5), tipL(L("FE-LISTAREA", 5))])
 
     # ── cube zone ──
-    add("FE-CUBE-BOOT", "FE-STATE", "depends", [B("FE-CUBE-BOOT"), tipT(T("FE-STATE"))])
-    # BOOT → CHROME (near: upper port, outer channel) / COORD (far: lower port, inner channel)
-    add("FE-CUBE-BOOT", "FE-CHROME", "depends",
-        [R("FE-CUBE-BOOT", -6), (ch_out, R1 - 6), (ch_out, R2), tipL(L("FE-CHROME"))])
-    add("FE-CUBE-BOOT", "FE-COORD", "depends",
-        [R("FE-CUBE-BOOT", 6), (ch_in, R1 + 6), (ch_in, R3 - 6), tipL(L("FE-COORD", -6))])
-    # BOOT → SCENE : left-hand channel, below the BOOT→API line
-    add("FE-CUBE-BOOT", "FE-SCENE", "depends",
-        [L("FE-CUBE-BOOT", 6), (ch_left, R1 + 6), (ch_left, R3), tipL(L("FE-SCENE"))])
-    add("FE-SCENE", "FE-COORD", "calls", [R("FE-SCENE", 6), tipL(L("FE-COORD", 6))])
-    add("FE-SCENE", "FE-FOCUS-STAGE", "depends", [B("FE-SCENE"), tipT(T("FE-FOCUS-STAGE"))])
+    add("FE-OPENCUBE", "FE-ACTION", "depends", [B("FE-OPENCUBE"), tipT(T("FE-ACTION"))])
+    # OPENCUBE → PANEL (near: upper port, outer channel) / COORDONE (far: lower port, inner channel)
+    add("FE-OPENCUBE", "FE-PANEL", "depends",
+        [R("FE-OPENCUBE", -6), (ch_out, R1 - 6), (ch_out, R2), tipL(L("FE-PANEL"))])
+    add("FE-OPENCUBE", "FE-COORDONE", "depends",
+        [R("FE-OPENCUBE", 6), (ch_in, R1 + 6), (ch_in, R3 - 6), tipL(L("FE-COORDONE", -6))])
+    # OPENCUBE → SCENE : left-hand channel, below the OPENCUBE→API line
+    add("FE-OPENCUBE", "FE-SCENE", "depends",
+        [L("FE-OPENCUBE", 6), (ch_left, R1 + 6), (ch_left, R3), tipL(L("FE-SCENE"))])
+    add("FE-SCENE", "FE-COORDONE", "calls", [R("FE-SCENE", 6), tipL(L("FE-COORDONE", 6))])
+    add("FE-SCENE", "FE-FOCUS", "depends", [B("FE-SCENE"), tipT(T("FE-FOCUS"))])
 
-    # ── AESTHETIC: down to CHROME, and wrap on the right to GATE / LIST ──
-    add("FE-AESTHETIC", "FE-CHROME", "depends", [B("FE-AESTHETIC"), tipT(T("FE-CHROME"))])
+    # ── AESTHETIC: down to PANEL, and wrap on the right to BOARD / LIST ──
+    add("FE-AESTHETIC", "FE-PANEL", "depends", [B("FE-AESTHETIC"), tipT(T("FE-PANEL"))])
     add("FE-AESTHETIC", "FE-LIST", "depends",
         [R("FE-AESTHETIC", -6), (wrap_in, R1 - 6), (wrap_in, R_LIST + 6), tipR(R("FE-LIST", 6))])
-    add("FE-AESTHETIC", "FE-GATE", "depends",
-        [R("FE-AESTHETIC", 6), (wrap_out, R1 + 6), (wrap_out, R_GATE - 6), tipR(R("FE-GATE", -6))])
+    add("FE-AESTHETIC", "FE-BOARD", "depends",
+        [R("FE-AESTHETIC", 6), (wrap_out, R1 + 6), (wrap_out, R_GATE - 6), tipR(R("FE-BOARD", -6))])
 
     # ── BE: HTTP bar → children, all horizontal ──
     hx = box("BE-HTTP")[0]
@@ -475,7 +476,7 @@ def _svg_zones() -> list[str]:
     return out
 
 
-def _svg_hub(mid, cx, cy, w, h, role) -> str:
+def _svg_hub(mid, cx, cy, w, h, role, zh="") -> str:
     x0, y0 = cx - w / 2, cy - h / 2
     is_api = mid == "FE-API"
     fill = "#e3e8ee" if is_api else "#f3e7bd"
@@ -485,17 +486,20 @@ def _svg_hub(mid, cx, cy, w, h, role) -> str:
             f'fill="{fill}" stroke="{stroke}" stroke-width="1.6"/>'
             f'<text transform="translate({fmt(cx + 3.4)} {fmt(cy)}) rotate(-90)" '
             f'text-anchor="middle" font-size="10.5" font-weight="700" letter-spacing="0.06em" '
-            f'fill="{INK}">{esc(mid)}</text></g>')
+            f'fill="{INK}">{esc(mid)}{(" " + esc(zh)) if zh else ""}</text></g>')
 
 
-def _svg_node(mid, cx, cy, w, h, role) -> str:
+def _svg_node(mid, cx, cy, w, h, role, zh="") -> str:
     x0, y0 = cx - w / 2, cy - h / 2
     st = ZONE_STYLE.get(REGION_FALLBACK.get(mid, ""), ZONE_STYLE["be"])
     return (f'<g><title>{esc(mid)} — {esc(role)}</title>'
             f'<rect x="{fmt(x0)}" y="{fmt(y0)}" width="{fmt(w)}" height="{fmt(h)}" rx="3" '
             f'fill="#ffffff" fill-opacity="0.94" stroke="{st["node"]}" stroke-width="1.1"/>'
-            f'<text x="{fmt(cx)}" y="{fmt(cy + 3.3)}" text-anchor="middle" font-size="9.4" '
-            f'fill="{INK}" letter-spacing="0.02em">{esc(mid)}</text></g>')
+            f'<text x="{fmt(cx)}" y="{fmt(cy - 3.2 if zh else cy + 3.3)}" text-anchor="middle" font-size="9.4" '
+            f'fill="{INK}" letter-spacing="0.02em">{esc(mid)}</text>'
+            + (f'<text x="{fmt(cx)}" y="{fmt(cy + 9.2)}" text-anchor="middle" font-size="9" '
+               f'fill="{st["node"]}">{esc(zh)}</text>' if zh else '')
+            + '</g>')
 
 
 def _svg_nodes(mods: dict) -> list[str]:
@@ -503,8 +507,9 @@ def _svg_nodes(mods: dict) -> list[str]:
     for mid, (cx, cy, w, h) in NODES.items():
         m = mods.get(mid)
         role = m.get("role", "") if m else ""
+        zh = m.get("zh", "") if m else ""
         draw = _svg_hub if mid in HUBS else _svg_node
-        out.append(draw(mid, cx, cy, w, h, role))
+        out.append(draw(mid, cx, cy, w, h, role, zh))
     return out
 
 
@@ -539,7 +544,7 @@ def _svg_legend() -> list[str]:
         return ly + 26 + i * 17
 
     out.append(head(16, "分区"))
-    zone_items = [("fe-decision", "决策路径 · NAV → LIST"), ("fe-cube", "立方体面 · CUBE-BOOT → AESTHETIC"),
+    zone_items = [("fe-decision", "决策路径 · NAV → LIST"), ("fe-cube", "立方体面 · OPENCUBE → AESTHETIC"),
                   ("be", "后端 · BE-HTTP 起")]
     for i, (zid, label) in enumerate(zone_items):
         st = ZONE_STYLE[zid]
@@ -648,7 +653,7 @@ code { font-family: "SF Mono", ui-monospace, Menlo, Consolas, monospace; font-si
   <h1>FIDV 模块关系图</h1>
   <p class="brand">MODULE MAP · __N_MODS__ 模块 · __N_EDGES__ 边</p>
 </header>
-<p class="lede">左后端、右前端；中间一根 <strong>FE-API</strong> 枢纽条立在所有框外，是前后端唯一契约口。右侧上淡绿＝决策路径（NAV → LIST），下淡蓝＝立方体面（CUBE-BOOT → AESTHETIC）；后端淡黄，<code>BE-HTTP</code> 为总线，分派至各子模块。</p>
+<p class="lede">左后端、右前端；中间一根 <strong>FE-API</strong> 枢纽条立在所有框外，是前后端唯一契约口。右侧上淡绿＝决策路径（NAV → LIST），下淡蓝＝立方体面（OPENCUBE → AESTHETIC）；后端淡黄，<code>BE-HTTP</code> 为总线，分派至各子模块。</p>
 
 <div class="fig" id="fig">
 __SVG__
@@ -660,7 +665,7 @@ __SVG__
 
 <h2>模块清单</h2>
 <table id="mod-table">
-  <thead><tr><th>id</th><th>侧</th><th>区</th><th>职责</th></tr></thead>
+  <thead><tr><th>id</th><th>中文</th><th>侧</th><th>区</th><th>职责</th></tr></thead>
   <tbody></tbody>
 </table>
 
@@ -693,7 +698,7 @@ __GRAPH_JSON__
   const edges = data.edges || [];
   modBody.innerHTML = mods.map(function (m) {
     const r = regionOf(m);
-    return "<tr><td><code>" + esc(m.id) + "</code></td><td class=\"side-" + esc(m.side) + "\">" +
+    return "<tr><td><code>" + esc(m.id) + "</code></td><td>" + esc(m.zh || "") + "</td><td class=\"side-" + esc(m.side) + "\">" +
       esc(m.side) + "</td><td>" + esc(REGION_LABEL[r] || r || "—") +
       "</td><td>" + esc(m.role || "") + "</td></tr>";
   }).join("");

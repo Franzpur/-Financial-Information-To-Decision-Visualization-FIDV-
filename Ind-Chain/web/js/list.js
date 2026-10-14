@@ -206,7 +206,7 @@ async function loadList() {
       code,
     );
     renderTotal(document.getElementById("listTotal"), data.count, data.totalCount, loc);
-    document.title = node ? `FIDV — ${node.name}` : document.title;
+    document.title = node ? `SFC — ${node.name}` : document.title;
     render(filterEl?.value || "");
     note.textContent = `${visibleRows(filterEl?.value || "").length} of ${rows.length} companies · primary L4 · click a row to open that company in the cube`;
   } catch (err) {
