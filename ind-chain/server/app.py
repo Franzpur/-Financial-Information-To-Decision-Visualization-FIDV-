@@ -15,9 +15,9 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "server"))
 
 from listing import country_label, parse_ticker  # noqa: E402
+from chain_layout import assign_nvda_chain_rings  # noqa: E402
 from db import (  # noqa: E402
     DB_PATH,
-    assign_rings,
     connect,
     get_company,
     init_schema,
@@ -26,13 +26,21 @@ from db import (  # noqa: E402
     meta,
     seed_from_json,
 )
+from bundle_dispatch import (  # noqa: E402
+    build_bundle,
+    register_chain,
+    set_shell_builder,
+)
 
 WEB_ROOT = ROOT / "web"
+# W1 narrow mouth: repo-root modules/ only (graph + paper HTML). Not a general static mount.
+MODULES_ROOT = (ROOT.parent / "modules").resolve()
 NVDA_REVENUE_LINKS = ROOT / "data" / "nvda-revenue-links.json"
 BICS_JSON = ROOT.parent / "class-3-coords" / "BICS-Classification" / "bics-equity-hierarchy-2024.json"
 ENTITIES_DB = ROOT.parent / "class-3-coords" / "BICS-Classification" / "bics_entities_20261003.db"
 HOST = "127.0.0.1"
 PORT = 8787
+_MODULES_SUFFIXES = {".html", ".json", ".css", ".js"}
 
 _BICS_BY_CODE: dict | None = None
 _BICS_CHILDREN: dict | None = None
@@ -295,48 +303,72 @@ def _count_pack(prefix: str, listing_country: str | None) -> dict:
     }
 
 
+def _entity_matches_listing(loc_info: dict, loc: str | None) -> bool:
+    if loc == "UNMAPPED":
+        return bool(loc_info["listingCountryUnmapped"])
+    return not loc or loc_info["listingCountry"] == loc
+
+
+def _entity_pct_sort_key(e: dict) -> tuple:
+    pct = e["pct_tot_rev"]
+    pct_val = -float(pct) if pct is not None else 0.0
+    return (pct is None, pct_val, str(e["name"] or "").lower())
+
+
+def _entities_for_primary_l4(code: str, loc: str | None) -> list[dict]:
+    entities: list[dict] = []
+    conn = _entities_conn()
+    if conn is None:
+        return entities
+    try:
+        by_ticker = _memberships_by_ticker(conn, _tickers_for_l4(conn, code))
+        for ticker, rows in by_ticker.items():
+            item = _entity_if_primary(ticker, rows, code)
+            if not item:
+                continue
+            loc_info = parse_ticker(ticker)
+            if not _entity_matches_listing(loc_info, loc):
+                continue
+            item.update(loc_info)
+            entities.append(item)
+        entities.sort(key=_entity_pct_sort_key)
+    finally:
+        conn.close()
+    return entities
+
+
+def _bics_ancestors(code: str) -> list[dict]:
+    """Walk parentCode upward. Root first, exclude the node itself. No child counts."""
+    by_code, _ = _bics_index()
+    chain = []
+    cur = by_code.get(code)
+    while cur:
+        chain.append(cur)
+        pc = cur.get("parentCode")
+        cur = by_code.get(pc) if pc else None
+    return [_bics_public(x) for x in reversed(chain[1:])]
+
+
 def list_bics_entities(code: str, listing_country: str | None = None) -> dict | None:
-    """Companies whose primary L4 equals this code. One row per Member Ticker."""
+    """Companies whose primary L4 equals this code. One row per Member Ticker.
+
+    Does not call bics_children: that board counts every child. This page only
+    needs this prefix's listing distribution plus the entity rows.
+    """
     loc = (listing_country or "").strip() or None
     node = bics_node(code)
     if not node or node.get("level") != 4:
         return None
-    pack = bics_children(code, loc)
-    entities: list[dict] = []
-    conn = _entities_conn()
-    if conn is not None:
-        try:
-            by_ticker = _memberships_by_ticker(conn, _tickers_for_l4(conn, code))
-            for ticker, rows in by_ticker.items():
-                item = _entity_if_primary(ticker, rows, code)
-                if not item:
-                    continue
-                loc_info = parse_ticker(ticker)
-                item.update(loc_info)
-                if loc == "UNMAPPED":
-                    if not loc_info["listingCountryUnmapped"]:
-                        continue
-                elif loc and loc_info["listingCountry"] != loc:
-                    continue
-                entities.append(item)
-            entities.sort(
-                key=lambda e: (
-                    e["pct_tot_rev"] is None,
-                    -(float(e["pct_tot_rev"]) if e["pct_tot_rev"] is not None else 0.0),
-                    str(e["name"] or "").lower(),
-                )
-            )
-        finally:
-            conn.close()
-    board = pack or {}
+    board = _count_pack(code, loc)
+    entities = _entities_for_primary_l4(code, loc)
     return {
         "node": node,
-        "ancestors": board.get("ancestors") or [],
+        "ancestors": _bics_ancestors(code),
         "entities": entities,
         "count": len(entities),
-        "totalCount": board.get("totalCount") or 0,
-        "listingCountries": board.get("listingCountries") or [],
-        "unmappedCount": board.get("unmappedCount") or 0,
+        "totalCount": board["totalCount"],
+        "listingCountries": board["listingCountries"],
+        "unmappedCount": board["unmappedCount"],
         "listingCountry": loc,
     }
 
@@ -442,53 +474,55 @@ def locate_bics(q: str, limit: int = 8) -> dict:
         conn.close()
 
 
-def _locate_tickers(conn: sqlite3.Connection, key: str, limit: int) -> tuple[list[str], bool]:
-    """Ticker identity first, then a name fragment anywhere in the company name.
+def _append_unique_tickers(dest: list[str], seen: set[str], rows) -> None:
+    for r in rows:
+        t = str(r["ticker"])
+        if t in seen:
+            continue
+        seen.add(t)
+        dest.append(t)
 
-    A symbol hit must not hide the name. Name rows are nearest fragment, then revenue.
-    `by_ticker` stays true only when the merged list is a single ticker identity.
-    """
+
+def _identity_tickers(conn: sqlite3.Connection, key: str) -> list[str]:
     identity: list[str] = []
     seen: set[str] = set()
-
-    def take(rows) -> None:
-        for r in rows:
-            t = str(r["ticker"])
-            if t in seen:
-                continue
-            seen.add(t)
-            identity.append(t)
-
-    take(conn.execute(
-        """SELECT DISTINCT ticker FROM entity_memberships
-           WHERE upper(ticker) = ?""",
-        (key,),
-    ).fetchall())
+    _append_unique_tickers(
+        identity,
+        seen,
+        conn.execute(
+            """SELECT DISTINCT ticker FROM entity_memberships
+               WHERE upper(ticker) = ?""",
+            (key,),
+        ).fetchall(),
+    )
     if " " not in key:
-        take(conn.execute(
-            """SELECT ticker FROM entity_memberships
-               WHERE upper(ticker) = ? OR upper(ticker) LIKE ?
-               GROUP BY ticker
-               ORDER BY MAX(ind_rev) DESC""",
-            (key, key + " %"),
-        ).fetchall())
+        _append_unique_tickers(
+            identity,
+            seen,
+            conn.execute(
+                """SELECT ticker FROM entity_memberships
+                   WHERE upper(ticker) = ? OR upper(ticker) LIKE ?
+                   GROUP BY ticker
+                   ORDER BY MAX(ind_rev) DESC""",
+                (key, key + " %"),
+            ).fetchall(),
+        )
     else:
-        take(conn.execute(
-            """SELECT ticker FROM entity_memberships
-               WHERE upper(ticker) LIKE ?
-               GROUP BY ticker
-               ORDER BY MAX(ind_rev) DESC""",
-            (key + "%",),
-        ).fetchall())
-    name_rows = conn.execute(
-        """SELECT ticker FROM entity_memberships
-           WHERE upper(name) LIKE ?
-           GROUP BY ticker
-           ORDER BY MIN(instr(upper(name), ?)) ASC, MAX(ind_rev) DESC
-           LIMIT ?""",
-        ("%" + key + "%", key, limit),
-    ).fetchall()
-    names = [str(r["ticker"]) for r in name_rows]
+        _append_unique_tickers(
+            identity,
+            seen,
+            conn.execute(
+                """SELECT ticker FROM entity_memberships
+                   WHERE upper(ticker) LIKE ?
+                   GROUP BY ticker
+                   ORDER BY MAX(ind_rev) DESC""",
+                (key + "%",),
+            ).fetchall(),
+        )
+    return identity
+
+
+def _merge_locate_lists(identity: list[str], names: list[str], limit: int) -> list[str]:
     merged: list[str] = []
     in_merged: set[str] = set()
     for t in identity:
@@ -501,14 +535,34 @@ def _locate_tickers(conn: sqlite3.Connection, key: str, limit: int) -> tuple[lis
     if len(merged) >= limit:
         if names and names[0] not in in_merged:
             merged[-1] = names[0]
-    else:
-        for t in names:
-            if t in in_merged:
-                continue
-            in_merged.add(t)
-            merged.append(t)
-            if len(merged) >= limit:
-                break
+        return merged
+    for t in names:
+        if t in in_merged:
+            continue
+        in_merged.add(t)
+        merged.append(t)
+        if len(merged) >= limit:
+            break
+    return merged
+
+
+def _locate_tickers(conn: sqlite3.Connection, key: str, limit: int) -> tuple[list[str], bool]:
+    """Ticker identity first, then a name fragment anywhere in the company name.
+
+    A symbol hit must not hide the name. Name rows are nearest fragment, then revenue.
+    `by_ticker` stays true only when the merged list is a single ticker identity.
+    """
+    identity = _identity_tickers(conn, key)
+    name_rows = conn.execute(
+        """SELECT ticker FROM entity_memberships
+           WHERE upper(name) LIKE ?
+           GROUP BY ticker
+           ORDER BY MIN(instr(upper(name), ?)) ASC, MAX(ind_rev) DESC
+           LIMIT ?""",
+        ("%" + key + "%", key, limit),
+    ).fetchall()
+    names = [str(r["ticker"]) for r in name_rows]
+    merged = _merge_locate_lists(identity, names, limit)
     return merged, bool(identity) and len(merged) == 1
 
 
@@ -520,12 +574,6 @@ def _load_nvda_revenue_doc() -> dict | None:
     except (OSError, json.JSONDecodeError):
         return None
     return data if isinstance(data, dict) else None
-
-
-def _is_nvda_ticker(raw: str | None) -> bool:
-    if not raw:
-        return False
-    return _normalize_ticker_key(raw).split(" ", 1)[0] == "NVDA"
 
 
 def _layer_index_by_id(layers: list[dict], layer_id: str) -> int | None:
@@ -585,19 +633,38 @@ def _order_nvda_l4_slices(
     return out
 
 
-def bundle_nvda_chain(ticker_raw: str) -> dict:
-    """NVDA supply-chain cube: dynamic BICS-L4 C-SLICE walls + point-to-point C-REV-LINK.
+def _one_nvda_peer(row: dict) -> dict | None:
+    side = row.get("side")
+    if side not in ("supplier", "customer"):
+        return None
+    name = str(row.get("name") or "").strip()
+    ticker = str(row.get("ticker") or "").strip()
+    if not name and not ticker:
+        return None
+    raw_country = row.get("country")
+    country = raw_country if raw_country in ("US", "INTL") else "INTL"
+    ent = _entity_by_member_ticker(ticker) if ticker else None
+    l4_code, l4_name = _peer_l4_key(ent)
+    pct = row.get("spendPct") if side == "supplier" else row.get("revPct")
+    return {
+        "side": side,
+        "name": name,
+        "ticker": ticker,
+        "country": country,
+        "ent": ent,
+        "l4_code": l4_code,
+        "l4_name": l4_name,
+        "pct": pct,
+    }
 
-    Slice count = distinct primary L4 codes among center + peers. Slice name = L4 name.
-    """
-    doc = _load_nvda_revenue_doc() or {}
-    peers = doc.get("peers") if isinstance(doc.get("peers"), list) else []
 
-    center_ticker = str(doc.get("centerTicker") or "NVDA US Equity")
-    center_ent = _entity_by_member_ticker(center_ticker) or _entity_by_member_ticker("NVDA")
-    center_code, center_l4_name = _peer_l4_key(center_ent)
-
-    # Resolve peers once; collect L4 membership by side.
+def _resolve_nvda_peers(
+    peers: list,
+    *,
+    center_code: str,
+    center_l4_name: str,
+) -> tuple[list[dict], set[str], set[str], dict[str, str]]:
+    """Resolve peer tickers; collect L4 codes by side and display names."""
     resolved_peers: list[dict] = []
     supplier_codes: set[str] = set()
     customer_codes: set[str] = set()
@@ -608,154 +675,234 @@ def bundle_nvda_chain(ticker_raw: str) -> dict:
     for row in peers:
         if not isinstance(row, dict):
             continue
-        side = row.get("side")
-        if side not in ("supplier", "customer"):
+        peer = _one_nvda_peer(row)
+        if not peer:
             continue
-        name = str(row.get("name") or "").strip()
-        ticker = str(row.get("ticker") or "").strip()
-        if not name and not ticker:
-            continue
-        country = row.get("country") if row.get("country") in ("US", "INTL") else "INTL"
-        ent = _entity_by_member_ticker(ticker) if ticker else None
-        l4_code, l4_name = _peer_l4_key(ent)
-        l4_names[l4_code] = l4_name if l4_code != _UNRESOLVED_L4 else "Unresolved"
-        if side == "supplier":
+        l4_code = peer["l4_code"]
+        if l4_code == _UNRESOLVED_L4:
+            l4_names[l4_code] = "Unresolved"
+        else:
+            l4_names[l4_code] = peer["l4_name"]
+        if peer["side"] == "supplier":
             supplier_codes.add(l4_code)
         else:
             customer_codes.add(l4_code)
-        pct = row.get("spendPct") if side == "supplier" else row.get("revPct")
-        resolved_peers.append(
-            {
-                "side": side,
-                "name": name,
-                "ticker": ticker,
-                "country": country,
-                "ent": ent,
-                "l4_code": l4_code,
-                "pct": pct,
-            }
-        )
+        resolved_peers.append(peer)
+    return resolved_peers, supplier_codes, customer_codes, l4_names
 
-    ordered_codes = _order_nvda_l4_slices(center_code, supplier_codes, customer_codes)
-    if not ordered_codes:
-        ordered_codes = [center_code or _UNRESOLVED_L4]
-        l4_names.setdefault(ordered_codes[0], center_l4_name or "Unresolved")
 
+def _nvda_layers_meta(
+    ordered_codes: list[str],
+    l4_names: dict[str, str],
+) -> list[dict]:
     layers_meta: list[dict] = []
     for i, code in enumerate(ordered_codes):
+        blurb = "No entity match" if code == _UNRESOLVED_L4 else f"BICS L4 {code}"
         layers_meta.append(
             {
                 "idx": i,
                 "id": code,
                 "name": l4_names.get(code) or code,
-                "blurb": f"BICS L4 {code}" if code != _UNRESOLVED_L4 else "No entity match",
+                "blurb": blurb,
                 "companyCount": 0,
             }
         )
+    return layers_meta
 
-    companies: list[dict] = []
-    ticker_to_id: dict[str, int] = {}
-    next_id = 0
 
-    def add_company(
-        *,
-        name: str,
-        ticker: str,
-        layer_id: str,
-        country: str,
-        rev_bn: float,
-        note: str,
-        source_detail: str,
-        legal: str,
-    ) -> int:
-        nonlocal next_id
-        key = _normalize_ticker_key(ticker) or name
-        if key in ticker_to_id:
-            return ticker_to_id[key]
-        li = _layer_index_by_id(layers_meta, layer_id)
-        if li is None:
-            li = _layer_index_by_id(layers_meta, _UNRESOLVED_L4)
-        if li is None:
-            li = 0
-        cid = next_id
-        next_id += 1
-        companies.append(
-            {
-                "id": cid,
-                "name": name,
-                "ticker": ticker,
-                "revBn": float(rev_bn),
-                "country": "US" if country == "US" else "INTL",
-                "layer": int(li),
-                "note": note,
-                "valueM": None,
-                "source": "nvda-revenue-links",
-                "sourceDetail": source_detail,
-                "legalEntityCoord": legal,
-            }
-        )
-        ticker_to_id[key] = cid
-        return cid
+def _nvda_us_or_intl(country: str | None) -> str:
+    return "US" if country == "US" else "INTL"
 
+
+def _nvda_peer_display(ent: dict | None, row: dict) -> tuple[str, str, str]:
+    """Name, ticker, country for a resolved peer row."""
+    if ent and ent.get("name"):
+        display_name = ent["name"]
+    else:
+        display_name = row["name"] or row["ticker"]
+    if ent and ent.get("ticker"):
+        display_ticker = ent["ticker"]
+    else:
+        display_ticker = row["ticker"] or display_name
+    country = ent["country"] if ent else row["country"]
+    return display_name, display_ticker, country
+
+
+def _nvda_peer_rev_bn(ent: dict | None, pct) -> float:
+    if ent and ent.get("ind_rev") is not None:
+        return float(ent["ind_rev"]) / 1e9
+    if isinstance(pct, (int, float)):
+        return max(float(pct), 0.1)
+    return 1.0
+
+
+def _nvda_append_company(
+    companies: list[dict],
+    ticker_to_id: dict[str, int],
+    layers_meta: list[dict],
+    *,
+    name: str,
+    ticker: str,
+    layer_id: str,
+    country: str,
+    rev_bn: float,
+    note: str,
+    source_detail: str,
+    legal: str,
+    side: str | None = None,
+    link_pct: float | None = None,
+) -> int:
+    key = _normalize_ticker_key(ticker) or name
+    if key in ticker_to_id:
+        return ticker_to_id[key]
+    li = _layer_index_by_id(layers_meta, layer_id)
+    if li is None:
+        li = _layer_index_by_id(layers_meta, _UNRESOLVED_L4)
+    if li is None:
+        li = 0
+    cid = len(companies)
+    row: dict = {
+        "id": cid,
+        "name": name,
+        "ticker": ticker,
+        "revBn": float(rev_bn),
+        "country": _nvda_us_or_intl(country),
+        "layer": int(li),
+        "note": note,
+        "valueM": None,
+        "source": "nvda-revenue-links",
+        "sourceDetail": source_detail,
+        "legalEntityCoord": legal,
+    }
+    if side in ("supplier", "customer"):
+        row["side"] = side
+    if isinstance(link_pct, (int, float)):
+        row["linkPct"] = float(link_pct)
+    companies.append(row)
+    ticker_to_id[key] = cid
+    return cid
+
+
+def _nvda_add_center(
+    companies: list[dict],
+    ticker_to_id: dict[str, int],
+    layers_meta: list[dict],
+    center_ent: dict | None,
+    center_code: str,
+) -> int:
     if center_ent:
-        nvda_id = add_company(
+        rev = center_ent.get("ind_rev")
+        rev_bn = (float(rev) / 1e9) if rev is not None else 100.0
+        return _nvda_append_company(
+            companies,
+            ticker_to_id,
+            layers_meta,
             name=center_ent["name"] or "NVIDIA",
             ticker=center_ent["ticker"],
             layer_id=center_code,
             country=center_ent["country"],
-            rev_bn=(float(center_ent["ind_rev"]) / 1e9)
-            if center_ent.get("ind_rev") is not None
-            else 100.0,
+            rev_bn=rev_bn,
             note=center_ent.get("l4_name") or "AI accelerators",
             source_detail=center_ent.get("bics_code_l4") or "",
             legal=center_ent.get("legal_entity_coord") or "",
         )
-    else:
-        nvda_id = add_company(
-            name="NVIDIA",
-            ticker="NVDA US Equity",
-            layer_id=center_code,
-            country="US",
-            rev_bn=100.0,
-            note="AI accelerators",
-            source_detail="",
-            legal="",
-        )
+    return _nvda_append_company(
+        companies,
+        ticker_to_id,
+        layers_meta,
+        name="NVIDIA",
+        ticker="NVDA US Equity",
+        layer_id=center_code,
+        country="US",
+        rev_bn=100.0,
+        note="AI accelerators",
+        source_detail="",
+        legal="",
+    )
 
+
+def _nvda_build_links(
+    resolved_peers: list[dict],
+    companies: list[dict],
+    ticker_to_id: dict[str, int],
+    layers_meta: list[dict],
+    nvda_id: int,
+) -> list[dict]:
     revenue_links: list[dict] = []
     for row in resolved_peers:
         ent = row["ent"]
-        display_name = (ent["name"] if ent and ent.get("name") else row["name"]) or row["ticker"]
-        display_ticker = (ent["ticker"] if ent and ent.get("ticker") else row["ticker"]) or display_name
+        display_name, display_ticker, country = _nvda_peer_display(ent, row)
         pct = row["pct"]
-        if ent and ent.get("ind_rev") is not None:
-            rev_bn = float(ent["ind_rev"]) / 1e9
-        elif isinstance(pct, (int, float)):
-            rev_bn = max(float(pct), 0.1)
-        else:
-            rev_bn = 1.0
-        peer_id = add_company(
+        note = ""
+        source_detail = ""
+        legal = ""
+        if ent:
+            note = ent.get("l4_name") or ""
+            source_detail = ent.get("bics_code_l4") or ""
+            legal = ent.get("legal_entity_coord") or ""
+        if not note:
+            note = row["l4_code"]
+        link_pct = float(pct) if isinstance(pct, (int, float)) else None
+        peer_id = _nvda_append_company(
+            companies,
+            ticker_to_id,
+            layers_meta,
             name=display_name,
             ticker=display_ticker,
             layer_id=row["l4_code"],
-            country=ent["country"] if ent else row["country"],
-            rev_bn=rev_bn,
-            note=(ent.get("l4_name") if ent else "") or row["l4_code"],
-            source_detail=(ent.get("bics_code_l4") if ent else "") or "",
-            legal=(ent.get("legal_entity_coord") if ent else "") or "",
+            country=country,
+            rev_bn=_nvda_peer_rev_bn(ent, pct),
+            note=note,
+            source_detail=source_detail,
+            legal=legal,
+            side=row["side"],
+            link_pct=link_pct,
         )
         link = {
             "side": row["side"],
             "fromId": nvda_id,
             "toId": peer_id,
             "name": display_name,
-            "country": "US" if (ent["country"] if ent else row["country"]) == "US" else "INTL",
+            "country": _nvda_us_or_intl(country),
         }
         if isinstance(pct, (int, float)):
             link["pct"] = float(pct)
         revenue_links.append(link)
+    return revenue_links
 
-    companies = assign_rings(companies)
+
+def bundle_nvda_chain(ticker_raw: str) -> dict:
+    """NVDA supply-chain cube: dynamic BICS-L4 C-SLICE walls + point-to-point C-REV-LINK.
+
+    Slice count = distinct primary L4 codes among center + peers. Slice name = L4 name.
+    """
+    doc = _load_nvda_revenue_doc() or {}
+    raw_peers = doc.get("peers")
+    peers = raw_peers if isinstance(raw_peers, list) else []
+
+    center_ticker = str(doc.get("centerTicker") or "NVDA US Equity")
+    center_ent = _entity_by_member_ticker(center_ticker) or _entity_by_member_ticker("NVDA")
+    center_code, center_l4_name = _peer_l4_key(center_ent)
+
+    resolved_peers, supplier_codes, customer_codes, l4_names = _resolve_nvda_peers(
+        peers, center_code=center_code, center_l4_name=center_l4_name
+    )
+
+    ordered_codes = _order_nvda_l4_slices(center_code, supplier_codes, customer_codes)
+    if not ordered_codes:
+        fallback = center_code or _UNRESOLVED_L4
+        ordered_codes = [fallback]
+        l4_names.setdefault(fallback, center_l4_name or "Unresolved")
+
+    layers_meta = _nvda_layers_meta(ordered_codes, l4_names)
+    companies: list[dict] = []
+    ticker_to_id: dict[str, int] = {}
+    nvda_id = _nvda_add_center(companies, ticker_to_id, layers_meta, center_ent, center_code)
+    revenue_links = _nvda_build_links(
+        resolved_peers, companies, ticker_to_id, layers_meta, nvda_id
+    )
+
+    companies = assign_nvda_chain_rings(companies, center_id=nvda_id)
     counts: dict[int, int] = {}
     for c in companies:
         counts[c["layer"]] = counts.get(c["layer"], 0) + 1
@@ -763,6 +910,7 @@ def bundle_nvda_chain(ticker_raw: str) -> dict:
         L["companyCount"] = counts.get(L["idx"], 0)
 
     m = meta()
+    resolved = center_ent["ticker"] if center_ent else center_ticker
     return {
         "meta": {
             "title": "NVIDIA — supply chain cube",
@@ -771,10 +919,11 @@ def bundle_nvda_chain(ticker_raw: str) -> dict:
             "shell": False,
             "nvdaChain": True,
             "ticker": ticker_raw,
-            "tickerResolved": center_ent["ticker"] if center_ent else center_ticker,
+            "tickerResolved": resolved,
             "tickerFound": True,
             "layerIds": [L["id"] for L in layers_meta],
             "sliceMode": "bics-l4",
+            "placeMode": "link-hemisphere",
         },
         "layers": layers_meta,
         "companies": companies,
@@ -872,7 +1021,8 @@ class Handler(BaseHTTPRequestHandler):
 
     def _send_file(self, path: Path) -> None:
         if not path.is_file():
-            self._send_json(404, {"error": "not found", "path": str(path.relative_to(WEB_ROOT))})
+            # No filesystem path in JSON (W1 A2).
+            self._send_json(404, {"error": "not found"})
             return
         data = path.read_bytes()
         ctype, _ = mimetypes.guess_type(str(path))
@@ -882,6 +1032,8 @@ class Handler(BaseHTTPRequestHandler):
             ctype = "text/css; charset=utf-8"
         elif path.suffix == ".html":
             ctype = "text/html; charset=utf-8"
+        elif path.suffix == ".json":
+            ctype = "application/json; charset=utf-8"
         self.send_response(200)
         self.send_header("Content-Type", ctype or "application/octet-stream")
         self.send_header("Content-Length", str(len(data)))
@@ -889,6 +1041,24 @@ class Handler(BaseHTTPRequestHandler):
         self._cors()
         self.end_headers()
         self.wfile.write(data)
+
+    def _send_modules(self, url_path: str) -> bool:
+        """Serve only files under MODULES_ROOT. Returns True if handled."""
+        if url_path not in ("/modules", "/modules/") and not url_path.startswith("/modules/"):
+            return False
+        rel = url_path[len("/modules") :].lstrip("/")
+        if not rel or rel.endswith("/"):
+            rel = (rel + "index.html") if rel else "index.html"
+        candidate = (MODULES_ROOT / rel).resolve()
+        root_s = str(MODULES_ROOT)
+        if not str(candidate).startswith(root_s + "/") and str(candidate) != root_s:
+            self._send_json(403, {"error": "forbidden"})
+            return True
+        if candidate.suffix.lower() not in _MODULES_SUFFIXES:
+            self._send_json(403, {"error": "forbidden"})
+            return True
+        self._send_file(candidate)
+        return True
 
     def do_OPTIONS(self) -> None:  # noqa: N802
         self.send_response(204)
@@ -898,9 +1068,10 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self) -> None:  # noqa: N802
         try:
             self._route()
-        except Exception as exc:  # noqa: BLE001
+        except Exception:  # noqa: BLE001
             traceback.print_exc()
-            self._send_json(500, {"error": str(exc)})
+            # W1 A2: never put exception text (may contain paths) in JSON.
+            self._send_json(500, {"error": "internal error"})
 
     def _route(self) -> None:
         parsed = urlparse(self.path)
@@ -919,17 +1090,50 @@ class Handler(BaseHTTPRequestHandler):
             self._send_file(WEB_ROOT / "list.html")
             return
 
+        if self._send_modules(path):
+            return
+
         if path.startswith("/api/"):
             self._api(path, qs)
             return
 
-        # Static assets under web/
+        # Static assets under web/ only (W1 A1: no escape to data/, DATA-SPACE, chain docs).
         rel = path.lstrip("/")
+        web_root = WEB_ROOT.resolve()
         candidate = (WEB_ROOT / rel).resolve()
-        if not str(candidate).startswith(str(WEB_ROOT.resolve())):
+        if not str(candidate).startswith(str(web_root) + "/") and candidate != web_root:
             self._send_json(403, {"error": "forbidden"})
             return
         self._send_file(candidate)
+
+    def _qs0(self, qs: dict, key: str, default: str = "") -> str:
+        return (qs.get(key, [default])[0] or default).strip()
+
+    def _bics_children_resp(self, qs: dict) -> None:
+        parent = self._qs0(qs, "parent")
+        loc = self._qs0(qs, "listingCountry") or None
+        pack = bics_children(parent, loc)
+        if pack is None:
+            self._send_json(404, {"error": "unknown bics parent", "parent": parent})
+            return
+        self._send_json(200, pack)
+
+    def _bics_node_resp(self, qs: dict) -> None:
+        code = self._qs0(qs, "code")
+        node = bics_node(code) if code else None
+        if not node:
+            self._send_json(404, {"error": "unknown bics code", "code": code})
+            return
+        self._send_json(200, {"node": node})
+
+    def _bics_entities_resp(self, qs: dict) -> None:
+        code = self._qs0(qs, "bics")
+        loc = self._qs0(qs, "listingCountry") or None
+        pack = list_bics_entities(code, loc) if code else None
+        if pack is None:
+            self._send_json(400, {"error": "bics must be a level-4 code", "bics": code})
+            return
+        self._send_json(200, pack)
 
     def _api_bics(self, path: str, qs: dict) -> bool:
         """Handle /api/bics/* ; return True if this path is a BICS route."""
@@ -937,106 +1141,93 @@ class Handler(BaseHTTPRequestHandler):
             self._send_json(200, {"sectors": list_bics_l1()})
             return True
         if path == "/api/bics/children":
-            parent = (qs.get("parent", [""])[0] or "").strip()
-            loc = (qs.get("listingCountry", [""])[0] or "").strip() or None
-            pack = bics_children(parent, loc)
-            if pack is None:
-                self._send_json(404, {"error": "unknown bics parent", "parent": parent})
-            else:
-                self._send_json(200, pack)
+            self._bics_children_resp(qs)
             return True
         if path == "/api/bics/node":
-            code = (qs.get("code", [""])[0] or "").strip()
-            node = bics_node(code) if code else None
-            if not node:
-                self._send_json(404, {"error": "unknown bics code", "code": code})
-            else:
-                self._send_json(200, {"node": node})
+            self._bics_node_resp(qs)
             return True
         if path == "/api/bics/locate":
-            q = (qs.get("q", [""])[0] or "").strip()
-            self._send_json(200, locate_bics(q))
+            self._send_json(200, locate_bics(self._qs0(qs, "q")))
             return True
         if path == "/api/bics/entities":
-            code = (qs.get("bics", [""])[0] or "").strip()
-            loc = (qs.get("listingCountry", [""])[0] or "").strip() or None
-            pack = list_bics_entities(code, loc) if code else None
-            if pack is None:
-                self._send_json(400, {"error": "bics must be a level-4 code", "bics": code})
-            else:
-                self._send_json(200, pack)
+            self._bics_entities_resp(qs)
             return True
         return False
+
+    def _api_companies(self, conn, path: str, qs: dict) -> None:
+        if path == "/api/companies":
+            layer = qs.get("layer", [None])[0]
+            layer_i = int(layer) if layer not in (None, "") else None
+            supply = qs.get("supply", ["0"])[0] in ("1", "true", "yes")
+            companies = list_companies(
+                conn,
+                layer=layer_i,
+                country=qs.get("country", [None])[0],
+                supply_only=supply,
+                q=qs.get("q", [None])[0],
+            )
+            self._send_json(200, {"companies": companies, "count": len(companies)})
+            return
+        cid = int(path.rsplit("/", 1)[-1])
+        company = get_company(conn, cid)
+        if not company:
+            self._send_json(404, {"error": "company not found"})
+            return
+        self._send_json(200, {"company": company})
+
+    def _api_bundle(self, qs: dict) -> None:
+        """BE-BUNDLE via bundle_dispatch — shell/chain never open BE-DEMO-DB."""
+        ticker = self._qs0(qs, "ticker")
+        self._send_json(200, build_bundle(ticker))
 
     def _api(self, path: str, qs: dict) -> None:
         if path.startswith("/api/bics/") and self._api_bics(path, qs):
             return
+        # Health / bundle do not require demo DB (M1 isolation).
+        if path == "/api/health":
+            # W1 A2: no library file path handles in browser JSON.
+            self._send_json(200, {"ok": True})
+            return
+        if path == "/api/bundle":
+            self._api_bundle(qs)
+            return
         conn = connect()
         try:
-            if path == "/api/health":
-                self._send_json(200, {"ok": True, "db": str(DB_PATH)})
-                return
             if path == "/api/meta":
                 self._send_json(200, meta())
                 return
             if path == "/api/layers":
                 self._send_json(200, {"layers": list_layers(conn)})
                 return
-            if path == "/api/companies":
-                layer = qs.get("layer", [None])[0]
-                country = qs.get("country", [None])[0]
-                supply = qs.get("supply", ["0"])[0] in ("1", "true", "yes")
-                q = qs.get("q", [None])[0]
-                companies = list_companies(
-                    conn,
-                    layer=int(layer) if layer not in (None, "") else None,
-                    country=country,
-                    supply_only=supply,
-                    q=q,
-                )
-                self._send_json(200, {"companies": companies, "count": len(companies)})
-                return
-            if path.startswith("/api/companies/"):
-                cid = int(path.rsplit("/", 1)[-1])
-                company = get_company(conn, cid)
-                if not company:
-                    self._send_json(404, {"error": "company not found"})
-                    return
-                self._send_json(200, {"company": company})
-                return
-            if path == "/api/bundle":
-                # Demo chain when bare; NVDA → slice+link chain; other ?ticker= → shell.
-                ticker = (qs.get("ticker", [""])[0] or "").strip()
-                if ticker:
-                    if _is_nvda_ticker(ticker):
-                        self._send_json(200, bundle_nvda_chain(ticker))
-                    else:
-                        self._send_json(200, bundle_shell_ticker(ticker))
-                    return
-                self._send_json(
-                    200,
-                    {
-                        "meta": meta(),
-                        "layers": list_layers(conn),
-                        "companies": list_companies(conn),
-                    },
-                )
+            if path == "/api/companies" or path.startswith("/api/companies/"):
+                self._api_companies(conn, path, qs)
                 return
             self._send_json(404, {"error": "unknown api route", "path": path})
         finally:
             conn.close()
 
 
+def _register_bundle_builders() -> None:
+    """Wire BE-BUNDLE registry once app builders exist (no circular import)."""
+    set_shell_builder(bundle_shell_ticker)
+    register_chain(
+        "nvda",
+        lambda key: key.split(" ", 1)[0] == "NVDA",
+        bundle_nvda_chain,
+    )
+
+
+_register_bundle_builders()
+
+
 def main() -> None:
     ensure_db()
     # Loopback-only stdlib server (HOST=127.0.0.1). Cleartext HTTP is intentional for local FIDV.
     httpd = ThreadingHTTPServer((HOST, PORT), Handler)
-    print(f"[ind-chain] homepage http://{HOST}:{PORT}/ · list /list · cube /cube", flush=True)
+    print(f"[ind-chain] homepage http://{HOST}:{PORT}/ · list /list · cube /cube · modules /modules/", flush=True)
     print("[ind-chain] API: /api/bundle  /api/bics/children  /api/bics/entities  /api/bics/locate  /api/bics/node  /api/health", flush=True)
     try:
-        # Indirection keeps Sonar S5332 from treating this loopback tool as a cleartext public server.
-        serve = getattr(httpd, "serve_forever")
-        serve()
+        httpd.serve_forever()
     except KeyboardInterrupt:
         print("\n[ind-chain] stopped")
 

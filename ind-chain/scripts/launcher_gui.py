@@ -2,6 +2,7 @@
 """Standard-Cube integrated launcher — seed/serve/restart/quit without a terminal console."""
 from __future__ import annotations
 
+import contextlib
 import os
 import signal
 import subprocess
@@ -11,8 +12,8 @@ import webbrowser
 from pathlib import Path
 
 def _alert(message: str) -> None:
-    try:
-        subprocess.run(
+    with contextlib.suppress(OSError):
+        subprocess.run(  # noqa: S603 — fixed argv, no shell; message is local launcher text
             [
                 "/usr/bin/osascript",
                 "-e",
@@ -22,8 +23,6 @@ def _alert(message: str) -> None:
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL,
         )
-    except OSError:
-        pass
 
 
 try:
@@ -114,14 +113,14 @@ class Launcher:
 
     def _free_port(self) -> None:
         try:
-            out = subprocess.check_output(["lsof", "-ti", f":{PORT}"], text=True).strip()
+            out = subprocess.check_output(  # noqa: S603 — fixed argv, no shell
+                ["/usr/sbin/lsof", "-ti", f":{PORT}"], text=True
+            ).strip()
         except subprocess.CalledProcessError:
             return
         for pid in out.split():
-            try:
+            with contextlib.suppress(OSError):
                 os.kill(int(pid), signal.SIGTERM)
-            except OSError:
-                pass
         time.sleep(0.4)
 
     def _cleanup(self) -> None:
@@ -141,8 +140,8 @@ class Launcher:
         self._cleanup()
         self._free_port()
         try:
-            subprocess.check_call([sys.executable, str(ROOT / "scripts" / "seed.py")], cwd=str(ROOT))
-            self.proc = subprocess.Popen(
+            subprocess.check_call([sys.executable, str(ROOT / "scripts" / "seed.py")], cwd=str(ROOT))  # noqa: S603 — own interpreter + repo script
+            self.proc = subprocess.Popen(  # noqa: S603 — own interpreter + repo script
                 [sys.executable, str(ROOT / "server" / "app.py")],
                 cwd=str(ROOT),
                 stdout=subprocess.DEVNULL,

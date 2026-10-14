@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>FIDV 模块关系 · 静态跟踪</title>
+<style>
+:root {
+  --paper: #f7f5f0;
+  --ink: #1a1f26;
+  --muted: #4a5560;
+  --rule: #c5ccd4;
+  --fill: #ece8e0;
+  --fe: #2a4a6a;
+  --be: #4a3a28;
+  --other: #3a4a3a;
+}
+@page { size: A4; margin: 10mm; }
+* { box-sizing: border-box; }
+body {
+  margin: 0 auto;
+  padding: 10mm 10mm 16mm;
+  max-width: 210mm;
+  color: var(--ink);
+  background: var(--paper);
+  font-family: "Iowan Old Style", "Palatino Linotype", Palatino, "Songti SC", "Noto Serif SC", serif;
+  font-size: 11pt;
+  line-height: 1.45;
+}
+header.head { display: flex; align-items: baseline; justify-content: space-between; gap: 1em;
+  border-bottom: 1.5px solid var(--ink); padding-bottom: 0.35em; margin-bottom: 0.5em; }
+h1 { font-size: 17pt; font-weight: 600; letter-spacing: 0.04em; margin: 0; }
+.brand { letter-spacing: 0.14em; font-size: 10.5pt; margin: 0; color: var(--muted); }
+h2 { font-size: 12.5pt; border-bottom: 1px solid var(--rule); padding-bottom: 0.15em; margin-top: 1.35em; }
+p { margin: 0.45em 0; }
+.cover-meta, .lede, .status { color: var(--muted); font-size: 9.6pt; }
+.lede { margin: 0.2em 0 0.6em; }
+.no-print { font-size: 10pt; color: var(--muted); border-bottom: 1px solid var(--rule); padding-bottom: 0.6em; margin-bottom: 0.8em; }
+table { width: 100%; border-collapse: collapse; font-size: 9.5pt; margin: 0.6em 0 1em; }
+th, td { border: 1px solid var(--rule); padding: 0.28em 0.45em; text-align: left; vertical-align: top; }
+th { background: var(--fill); font-weight: 600; }
+code { font-family: "SF Mono", ui-monospace, Menlo, Consolas, monospace; font-size: 0.86em; }
+.badge { display: inline-block; border: 1px solid var(--rule); background: var(--fill); padding: 0.05em 0.4em; font-size: 9pt; }
+.callout { background: var(--fill); border: 1px solid var(--rule); padding: 0.45em 0.65em; margin: 0.7em 0; font-size: 10pt; }
+.fig { margin: 0.4em 0 0.6em; border: 1px solid var(--rule); background: #fcfbf8; padding: 0.4em 0.4em 0.2em; }
+.fig svg { display: block; width: 100%; height: auto; }
+.fig-cap { font-size: 9pt; color: var(--muted); margin: 0.5em 0 0; }
+.tables { break-before: page; }
+.side-FE { color: var(--fe); }
+.side-BE { color: var(--be); }
+.side-other { color: var(--other); }
+@media print {
+  body { background: white; padding: 0; max-width: none; }
+  .no-print { display: none; }
+  .fig { background: white; }
+}
+</style>
+</head>
+<body>
+<p class="no-print">静态页 · 可 <code>file://</code> 直接打开 · 真源 <code>modules/graph.json</code> · 版式与布线在 <code>modules/bake_static.py</code> · 改后运行 <code>python3 modules/bake_static.py</code> 重烘焙</p>
+<header class="head">
+  <h1>FIDV 模块关系图</h1>
+  <p class="brand">MODULE MAP · 23 模块 · 30 边</p>
+</header>
+<p class="lede">左后端、右前端；中间一根 <strong>FE-API</strong> 枢纽条立在所有框外，是前后端唯一契约口。右侧上淡绿＝决策路径（NAV → LIST），下淡蓝＝立方体面（CUBE-BOOT → AESTHETIC）；后端淡黄，<code>BE-HTTP</code> 为总线，分派至各子模块。</p>
+
+<div class="fig" id="fig">
+<svg id="graph-svg" viewBox="0 0 690 528" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="FIDV module relation graph" font-family="'Helvetica Neue', Helvetica, Arial, 'PingFang SC', sans-serif"><defs><marker id="arrow-fe" viewBox="0 0 12 12" refX="11" refY="6" markerWidth="9" markerHeight="9" markerUnits="userSpaceOnUse" orient="auto"><path d="M0 1.2 L11 6 L0 10.8 z" fill="#00a86b"/></marker><marker id="arrow-be" viewBox="0 0 12 12" refX="11" refY="6" markerWidth="9" markerHeight="9" markerUnits="userSpaceOnUse" orient="auto"><path d="M0 1.2 L11 6 L0 10.8 z" fill="#5dade2"/></marker><marker id="arrow-x" viewBox="0 0 12 12" refX="11" refY="6" markerWidth="9" markerHeight="9" markerUnits="userSpaceOnUse" orient="auto"><path d="M0 1.2 L11 6 L0 10.8 z" fill="#e02020"/></marker></defs><rect x="8" y="22" width="312" height="390" rx="5" fill="#fbf4dd" stroke="#c2a557" stroke-width="1.3"/><rect x="388" y="22" width="294" height="162" rx="5" fill="#e9f5ec" stroke="#6fa77c" stroke-width="1.3"/><rect x="388" y="200" width="294" height="212" rx="5" fill="#e7f0f9" stroke="#6f94bb" stroke-width="1.3"/><rect x="18" y="14" width="56" height="16" rx="8" fill="#c2a557"/><text x="46" y="25.6" text-anchor="middle" font-family="'Iowan Old Style', 'Palatino Linotype', Palatino, 'Songti SC', 'Noto Serif SC', serif" font-size="10.5" font-weight="700" fill="#ffffff" letter-spacing="0.08em">后端</text><rect x="398" y="14" width="56" height="16" rx="8" fill="#6fa77c"/><text x="426" y="25.6" text-anchor="middle" font-family="'Iowan Old Style', 'Palatino Linotype', Palatino, 'Songti SC', 'Noto Serif SC', serif" font-size="10.5" font-weight="700" fill="#ffffff" letter-spacing="0.08em">决策路径</text><rect x="398" y="192" width="56" height="16" rx="8" fill="#6f94bb"/><text x="426" y="203.6" text-anchor="middle" font-family="'Iowan Old Style', 'Palatino Linotype', Palatino, 'Songti SC', 'Noto Serif SC', serif" font-size="10.5" font-weight="700" fill="#ffffff" letter-spacing="0.08em">立方体面</text><g><title>BE-HTTP — Loopback HTTP + static + modules narrow mouth</title><rect x="280" y="44" width="30" height="354" rx="4" fill="#f3e7bd" stroke="#8c7326" stroke-width="1.6"/><text transform="translate(298.4 221) rotate(-90)" text-anchor="middle" font-size="10.5" font-weight="700" letter-spacing="0.06em" fill="#1a1f26">BE-HTTP</text></g><g><title>BE-BICS-HIER — BICS hierarchy JSON index</title><rect x="154" y="42" width="98" height="28" rx="3" fill="#ffffff" fill-opacity="0.94" stroke="#8c7326" stroke-width="1.1"/><text x="203" y="59.3" text-anchor="middle" font-size="9.4" fill="#1a1f26" letter-spacing="0.02em">BE-BICS-HIER</text></g><g><title>BE-ENTITY — Entity membership / counts DB</title><rect x="154" y="92" width="98" height="28" rx="3" fill="#ffffff" fill-opacity="0.94" stroke="#8c7326" stroke-width="1.1"/><text x="203" y="109.3" text-anchor="middle" font-size="9.4" fill="#1a1f26" letter-spacing="0.02em">BE-ENTITY</text></g><g><title>BE-INGEST — DATA-SPACE ingest scripts (offline)</title><rect x="20" y="92" width="98" height="28" rx="3" fill="#ffffff" fill-opacity="0.94" stroke="#8c7326" stroke-width="1.1"/><text x="69" y="109.3" text-anchor="middle" font-size="9.4" fill="#1a1f26" letter-spacing="0.02em">BE-INGEST</text></g><g><title>BE-LISTING — Listing-country from yellow-key</title><rect x="154" y="142" width="98" height="28" rx="3" fill="#ffffff" fill-opacity="0.94" stroke="#8c7326" stroke-width="1.1"/><text x="203" y="159.3" text-anchor="middle" font-size="9.4" fill="#1a1f26" letter-spacing="0.02em">BE-LISTING</text></g><g><title>BE-BUNDLE — mode-first bundle dispatch demo|shell|chain</title><rect x="154" y="291" width="98" height="28" rx="3" fill="#ffffff" fill-opacity="0.94" stroke="#8c7326" stroke-width="1.1"/><text x="203" y="308.3" text-anchor="middle" font-size="9.4" fill="#1a1f26" letter-spacing="0.02em">BE-BUNDLE</text></g><g><title>BE-DEMO-DB — Demo SQLite companies/layers</title><rect x="20" y="216" width="98" height="28" rx="3" fill="#ffffff" fill-opacity="0.94" stroke="#8c7326" stroke-width="1.1"/><text x="69" y="233.3" text-anchor="middle" font-size="9.4" fill="#1a1f26" letter-spacing="0.02em">BE-DEMO-DB</text></g><g><title>BE-SHELL — Empty-wall shell for non-chain ticker</title><rect x="20" y="266" width="98" height="28" rx="3" fill="#ffffff" fill-opacity="0.94" stroke="#8c7326" stroke-width="1.1"/><text x="69" y="283.3" text-anchor="middle" font-size="9.4" fill="#1a1f26" letter-spacing="0.02em">BE-SHELL</text></g><g><title>BE-CHAIN-LAYOUT — Server-side ring / slice layout</title><rect x="20" y="316" width="98" height="28" rx="3" fill="#ffffff" fill-opacity="0.94" stroke="#8c7326" stroke-width="1.1"/><text x="69" y="333.3" text-anchor="middle" font-size="9.4" fill="#1a1f26" letter-spacing="0.02em">BE-CHAIN-LAYOUT</text></g><g><title>BE-NVDA-LINKS — NVDA revenue-link chain document</title><rect x="20" y="366" width="98" height="28" rx="3" fill="#ffffff" fill-opacity="0.94" stroke="#8c7326" stroke-width="1.1"/><text x="69" y="383.3" text-anchor="middle" font-size="9.4" fill="#1a1f26" letter-spacing="0.02em">BE-NVDA-LINKS</text></g><g><title>MODULES-TRACK — Repo-root modules graph + paper HTML</title><rect x="154" y="366" width="98" height="28" rx="3" fill="#ffffff" fill-opacity="0.94" stroke="#8c7326" stroke-width="1.1"/><text x="203" y="383.3" text-anchor="middle" font-size="9.4" fill="#1a1f26" letter-spacing="0.02em">MODULES-TRACK</text></g><g><title>FE-API — Single HTTP base for gate / list / cube</title><rect x="344" y="88" width="30" height="156" rx="4" fill="#e3e8ee" stroke="#3a4552" stroke-width="1.6"/><text transform="translate(362.4 166) rotate(-90)" text-anchor="middle" font-size="10.5" font-weight="700" letter-spacing="0.06em" fill="#1a1f26">FE-API</text></g><g><title>FE-NAV — Route assignment across home / list / cube</title><rect x="414" y="42" width="98" height="28" rx="3" fill="#ffffff" fill-opacity="0.94" stroke="#3f7a4d" stroke-width="1.1"/><text x="463" y="59.3" text-anchor="middle" font-size="9.4" fill="#1a1f26" letter-spacing="0.02em">FE-NAV</text></g><g><title>FE-GATE — BICS L1–L3 gate board</title><rect x="414" y="92" width="98" height="28" rx="3" fill="#ffffff" fill-opacity="0.94" stroke="#3f7a4d" stroke-width="1.1"/><text x="463" y="109.3" text-anchor="middle" font-size="9.4" fill="#1a1f26" letter-spacing="0.02em">FE-GATE</text></g><g><title>FE-LIST — L4 company list</title><rect x="414" y="142" width="98" height="28" rx="3" fill="#ffffff" fill-opacity="0.94" stroke="#3f7a4d" stroke-width="1.1"/><text x="463" y="159.3" text-anchor="middle" font-size="9.4" fill="#1a1f26" letter-spacing="0.02em">FE-LIST</text></g><g><title>FE-LISTING-UI — Listing-country control UI</title><rect x="552" y="117" width="98" height="28" rx="3" fill="#ffffff" fill-opacity="0.94" stroke="#3f7a4d" stroke-width="1.1"/><text x="601" y="134.3" text-anchor="middle" font-size="9.4" fill="#1a1f26" letter-spacing="0.02em">FE-LISTING-UI</text></g><g><title>FE-CUBE-BOOT — Cube page boot; consumes bundle</title><rect x="414" y="220" width="98" height="28" rx="3" fill="#ffffff" fill-opacity="0.94" stroke="#3d6896" stroke-width="1.1"/><text x="463" y="237.3" text-anchor="middle" font-size="9.4" fill="#1a1f26" letter-spacing="0.02em">FE-CUBE-BOOT</text></g><g><title>FE-AESTHETIC — Cross-cutting glass / paper tokens</title><rect x="552" y="220" width="98" height="28" rx="3" fill="#ffffff" fill-opacity="0.94" stroke="#3d6896" stroke-width="1.1"/><text x="601" y="237.3" text-anchor="middle" font-size="9.4" fill="#1a1f26" letter-spacing="0.02em">FE-AESTHETIC</text></g><g><title>FE-STATE — Cube session state</title><rect x="414" y="270" width="98" height="28" rx="3" fill="#ffffff" fill-opacity="0.94" stroke="#3d6896" stroke-width="1.1"/><text x="463" y="287.3" text-anchor="middle" font-size="9.4" fill="#1a1f26" letter-spacing="0.02em">FE-STATE</text></g><g><title>FE-CHROME — Floating cube chrome</title><rect x="552" y="270" width="98" height="28" rx="3" fill="#ffffff" fill-opacity="0.94" stroke="#3d6896" stroke-width="1.1"/><text x="601" y="287.3" text-anchor="middle" font-size="9.4" fill="#1a1f26" letter-spacing="0.02em">FE-CHROME</text></g><g><title>FE-SCENE — Three scene; consumes precomputed rings</title><rect x="414" y="320" width="98" height="28" rx="3" fill="#ffffff" fill-opacity="0.94" stroke="#3d6896" stroke-width="1.1"/><text x="463" y="337.3" text-anchor="middle" font-size="9.4" fill="#1a1f26" letter-spacing="0.02em">FE-SCENE</text></g><g><title>FE-COORD — Sole world placement from object/sxy</title><rect x="552" y="320" width="98" height="28" rx="3" fill="#ffffff" fill-opacity="0.94" stroke="#3d6896" stroke-width="1.1"/><text x="601" y="337.3" text-anchor="middle" font-size="9.4" fill="#1a1f26" letter-spacing="0.02em">FE-COORD</text></g><g><title>FE-FOCUS-STAGE — Focus / staging overlays</title><rect x="414" y="370" width="98" height="28" rx="3" fill="#ffffff" fill-opacity="0.94" stroke="#3d6896" stroke-width="1.1"/><text x="463" y="387.3" text-anchor="middle" font-size="9.4" fill="#1a1f26" letter-spacing="0.02em">FE-FOCUS-STAGE</text></g><path d="M463 70 L463 90.5" fill="none" stroke="#00a86b" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-fe)"><title>FE-NAV → FE-GATE (calls)</title></path><path d="M463 120 L463 140.5" fill="none" stroke="#00a86b" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-fe)"><title>FE-GATE → FE-LIST (calls)</title></path><path d="M463 170 L463 218.5" fill="none" stroke="#00a86b" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-fe)"><title>FE-LIST → FE-CUBE-BOOT (calls)</title></path><path d="M414 106 L375.5 106" fill="none" stroke="#00a86b" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-fe)"><title>FE-GATE → FE-API (calls)</title></path><path d="M414 156 L375.5 156" fill="none" stroke="#00a86b" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-fe)"><title>FE-LIST → FE-API (calls)</title></path><path d="M414 228 L375.5 228" fill="none" stroke="#00a86b" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-fe)"><title>FE-CUBE-BOOT → FE-API (calls)</title></path><path d="M344 131 L311.5 131" fill="none" stroke="#e02020" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-x)" stroke-dasharray="1.6 3"><title>FE-API → BE-HTTP (contract)</title></path><path d="M512 112 L532 112 L532 126 L550.5 126" fill="none" stroke="#00a86b" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-fe)" stroke-dasharray="5 3"><title>FE-GATE → FE-LISTING-UI (depends)</title></path><path d="M512 150 L532 150 L532 136 L550.5 136" fill="none" stroke="#00a86b" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-fe)" stroke-dasharray="5 3"><title>FE-LIST → FE-LISTING-UI (depends)</title></path><path d="M463 248 L463 268.5" fill="none" stroke="#00a86b" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-fe)" stroke-dasharray="5 3"><title>FE-CUBE-BOOT → FE-STATE (depends)</title></path><path d="M512 240 L524 240 L524 328 L550.5 328" fill="none" stroke="#00a86b" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-fe)" stroke-dasharray="5 3"><title>FE-CUBE-BOOT → FE-COORD (depends)</title></path><path d="M414 240 L398 240 L398 334 L412.5 334" fill="none" stroke="#00a86b" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-fe)" stroke-dasharray="5 3"><title>FE-CUBE-BOOT → FE-SCENE (depends)</title></path><path d="M512 228 L538 228 L538 284 L550.5 284" fill="none" stroke="#00a86b" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-fe)" stroke-dasharray="5 3"><title>FE-CUBE-BOOT → FE-CHROME (depends)</title></path><path d="M512 340 L550.5 340" fill="none" stroke="#00a86b" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-fe)"><title>FE-SCENE → FE-COORD (calls)</title></path><path d="M463 348 L463 368.5" fill="none" stroke="#00a86b" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-fe)" stroke-dasharray="5 3"><title>FE-SCENE → FE-FOCUS-STAGE (depends)</title></path><path d="M650 240 L672 240 L672 100 L513.5 100" fill="none" stroke="#00a86b" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-fe)" stroke-dasharray="5 3"><title>FE-AESTHETIC → FE-GATE (depends)</title></path><path d="M650 228 L662 228 L662 162 L513.5 162" fill="none" stroke="#00a86b" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-fe)" stroke-dasharray="5 3"><title>FE-AESTHETIC → FE-LIST (depends)</title></path><path d="M601 248 L601 268.5" fill="none" stroke="#00a86b" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-fe)" stroke-dasharray="5 3"><title>FE-AESTHETIC → FE-CHROME (depends)</title></path><path d="M280 305 L253.5 305" fill="none" stroke="#5dade2" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-be)"><title>BE-HTTP → BE-BUNDLE (calls)</title></path><path d="M280 56 L253.5 56" fill="none" stroke="#5dade2" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-be)"><title>BE-HTTP → BE-BICS-HIER (calls)</title></path><path d="M280 106 L253.5 106" fill="none" stroke="#5dade2" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-be)"><title>BE-HTTP → BE-ENTITY (calls)</title></path><path d="M280 156 L253.5 156" fill="none" stroke="#5dade2" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-be)"><title>BE-HTTP → BE-LISTING (calls)</title></path><path d="M280 380 L253.5 380" fill="none" stroke="#e02020" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-x)" stroke-dasharray="1.6 3"><title>BE-HTTP → MODULES-TRACK (contract)</title></path><path d="M154 296 L144 296 L144 230 L119.5 230" fill="none" stroke="#5dade2" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-be)"><title>BE-BUNDLE → BE-DEMO-DB (calls)</title></path><path d="M154 302 L132 302 L132 280 L119.5 280" fill="none" stroke="#5dade2" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-be)"><title>BE-BUNDLE → BE-SHELL (calls)</title></path><path d="M154 308 L132 308 L132 330 L119.5 330" fill="none" stroke="#5dade2" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-be)"><title>BE-BUNDLE → BE-CHAIN-LAYOUT (calls)</title></path><path d="M154 314 L144 314 L144 380 L119.5 380" fill="none" stroke="#5dade2" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-be)"><title>BE-BUNDLE → BE-NVDA-LINKS (calls)</title></path><path d="M69 344 L69 364.5" fill="none" stroke="#5dade2" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-be)" stroke-dasharray="5 3"><title>BE-CHAIN-LAYOUT → BE-NVDA-LINKS (depends)</title></path><path d="M203 120 L203 140.5" fill="none" stroke="#5dade2" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-be)" stroke-dasharray="5 3"><title>BE-ENTITY → BE-LISTING (depends)</title></path><path d="M118 106 L152.5 106" fill="none" stroke="#5dade2" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-be)" stroke-dasharray="5 3"><title>BE-INGEST → BE-ENTITY (depends)</title></path><line x1="8" y1="426" x2="682" y2="426" stroke="#c5ccd4" stroke-width="0.8"/><text x="16" y="442" font-family="'Iowan Old Style', 'Palatino Linotype', Palatino, 'Songti SC', 'Noto Serif SC', serif" font-size="10.5" font-weight="700" fill="#1a1f26" letter-spacing="0.1em">分区</text><rect x="16" y="453" width="20" height="11" rx="2.5" fill="#e9f5ec" stroke="#6fa77c" stroke-width="1.2"/><text x="44" y="462" font-size="9.4" fill="#4a5560">决策路径 · NAV → LIST</text><rect x="16" y="470" width="20" height="11" rx="2.5" fill="#e7f0f9" stroke="#6f94bb" stroke-width="1.2"/><text x="44" y="479" font-size="9.4" fill="#4a5560">立方体面 · CUBE-BOOT → AESTHETIC</text><rect x="16" y="487" width="20" height="11" rx="2.5" fill="#fbf4dd" stroke="#c2a557" stroke-width="1.2"/><text x="44" y="496" font-size="9.4" fill="#4a5560">后端 · BE-HTTP 起</text><rect x="16" y="504" width="20" height="11" rx="2.5" fill="#e3e8ee" stroke="#3a4552" stroke-width="1.5"/><text x="44" y="513" font-size="9.4" fill="#4a5560">枢纽条 · FE-API / BE-HTTP（框外 / 框缘）</text><text x="330" y="442" font-family="'Iowan Old Style', 'Palatino Linotype', Palatino, 'Songti SC', 'Noto Serif SC', serif" font-size="10.5" font-weight="700" fill="#1a1f26" letter-spacing="0.1em">边色</text><path d="M330 458.5 L364 458.5" stroke="#00a86b" stroke-width="2" fill="none"/><text x="372" y="462" font-size="9.4" fill="#4a5560">翠绿 · 前端内部</text><path d="M330 475.5 L364 475.5" stroke="#5dade2" stroke-width="2" fill="none"/><text x="372" y="479" font-size="9.4" fill="#4a5560">天青 · 后端内部</text><path d="M330 492.5 L364 492.5" stroke="#e02020" stroke-width="2" fill="none"/><text x="372" y="496" font-size="9.4" fill="#4a5560">亮红 · 跨侧</text><text x="530" y="442" font-family="'Iowan Old Style', 'Palatino Linotype', Palatino, 'Songti SC', 'Noto Serif SC', serif" font-size="10.5" font-weight="700" fill="#1a1f26" letter-spacing="0.1em">线型</text><path d="M530 458.5 L564 458.5" stroke="#1a1f26" stroke-width="1.6" fill="none"/><text x="572" y="462" font-size="9.4" fill="#4a5560">calls · 实线</text><path d="M530 475.5 L564 475.5" stroke="#1a1f26" stroke-width="1.6" fill="none" stroke-dasharray="5 3"/><text x="572" y="479" font-size="9.4" fill="#4a5560">depends · 虚线</text><path d="M530 492.5 L564 492.5" stroke="#1a1f26" stroke-width="1.6" fill="none" stroke-dasharray="1.6 3"/><text x="572" y="496" font-size="9.4" fill="#4a5560">contract · 点线</text></svg>
+</div>
+<p class="fig-cap">布线：每条边由节点边缘的固定端口直连或经一条通道折一次、折两次；零交叉、零叠段、线不穿框，箭头止于目标框缘外。</p>
+
+<div class="tables">
+<div class="callout" id="status"></div>
+
+<h2>模块清单</h2>
+<table id="mod-table">
+  <thead><tr><th>id</th><th>侧</th><th>区</th><th>职责</th></tr></thead>
+  <tbody></tbody>
+</table>
+
+<h2>关系边</h2>
+<table id="edge-table">
+  <thead><tr><th>from</th><th>to</th><th>type</th></tr></thead>
+  <tbody></tbody>
+</table>
+</div>
+
+<script id="graph-data" type="application/json">
+{
+  "version": 1,
+  "updated": "2026-10-14",
+  "title": "FIDV module graph (W1 track)",
+  "note": "Machine source of truth for module inventory and edges. Edit this file, then run python3 modules/bake_static.py to refresh modules/index.html (static; file:// OK; no fetch). Architecture: FE two modules (fe-decision 决策路径 · fe-cube 立方体面) + BE one module; FE-API (region fe-api) sits outside both FE frames as contract hub. Optional module.region is consumed by bake with fallback. Edge colors by side pair (FE内翠绿 #00a86b / BE内天青 #5dade2 / 跨侧亮红 #e02020); dash by type. Routing: channel + edge-slot orthogonal polylines (no cross / no coincide). Cross-side data contract is only FE-API→BE-HTTP (plus BE-HTTP→MODULES-TRACK narrow mouth). Direct page→data-module contract edges (GATE→BICS-HIER, LIST→ENTITY, CUBE-BOOT→BUNDLE) removed 2026-10-14: they duplicated the API path and read as if the browser opened library modules.",
+  "modules": [
+    {
+      "id": "FE-NAV",
+      "side": "FE",
+      "region": "fe-decision",
+      "role": "Route assignment across home / list / cube"
+    },
+    {
+      "id": "FE-GATE",
+      "side": "FE",
+      "region": "fe-decision",
+      "role": "BICS L1–L3 gate board"
+    },
+    {
+      "id": "FE-LIST",
+      "side": "FE",
+      "region": "fe-decision",
+      "role": "L4 company list"
+    },
+    {
+      "id": "FE-CUBE-BOOT",
+      "side": "FE",
+      "region": "fe-cube",
+      "role": "Cube page boot; consumes bundle"
+    },
+    {
+      "id": "FE-LISTING-UI",
+      "side": "FE",
+      "region": "fe-decision",
+      "role": "Listing-country control UI"
+    },
+    {
+      "id": "FE-STATE",
+      "side": "FE",
+      "region": "fe-cube",
+      "role": "Cube session state"
+    },
+    {
+      "id": "FE-COORD",
+      "side": "FE",
+      "region": "fe-cube",
+      "role": "Sole world placement from object/sxy"
+    },
+    {
+      "id": "FE-SCENE",
+      "side": "FE",
+      "region": "fe-cube",
+      "role": "Three scene; consumes precomputed rings"
+    },
+    {
+      "id": "FE-CHROME",
+      "side": "FE",
+      "region": "fe-cube",
+      "role": "Floating cube chrome"
+    },
+    {
+      "id": "FE-FOCUS-STAGE",
+      "side": "FE",
+      "region": "fe-cube",
+      "role": "Focus / staging overlays"
+    },
+    {
+      "id": "FE-API",
+      "side": "FE",
+      "region": "fe-api",
+      "role": "Single HTTP base for gate / list / cube"
+    },
+    {
+      "id": "FE-AESTHETIC",
+      "side": "FE",
+      "region": "fe-cube",
+      "role": "Cross-cutting glass / paper tokens"
+    },
+    {
+      "id": "BE-HTTP",
+      "side": "BE",
+      "region": "be",
+      "role": "Loopback HTTP + static + modules narrow mouth"
+    },
+    {
+      "id": "BE-BUNDLE",
+      "side": "BE",
+      "region": "be",
+      "role": "mode-first bundle dispatch demo|shell|chain"
+    },
+    {
+      "id": "BE-DEMO-DB",
+      "side": "BE",
+      "region": "be",
+      "role": "Demo SQLite companies/layers"
+    },
+    {
+      "id": "BE-SHELL",
+      "side": "BE",
+      "region": "be",
+      "role": "Empty-wall shell for non-chain ticker"
+    },
+    {
+      "id": "BE-CHAIN-LAYOUT",
+      "side": "BE",
+      "region": "be",
+      "role": "Server-side ring / slice layout"
+    },
+    {
+      "id": "BE-NVDA-LINKS",
+      "side": "BE",
+      "region": "be",
+      "role": "NVDA revenue-link chain document"
+    },
+    {
+      "id": "BE-BICS-HIER",
+      "side": "BE",
+      "region": "be",
+      "role": "BICS hierarchy JSON index"
+    },
+    {
+      "id": "BE-ENTITY",
+      "side": "BE",
+      "region": "be",
+      "role": "Entity membership / counts DB"
+    },
+    {
+      "id": "BE-LISTING",
+      "side": "BE",
+      "region": "be",
+      "role": "Listing-country from yellow-key"
+    },
+    {
+      "id": "BE-INGEST",
+      "side": "BE",
+      "region": "be",
+      "role": "DATA-SPACE ingest scripts (offline)"
+    },
+    {
+      "id": "MODULES-TRACK",
+      "side": "other",
+      "region": "be",
+      "role": "Repo-root modules graph + paper HTML"
+    }
+  ],
+  "edges": [
+    {
+      "from": "FE-NAV",
+      "to": "FE-GATE",
+      "type": "calls"
+    },
+    {
+      "from": "FE-GATE",
+      "to": "FE-LIST",
+      "type": "calls"
+    },
+    {
+      "from": "FE-LIST",
+      "to": "FE-CUBE-BOOT",
+      "type": "calls"
+    },
+    {
+      "from": "FE-GATE",
+      "to": "FE-API",
+      "type": "calls"
+    },
+    {
+      "from": "FE-LIST",
+      "to": "FE-API",
+      "type": "calls"
+    },
+    {
+      "from": "FE-CUBE-BOOT",
+      "to": "FE-API",
+      "type": "calls"
+    },
+    {
+      "from": "FE-API",
+      "to": "BE-HTTP",
+      "type": "contract"
+    },
+    {
+      "from": "FE-GATE",
+      "to": "FE-LISTING-UI",
+      "type": "depends"
+    },
+    {
+      "from": "FE-LIST",
+      "to": "FE-LISTING-UI",
+      "type": "depends"
+    },
+    {
+      "from": "FE-CUBE-BOOT",
+      "to": "FE-STATE",
+      "type": "depends"
+    },
+    {
+      "from": "FE-CUBE-BOOT",
+      "to": "FE-COORD",
+      "type": "depends"
+    },
+    {
+      "from": "FE-CUBE-BOOT",
+      "to": "FE-SCENE",
+      "type": "depends"
+    },
+    {
+      "from": "FE-CUBE-BOOT",
+      "to": "FE-CHROME",
+      "type": "depends"
+    },
+    {
+      "from": "FE-SCENE",
+      "to": "FE-COORD",
+      "type": "calls"
+    },
+    {
+      "from": "FE-SCENE",
+      "to": "FE-FOCUS-STAGE",
+      "type": "depends"
+    },
+    {
+      "from": "FE-AESTHETIC",
+      "to": "FE-GATE",
+      "type": "depends"
+    },
+    {
+      "from": "FE-AESTHETIC",
+      "to": "FE-LIST",
+      "type": "depends"
+    },
+    {
+      "from": "FE-AESTHETIC",
+      "to": "FE-CHROME",
+      "type": "depends"
+    },
+    {
+      "from": "BE-HTTP",
+      "to": "BE-BUNDLE",
+      "type": "calls"
+    },
+    {
+      "from": "BE-HTTP",
+      "to": "BE-BICS-HIER",
+      "type": "calls"
+    },
+    {
+      "from": "BE-HTTP",
+      "to": "BE-ENTITY",
+      "type": "calls"
+    },
+    {
+      "from": "BE-HTTP",
+      "to": "BE-LISTING",
+      "type": "calls"
+    },
+    {
+      "from": "BE-HTTP",
+      "to": "MODULES-TRACK",
+      "type": "contract"
+    },
+    {
+      "from": "BE-BUNDLE",
+      "to": "BE-DEMO-DB",
+      "type": "calls"
+    },
+    {
+      "from": "BE-BUNDLE",
+      "to": "BE-SHELL",
+      "type": "calls"
+    },
+    {
+      "from": "BE-BUNDLE",
+      "to": "BE-CHAIN-LAYOUT",
+      "type": "calls"
+    },
+    {
+      "from": "BE-BUNDLE",
+      "to": "BE-NVDA-LINKS",
+      "type": "calls"
+    },
+    {
+      "from": "BE-CHAIN-LAYOUT",
+      "to": "BE-NVDA-LINKS",
+      "type": "depends"
+    },
+    {
+      "from": "BE-ENTITY",
+      "to": "BE-LISTING",
+      "type": "depends"
+    },
+    {
+      "from": "BE-INGEST",
+      "to": "BE-ENTITY",
+      "type": "depends"
+    }
+  ]
+}
+</script>
+<script>
+(function () {
+  const status = document.getElementById("status");
+  const modBody = document.querySelector("#mod-table tbody");
+  const edgeBody = document.querySelector("#edge-table tbody");
+  const data = JSON.parse(document.getElementById("graph-data").textContent);
+  const REGION_FALLBACK = {"FE-NAV": "fe-decision", "FE-GATE": "fe-decision", "FE-LIST": "fe-decision", "FE-LISTING-UI": "fe-decision", "FE-CUBE-BOOT": "fe-cube", "FE-STATE": "fe-cube", "FE-COORD": "fe-cube", "FE-SCENE": "fe-cube", "FE-CHROME": "fe-cube", "FE-FOCUS-STAGE": "fe-cube", "FE-AESTHETIC": "fe-cube", "FE-API": "fe-api", "BE-HTTP": "be", "BE-BUNDLE": "be", "BE-DEMO-DB": "be", "BE-SHELL": "be", "BE-CHAIN-LAYOUT": "be", "BE-NVDA-LINKS": "be", "BE-BICS-HIER": "be", "BE-ENTITY": "be", "BE-LISTING": "be", "BE-INGEST": "be", "MODULES-TRACK": "be"};
+  const REGION_LABEL = { "fe-decision": "决策路径", "fe-cube": "立方体面", "fe-api": "API 枢纽（框外）", "be": "后端" };
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  }
+  function regionOf(m) {
+    if (m.region && REGION_LABEL[m.region]) return m.region;
+    return REGION_FALLBACK[m.id] || "";
+  }
+  const mods = data.modules || [];
+  const edges = data.edges || [];
+  modBody.innerHTML = mods.map(function (m) {
+    const r = regionOf(m);
+    return "<tr><td><code>" + esc(m.id) + "</code></td><td class=\"side-" + esc(m.side) + "\">" +
+      esc(m.side) + "</td><td>" + esc(REGION_LABEL[r] || r || "—") +
+      "</td><td>" + esc(m.role || "") + "</td></tr>";
+  }).join("");
+  edgeBody.innerHTML = edges.map(function (e) {
+    return "<tr><td><code>" + esc(e.from) + "</code></td><td><code>" + esc(e.to) +
+      "</code></td><td>" + esc(e.type) + "</td></tr>";
+  }).join("");
+  status.innerHTML = "静态烘焙 · version <code>" + esc(data.version) + "</code> · updated <code>" +
+    esc(data.updated || "—") + "</code> · " + mods.length + " 模块 · " + edges.length + " 边";
+})();
+</script>
+</body>
+</html>

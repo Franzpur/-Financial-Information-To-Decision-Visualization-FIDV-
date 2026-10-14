@@ -9,7 +9,7 @@
  *   x  right (+x) / left (−x). A slice face is x∈[0,10].
  *   y  up (+y) / down (−y). Face is y∈[0,10].
  *   1 s = 1 x = 1 y = UNIT meters. Focus keeps that slice.
- *   The rest of the cube shifts left along −x by cubeExitX().
+ *   Non-stay slices hide in place (no −x park residual).
  *
  * 调位置：改本文件 LAYOUT，或改对象的 (s, x, y)。不要直接写 Three.js 坐标。
  *
@@ -50,8 +50,6 @@ export const LAYOUT = {
   companyLabel: { liftMeters: 0.02, aboveMeters: 0.12 },
   /** Ring polylines sit a hair in front of the glass (+s). */
   ringGuideLiftMeters: 0.008,
-  /** Wireframe padding around the unit cube, in meters (constant on screen when s-gap changes). */
-  framePad: { sMeters: 0.25, faceMeters: 0.225 },
   /** [C-AXES] Axis lengths in user units. Tick chrome is derived in axisChrome(). */
   axes: { sEnd: 20, xEnd: 22.5, yEnd: 22.5 },
   /** [C-STDVIEW] Camera and look-at, user (s, x, y). */
@@ -127,12 +125,12 @@ export function localOffset(ds, dx, dy, gap) {
   };
 }
 
-/** [C-PULL] One face width along −x (left). Focused slice stays; the rest of the cube uses this. */
+/** Legacy −x park distance (FACE_SPAN). Non-stay slices no longer park; kept for callers. */
 export function cubeExitX() {
   return FACE_SPAN;
 }
 
-/** Slice group anchor. exitX moves this slice along −x. The focused slice passes 0. */
+/** Slice group anchor. exitX unused for non-stay hide-in-place (pass 0). */
 export function sliceAnchor(s, exitX = 0) {
   return {
     s,

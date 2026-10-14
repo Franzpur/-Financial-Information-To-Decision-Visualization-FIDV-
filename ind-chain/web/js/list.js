@@ -2,6 +2,7 @@
 
 import { renderNations } from "./nations.js?v=33";
 import { displayIndustryCoord } from "./coords.js?v=35";
+import { fetchBicsEntities } from "./api.js?v=51";
 
 if ("scrollRestoration" in history) history.scrollRestoration = "manual";
 
@@ -180,15 +181,17 @@ async function loadList() {
     return;
   }
   try {
-    const qs = new URLSearchParams({ bics: code });
-    if (loc) qs.set("listingCountry", loc);
-    const res = await fetch(`/api/bics/entities?${qs.toString()}`);
-    if (res.status === 400) {
-      note.textContent = "This page lists level-4 classes only.";
-      return;
+    let data;
+    try {
+      data = await fetchBicsEntities({ bics: code, listingCountry: loc });
+    } catch (err) {
+      const msg = String(err?.message || err);
+      if (/\(400\)/.test(msg)) {
+        note.textContent = "This page lists level-4 classes only.";
+        return;
+      }
+      throw err;
     }
-    if (!res.ok) throw new Error(`entities ${res.status}`);
-    const data = await res.json();
     const node = data.node;
     rows = data.entities || [];
     if (lede && node) {

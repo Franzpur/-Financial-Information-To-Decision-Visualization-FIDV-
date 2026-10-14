@@ -1,0 +1,298 @@
+{
+  "version": 1,
+  "updated": "2026-10-14",
+  "title": "FIDV module graph (W1 track)",
+  "note": "Machine source of truth for module inventory and edges. Edit this file, then run python3 modules/bake_static.py to refresh modules/index.html (static; file:// OK; no fetch). Architecture: FE two modules (fe-decision 决策路径 · fe-cube 立方体面) + BE one module; FE-API (region fe-api) sits outside both FE frames as contract hub. Optional module.region is consumed by bake with fallback. Edge colors by side pair (FE内翠绿 #00a86b / BE内天青 #5dade2 / 跨侧亮红 #e02020); dash by type. Routing: channel + edge-slot orthogonal polylines (no cross / no coincide). Cross-side data contract is only FE-API→BE-HTTP (plus BE-HTTP→MODULES-TRACK narrow mouth). Direct page→data-module contract edges (GATE→BICS-HIER, LIST→ENTITY, CUBE-BOOT→BUNDLE) removed 2026-10-14: they duplicated the API path and read as if the browser opened library modules.",
+  "modules": [
+    {
+      "id": "FE-NAV",
+      "side": "FE",
+      "region": "fe-decision",
+      "role": "Route assignment across home / list / cube"
+    },
+    {
+      "id": "FE-GATE",
+      "side": "FE",
+      "region": "fe-decision",
+      "role": "BICS L1–L3 gate board"
+    },
+    {
+      "id": "FE-LIST",
+      "side": "FE",
+      "region": "fe-decision",
+      "role": "L4 company list"
+    },
+    {
+      "id": "FE-CUBE-BOOT",
+      "side": "FE",
+      "region": "fe-cube",
+      "role": "Cube page boot; consumes bundle"
+    },
+    {
+      "id": "FE-LISTING-UI",
+      "side": "FE",
+      "region": "fe-decision",
+      "role": "Listing-country control UI"
+    },
+    {
+      "id": "FE-STATE",
+      "side": "FE",
+      "region": "fe-cube",
+      "role": "Cube session state"
+    },
+    {
+      "id": "FE-COORD",
+      "side": "FE",
+      "region": "fe-cube",
+      "role": "Sole world placement from object/sxy"
+    },
+    {
+      "id": "FE-SCENE",
+      "side": "FE",
+      "region": "fe-cube",
+      "role": "Three scene; consumes precomputed rings"
+    },
+    {
+      "id": "FE-CHROME",
+      "side": "FE",
+      "region": "fe-cube",
+      "role": "Floating cube chrome"
+    },
+    {
+      "id": "FE-FOCUS-STAGE",
+      "side": "FE",
+      "region": "fe-cube",
+      "role": "Focus / staging overlays"
+    },
+    {
+      "id": "FE-API",
+      "side": "FE",
+      "region": "fe-api",
+      "role": "Single HTTP base for gate / list / cube"
+    },
+    {
+      "id": "FE-AESTHETIC",
+      "side": "FE",
+      "region": "fe-cube",
+      "role": "Cross-cutting glass / paper tokens"
+    },
+    {
+      "id": "BE-HTTP",
+      "side": "BE",
+      "region": "be",
+      "role": "Loopback HTTP + static + modules narrow mouth"
+    },
+    {
+      "id": "BE-BUNDLE",
+      "side": "BE",
+      "region": "be",
+      "role": "mode-first bundle dispatch demo|shell|chain"
+    },
+    {
+      "id": "BE-DEMO-DB",
+      "side": "BE",
+      "region": "be",
+      "role": "Demo SQLite companies/layers"
+    },
+    {
+      "id": "BE-SHELL",
+      "side": "BE",
+      "region": "be",
+      "role": "Empty-wall shell for non-chain ticker"
+    },
+    {
+      "id": "BE-CHAIN-LAYOUT",
+      "side": "BE",
+      "region": "be",
+      "role": "Server-side ring / slice layout"
+    },
+    {
+      "id": "BE-NVDA-LINKS",
+      "side": "BE",
+      "region": "be",
+      "role": "NVDA revenue-link chain document"
+    },
+    {
+      "id": "BE-BICS-HIER",
+      "side": "BE",
+      "region": "be",
+      "role": "BICS hierarchy JSON index"
+    },
+    {
+      "id": "BE-ENTITY",
+      "side": "BE",
+      "region": "be",
+      "role": "Entity membership / counts DB"
+    },
+    {
+      "id": "BE-LISTING",
+      "side": "BE",
+      "region": "be",
+      "role": "Listing-country from yellow-key"
+    },
+    {
+      "id": "BE-INGEST",
+      "side": "BE",
+      "region": "be",
+      "role": "DATA-SPACE ingest scripts (offline)"
+    },
+    {
+      "id": "MODULES-TRACK",
+      "side": "other",
+      "region": "be",
+      "role": "Repo-root modules graph + paper HTML"
+    }
+  ],
+  "edges": [
+    {
+      "from": "FE-NAV",
+      "to": "FE-GATE",
+      "type": "calls"
+    },
+    {
+      "from": "FE-GATE",
+      "to": "FE-LIST",
+      "type": "calls"
+    },
+    {
+      "from": "FE-LIST",
+      "to": "FE-CUBE-BOOT",
+      "type": "calls"
+    },
+    {
+      "from": "FE-GATE",
+      "to": "FE-API",
+      "type": "calls"
+    },
+    {
+      "from": "FE-LIST",
+      "to": "FE-API",
+      "type": "calls"
+    },
+    {
+      "from": "FE-CUBE-BOOT",
+      "to": "FE-API",
+      "type": "calls"
+    },
+    {
+      "from": "FE-API",
+      "to": "BE-HTTP",
+      "type": "contract"
+    },
+    {
+      "from": "FE-GATE",
+      "to": "FE-LISTING-UI",
+      "type": "depends"
+    },
+    {
+      "from": "FE-LIST",
+      "to": "FE-LISTING-UI",
+      "type": "depends"
+    },
+    {
+      "from": "FE-CUBE-BOOT",
+      "to": "FE-STATE",
+      "type": "depends"
+    },
+    {
+      "from": "FE-CUBE-BOOT",
+      "to": "FE-COORD",
+      "type": "depends"
+    },
+    {
+      "from": "FE-CUBE-BOOT",
+      "to": "FE-SCENE",
+      "type": "depends"
+    },
+    {
+      "from": "FE-CUBE-BOOT",
+      "to": "FE-CHROME",
+      "type": "depends"
+    },
+    {
+      "from": "FE-SCENE",
+      "to": "FE-COORD",
+      "type": "calls"
+    },
+    {
+      "from": "FE-SCENE",
+      "to": "FE-FOCUS-STAGE",
+      "type": "depends"
+    },
+    {
+      "from": "FE-AESTHETIC",
+      "to": "FE-GATE",
+      "type": "depends"
+    },
+    {
+      "from": "FE-AESTHETIC",
+      "to": "FE-LIST",
+      "type": "depends"
+    },
+    {
+      "from": "FE-AESTHETIC",
+      "to": "FE-CHROME",
+      "type": "depends"
+    },
+    {
+      "from": "BE-HTTP",
+      "to": "BE-BUNDLE",
+      "type": "calls"
+    },
+    {
+      "from": "BE-HTTP",
+      "to": "BE-BICS-HIER",
+      "type": "calls"
+    },
+    {
+      "from": "BE-HTTP",
+      "to": "BE-ENTITY",
+      "type": "calls"
+    },
+    {
+      "from": "BE-HTTP",
+      "to": "BE-LISTING",
+      "type": "calls"
+    },
+    {
+      "from": "BE-HTTP",
+      "to": "MODULES-TRACK",
+      "type": "contract"
+    },
+    {
+      "from": "BE-BUNDLE",
+      "to": "BE-DEMO-DB",
+      "type": "calls"
+    },
+    {
+      "from": "BE-BUNDLE",
+      "to": "BE-SHELL",
+      "type": "calls"
+    },
+    {
+      "from": "BE-BUNDLE",
+      "to": "BE-CHAIN-LAYOUT",
+      "type": "calls"
+    },
+    {
+      "from": "BE-BUNDLE",
+      "to": "BE-NVDA-LINKS",
+      "type": "calls"
+    },
+    {
+      "from": "BE-CHAIN-LAYOUT",
+      "to": "BE-NVDA-LINKS",
+      "type": "depends"
+    },
+    {
+      "from": "BE-ENTITY",
+      "to": "BE-LISTING",
+      "type": "depends"
+    },
+    {
+      "from": "BE-INGEST",
+      "to": "BE-ENTITY",
+      "type": "depends"
+    }
+  ]
+}

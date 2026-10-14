@@ -4,10 +4,10 @@ import {
   passesFilter,
   writeHash,
   companyById,
-} from "./state.js?v=51";
-import { formatCoord } from "./coords.js?v=50";
+} from "./state.js?v=55";
+import { formatCoord } from "./coords.js?v=51";
 import { bondChartHtml } from "./bondChart.js?v=1";
-import { STDVIEW_MS } from "./scene.js?v=64";
+import { STDVIEW_MS } from "./scene.js?v=71";
 
 const ZOOM_MS = 450;
 
@@ -43,7 +43,7 @@ export function createUI(sceneApi) {
   }
 
   function setDetailDefault() {
-    detail.innerHTML = `<p>Click a company or slice. The slice stays; the rest of the cube shifts left along <strong>−x</strong> and fades. Esc clears selection, then focus.</p>`;
+    detail.innerHTML = `<p>Click a company or slice frame to keep that slice; others hide in place. Shift+frame pins more. Esc clears selection, then focus, then pins. A/F hides rings/slices or axes.</p>`;
   }
 
   function ringLabel(c) {
@@ -79,7 +79,9 @@ export function createUI(sceneApi) {
         <span>Ticker</span><span>${c.ticker || "—"}</span>
         <span>Country</span><span>${region}</span>
         <span>Revenue (approx.)</span><span>${formatRevenue(c)}</span>
-        <span>Size score</span><span>${c.revScore != null ? c.revScore.toFixed(1) + " / 100" : "—"}</span>
+        <span>${c.side || c.linkPct != null ? "Link score" : "Size score"}</span><span>${c.revScore != null ? c.revScore.toFixed(1) + " / 100" : "—"}</span>
+        ${c.side ? `<span>Chain side</span><span>${c.side}</span>` : ""}
+        ${c.linkPct != null ? `<span>Link %</span><span>${Number(c.linkPct).toFixed(2)}%</span>` : ""}
         <span>Position (s, x, y)</span><span>${formatCoord(c.coord)}</span>
         ${ringRow}
         <span>Alphabet link</span><span>${c.valueM != null ? `~$${c.valueM.toFixed(0)}M (GOOGL_SUPPLY)` : "Not in quantified supplier table"}</span>
@@ -209,9 +211,33 @@ export function createUI(sceneApi) {
       cubeFilterLabel.textContent = FILTER_LABELS[mode] || FILTER_LABELS.all;
     }
     cubeFilterPanel?.querySelectorAll(".cube-filter-opt").forEach((b) => {
-      const on = b.dataset.filter === mode;
-      b.classList.toggle("is-on", on);
-      b.setAttribute("aria-selected", on ? "true" : "false");
+      b.classList.toggle("is-on", b.dataset.filter === mode);
+    });
+  }
+
+  function placeAltUnderFilter() {
+    const alt = document.getElementById("cubeAltFunc");
+    if (!alt) return;
+    const viewport = document.getElementById("viewport");
+    const filterOpen =
+      cubeFilter?.classList.contains("is-open") &&
+      cubeFilterPanel &&
+      !cubeFilterPanel.hidden;
+    if (!filterOpen || !viewport) {
+      alt.style.top = "";
+      return;
+    }
+    // Measure after panel is laid out (hidden→shown).
+    requestAnimationFrame(() => {
+      const el = document.getElementById("cubeAltFunc");
+      if (!el || !cubeFilterPanel || cubeFilterPanel.hidden) {
+        if (el) el.style.top = "";
+        return;
+      }
+      const gap = 4;
+      const vRect = viewport.getBoundingClientRect();
+      const pRect = cubeFilterPanel.getBoundingClientRect();
+      el.style.top = `${Math.round(pRect.bottom - vRect.top + gap)}px`;
     });
   }
 
@@ -220,6 +246,7 @@ export function createUI(sceneApi) {
     cubeFilter.classList.toggle("is-open", open);
     cubeFilterFace.setAttribute("aria-expanded", open ? "true" : "false");
     cubeFilterPanel.hidden = !open;
+    placeAltUnderFilter();
   }
 
   function applyFilterMode(mode) {
@@ -243,10 +270,69 @@ export function createUI(sceneApi) {
     if (!opt) return;
     applyFilterMode(opt.dataset.filter);
   });
+  // [C-ALT] Alternative functions (A/F) — may stay open together with Filter.
+  const cubeAlt = document.getElementById("cubeAltFunc");
+  const cubeAltFace = document.getElementById("cubeAltFace");
+  const cubeAltPanel = document.getElementById("cubeAltPanel");
+
+  function syncAltUI() {
+    const ringsOn = Boolean(state.altHideRingsSlices);
+    const axesOn = Boolean(state.altHideAxes);
+    cubeAlt?.classList.toggle("is-active", ringsOn || axesOn);
+    cubeAltPanel?.querySelectorAll(".cube-filter-opt").forEach((b) => {
+      const key = b.dataset.alt;
+      const on =
+        key === "ringsSlices" ? ringsOn : key === "axes" ? axesOn : false;
+      b.classList.toggle("is-on", on);
+      b.setAttribute("aria-pressed", on ? "true" : "false");
+    });
+  }
+
+  function setCubeAltOpen(open) {
+    if (!cubeAlt || !cubeAltFace || !cubeAltPanel) return;
+    cubeAlt.classList.toggle("is-open", open);
+    cubeAltFace.setAttribute("aria-expanded", open ? "true" : "false");
+    cubeAltPanel.hidden = !open;
+  }
+
+  function applyAltToggle(key) {
+    if (key === "ringsSlices") {
+      state.altHideRingsSlices = !state.altHideRingsSlices;
+    } else if (key === "axes") {
+      state.altHideAxes = !state.altHideAxes;
+    } else return;
+    syncAltUI();
+    sceneApi.applyVisibility();
+    if (key === "axes") sceneApi.layoutPlanes();
+  }
+
+  function hitFilterChrome(t) {
+    return Boolean(cubeFilter?.contains(t));
+  }
+  function hitAltChrome(t) {
+    return Boolean(cubeAlt?.contains(t));
+  }
+
+  // Outside click: close only the panel whose chrome was not hit (peer chrome ≠ outside).
   document.addEventListener("pointerdown", (e) => {
-    if (!cubeFilter || cubeFilterPanel?.hidden) return;
-    if (cubeFilter.contains(e.target)) return;
-    setCubeFilterOpen(false);
+    const t = e.target;
+    if (cubeFilter && cubeFilterPanel && !cubeFilterPanel.hidden) {
+      if (!hitFilterChrome(t) && !hitAltChrome(t)) setCubeFilterOpen(false);
+    }
+    if (cubeAlt && cubeAltPanel && !cubeAltPanel.hidden) {
+      if (!hitAltChrome(t) && !hitFilterChrome(t)) setCubeAltOpen(false);
+    }
+  });
+
+  syncAltUI();
+  cubeAltFace?.addEventListener("click", (e) => {
+    e.stopPropagation();
+    setCubeAltOpen(cubeAltPanel?.hidden !== false);
+  });
+  cubeAltPanel?.addEventListener("click", (e) => {
+    const opt = e.target.closest(".cube-filter-opt");
+    if (!opt) return;
+    applyAltToggle(opt.dataset.alt);
   });
 
   const D_SNAPS = [25, 50, 75, 100, 125, 150, 175, 200];
@@ -270,7 +356,6 @@ export function createUI(sceneApi) {
     const max = Number(gapD.max) || 200;
     const t = max === min ? 0 : (pct - min) / (max - min);
     gapDThumb.style.left = `${t * 100}%`;
-    gapDThumb.setAttribute("aria-valuenow", String(pct));
   }
 
   function applyDPct(rawPct) {
@@ -337,18 +422,8 @@ export function createUI(sceneApi) {
     e.preventDefault();
     applyDPct(pctFromClientX(e.clientX));
   });
-  gapDThumb?.addEventListener("keydown", (e) => {
-    const cur = Math.round(state.d * 100);
-    let next = null;
-    if (e.key === "ArrowLeft" || e.key === "ArrowDown") next = cur - 1;
-    else if (e.key === "ArrowRight" || e.key === "ArrowUp") next = cur + 1;
-    else if (e.key === "PageDown") next = cur - 25;
-    else if (e.key === "PageUp") next = cur + 25;
-    else if (e.key === "Home") next = 0;
-    else if (e.key === "End") next = 200;
-    if (next == null) return;
-    e.preventDefault();
-    applyDPct(next);
+  gapD?.addEventListener("input", () => {
+    applyDPct(Number(gapD.value));
   });
 
   navHint.classList.toggle("hidden", !state.helpOpen);

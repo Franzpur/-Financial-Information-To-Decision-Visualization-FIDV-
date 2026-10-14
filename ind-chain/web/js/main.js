@@ -1,7 +1,7 @@
-import { fetchBundle } from "./api.js?v=50";
-import { state, readHash, resolveBicsLabel } from "./state.js?v=51";
-import { createScene } from "./scene.js?v=64";
-import { createUI } from "./ui.js?v=58";
+import { fetchBundle } from "./api.js?v=51";
+import { state, readHash, resolveBicsLabel } from "./state.js?v=55";
+import { createScene } from "./scene.js?v=71";
+import { createUI } from "./ui.js?v=68";
 
 const bootError = document.getElementById("bootError");
 const app = document.getElementById("app");
@@ -23,10 +23,12 @@ async function boot() {
     state.layers = Array.isArray(bundle.layers) ? bundle.layers : [];
     state.companies = Array.isArray(bundle.companies) ? bundle.companies : [];
     state.countries = bundle.meta?.countries || {};
-    state.shellCube = Boolean(bundle.meta?.shell);
+    // FE-CUBE-BOOT: meta.mode is the discriminant (demo | shell | chain).
+    const mode = bundle.meta?.mode;
+    state.shellCube = mode === "shell" || (mode == null && Boolean(bundle.meta?.shell));
     state.shellAnchor = bundle.meta?.shellAnchor || null;
     state.revenueLinks = Array.isArray(bundle.revenueLinks) ? bundle.revenueLinks : [];
-    if (bundle.meta?.shell && bundle.meta?.tickerFound === false) {
+    if (state.shellCube && bundle.meta?.tickerFound === false) {
       state.openTickerMiss = true;
     }
 

@@ -80,6 +80,7 @@ p { margin: 0 0 10px; }
 }
 #viewport.company-zoom .top-search,
 #viewport.company-zoom .cube-filter,
+#viewport.company-zoom .cube-alt,
 #viewport.company-zoom .cube-home,
 #viewport.company-zoom .d-box,
 #viewport.company-zoom .hud,
@@ -98,6 +99,16 @@ p { margin: 0 0 10px; }
   z-index: 4;
   pointer-events: auto;
   min-width: 118px;
+}
+/* [C-ALT] Alternative functions — stacked under Filter (JS moves top when Filter panel opens) */
+.cube-alt {
+  top: 56px;
+  min-width: 118px;
+  transition: top 0.16s ease;
+}
+.cube-alt.is-active .cube-filter-face {
+  border-color: var(--accent);
+  color: var(--text);
 }
 .cube-filter-face {
   display: flex;
@@ -1049,7 +1060,9 @@ a.list-row:focus-within {
   accent-color: var(--accent);
   -webkit-appearance: none;
   appearance: none;
-  pointer-events: none;
+  /* Native range is the accessible control; triangle thumb stays decorative. */
+  pointer-events: auto;
+  opacity: 0.01;
 }
 #gapD:focus {
   outline: none;

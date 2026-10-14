@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>决策立方体色彩方案与美学建议</title>
+<style>
+:root {
+  --paper: #f7f5f0;
+  --ink: #1a1f26;
+  --muted: #4a5560;
+  --rule: #c5ccd4;
+  --fill: #ece8e0;
+}
+@page { size: A4; margin: 14mm 14mm 16mm; }
+* { box-sizing: border-box; }
+body {
+  margin: 0 auto;
+  padding: 16mm 16mm 22mm;
+  max-width: 180mm;
+  color: var(--ink);
+  background: var(--paper);
+  font-family: "Iowan Old Style", "Palatino Linotype", Palatino, "Songti SC", "Noto Serif SC", serif;
+  font-size: 11pt;
+  line-height: 1.45;
+}
+h1 { font-size: 18pt; font-weight: 600; letter-spacing: 0.04em; margin: 0.2em 0 0.3em; }
+.brand { letter-spacing: 0.07em; font-size: 13pt; margin: 0; }
+h2 { font-size: 12.5pt; border-bottom: 1px solid var(--rule); padding-bottom: 0.15em; margin-top: 1.35em; page-break-after: avoid; }
+h3 { font-size: 11.5pt; font-weight: 600; margin: 1.05em 0 0.25em; page-break-after: avoid; }
+p { margin: 0.45em 0; }
+.cover-meta, .lede { color: var(--muted); font-size: 10pt; }
+.no-print { font-size: 10pt; color: var(--muted); border-bottom: 1px solid var(--rule); padding-bottom: 0.6em; margin-bottom: 1em; }
+ul, ol { margin: 0.35em 0 0.7em; padding-left: 1.3em; }
+li { margin: 0.22em 0; }
+table { width: 100%; border-collapse: collapse; font-size: 9.5pt; margin: 0.6em 0 1em; page-break-inside: avoid; }
+th, td { border: 1px solid var(--rule); padding: 0.28em 0.45em; text-align: left; vertical-align: top; }
+th { background: var(--fill); font-weight: 600; }
+code, pre { font-family: "SF Mono", ui-monospace, Menlo, Consolas, monospace; }
+code { font-size: 0.86em; }
+.swatch {
+  display: inline-block;
+  width: 0.85em;
+  height: 0.85em;
+  border: 1px solid var(--rule);
+  vertical-align: -0.1em;
+  margin-right: 0.25em;
+}
+.tag { font-size: 9pt; color: var(--muted); }
+@media print {
+  body { background: white; }
+  .no-print { display: none; }
+  a { color: inherit; text-decoration: none; }
+}
+</style>
+</head>
+<body>
+<p class="no-print">浏览器打开 → 打印 → 存 PDF → 关掉页眉网址。</p>
+<p class="brand">FIDV</p>
+<h1>决策立方体色彩方案与美学建议</h1>
+<p class="cover-meta">内阁读本 · 2026-10-13 · 产品树 <code>ind-chain/</code> · 不实施、不否决</p>
+<p class="lede">业主 Purkniv 电内阁：据 AESTHETIC、COLORS、CONCEPTS（C-POINT / C-REV-LINK / C-ALT / chrome）、briefing 工程影像与 worklog-006 #200–205，提出色板与美学改进看法。</p>
+
+<h2>1. 现状摘要</h2>
+<p>工程已分两层色：chrome 真源在 <code>agent_tasklist/AESTHETIC.md</code> / <code>app.css</code>；立方体数据材质在 <code>state.js</code> 的 <code>COLORS</code>，轴色另写在 <code>scene.js</code>（未入 <code>COLORS</code>）。近条已落地：米白盘 + US/INTL 色环边、半盘坐标、墨绿/暗红收入线、A/F、钉片 stay。</p>
+<p>briefing <code>05-cube.png</code> 仍是旧底栏 chip 壳；现 chrome 已迁到左上 Filter / A/F 与玻璃浮层。影像仍有效：总览下同心环密、标签叠、冰蓝结构线与青点抢读。</p>
+
+<h2>2. 建议色板（立方体为主）</h2>
+<p>原则：三层语义不混——<strong>结构</strong>（切片/轴/导环）用冷钢蓝灰；<strong>归属</strong>（上市地）固定 US/INTL；<strong>关系</strong>（收入线）用墨绿/暗红。chrome 强调色只服务控件，不进点/线语义。</p>
+
+<h3>2.1 建议表</h3>
+<table>
+<thead>
+<tr><th>用途</th><th>建议 hex</th><th>现用</th><th>取舍</th></tr>
+</thead>
+<tbody>
+<tr>
+  <td>C-POINT 盘填（米白）</td>
+  <td><span class="swatch" style="background:#efe8dc"></span><code>#efe8dc</code></td>
+  <td><code>RING_FILL 0xefe8dc</code></td>
+  <td><strong>保持</strong>。与业主「米白」一致；暗底上可读，又不抢 rim。</td>
+</tr>
+<tr>
+  <td>US 环边 / 语义</td>
+  <td><span class="swatch" style="background:#3cf0ff"></span><code>#3cf0ff</code></td>
+  <td><code>COLORS.US</code> / <code>--us</code></td>
+  <td><strong>保持</strong>。概念色；美工部不单改（AESTHETIC §2.5）。</td>
+</tr>
+<tr>
+  <td>非美环边 / 语义</td>
+  <td><span class="swatch" style="background:#ffb020"></span><code>#ffb020</code></td>
+  <td><code>COLORS.INTL</code> / <code>--intl</code></td>
+  <td><strong>保持</strong>。同上。</td>
+</tr>
+<tr>
+  <td>收入线 · 供方</td>
+  <td><span class="swatch" style="background:#3d8f6a"></span><code>#3d8f6a</code></td>
+  <td><code>#1f4d3a</code></td>
+  <td><strong>上提明度</strong>。现墨绿过沉，中距几乎并入底；仍属墨绿族，不改成亮绿。</td>
+</tr>
+<tr>
+  <td>收入线 · 客方</td>
+  <td><span class="swatch" style="background:#a04848"></span><code>#a04848</code></td>
+  <td><code>#6b2a2a</code></td>
+  <td><strong>上提明度</strong>。与供方同级可读；仍暗红，避免猩红报警感。</td>
+</tr>
+<tr>
+  <td>切片玻璃面</td>
+  <td><span class="swatch" style="background:#1a2330"></span><code>#1a2330</code> · opacity ≈ 0.22–0.28</td>
+  <td><code>PLANE</code> · opacity 0.3</td>
+  <td><strong>色保持、面略更透</strong>。总览少挡点；聚焦时可再实一点（行为层，色不变）。</td>
+</tr>
+<tr>
+  <td>切片描边</td>
+  <td><span class="swatch" style="background:#3a4658"></span><code>#3a4658</code></td>
+  <td><code>EDGE</code></td>
+  <td><strong>保持</strong>。结构层；焦点勿改色（CONCEPTS C-EDGE）。</td>
+</tr>
+<tr>
+  <td>导环（营收环线）</td>
+  <td><span class="swatch" style="background:#5a7088"></span><code>#5a7088</code> · 外环更淡</td>
+  <td>约 <code>#8eb6d8</code> 族、偏亮</td>
+  <td><strong>压暗</strong>。影像上导环与 US 青点同温、同亮，点易埋；导环应退到结构层。</td>
+</tr>
+<tr>
+  <td>轴 s</td>
+  <td><span class="swatch" style="background:#c8d8ea"></span><code>#c8d8ea</code></td>
+  <td><code>#d4e8ff</code></td>
+  <td><strong>微降饱和</strong>。仍冰蓝，与 US 青拉开；并入 <code>COLORS</code> 单源。</td>
+</tr>
+<tr>
+  <td>轴 y / x</td>
+  <td><code>#9eb6cc</code> / <code>#7a9ab4</code></td>
+  <td><code>#b0cce8</code> / <code>#8eb6d8</code></td>
+  <td><strong>保持阶梯、整体略哑</strong>。刻度主次仍靠 MAJOR/MINOR。</td>
+</tr>
+<tr>
+  <td>HUD / 玻璃 chrome</td>
+  <td>沿用 AESTHETIC 全表</td>
+  <td><code>--bg</code>…<code>--accent</code></td>
+  <td><strong>不另起皮</strong>。激活只用 <code>--accent #8be0c0</code>。</td>
+</tr>
+<tr>
+  <td>工程底 / 视口晕</td>
+  <td><code>#0b0d10</code>；晕 <code>#121820</code></td>
+  <td>已用</td>
+  <td><strong>保持</strong>。与门厅、名单同族。</td>
+</tr>
+</tbody>
+</table>
+
+<h3>2.2 与现 COLORS / AESTHETIC 对照结论</h3>
+<ol>
+<li><strong>不动</strong>：<code>--us</code> / <code>--intl</code> / chrome 全套 / <code>RING_FILL</code> / <code>PLANE</code> 色相 / <code>EDGE</code>。</li>
+<li><strong>建议动</strong>：<code>LINK_SUPPLIER</code>、<code>LINK_CUSTOMER</code> 上提一级明度；导环与轴从「接近数据点」退到「结构素描」；轴常量并入 <code>COLORS</code>，避免 scene 私货第二套。</li>
+<li><strong>发光</strong>：CSS <code>.dot</code> 与 scene rim <code>emissiveIntensity ≈ 1.35–1.4</code> 在影像上已形成晕。AESTHETIC 禁无必要 glow 堆叠——建议 rim 发光降到约 0.6–0.9，选中/悬停再抬，默认点靠米白盘 + 色边即可辨。</li>
+</ol>
+
+<pre>建议 COLORS 增量（示意，内阁不改码）
+RING_FILL:     0xefe8dc   // 保持
+LINK_SUPPLIER: 0x3d8f6a   // 自 0x1f4d3a
+LINK_CUSTOMER: 0xa04848   // 自 0x6b2a2a
+PLANE / EDGE / US / INTL：保持
+AXIS_S / AXIS_Y / AXIS_X：迁入 COLORS，略哑于现 scene 常量
+</pre>
+
+<h2>3. 美学改进建议（可编号）</h2>
+
+<h3>必须改 <span class="tag">M</span></h3>
+<ol>
+<li><strong>M1 · 收入线对比</strong> — 墨绿/暗红上提明度（上表），否则 NVDA 链半盘关系在总览几乎不可扫读。</li>
+<li><strong>M2 · 导环让位给点</strong> — 压暗/减不透明度导环；默认 overview 或点密时鼓励 A/F「藏环+切片」，把关系与点留在前场。</li>
+<li><strong>M3 · 轴色入 COLORS</strong> — 消灭 scene 私有冰蓝与 <code>COLORS.US</code> 的无意撞车；改一处、概念一处。</li>
+</ol>
+
+<h3>酌情 <span class="tag">O</span></h3>
+<ol>
+<li><strong>O1 · 降默认 emissive</strong> — 悬停/选中再亮；与「简洁第一」一致。</li>
+<li><strong>O2 · 聚焦时切片面略实、总览更透</strong> — 同一 <code>PLANE</code> 色，只调 opacity；不引入第二色。</li>
+<li><strong>O3 · 标签密度</strong> — overview 只显层名或焦点邻层；共面标签在 d 小、层多时易糊成一条（影像已见）。</li>
+<li><strong>O4 · HUD 图例</strong> — 底浮一行极简：米白盘 + 青/橙边 = 美/非美；绿线/红线 = 供/客。不恢复旧 chip 墙。</li>
+<li><strong>O5 · 门厅/名单</strong> — 继续单色格阵；accent 仅 hover。与立方体「一进三维才开语义色」的落差可保留，但立方体入口处用一句 muted 说明即可。</li>
+</ol>
+
+<h3>仅看法 <span class="tag">V</span></h3>
+<ol>
+<li><strong>V1</strong> — 米白盘是正确锚：把「实体公司」从线框里托出来；勿改回纯色发光球。</li>
+<li><strong>V2</strong> — 半盘（供 x&lt;5 / 客 x&gt;5）是空间语法，色只是复述；色改不能替代半盘几何。</li>
+<li><strong>V3</strong> — A/F 与钉片是美学工具不只是功能：密场景下「藏结构、留关系」应成为标准读法之一。</li>
+</ol>
+
+<h2>4. 设计问题看法</h2>
+<ol>
+<li><strong>语义层叠不够分层</strong> — 结构线（轴、导环、EDGE）与数据点（US 青）同处冷色高亮带，影像上点被线网吃掉。设计意图应是：结构淡、归属亮、关系次亮。</li>
+<li><strong>色源分裂</strong> — chrome 有 token，立方体有 <code>COLORS</code>，轴又在 scene。延展时易第三套。</li>
+<li><strong>关系色过沉</strong> — #201 落地的墨绿/暗红概念对，工程值偏印刷墨、偏暗底工程屏。</li>
+<li><strong>Glow 与简洁张力</strong> — 环边 emissive + CSS box-shadow 双晕，近距炫、远距糊。</li>
+<li><strong>壳层 vs NVDA 链 vs 演示链</strong> — 三种立方体信息量差极大；壳层空墙正确，但用户从名单点进若期望「链」，空壳易被读成「坏了」而非「标准壳」。这是信息架构，不单是色。</li>
+<li><strong>briefing 资产过期</strong> — <code>05-cube.png</code> 仍画底栏 Filter chips；对外讲稿与现产品不一致。内阁只记看法：展出图应换一帧现 Filter/A/F。</li>
+</ol>
+
+<h2>5. 视角问题看法</h2>
+<table>
+<thead>
+<tr><th>状态</th><th>可读性看法</th></tr>
+</thead>
+<tbody>
+<tr>
+  <td>Overview <code>(24,21,21)→原点</code></td>
+  <td>层叠透视正确，但导环在此角形成莫尔纹与中心糊团。宜：默认略压导环，或进入后提示 A/F；层标签应收束。</td>
+</tr>
+<tr>
+  <td>Focused <code>(s*+10,5,5)→面心</code></td>
+  <td>最佳读盘面；共面环此时近似正圆。设计应默认「细读用 focus / C」。Overview 只做方位图。</td>
+</tr>
+<tr>
+  <td>d→0</td>
+  <td>点半径缩小 + 层贴合：半盘与全局相对坐标是救命绳。线在圆心附近易成束——供/客分色上提后仍可能绞；可依赖 hover 放大与选中高亮，而非再加粗到像面。</td>
+</tr>
+<tr>
+  <td>半盘</td>
+  <td>左右语法清晰。斜视时共面盘变椭圆/线，边缘点难点——hover 1.5× 已对症；勿改回 billboard（与 #192 意志相反）。</td>
+</tr>
+<tr>
+  <td>Stay / 钉片</td>
+  <td>非 stay 就地全隐（废 −x 残影）正确，视野干净。风险：用户不知「藏了什么」——HUD 短句「All slices · N visible」需在钉片态写清 stay 数。</td>
+</tr>
+<tr>
+  <td>自由轨道 vs C</td>
+  <td>离标准位后无「你已偏航」反馈时，标签与盘的共面关系更难读。看法：离 C 位较远时可 muted 提示「C 回标准」，不强制吸回（守 C-CAM-HOLD）。</td>
+</tr>
+<tr>
+  <td>Company-zoom</td>
+  <td>底左放大、chrome 隐去：构图清楚。注意放大后米白盘边缘锯齿与 rim 晕加倍——与 O1 同源。</td>
+</tr>
+</tbody>
+</table>
+
+<h2>6. 谏言</h2>
+<p><strong>不发问。</strong> 本次召是方案与看法，未下实施令；色与 glow 的取舍留给业主与后续总参谋部规划。</p>
+
+<h2>7. 落盘</h2>
+<p>本报告：<code>cabinet/reports/FIDV-cube-color-aesthetic-advice.html</code>。未改产品代码、未改 AESTHETIC / CONCEPTS、未写入 <code>library/</code>。</p>
+</body>
+</html>

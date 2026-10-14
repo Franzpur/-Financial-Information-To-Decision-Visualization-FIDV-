@@ -144,9 +144,7 @@ def should_skip(path: Path) -> bool:
         return True
     if n.startswith("pull-"):
         return True
-    if "comsumer staples" in n or n.startswith("bics_consumer staples"):
-        return True
-    return False
+    return "comsumer staples" in n or n.startswith("bics_consumer staples")
 
 
 def _at(row, idx) -> str:

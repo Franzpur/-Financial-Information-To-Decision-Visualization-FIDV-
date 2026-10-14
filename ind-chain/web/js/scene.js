@@ -6,7 +6,15 @@
  */
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-import { COLORS, state, passesFilter, companyById } from "./state.js?v=51";
+import {
+  COLORS,
+  colorCss,
+  state,
+  passesFilter,
+  companyById,
+  stayLayers,
+  layerIsStay,
+} from "./state.js?v=55";
 import {
   FACE,
   FACE_SPAN,
@@ -15,7 +23,6 @@ import {
   LAYOUT,
   gapMeters,
   gapSafe,
-  cubeExitX,
   coordToLocal,
   localToCoord,
   localOffset,
@@ -28,17 +35,9 @@ import {
   viewSpaceMeters,
   SHELL_ANCHOR,
   SHELL_SPAN_LAYERS,
-} from "./coords.js?v=50";
+} from "./coords.js?v=51";
 
 /** Axis palette matched to concentric rings (cool steel / ice blue). */
-const AXIS_S = 0xd4e8ff; // = ring r=10
-const AXIS_Y = 0xb0cce8;
-const AXIS_X = 0x8eb6d8; // = ring guides
-const AXIS_S_CSS = "#d4e8ff";
-const AXIS_Y_CSS = "#b0cce8";
-const AXIS_X_CSS = "#8eb6d8";
-const AXIS_TICK_MAJOR = 0xc0d8f0;
-const AXIS_TICK_MINOR = 0x5a7088;
 /** Demo chain: layers.length. Shell: virtual 11 so user s=5 is mid-stack. */
 const N_LAYERS = () => (state.shellCube ? SHELL_SPAN_LAYERS : state.layers.length);
 export function createScene(viewport, hooks = {}) {
@@ -99,7 +98,6 @@ export function createScene(viewport, hooks = {}) {
     planeGroups: [],
     meshes: [],
     byId: new Map(),
-    boxHelper: null,
     axesGroup: null,
     keys: new Set(),
     raycaster: new THREE.Raycaster(),
@@ -205,9 +203,13 @@ function placeSliceGroup(g, i) {
 
 function pointRadius(_c) {
   // Shell: sized for overview-ish framing (~8–12 m) so the firm reads as a clear ring.
-  // Chain (C-REV-LINK): slightly larger than bare demo so peers read at overview.
+  // Chain (C-REV-LINK): shrink as d→0 so stacked slices do not read as one blob.
   if (state.shellCube) return 0.28;
-  if ((state.revenueLinks || []).length) return 0.055;
+  if ((state.revenueLinks || []).length) {
+    const d = Number(state.d);
+    const t = Number.isFinite(d) ? Math.max(0, Math.min(1, d)) : 1;
+    return 0.028 + 0.027 * t;
+  }
   return 0.022;
 }
 
@@ -353,6 +355,10 @@ function placeRevenueLinks(ctx) {
   const Wa = new THREE.Vector3();
   const Wb = new THREE.Vector3();
   const mid = new THREE.Vector3();
+  const dir = new THREE.Vector3();
+  const perp = new THREE.Vector3();
+  const up = new THREE.Vector3(0, 1, 0);
+  const alt = new THREE.Vector3(1, 0, 0);
   items.forEach((item) => {
     const a = ctx.byId.get(item.fromId);
     const b = ctx.byId.get(item.toId);
@@ -361,17 +367,55 @@ function placeRevenueLinks(ctx) {
     b.getWorldPosition(Wb);
     const la = ctx.root.worldToLocal(Wa.clone());
     const lb = ctx.root.worldToLocal(Wb.clone());
-    const pos = item.line.geometry.attributes.position;
-    pos.setXYZ(0, la.x, la.y, la.z);
-    pos.setXYZ(1, lb.x, lb.y, lb.z);
-    pos.needsUpdate = true;
-    item.line.geometry.computeBoundingSphere();
+    dir.copy(lb).sub(la);
+    const len = dir.length();
+    if (len > 1e-6) {
+      dir.multiplyScalar(1 / len);
+      const ref = Math.abs(dir.y) < 0.9 ? up : alt;
+      perp.crossVectors(dir, ref).normalize().multiplyScalar(0.01);
+    } else {
+      perp.set(0, 0.01, 0);
+    }
+    const setSeg = (line, ox, oy, oz) => {
+      if (!line) return;
+      const pos = line.geometry.attributes.position;
+      pos.setXYZ(0, la.x + ox, la.y + oy, la.z + oz);
+      pos.setXYZ(1, lb.x + ox, lb.y + oy, lb.z + oz);
+      pos.needsUpdate = true;
+      line.geometry.computeBoundingSphere();
+    };
+    setSeg(item.line, perp.x, perp.y, perp.z);
+    setSeg(item.lineB, -perp.x, -perp.y, -perp.z);
     if (item.label) {
       mid.copy(la).add(lb).multiplyScalar(0.5);
       item.label.position.copy(mid);
       item.label.quaternion.copy(ctx.camera.quaternion);
     }
   });
+}
+
+function linkSideColor(side) {
+  return side === "supplier" ? COLORS.LINK_SUPPLIER : COLORS.LINK_CUSTOMER;
+}
+
+function makeRevenueLinkStroke(side) {
+  const mat = new THREE.LineBasicMaterial({
+    color: linkSideColor(side),
+    transparent: true,
+    opacity: 0.92,
+    depthWrite: false,
+    linewidth: 2,
+  });
+  const line = new THREE.Line(
+    new THREE.BufferGeometry().setFromPoints([
+      new THREE.Vector3(),
+      new THREE.Vector3(),
+    ]),
+    mat
+  );
+  line.userData.isRevenueLink = true;
+  line.renderOrder = 4;
+  return line;
 }
 
 function buildRevenueLinks(ctx) {
@@ -384,18 +428,12 @@ function buildRevenueLinks(ctx) {
     const toId = link.toId;
     if (fromId == null || toId == null) return;
     if (!ctx.byId.has(fromId) || !ctx.byId.has(toId)) return;
-    const line = new THREE.Line(
-      new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), new THREE.Vector3()]),
-      new THREE.LineBasicMaterial({
-        color: COLORS.EDGE,
-        transparent: true,
-        opacity: 0.72,
-        depthWrite: false,
-      })
-    );
-    line.userData.isRevenueLink = true;
-    line.renderOrder = 4;
+    // Twin strokes approximate thicker lines (WebGL often ignores linewidth).
+    const line = makeRevenueLinkStroke(link.side);
+    const lineB = makeRevenueLinkStroke(link.side);
+    lineB.material.opacity = 0.55;
     ctx.root.add(line);
+    ctx.root.add(lineB);
     const pct = Number(link.pct);
     const pctLine = Number.isFinite(pct)
       ? pct.toFixed(2) + "% " + (link.side === "supplier" ? "NVDA spend" : "NVDA rev")
@@ -410,7 +448,14 @@ function buildRevenueLinks(ctx) {
     label.userData.isRevenueLabel = true;
     label.renderOrder = 7;
     ctx.root.add(label);
-    ctx.revenueLinkObjs.push({ side: link.side, fromId, toId, line, label });
+    ctx.revenueLinkObjs.push({
+      side: link.side,
+      fromId,
+      toId,
+      line,
+      lineB,
+      label,
+    });
   });
 }
 
@@ -421,9 +466,7 @@ function buildCube(ctx) {
   ctx.meshes = [];
   ctx.revenueLinkObjs = [];
   ctx.byId.clear();
-  ctx.boxHelper = null;
-
-  // [C-CUBE] Shell: no C-SLICE walls, no C-RING guides, no thick bars — firm at (5,5,5). Outer frame is the thin Box3Helper only.
+  // [C-CUBE] Shell: no C-SLICE walls, no C-RING guides, no thick bars — firm at (5,5,5). No outer wire cube.
   if (!state.shellCube) {
     state.layers.forEach((L, i) => {
       const g = new THREE.Group();
@@ -480,18 +523,20 @@ function buildCube(ctx) {
           const { dx, dy } = ringOffset(radiusUser, a);
           pts.push(v3(localOffset(liftS, dx, dy, gapNow())));
         }
+        // Cabinet M2: muted steel guides — outer rings fainter than center.
+        const guideOp = r === 10 ? 0.42 : 0.12 + r * 0.018;
         const ringLine = new THREE.Line(
           new THREE.BufferGeometry().setFromPoints(pts),
           new THREE.LineBasicMaterial({
-            color: r === 10 ? 0xd4e8ff : 0x8eb6d8,
+            color: r === 10 ? COLORS.RING_GUIDE_CENTER : COLORS.RING_GUIDE,
             transparent: true,
-            opacity: r === 10 ? 0.85 : 0.42 + r * 0.028,
+            opacity: guideOp,
             depthWrite: false,
           })
         );
         ringLine.renderOrder = 1;
         ringLine.userData.isRingGuide = true;
-        ringLine.userData.baseOpacity = r === 10 ? 0.85 : 0.42 + r * 0.028;
+        ringLine.userData.baseOpacity = guideOp;
         g.add(ringLine);
       }
 
@@ -504,9 +549,17 @@ function buildCube(ctx) {
     const isUS = c.country === "US";
     const color = isUS ? COLORS.US : COLORS.INTL;
     const r = pointRadius(c);
-    // Shell: BasicMaterial — Standard+emissive reads as a soft fog blob at overview.
-    const material = state.shellCube
-        ? new THREE.MeshBasicMaterial({
+    // C-POINT: 米白实心盘 + US/INTL 色环边；整圆可拾取。共面 YZ，非 billboard。
+    const fillMat = new THREE.MeshBasicMaterial({
+      color: COLORS.RING_FILL,
+      transparent: false,
+      depthWrite: true,
+      opacity: 1,
+      toneMapped: false,
+      side: THREE.DoubleSide,
+    });
+    const rimMat = state.shellCube
+      ? new THREE.MeshBasicMaterial({
           color,
           transparent: false,
           depthWrite: true,
@@ -514,22 +567,37 @@ function buildCube(ctx) {
           toneMapped: false,
           side: THREE.DoubleSide,
         })
-        : new THREE.MeshStandardMaterial({
+      : new THREE.MeshStandardMaterial({
           color,
           roughness: 0.22,
           metalness: 0.05,
           emissive: color,
-          emissiveIntensity: isUS ? 1.35 : 1.4,
+          emissiveIntensity: isUS ? 0.75 : 0.7,
           transparent: false,
           depthWrite: true,
           opacity: 1,
           side: THREE.DoubleSide,
         });
-    const mesh = new THREE.Mesh(new THREE.RingGeometry(r * 0.775, r, 64), material);
-    // Same face as C-SLICE / C-LABEL: RingGeometry XY → YZ (parallel + coplanar with slice).
+    const fill = new THREE.Mesh(new THREE.CircleGeometry(r * 0.82, 64), fillMat);
+    fill.userData.companyId = c.id;
+    fill.userData.isRingFill = true;
+    fill.renderOrder = 5;
+    const rim = new THREE.Mesh(new THREE.RingGeometry(r * 0.78, r, 64), rimMat);
+    rim.userData.companyId = c.id;
+    rim.userData.isRingRim = true;
+    rim.renderOrder = 6;
+    const mesh = new THREE.Group();
     mesh.rotation.y = Math.PI / 2;
     mesh.userData.companyId = c.id;
+    mesh.userData.basePointR = r;
+    mesh.userData.dScale = 1;
+    mesh.userData.targetHoverScale = 1;
+    mesh.userData.fill = fill;
+    mesh.userData.rim = rim;
+    mesh.userData.isCompanyPoint = true;
     mesh.renderOrder = 5;
+    mesh.add(fill);
+    mesh.add(rim);
 
     const useShellPlace =
       state.shellCube || c.layer == null || !ctx.planeGroups[c.layer];
@@ -570,12 +638,10 @@ function buildCube(ctx) {
 }
 
 function layoutPlanes(ctx) {
-  const exit = ctx.cubeExit ?? 0;
-  const stay =
-    state.focusLayer != null ? state.focusLayer : ctx.exitStayLayer;
+  ctx.cubeExit = 0;
   ctx.planeGroups.forEach((g, i) => {
     g.userData.pull = 0;
-    g.userData.exitX = stay != null && i !== stay ? exit : 0;
+    g.userData.exitX = 0;
     placeSliceGroup(g, i);
   });
   // Shell company points live on root — re-place when d (gap) changes.
@@ -592,43 +658,35 @@ function layoutPlanes(ctx) {
       }
     });
   }
-  syncFrame(ctx);
+  // NVDA chain: shrink point rings as d→0 so stacked faces stay readable.
+  // dScale multiplies with hover/select scale in lerpVisibility (not absolute).
+  if (!state.shellCube && (state.revenueLinks || []).length) {
+    state.companies.forEach((c) => {
+      const mesh = ctx.byId.get(c.id);
+      if (!mesh) return;
+      const r = pointRadius(c);
+      const base = mesh.userData.basePointR || r;
+      const dScale = base > 1e-9 ? r / base : 1;
+      mesh.userData.dScale = dScale;
+      const h = mesh.userData.targetHoverScale ?? 1;
+      mesh.scale.setScalar(dScale * h);
+      if (mesh.userData.label && c.coord) {
+        const useShell =
+          c.layer == null || !ctx.planeGroups[c.layer];
+        if (useShell) {
+          applyCoord(mesh.userData.label, companyLabelCoord(c.coord, r, gapNow()));
+        } else {
+          applySliceCoord(
+            mesh.userData.label,
+            c.layer,
+            companyLabelCoord(c.coord, r, gapNow())
+          );
+        }
+      }
+    });
+  }
   rebuildAxes(ctx);
   placeRevenueLinks(ctx);
-}
-
-/** [C-COORD] Wire cube around user (s, x, y) from the padded unit cube. */
-function syncFrame(ctx) {
-  if (ctx.boxHelper) {
-    ctx.root.remove(ctx.boxHelper);
-    ctx.boxHelper.geometry?.dispose?.();
-    ctx.boxHelper.material?.dispose?.();
-    ctx.boxHelper = null;
-  }
-  const n = N_LAYERS();
-  const gap = gapNow();
-  const padS = LAYOUT.framePad.sMeters / gapDivNow();
-  const padF = LAYOUT.framePad.faceMeters / UNIT;
-  const min = coordToLocal({ s: -padS, x: -padF, y: -padF }, n, gap);
-  const max = coordToLocal(
-    { s: n - 1 + padS, x: FACE_SPAN + padF, y: FACE_SPAN + padF },
-    n,
-    gap
-  );
-  const box = new THREE.Box3().setFromPoints([v3(min), v3(max)]);
-  const helper = new THREE.Box3Helper(box, 0x2a3545);
-  helper.material.transparent = true;
-  helper.material.depthWrite = false;
-  if (state.shellCube) {
-    helper.material.color.setHex(0x8eb6d8);
-    helper.material.opacity = 0.85;
-  } else {
-    helper.material.color.setHex(0x2a3545);
-    helper.material.opacity = state.focusLayer == null ? 0.35 : 0;
-  }
-  helper.position.copy(v3(localOffset(0, -(ctx.cubeExit ?? 0), 0, gap)));
-  ctx.root.add(helper);
-  ctx.boxHelper = helper;
 }
 
 /**
@@ -658,13 +716,13 @@ function rebuildAxes(ctx) {
   const yDir = new THREE.Vector3(0, 1, 0);
   const xDir = new THREE.Vector3(0, 0, USER_X_SIGN);
 
-  axes.add(makeAxisLine(at(chrome.sEnd, 0, 0), AXIS_S));
-  axes.add(makeAxisLine(at(0, 0, chrome.yEnd), AXIS_Y));
-  axes.add(makeAxisLine(at(0, chrome.xEnd, 0), AXIS_X));
+  axes.add(makeAxisLine(at(chrome.sEnd, 0, 0), COLORS.AXIS_S));
+  axes.add(makeAxisLine(at(0, 0, chrome.yEnd), COLORS.AXIS_Y));
+  axes.add(makeAxisLine(at(0, chrome.xEnd, 0), COLORS.AXIS_X));
 
-  axes.add(makeAxisArrow(sDir, chrome.sEnd * gap, AXIS_S));
-  axes.add(makeAxisArrow(yDir, chrome.yEnd * UNIT, AXIS_Y));
-  axes.add(makeAxisArrow(xDir, chrome.xEnd * UNIT, AXIS_X));
+  axes.add(makeAxisArrow(sDir, chrome.sEnd * gap, COLORS.AXIS_S));
+  axes.add(makeAxisArrow(yDir, chrome.yEnd * UNIT, COLORS.AXIS_Y));
+  axes.add(makeAxisArrow(xDir, chrome.xEnd * UNIT, COLORS.AXIS_X));
 
   // Slice ticks every unit 0..sEnd; emphasize existing layer indices 0..n-1
   for (let i = 0; i <= chrome.sEnd; i++) {
@@ -674,7 +732,7 @@ function rebuildAxes(ctx) {
       new THREE.Line(
         new THREE.BufferGeometry().setFromPoints([at(i, 0, 0), at(i, 0, tickH)]),
         new THREE.LineBasicMaterial({
-          color: isLayer ? AXIS_TICK_MAJOR : AXIS_TICK_MINOR,
+          color: isLayer ? COLORS.AXIS_TICK_MAJOR : COLORS.AXIS_TICK_MINOR,
           transparent: true,
           opacity: isLayer ? 0.9 : 0.45,
           depthWrite: false,
@@ -687,7 +745,7 @@ function rebuildAxes(ctx) {
         String(i),
         isLayer ? 0.26 : 0.2,
         isLayer ? 0.2 : 0.16,
-        isLayer ? AXIS_S_CSS : "#7a90a8"
+        isLayer ? colorCss(COLORS.AXIS_S) : colorCss(COLORS.AXIS_TICK_MINOR)
       );
       num.position.copy(at(i, 0, tickH + chrome.labelGapY));
       axes.add(num);
@@ -699,10 +757,15 @@ function rebuildAxes(ctx) {
     axes.add(
       new THREE.Line(
         new THREE.BufferGeometry().setFromPoints([at(0, 0, yu), at(chrome.yTickS, 0, yu)]),
-        new THREE.LineBasicMaterial({ color: AXIS_Y, transparent: true, opacity: 0.9, depthWrite: false })
+        new THREE.LineBasicMaterial({
+          color: COLORS.AXIS_Y,
+          transparent: true,
+          opacity: 0.9,
+          depthWrite: false,
+        })
       )
     );
-    const yl = makeSyPlaneLabel(String(yu), 0.2, 0.16, AXIS_Y_CSS);
+    const yl = makeSyPlaneLabel(String(yu), 0.2, 0.16, colorCss(COLORS.AXIS_Y));
     yl.position.copy(at(chrome.yNumeralS, 0, yu));
     axes.add(yl);
   }
@@ -712,24 +775,29 @@ function rebuildAxes(ctx) {
     axes.add(
       new THREE.Line(
         new THREE.BufferGeometry().setFromPoints([at(0, xu, 0), at(0, xu, chrome.xTickY)]),
-        new THREE.LineBasicMaterial({ color: AXIS_X, transparent: true, opacity: 0.9, depthWrite: false })
+        new THREE.LineBasicMaterial({
+          color: COLORS.AXIS_X,
+          transparent: true,
+          opacity: 0.9,
+          depthWrite: false,
+        })
       )
     );
     // x-axis numerals sit in the x/y plane (Three.js YZ)
-    const xl = makeXyPlaneLabel(String(xu), 0.2, 0.16, AXIS_X_CSS);
+    const xl = makeXyPlaneLabel(String(xu), 0.2, 0.16, colorCss(COLORS.AXIS_X));
     xl.position.copy(at(0, xu, chrome.xNumeralY));
     axes.add(xl);
   }
 
-  const sliceLbl = makeSyPlaneLabel("s", 0.32, 0.26, AXIS_S_CSS);
+  const sliceLbl = makeSyPlaneLabel("s", 0.32, 0.26, colorCss(COLORS.AXIS_S));
   sliceLbl.position.copy(at(chrome.sLabel.s, chrome.sLabel.x, chrome.sLabel.y));
   axes.add(sliceLbl);
 
-  const yLbl = makeSyPlaneLabel("y", 0.28, 0.22, AXIS_Y_CSS);
+  const yLbl = makeSyPlaneLabel("y", 0.28, 0.22, colorCss(COLORS.AXIS_Y));
   yLbl.position.copy(at(chrome.yLabel.s, chrome.yLabel.x, chrome.yLabel.y));
   axes.add(yLbl);
 
-  const xLbl = makeXyPlaneLabel("x", 0.28, 0.22, AXIS_X_CSS);
+  const xLbl = makeXyPlaneLabel("x", 0.28, 0.22, colorCss(COLORS.AXIS_X));
   xLbl.position.copy(at(chrome.xLabel.s, chrome.xLabel.x, chrome.xLabel.y));
   axes.add(xLbl);
 
@@ -741,6 +809,7 @@ function rebuildAxes(ctx) {
 
   ctx.axesGroup = axes;
   ctx.root.add(axes);
+  applyAltAxes(ctx);
 }
 
 function makeAxisLine(to, color) {
@@ -797,38 +866,18 @@ function makeXyPlaneLabel(text, w, h, fill) {
   return mesh;
 }
 
-/** [C-PULL][C-RETRACT] Focused slice stays. Exit eases along −x out and +x back; frame follows. */
+/**
+ * [C-PULL][C-RETRACT] Stay = pinned ∪ {focus}; non-stay hide in place (no −x park).
+ * Placement always exitX=0; visibility handles hide/show.
+ */
 function lerpPullOut(ctx) {
-  if (state.focusLayer != null) ctx.exitStayLayer = state.focusLayer;
-  const stay =
-    state.focusLayer != null ? state.focusLayer : ctx.exitStayLayer;
-  const target = state.focusLayer == null ? 0 : cubeExitX();
-  const cur = ctx.cubeExit ?? 0;
-  const diff = target - cur;
-  const k = 0.13 + Math.min(0.12, Math.abs(diff) * 0.12);
-  const next = cur + diff * k;
-  ctx.cubeExit = Math.abs(next - target) < 0.001 ? target : next;
-  ctx.planeGroups.forEach((g, i) => {
+  ctx.cubeExit = 0;
+  ctx.exitStayLayer = null;
+  ctx.planeGroups.forEach((g) => {
     g.userData.pull = 0;
-    g.userData.exitX = stay != null && i !== stay ? ctx.cubeExit : 0;
-    placeSliceGroup(g, i);
+    g.userData.exitX = 0;
+    placeSliceGroup(g, g.userData.layer);
   });
-  if (state.focusLayer == null && ctx.cubeExit < 0.001) {
-    ctx.cubeExit = 0;
-    ctx.exitStayLayer = null;
-  }
-  placeFrame(ctx);
-}
-
-function placeFrame(ctx) {
-  const frame = ctx.boxHelper;
-  if (!frame?.material) return;
-  frame.position.copy(v3(localOffset(0, -(ctx.cubeExit ?? 0), 0, gapNow())));
-  const target = state.focusLayer == null ? 0.35 : 0;
-  const mat = frame.material;
-  mat.transparent = true;
-  mat.opacity += (target - mat.opacity) * 0.18;
-  if (Math.abs(mat.opacity - target) < 0.01) mat.opacity = target;
 }
 
 function framingDistance() {
@@ -926,6 +975,7 @@ function resetCamera(ctx) {
   state.focusLayer = null;
   state.selectedId = null;
   state.hoverId = null;
+  state.pinnedLayers = [];
   ctx.cubeExit = 0;
   ctx.exitStayLayer = null;
   ctx.planeGroups.forEach((g) => {
@@ -937,13 +987,12 @@ function resetCamera(ctx) {
   ctx.hooks.onReset?.();
 }
 
-/** [C-FOCUS-ACT][C-PULL][C-RETRACT][C-CAM-HOLD] Toggle/set focus; pull via visibility; do not move camera. */
+/** [C-FOCUS-ACT][C-PULL][C-RETRACT][C-CAM-HOLD] Toggle/set focus; hide non-stay; do not move camera. */
 function focusSlice(ctx, i) {
   if (state.shellCube) return;
   const n = state.layers.length;
   if (i == null || i < 0 || i >= n) return;
   if (state.focusLayer === i) {
-    ctx.exitStayLayer = state.focusLayer;
     state.focusLayer = null;
     state.selectedId = null;
     state.hoverId = null;
@@ -952,30 +1001,59 @@ function focusSlice(ctx, i) {
     return;
   }
   state.focusLayer = i;
-  ctx.exitStayLayer = i;
   state.selectedId = null;
   queueVisibilityTargets(ctx);
-  // Keep current camera — no recenter toward cube interior
   ctx.hooks.onFocusChange?.();
 }
 
-/** [C-ESC] Clear select first, then focus; camera unchanged. */
+/** [C-PIN] Shift+pull-zone toggles pin; does not change focus alone. */
+function togglePinLayer(ctx, i) {
+  if (state.shellCube) return;
+  const n = state.layers.length;
+  if (i == null || i < 0 || i >= n) return;
+  const pins = state.pinnedLayers || [];
+  const idx = pins.indexOf(i);
+  if (idx >= 0) pins.splice(idx, 1);
+  else pins.push(i);
+  pins.sort((a, b) => a - b);
+  state.pinnedLayers = pins;
+  queueVisibilityTargets(ctx);
+  ctx.hooks.onFocusChange?.();
+}
+
+/** [C-ESC] Clear select → focus → all pins; camera unchanged. */
 function clearFocus(ctx) {
   if (state.selectedId != null) {
     state.selectedId = null;
     queueVisibilityTargets(ctx);
-    if (state.focusLayer != null) ctx.hooks.onFocusChange?.();
-    else ctx.hooks.onClear?.();
+    if (state.focusLayer != null || (state.pinnedLayers || []).length) {
+      ctx.hooks.onFocusChange?.();
+    } else ctx.hooks.onClear?.();
     return;
   }
   if (state.focusLayer != null) {
-    ctx.exitStayLayer = state.focusLayer;
     state.focusLayer = null;
     state.hoverId = null;
     queueVisibilityTargets(ctx);
     ctx.hooks.onClear?.();
     return;
   }
+  if ((state.pinnedLayers || []).length) {
+    state.pinnedLayers = [];
+    state.hoverId = null;
+    queueVisibilityTargets(ctx);
+    ctx.hooks.onClear?.();
+    return;
+  }
+  ctx.hooks.onClear?.();
+}
+
+/** Double-click empty: clear focus only; pins stay. */
+function clearFocusKeepPins(ctx) {
+  if (state.focusLayer == null) return;
+  state.focusLayer = null;
+  state.hoverId = null;
+  queueVisibilityTargets(ctx);
   ctx.hooks.onClear?.();
 }
 
@@ -985,10 +1063,8 @@ function selectCompany(ctx, id, opts = {}) {
   state.selectedId = id;
   if (!state.shellCube && c.layer != null) {
     state.focusLayer = c.layer;
-    ctx.exitStayLayer = c.layer;
   }
   ctx.camAnim = null;
-  // Keep OrbitControls on: left=pan, right=orbit (never leave enabled=false).
   ctx.controls.enabled = true;
   queueVisibilityTargets(ctx);
   if (!state.shellCube && opts.standardView) {
@@ -999,113 +1075,174 @@ function selectCompany(ctx, id, opts = {}) {
   ctx.hooks.onSelect?.(c, {});
 }
 
+function companyOnStay(c) {
+  if (state.shellCube || c.layer == null) return true;
+  return layerIsStay(c.layer);
+}
+
+function applyAltAxes(ctx) {
+  if (ctx.axesGroup) ctx.axesGroup.visible = !state.altHideAxes;
+}
+
 function queueVisibilityTargets(ctx) {
   const chainMode = !state.shellCube && (state.revenueLinks || []).length > 0;
+  const stay = stayLayers();
+  const hideChrome = state.altHideRingsSlices;
+
   state.companies.forEach((c) => {
     const mesh = ctx.byId.get(c.id);
     if (!mesh) return;
     const show = passesFilter(c);
-    // [C-REV-LINK] Chain keeps every peer lit across slices so point-to-point edges stay readable.
-    const onFocus =
-      state.shellCube ||
-      chainMode ||
-      state.focusLayer == null ||
-      c.layer === state.focusLayer;
-    mesh.visible = show;
+    const onStay = companyOnStay(c);
+    const lit = show && onStay;
+    if (lit) mesh.visible = true;
     if (mesh.userData.label) {
-      mesh.userData.label.visible = state.shellCube || chainMode
+      mesh.userData.label.visible = state.shellCube
         ? show
-        : show && state.focusLayer != null && c.layer === state.focusLayer;
+        : chainMode
+          ? lit
+          : lit && stay != null;
     }
     const selected = c.id === state.selectedId;
     const hovered = c.id === state.hoverId;
-    // Off-focus: crush emissive + opacity (must use transparent materials or glow stays lit)
     const targetEmissive = state.shellCube
       ? null
       : selected
         ? 2.2
         : hovered
           ? 1.9
-          : onFocus
+          : lit
             ? c.country === "US"
-              ? 1.35
-              : 1.25
+              ? 0.75
+              : 0.7
             : 0.06;
-    const targetOpacity = onFocus ? 1 : 0;
-    const targetScale = selected
+    const targetOpacity = lit ? 1 : 0;
+    const targetHoverScale = selected
       ? state.shellCube
         ? 1.45
         : 1.4
       : hovered
-        ? 1.25
-        : onFocus
+        ? 1.5
+        : lit
           ? 1
           : 0.55;
     mesh.userData.targetEmissive = targetEmissive;
     mesh.userData.targetOpacity = targetOpacity;
-    mesh.userData.targetScale = targetScale;
-    // Opacity always lerps; transparent while fading so fade-in matches fade-out.
-    const mat = mesh.material;
-    mat.transparent = true;
-    mat.depthWrite = false;
-    mesh.renderOrder = onFocus ? 8 : 4;
-    if (mesh.userData.label) mesh.userData.label.renderOrder = onFocus ? 10 : 4;
+    mesh.userData.targetHoverScale = targetHoverScale;
+    const rim = mesh.userData.rim;
+    const fill = mesh.userData.fill;
+    if (rim?.material) {
+      rim.material.transparent = true;
+      rim.material.depthWrite = false;
+    }
+    if (fill?.material) {
+      fill.material.transparent = true;
+      fill.material.depthWrite = false;
+    }
+    mesh.renderOrder = lit ? 8 : 4;
+    if (mesh.userData.label) mesh.userData.label.renderOrder = lit ? 10 : 4;
   });
+
   (ctx.revenueLinkObjs || []).forEach((item) => {
     const a = companyById(item.fromId);
     const b = companyById(item.toId);
-    const showLink = Boolean(a && b && passesFilter(a) && passesFilter(b));
+    const showLink = Boolean(
+      a &&
+        b &&
+        passesFilter(a) &&
+        passesFilter(b) &&
+        companyOnStay(a) &&
+        companyOnStay(b)
+    );
     if (item.line) item.line.visible = showLink;
+    if (item.lineB) item.lineB.visible = showLink;
     if (item.label) item.label.visible = showLink;
   });
 
   ctx.planeGroups.forEach((g, i) => {
-    const dim = state.focusLayer != null && i !== state.focusLayer;
-    // Focused slice draws after dimmed neighbors so its points stay visible
+    const onStay = layerIsStay(i);
+    const dim = !onStay;
     g.renderOrder = dim ? 0 : 2;
     g.userData.pull = 0;
     const focused = state.focusLayer === i;
+    const pinned = (state.pinnedLayers || []).includes(i);
     g.children.forEach((ch) => {
       if (!ch.material || ch.material.opacity == null) return;
       const base = ch.userData.baseOpacity ?? 1;
       if (ch.userData.isSlicePlane) {
-        ch.userData.targetOpacity = dim ? 0 : focused ? 0.38 : base;
+        if (hideChrome || dim) ch.userData.targetOpacity = 0;
+        else ch.userData.targetOpacity = focused || pinned ? 0.38 : base;
+        ch.visible = true;
       } else if (ch.userData.isRingGuide) {
-        ch.userData.targetOpacity = dim ? 0 : base;
-      } else if (ch.userData.isSliceEdge || (ch.isLineSegments && !ch.userData.isRingGuide)) {
-        ch.userData.targetOpacity = dim ? 0 : base;
+        ch.userData.targetOpacity = hideChrome || dim ? 0 : base;
+      } else if (
+        ch.userData.isSliceEdge ||
+        (ch.isLineSegments && !ch.userData.isRingGuide)
+      ) {
+        ch.userData.targetOpacity = hideChrome || dim ? 0 : base;
         if (ch.material.color) ch.material.color.setHex(COLORS.EDGE);
       } else if (ch.userData.isDomainLabel) {
-        ch.userData.targetOpacity = dim ? 0 : 1;
+        ch.userData.targetOpacity = hideChrome || dim ? 0 : 1;
       }
     });
   });
+
+  applyAltAxes(ctx);
+}
+
+function lerpPointMaterial(mat, targetEmissive, targetOpacity, k) {
+  if (!mat) return;
+  if (targetEmissive != null && mat.emissiveIntensity != null) {
+    mat.emissiveIntensity += (targetEmissive - mat.emissiveIntensity) * k;
+  }
+  if (targetOpacity != null) {
+    mat.transparent = true;
+    mat.depthWrite = false;
+    mat.opacity += (targetOpacity - mat.opacity) * k;
+    if (targetOpacity >= 0.99 && mat.opacity > 0.98) {
+      mat.opacity = 1;
+      mat.transparent = false;
+      mat.depthWrite = true;
+    }
+  }
 }
 
 function lerpVisibility(ctx) {
   const k = 0.18;
   ctx.meshes.forEach((mesh) => {
-    if (!mesh.visible) return;
-    const mat = mesh.material;
-    if (
-      mesh.userData.targetEmissive != null &&
-      mat.emissiveIntensity != null
-    ) {
-      mat.emissiveIntensity += (mesh.userData.targetEmissive - mat.emissiveIntensity) * k;
+    const targetOp = mesh.userData.targetOpacity;
+    if (!mesh.visible && !(targetOp > 0.01)) return;
+    if (targetOp > 0.01) mesh.visible = true;
+    const rim = mesh.userData.rim;
+    const fill = mesh.userData.fill;
+    if (rim || fill) {
+      lerpPointMaterial(
+        rim?.material,
+        mesh.userData.targetEmissive,
+        targetOp,
+        k
+      );
+      lerpPointMaterial(fill?.material, null, targetOp, k);
+    } else if (mesh.material) {
+      lerpPointMaterial(
+        mesh.material,
+        mesh.userData.targetEmissive,
+        targetOp,
+        k
+      );
     }
-    if (mesh.userData.targetOpacity != null) {
-      mat.transparent = true;
-      mat.depthWrite = false;
-      mat.opacity += (mesh.userData.targetOpacity - mat.opacity) * k;
-      if (mesh.userData.targetOpacity >= 0.99 && mat.opacity > 0.98) {
-        mat.opacity = 1;
-        mat.transparent = false;
-        mat.depthWrite = true;
-      }
-    }
-    if (mesh.userData.targetScale != null) {
-      const s = mesh.scale.x + (mesh.userData.targetScale - mesh.scale.x) * k;
-      mesh.scale.setScalar(s);
+    const dScale = mesh.userData.dScale ?? 1;
+    const hover = mesh.userData.targetHoverScale ?? 1;
+    const desired = dScale * hover;
+    const s = mesh.scale.x + (desired - mesh.scale.x) * k;
+    mesh.scale.setScalar(s);
+    const op =
+      rim?.material?.opacity ??
+      mesh.material?.opacity ??
+      (targetOp == null ? 1 : targetOp);
+    if (targetOp != null && targetOp < 0.01 && op < 0.02) {
+      mesh.visible = false;
+      if (mesh.userData.label) mesh.userData.label.visible = false;
     }
   });
   ctx.planeGroups.forEach((g) => {
@@ -1220,8 +1357,11 @@ function wireInput(ctx, viewport) {
   });
   el.addEventListener("dblclick", (e) => {
     setPointer(ctx, e);
-    const companyHits = ctx.raycaster.intersectObjects(ctx.meshes.filter((m) => m.visible), false);
-    if (!companyHits.length) clearFocus(ctx);
+    const companyHits = ctx.raycaster.intersectObjects(
+      ctx.meshes.filter((m) => m.visible),
+      true
+    );
+    if (!companyHits.length) clearFocusKeepPins(ctx);
   });
   el.addEventListener("pointermove", (e) => {
     const dx = e.clientX - ctx.pointerState.x;
@@ -1267,10 +1407,14 @@ function pick(ctx, event) {
   setPointer(ctx, event);
   const companyHits = ctx.raycaster.intersectObjects(
     ctx.meshes.filter((m) => m.visible),
-    false
+    true
   );
   if (companyHits.length) {
-    selectCompany(ctx, companyHits[0].object.userData.companyId);
+    let id = companyHits[0].object.userData.companyId;
+    if (id == null && companyHits[0].object.parent) {
+      id = companyHits[0].object.parent.userData.companyId;
+    }
+    if (id != null) selectCompany(ctx, id);
     return;
   }
   const planes = [];
@@ -1283,16 +1427,21 @@ function pick(ctx, event) {
   if (!planeHits.length) return;
   const hit = planeHits[0];
   if (!isPullFrameHit(ctx, hit)) return;
-  focusSlice(ctx, hit.object.userData.layerIndex);
+  const layerIndex = hit.object.userData.layerIndex;
+  if (event.shiftKey) togglePinLayer(ctx, layerIndex);
+  else focusSlice(ctx, layerIndex);
 }
 
 function hover(ctx, event, viewport) {
   const rect = setPointer(ctx, event);
   const hits = ctx.raycaster.intersectObjects(
     ctx.meshes.filter((m) => m.visible),
-    false
+    true
   );
-  const id = hits.length ? hits[0].object.userData.companyId : null;
+  let id = hits.length ? hits[0].object.userData.companyId : null;
+  if (id == null && hits.length && hits[0].object.parent) {
+    id = hits[0].object.parent.userData.companyId;
+  }
   if (id !== state.hoverId) {
     state.hoverId = id;
     queueVisibilityTargets(ctx);

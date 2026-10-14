@@ -2,6 +2,7 @@
 
 import { renderNations } from "./nations.js?v=33";
 import { displayIndustryCoord } from "./coords.js?v=35";
+import { fetchBicsChildren, fetchBicsLocate } from "./api.js?v=51";
 
 if ("scrollRestoration" in history) history.scrollRestoration = "manual";
 
@@ -226,9 +227,7 @@ async function searchLocate(token, q, current, box) {
   }
   let data;
   try {
-    const res = await fetch(`/api/bics/locate?q=${encodeURIComponent(q)}`);
-    if (!res.ok) return;
-    data = await res.json();
+    data = await fetchBicsLocate(q);
   } catch {
     return;
   }
@@ -372,15 +371,8 @@ async function loadBoard() {
   const nationEl = document.getElementById("nationList");
   const parent = currentBics();
   const loc = currentListing();
-  const qs = new URLSearchParams();
-  if (parent) qs.set("parent", parent);
-  if (loc) qs.set("listingCountry", loc);
-  const q = qs.toString();
-  const url = q ? `/api/bics/children?${q}` : "/api/bics/children";
   try {
-    const res = await fetch(url);
-    if (!res.ok) throw new Error(`children ${res.status}`);
-    const data = await res.json();
+    const data = await fetchBicsChildren({ parent, listingCountry: loc });
     const node = data.parent;
     if (node?.level === 4) {
       location.replace(listHref(node.bicsCode, loc));
