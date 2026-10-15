@@ -4,13 +4,13 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>SFC — Industry gate</title>
-<link rel="stylesheet" href="/css/app.css?v=42" />
+<link rel="stylesheet" href="/css/app.css?v=43" />
 <link rel="preload" href="/vendor/fonts/jost/Jost-300-Light-caps.woff2" as="font" type="font/woff2" crossorigin />
 </head>
 <body class="home-body">
   <svg class="sfc-defs" aria-hidden="true" focusable="false">
     <defs>
-      <g id="sfc-lockup">
+      <g id="sfc-mark">
         <g class="sfc-frames">
           <rect x="8" y="14" width="18" height="44" rx="1.5" opacity="0.95"/>
           <rect x="22" y="14" width="18" height="44" rx="1.5" opacity="0.55"/>
@@ -24,6 +24,9 @@
           <path class="sfc-facet-dim" d="M439 100V130H424Z"/>
         </g>
         <line class="sfc-rule" x1="8" y1="66" x2="220.6" y2="66"/>
+      </g>
+      <g id="sfc-lockup">
+        <use href="#sfc-mark"/>
         <text class="sfc-fullname" x="8" y="77.5" font-size="9.32" textLength="212.6" lengthAdjust="spacing">STANDARD FINANCIAL CHARTING</text>
       </g>
     </defs>
@@ -41,7 +44,7 @@
   <main class="home home-pending" id="home" hidden>
     <header class="home-brand">
       <a href="/" class="home-logo-link" aria-label="SFC industry gate">
-      <svg class="splash-logo home-logo" viewBox="0 6 229 80" width="260" height="91" aria-hidden="true"><use href="#sfc-lockup"/></svg>
+      <svg class="splash-logo home-logo" viewBox="0 6 229 61" width="130" height="35" aria-hidden="true"><use href="#sfc-mark"/></svg>
       </a>
       <p class="home-lede" id="homeLede">BICS industry coordinates · a level-4 cell opens the company list.</p>
       <div class="home-locate">

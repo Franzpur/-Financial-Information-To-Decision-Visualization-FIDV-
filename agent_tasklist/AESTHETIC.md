@@ -34,7 +34,7 @@
 
 ### Logo 标准（业主说「logo」即按此开发）
 
-产品 splash / home 左标矢量真源：`Ind-Chain/web/index.html` 内 `#sfc-lockup`（隐藏 `.sfc-defs` 中定义，开屏与门厅以 `<use>` 引用）的 `.sfc-frames` 三框；`list.html` 页眉内联同一份。纸面同族反相：`library/showable-report/assets/sfc-logo-frames-paper.svg`（封面 `SFC-plan-cover.html` 已对齐）。
+产品 splash / home 左标矢量真源：`Ind-Chain/web/index.html` 内 `#sfc-mark` / `#sfc-lockup`（隐藏 `.sfc-defs` 中定义；开屏 `<use>` 引用带全称的 `#sfc-lockup`，门厅 `<use>` 引用不带全称的 `#sfc-mark`）的 `.sfc-frames` 三框；`list.html` 页眉内联 `#sfc-mark` 同一份。纸面同族反相：`library/showable-report/assets/sfc-logo-frames-paper.svg`（封面 `SFC-plan-cover.html` 已对齐）。
 
 **理念一句话：** 层次感来自三枚竖向圆角矩形**错位相套** + **递减透明度**（前实后虚），不是左右并排实心色块。
 
@@ -55,7 +55,7 @@
 
 **组与露出**
 
-- 可与右侧 **SFC 矢量字标** + `--accent` 底线 + 全称小字同组（splash / home / list），规格见下节「SFC 字标与全称」。
+- 可与右侧 **SFC 矢量字标** + `--accent` 底线同组（splash / home / list）；全称小字只随开屏露出。规格见下节「SFC 字标与全称」。
 - **单独露出**时只保留三框（纸面封面、仅标露出等），不另起第二套皮。
 - 启动图标 `Ind-Chain/assets/sfc-launcher*` 同族；纸面只用同族反相矢量。
 
@@ -76,9 +76,10 @@
 | 斜面 | 独立 path：F 左上方块左下半三角 `--muted`（`.sfc-facet`）；C 底横右端斜切，切口三角 `--muted` 50% 不透明（`.sfc-facet-dim`）。不加渐变、不加 glow |
 | accent 线 | `.sfc-rule`：`--accent`、`stroke-width 1`、`opacity .55`；`y=66`，x 8→220.6（与全称同宽） |
 | 全称 | 「STANDARD FINANCIAL CHARTING」，`.sfc-fullname`：**Jost Light 300**（SIL OFL 1.1，本地 `Ind-Chain/web/vendor/fonts/jost/`，仅 A–Z+空格子集 woff2，附 `OFL.txt` 与来源 `README.txt`；禁 CDN）；fallback `-apple-system` / SF Pro / `system-ui`；`letter-spacing .3em`；`font-size 9.32`，`textLength 212.6` 锁宽；基线 `y=77.5`；填 `--text` |
-| 显示尺寸 | 开屏 300px 宽；门厅 260px；下钻门厅与列表页 200px（`.home.home-drilled .home-logo`）。低于 200px 全称难读，勿再缩 |
+| 两版 | 业主 2026-10-15 拍板：**全称只在开屏出现**。`index.html` 隐藏 defs 拆两组：`#sfc-mark`（三框 + SFC + accent 线）与 `#sfc-lockup`（`<use href="#sfc-mark">` + 全称）。开屏用 `#sfc-lockup`、`viewBox="0 6 229 80"`；版面（门厅 / 下钻门厅 / 列表页）用 `#sfc-mark`、`viewBox="0 6 229 61"`（下缘收至绿线，不留全称空白） |
+| 显示尺寸 | 开屏 300px 宽（带全称，不动）。版面不带全称，字标为原版面的 1/2（业主：大 SFC 在分类版面喧宾夺主）：门厅 130px 宽（SFC 字形约 84×25px）；下钻门厅与列表页 100px（`.home.home-drilled .home-logo`；字形约 65×19px）。两版横向 viewBox 同为 229 单位，故按 width 换算字形 |
 
-**禁止**：把 SFC 改回 `<text>` 或换嵌入字体；改斜面位置 / 另加高光；全称换字族、改大小写或去宽字距；三处版面不一致（改一处须同改 `index.html` 的 `#sfc-lockup` 与 `list.html` 页眉）。
+**禁止**：把 SFC 改回 `<text>` 或换嵌入字体；改斜面位置 / 另加高光；全称换字族、改大小写或去宽字距；在分类版面露出全称；三处版面不一致（改一处须同改 `index.html` 的 `#sfc-mark` / `#sfc-lockup` 与 `list.html` 页眉内联副本，后者不含全称）。
 
 ### 字标与开屏（C-SPLASH）
 
@@ -153,4 +154,4 @@
 | 总参谋部 | 可在规划中调度美工部；业主安排下可规划管理美工部角色文件；专知路径内美工部可改码；跨域交父代理；产品终裁仍归监理部 |
 | 书记 | 美工部不写 worklog |
 
-*Last updated: 2026-10-15 · SFC 字标改版：衬线字标退役，矢量方角字标 + 斜面 + 全宽 accent 线 + Jost Light 全称。2026-10-13 · Logo 标准写入：三框错位相套比例与明暗两用；权知统一：专知路径内可改码。*
+*Last updated: 2026-10-15 · 版面字标减半且去全称（`#sfc-mark`），全称只留开屏。2026-10-15 · SFC 字标改版：衬线字标退役，矢量方角字标 + 斜面 + 全宽 accent 线 + Jost Light 全称。2026-10-13 · Logo 标准写入：三框错位相套比例与明暗两用；权知统一：专知路径内可改码。*
