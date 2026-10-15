@@ -523,7 +523,7 @@ p { margin: 0 0 10px; }
   display: block;
 }
 .home.home-drilled .home-logo {
-  width: 160px;
+  width: 200px;
   height: auto;
 }
 .home-lede {
@@ -1183,6 +1183,42 @@ a.list-row:focus-within {
 }
 .splash-logo {
   display: block;
+}
+
+/* SFC lockup: three frames + SFC wordmark paths + accent rule + Jost Light full name */
+@font-face {
+  font-family: "Jost";
+  font-weight: 300;
+  font-style: normal;
+  font-display: block;
+  src: url("/vendor/fonts/jost/Jost-300-Light-caps.woff2") format("woff2");
+  unicode-range: U+0020, U+0041-005A;
+}
+.sfc-defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+.sfc-frames {
+  fill: none;
+  stroke: var(--text);
+  stroke-width: 1.25;
+  stroke-linejoin: round;
+}
+.sfc-word { fill: var(--text); }
+.sfc-facet { fill: var(--muted); }
+.sfc-facet-dim { fill: var(--muted); opacity: 0.5; }
+.sfc-rule {
+  stroke: var(--accent);
+  stroke-width: 1;
+  opacity: 0.55;
+}
+.sfc-fullname {
+  fill: var(--text);
+  font-family: "Jost", -apple-system, "SF Pro Text", system-ui, sans-serif;
+  font-weight: 300;
+  letter-spacing: 0.3em;
 }
 @keyframes splash-in {
   from { opacity: 0; transform: scale(0.98); }

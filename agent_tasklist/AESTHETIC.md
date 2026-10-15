@@ -34,7 +34,7 @@
 
 ### Logo 标准（业主说「logo」即按此开发）
 
-产品 splash / home 左标矢量真源：`Ind-Chain/web/index.html` 内 `.splash-logo` 三框。纸面同族反相：`library/showable-report/assets/sfc-logo-frames-paper.svg`（封面 `SFC-plan-cover.html` 已对齐）。
+产品 splash / home 左标矢量真源：`Ind-Chain/web/index.html` 内 `#sfc-lockup`（隐藏 `.sfc-defs` 中定义，开屏与门厅以 `<use>` 引用）的 `.sfc-frames` 三框；`list.html` 页眉内联同一份。纸面同族反相：`library/showable-report/assets/sfc-logo-frames-paper.svg`（封面 `SFC-plan-cover.html` 已对齐）。
 
 **理念一句话：** 层次感来自三枚竖向圆角矩形**错位相套** + **递减透明度**（前实后虚），不是左右并排实心色块。
 
@@ -42,7 +42,7 @@
 |----|-----|------|
 | 单框 | `width=18` `height=44` `rx=1.5` | 竖向圆角矩形；宽高比勿改 |
 | 起始 x | `8` / `22` / `36` | 步距 **14**；勿改步距或错位量 |
-| 纵位 | `y=14`（三框同 y） | 与 splash `viewBox="0 0 280 72"` 对齐 |
+| 纵位 | `y=14`（三框同 y） | 与 lockup `viewBox="0 6 229 80"` 对齐 |
 | opacity | `0.95` / `0.55` / `0.28` | 前→后递减；fill=`none` |
 | stroke | `stroke-width≈1.25`，`stroke-linejoin=round` | 描边框，非填充块 |
 
@@ -55,7 +55,7 @@
 
 **组与露出**
 
-- 可与右侧 **SFC** 衬线字标（Iowan / Palatino / Georgia 栈）+ `--accent` 底线同组（splash / home）。
+- 可与右侧 **SFC 矢量字标** + `--accent` 底线 + 全称小字同组（splash / home / list），规格见下节「SFC 字标与全称」。
 - **单独露出**时只保留三框（纸面封面、仅标露出等），不另起第二套皮。
 - 启动图标 `Ind-Chain/assets/sfc-launcher*` 同族；纸面只用同族反相矢量。
 
@@ -65,9 +65,24 @@
 - 勿用低分辨率反色位图放大当纸面 / 印刷源；纸面从矢量按上表反相 stroke。
 - 勿另起第二套 logo 几何或吉祥物替代三框。
 
+### SFC 字标与全称（lockup）
+
+业主 2026-10-15 拍板：以业主自制图为准，衬线 `<text>` 字标退役。
+
+| 部件 | 规格 |
+|------|------|
+| 版面 | `viewBox="0 6 229 80"`；左三框（Logo 标准，x 8–54，y 14–58）；右 **SFC** 与三框同高（y 14–58，x 72–220.6）；accent 线与全称在下，左起三框、右止 C 右缘 |
+| SFC 字形 | 自绘 `<path>`，非字体：130 单位字高网格，笔画 30、横画间隔 20（三横 y 0–30 / 50–80 / 100–130），外角 45° 斜切 30；S 0–145、F 165–291、C 308–439；以 `translate(72 14) scale(0.338462)` 落版。填 `--text`（`.sfc-word`） |
+| 斜面 | 独立 path：F 左上方块左下半三角 `--muted`（`.sfc-facet`）；C 底横右端斜切，切口三角 `--muted` 50% 不透明（`.sfc-facet-dim`）。不加渐变、不加 glow |
+| accent 线 | `.sfc-rule`：`--accent`、`stroke-width 1`、`opacity .55`；`y=66`，x 8→220.6（与全称同宽） |
+| 全称 | 「STANDARD FINANCIAL CHARTING」，`.sfc-fullname`：**Jost Light 300**（SIL OFL 1.1，本地 `Ind-Chain/web/vendor/fonts/jost/`，仅 A–Z+空格子集 woff2，附 `OFL.txt` 与来源 `README.txt`；禁 CDN）；fallback `-apple-system` / SF Pro / `system-ui`；`letter-spacing .3em`；`font-size 9.32`，`textLength 212.6` 锁宽；基线 `y=77.5`；填 `--text` |
+| 显示尺寸 | 开屏 300px 宽；门厅 260px；下钻门厅与列表页 200px（`.home.home-drilled .home-logo`）。低于 200px 全称难读，勿再缩 |
+
+**禁止**：把 SFC 改回 `<text>` 或换嵌入字体；改斜面位置 / 另加高光；全称换字族、改大小写或去宽字距；三处版面不一致（改一处须同改 `index.html` 的 `#sfc-lockup` 与 `list.html` 页眉）。
+
 ### 字标与开屏（C-SPLASH）
 
-- 居中 **SFC** 字标 + 左侧 **Logo 标准**三框 + accent 细线（几何见上节；现稿勿擅自改形）。
+- 居中 **SFC lockup**（三框 + 矢量字标 + accent 线 + 全称；规格见上节，勿擅自改形）。
 - 入场：约 **0.4s** 轻淡入（`splash-in`）。
 - **仅挂在工程首页 `/`（C-HOME）**：清晰态维持约 **2s**，再 **约 4s** opacity 淡出（JS fade fallback **4200ms**）。开屏期实心 `--bg` 盖住门厅，避免与 `.home-logo` 双标叠影；淡出后再露格阵。`?bics=` 下钻不重播。
 - **进 `/cube`（含分类入口）不播开屏。**
@@ -115,6 +130,7 @@
 | 资产 | 路径 |
 |------|------|
 | 色板 / chrome / 首页 | `Ind-Chain/web/css/app.css`；`Ind-Chain/web/index.html`（C-HOME + C-SPLASH）；`Ind-Chain/web/js/home.js` |
+| 字标全称字体 | `Ind-Chain/web/vendor/fonts/jost/`（woff2 子集、`OFL.txt`、来源 `README.txt`） |
 | 四级名单 | `Ind-Chain/web/list.html`；`Ind-Chain/web/js/list.js` |
 | 立方体壳 | `Ind-Chain/web/cube.html`（C-CUBE；无 splash） |
 | splash 时序 | `Ind-Chain/web/js/home.js`（hold ~2s → fade ~4s） |
@@ -137,4 +153,4 @@
 | 总参谋部 | 可在规划中调度美工部；业主安排下可规划管理美工部角色文件；专知路径内美工部可改码；跨域交父代理；产品终裁仍归监理部 |
 | 书记 | 美工部不写 worklog |
 
-*Last updated: 2026-10-13 · Logo 标准写入：三框错位相套比例与明暗两用；权知统一：专知路径内可改码。*
+*Last updated: 2026-10-15 · SFC 字标改版：衬线字标退役，矢量方角字标 + 斜面 + 全宽 accent 线 + Jost Light 全称。2026-10-13 · Logo 标准写入：三框错位相套比例与明暗两用；权知统一：专知路径内可改码。*

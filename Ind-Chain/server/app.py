@@ -90,6 +90,8 @@ class Handler(BaseHTTPRequestHandler):
             ctype = "text/html; charset=utf-8"
         elif path.suffix == ".json":
             ctype = "application/json; charset=utf-8"
+        elif path.suffix == ".woff2":
+            ctype = "font/woff2"
         self.send_response(200)
         self.send_header("Content-Type", ctype or "application/octet-stream")
         self.send_header("Content-Length", str(len(data)))

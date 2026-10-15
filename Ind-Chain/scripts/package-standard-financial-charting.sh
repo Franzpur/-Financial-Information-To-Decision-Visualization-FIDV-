@@ -120,6 +120,7 @@ PY_MM="${PY_FULL%.*}"
   echo "ncurses (libncurses, libform, libmenu, libpanel inside the Python framework): X11/MIT-style, https://invisible-island.net/ncurses/"
   echo "SQLite: NOT bundled; Python uses the macOS system library (public domain)."
   echo "three.js 0.170.0 (Resources/sfc/Ind-Chain/web/vendor/three): MIT, full text in vendor/three/LICENSE."
+  echo "Jost Light 300, caps subset (Resources/sfc/Ind-Chain/web/vendor/fonts/jost): SIL Open Font License 1.1, full text in vendor/fonts/jost/OFL.txt. Source: https://github.com/indestructible-type/Jost"
   echo
   echo "----- Python license (Python/LICENSE.txt, verbatim) -----"
   cat "$APP/Contents/Frameworks/Python.framework/Versions/Current/lib/python${PY_MM}/LICENSE.txt"
@@ -282,7 +283,7 @@ else
      - companies.json（${CO_N} 家公司；其中 ${CO_V} 家带 value_m 数值，代码把它们标注为彭博 Alphabet 供应商关系 GOOGL_SUPPLY.xlsx，其余为公开行业图谱）；
      - nvda-revenue-links.json（文件自注来源：Bloomberg Supply Chain Summary 2026-10-05 截图整理 + 旧 json，即含彭博供应链数据）；
      - layers.json（${LAYER_N} 个层名称与简介，自拟，无外部来源标注）；
-     - three.js 0.170.0（MIT）；内置 Python ${PY_FULL}（PSF）、OpenSSL（Apache-2.0）等，声明见 Contents/Resources/THIRD-PARTY-NOTICES.txt。
+     - three.js 0.170.0（MIT）；Jost Light 字体子集（OFL）；内置 Python ${PY_FULL}（PSF）、OpenSSL（Apache-2.0）等，声明见 Contents/Resources/THIRD-PARTY-NOTICES.txt。
    外发由业主授权；转发前请自行确认上述内容的许可，本说明不构成法律意见。"
 fi
 
