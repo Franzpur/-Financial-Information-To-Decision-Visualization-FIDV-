@@ -73,12 +73,12 @@
 - **进 `/cube`（含分类入口）不播开屏。**
 - 无转圈、无 Loading 长文案、不画视空间球。
 
-### 启动图标与集成启动窗
+### 启动图标与原生壳面板
 
 - 暗底上 **Logo 标准**三框同族 + accent 细线（与 splash 左标同族，非另皮）。
 - 源与产物：`Ind-Chain/assets/fidv-launcher-1024.png`、`fidv-launcher.icns`。
 - 施加：`Ind-Chain/scripts/set-command-icon.sh` → 根 `Standard-Financial-Charting.app/Contents/Resources/AppIcon.icns`（访达双击 `.app`，无 Terminal）。
-- **集成启动窗**（`Ind-Chain/scripts/launcher_gui.py`）：tkinter 小窗，色用同一板（BG `#0b0d10`、PANEL `#14181e`、STROKE `#2a313c`、TEXT `#e8edf4`、MUTED `#9aa6b5`、ACCENT `#8be0c0`）。标题 **Standard-Financial-Charting**，副标 `Ind-Chain`。按钮：**Open homepage** / **Restart** / **Quit**。命令跑在后端。
+- 原 tkinter 启动窗已于 P4 退役；色板见上（BG `#0b0d10`、MUTED `#9aa6b5` 等），原生壳错误面板与窗背景沿用同一板（`Ind-Chain/shell/ErrorPanel.swift`）。
 
 ### 工程首页（C-HOME）
 
@@ -121,7 +121,7 @@
 | 面板类名与 HUD 外观 | `Ind-Chain/web/js/ui.js`（视觉层） |
 | 启动图标 | `Ind-Chain/assets/fidv-launcher*` |
 | 图标脚本 | `Ind-Chain/scripts/set-command-icon.sh` |
-| 启动器附着面 | 根 `Standard-Financial-Charting.app` 图标资源；`launcher_gui.py` 色板与窗体外观 |
+| 启动器附着面 | 根 `Standard-Financial-Charting.app` 图标资源；原生壳错误面板色板（沿用本文，`Ind-Chain/shell/ErrorPanel.swift`） |
 | Logo 几何真源 | `Ind-Chain/web/index.html`（`.splash-logo` 三框）；纸面同族 `library/showable-report/assets/sfc-logo-frames-paper.svg`（秘书纸面附着；几何以本文 Logo 标准为准） |
 | 概念续工指针 | `Ind-Chain/CONCEPTS.md` §10（美学细节回指本文） |
 

@@ -247,10 +247,36 @@ Removed / 已废弃：旧「角视图 corner view」与 **V / Home** 绑定（�
 | 信息部 / `agent_tasklist/INFORMATION.md` | 数据目录、调用词条、乱缺建议、BQLX 公式方案 |
 | `web/js/state.js` | Shared state |
 | `web/js/ui.js` | Panels / status / buttons |
+| `shell/*.swift` | **App shell** (SHELL-WINDOW window + WKWebView; SHELL-PROC back-end child) → §11 |
+| `scripts/build-standard-financial-charting-app.sh` | Rebuild the universal `.app` (ad-hoc signed, atomic swap) |
+| `scripts/package-standard-financial-charting.sh` | **SHELL-PACK**: self-contained `dist/` package + zip + checksums |
+| `scripts/regress_*` | `regress_all.sh quick/full/capture`; `regress_api_golden.py`, `regress_app_lifecycle.sh` |
 
 **One-liner resume / 一句话续工**  
 立方体 = 沿 **s** 堆的 **切片**；位置一律 **(s, x, y)**；面 **x,y∈[0,10]**；**1 s = 1 x = 1 y = UNIT**；右=+x 左=−x 上=+y 下=−y 前=+s 后=−s；stay（钉∪焦点）不动，非 stay 就地全隐（无 −x 残影）；**C** = 标准视角；切层/抽回不扭相机；**A/F** = 另类显示。
 
 ---
 
-*Last updated: 2026-10-02 · Coordinates are `(s, x, y)` in `web/js/coords.js`. Keep in sync with `LAYOUT.camera` and hotkeys in `scene.js`.*
+## 11. Local app / 本地应用
+
+The page became an app without changing its module structure (see `modules/`). The browser side is unchanged; only a native shell and a packaging step were added.
+网页变成应用，**模块结构不变**（见 `modules/`）；浏览器侧原样，只新增原生壳与打包。
+
+| Term / 名 | Meaning / 含义 |
+|-----------|----------------|
+| **App shell / 应用壳** (SHELL-WINDOW) | *Not* the bundle's `meta.mode = shell` empty-wall template (`BE-SHELL`). / 与 bundle 的 `meta.mode = shell` 空墙模板（`BE-SHELL`）无关。Swift/AppKit window + `WKWebView` loading `http://127.0.0.1:<port>/`. Window frame is remembered; error panel on failure. / 原生窗口与 WKWebView，只载 loopback；失败出面板。 |
+| **Embedded back end / 内嵌后端** (SHELL-PROC) | The shell owns one `server/app.py` child: free port, exits with the shell (parent-PID watcher), restarted on crash or hang (bounded). / 壳拥有的后端子进程，随壳退出，崩溃或卡死有限次重启。 |
+| **Package / 打包** (SHELL-PACK) | Allow-list copy of the repo layout into `Contents/Resources/sfc/`, zip + SHA-256. / 白名单拷贝，布局与仓库同构。 |
+| **Data dir / 数据目录** | `~/Library/Application Support/Standard-Financial-Charting/` (user data, separate from the package); logs in `~/Library/Logs/Standard-Financial-Charting/`. / 在用户目录，与包分离。 |
+| **Self-contained package / 自包含包** | Carries its own Python (see Embedded runtime) and a vendored three.js (`web/vendor/three/`), so it needs no system Python and runs offline. / 自带 Python 与本地化 three，无需系统 Python，可离线。 |
+| **Invariants / 不变量** | The app shell injects no JS bridge; loads loopback only; FE talks to BE only through FE-API; W1 stays the only static window (`web/`). / 应用壳不注入桥、只载 loopback、FE 只经 FE-API、W1 窄口不变。 |
+| **Embedded runtime / 内嵌运行时** | python.org Python 3.14.8 universal2, trimmed (no tkinter, IDLE, tests, pip, headers), relocated (`@loader_path`) and precompiled, at `Contents/Frameworks/Python.framework`. Selection order (SHELL-PROC): bundled, then system candidates, then the "need Python" panel. The inherited environment is cleaned for the child (`PYTHON*`, `DYLD_*` removed, `PYTHONNOUSERSITE=1`). Fetched and trimmed by `scripts/fetch-embedded-python.sh`; entitlements in `scripts/sfc.entitlements` (empty). A third-party artifact, **not a module**: building it belongs to SHELL-PACK, choosing it to SHELL-PROC. / python.org 官方 universal2，裁剪、重定位、预编译，放在 `Contents/Frameworks/`；优先序：包内、系统、面板；第三方制品，不是模块。 |
+| **Signing / Notarization / 签名与公证** | Inside-out hardened-runtime signing; `SFC_SIGN_IDENTITY` (Developer ID) and `SFC_NOTARY_PROFILE` switch on a real signature and Apple notarization (staple before zipping). Today: ad hoc, not notarized (no identity on this machine). / 由内向外签、开 hardened runtime；环境变量驱动；现为 ad-hoc、未公证。 |
+| **Internal package / 内部包** | Default package (`dist/internal/`): includes `bics_entities_*.db` (Bloomberg-derived). Team only, never public. / 默认包，含实体库，仅限团队内部。 |
+| **External package / 外发包 = 外发版** (`-noentities`; one concept, same as the README title 「外发版（不含实体库）」) | Built with `--no-entities`: no `bics_entities_*.db`; lists are empty and name search finds nothing; the rest works. Still contains the BICS hierarchy JSON and Bloomberg-derived demo data. Shipping it is an owner decision (`PUBLIC-PRIVATE.md`). / 不含实体库的变体，仍含 BICS 层级与彭博来源的演示数据，外发由业主决定。 |
+
+Environment contract / 环境约定: `SFC_PORT`, `SFC_PARENT_PID`, `SFC_DATA_DIR` (see `README.md`).
+
+---
+
+*Last updated: 2026-10-15 · Coordinates are `(s, x, y)` in `web/js/coords.js`. Keep in sync with `LAYOUT.camera` and hotkeys in `scene.js`.*
