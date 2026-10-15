@@ -16,3 +16,14 @@ agent_tasklist/*
 
 # 交叉整合部：队员下载件与功能对比报告不进仓（见 POWER-KNOWLEDGE.md）
 cross-integration/
+/dist/
+/build/
+.sfc-stage-*
+.sfc-old-*
+
+# signing material: never commit
+*.p12
+*.p8
+*.cer
+*.mobileprovision
+*.certSigningRequest

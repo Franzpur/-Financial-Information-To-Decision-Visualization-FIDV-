@@ -4,8 +4,12 @@ from __future__ import annotations
 
 import json
 import mimetypes
+import os
+import signal
 import sqlite3
 import sys
+import threading
+import time
 import traceback
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -39,7 +43,11 @@ NVDA_REVENUE_LINKS = ROOT / "data" / "nvda-revenue-links.json"
 BICS_JSON = ROOT.parent / "BE-CLASS" / "BICS-Classification" / "bics-equity-hierarchy-2024.json"
 ENTITIES_DB = ROOT.parent / "BE-CLASS" / "BICS-Classification" / "bics_entities_20261003.db"
 HOST = "127.0.0.1"
-PORT = 8787
+DEFAULT_PORT = 8787
+# Shell embedding (SHELL-PROC): SFC_PORT picks the port, SFC_PARENT_PID ties our life to the shell.
+SHELL_PORT_ENV = "SFC_PORT"
+SHELL_PARENT_ENV = "SFC_PARENT_PID"
+DATA_DIR_ENV = "SFC_DATA_DIR"
 _MODULES_SUFFIXES = {".html", ".json", ".css", ".js"}
 
 _BICS_BY_CODE: dict | None = None
@@ -979,9 +987,41 @@ def bundle_shell_ticker(ticker_raw: str) -> dict:
     }
 
 
-def ensure_db() -> None:
+def _quarantine_db() -> None:
+    """Rename an unreadable DB (and its journal) aside, keep the newest 2 copies, so ensure_db can rebuild."""
+    stamp = time.strftime("%Y%m%dT%H%M%SZ", time.gmtime())
+    for suffix in ("", "-journal"):
+        src = DB_PATH.with_name(DB_PATH.name + suffix)
+        if src.exists():
+            src.rename(DB_PATH.with_name(f"{DB_PATH.name}.corrupt-{stamp}{suffix}"))
+    old = sorted(DB_PATH.parent.glob(f"{DB_PATH.name}.corrupt-*[0-9Z]"))
+    for stale in old[:-2]:
+        stale.unlink(missing_ok=True)
+        stale.with_name(stale.name + "-journal").unlink(missing_ok=True)
+
+
+def _open_checked_db() -> sqlite3.Connection | None:
     conn = connect()
-    init_schema(conn)
+    try:
+        init_schema(conn)
+        if conn.execute("PRAGMA quick_check").fetchone()[0] != "ok":
+            raise sqlite3.DatabaseError("quick_check failed")
+    except sqlite3.OperationalError:
+        conn.close()
+        raise  # locked / cannot open: not corruption, never set a healthy DB aside
+    except sqlite3.DatabaseError:
+        conn.close()
+        return None
+    return conn
+
+
+def ensure_db() -> None:
+    conn = _open_checked_db()
+    if conn is None:
+        print(f"[Ind-Chain] SQLite unreadable, set aside and rebuilding → {DB_PATH}", flush=True)
+        _quarantine_db()
+        conn = connect()
+        init_schema(conn)
     n = conn.execute("SELECT COUNT(*) AS n FROM companies").fetchone()["n"]
     if n == 0:
         seed_from_json(conn)
@@ -1220,16 +1260,92 @@ def _register_bundle_builders() -> None:
 _register_bundle_builders()
 
 
+def _resolve_port() -> tuple[int, bool]:
+    """Return (port, from_env). Unset -> 8787; invalid SFC_PORT -> exit non-zero."""
+    raw = os.environ.get(SHELL_PORT_ENV)
+    if raw is None:
+        return DEFAULT_PORT, False
+    try:
+        port = int(raw)
+    except ValueError:
+        port = -1
+    if not 1024 <= port <= 65535:
+        print(f"[Ind-Chain] invalid {SHELL_PORT_ENV}={raw!r} (need integer 1024-65535)", file=sys.stderr, flush=True)
+        sys.exit(2)
+    return port, True
+
+
+def _check_data_dir() -> None:
+    """SFC_DATA_DIR must be an absolute, creatable, writable directory; else exit 2 with a readable line."""
+    raw = os.environ.get(DATA_DIR_ENV)
+    if raw is None:
+        return
+    d = Path(raw)
+    problem = None
+    if not d.is_absolute():
+        problem = "not an absolute path"
+    else:
+        try:
+            d.mkdir(parents=True, exist_ok=True)
+        except OSError as exc:
+            problem = f"cannot create ({exc.strerror})"
+        else:
+            if not os.access(d, os.W_OK):
+                problem = "not writable"
+    if problem:
+        print(f"[Ind-Chain] invalid {DATA_DIR_ENV}={raw!r}: {problem}", file=sys.stderr, flush=True)
+        sys.exit(2)
+
+
+def _start_parent_watch() -> None:
+    """Exit (hard) if the embedding shell dies, so no orphan server is left behind."""
+    raw = os.environ.get(SHELL_PARENT_ENV)
+    if raw is None:
+        return
+    try:
+        parent = int(raw)
+        if parent <= 1:
+            raise ValueError
+    except ValueError:
+        print(f"[Ind-Chain] ignoring invalid {SHELL_PARENT_ENV}={raw!r}", file=sys.stderr, flush=True)
+        return
+
+    def watch() -> None:
+        while True:
+            time.sleep(1.0)
+            try:
+                os.kill(parent, 0)
+            except ProcessLookupError:
+                print("[Ind-Chain] parent gone, exiting", flush=True)
+                os._exit(0)
+            except PermissionError:
+                continue
+
+    threading.Thread(target=watch, daemon=True, name="parent-watch").start()
+
+
+def _raise_interrupt(_signum, _frame) -> None:
+    raise KeyboardInterrupt
+
+
 def main() -> None:
+    port, from_env = _resolve_port()
+    _check_data_dir()
+    _start_parent_watch()  # before ensure_db(): first-run seed can take seconds
+    signal.signal(signal.SIGTERM, _raise_interrupt)
     ensure_db()
     # Loopback-only stdlib server (HOST=127.0.0.1). Cleartext HTTP is intentional for local FIDV.
-    httpd = ThreadingHTTPServer((HOST, PORT), Handler)
-    print(f"[Ind-Chain] homepage http://{HOST}:{PORT}/ · list /list · cube /cube · modules /modules/", flush=True)
+    httpd = ThreadingHTTPServer((HOST, port), Handler)
+    if from_env:
+        print(f"[Ind-Chain] port {port}", flush=True)
+    print(f"[Ind-Chain] homepage http://{HOST}:{port}/ · list /list · cube /cube · modules /modules/", flush=True)
     print("[Ind-Chain] API: /api/bundle  /api/bics/children  /api/bics/entities  /api/bics/locate  /api/bics/node  /api/health", flush=True)
     try:
         httpd.serve_forever()
     except KeyboardInterrupt:
         print("\n[Ind-Chain] stopped")
+    finally:
+        httpd.server_close()
 
 
 if __name__ == "__main__":

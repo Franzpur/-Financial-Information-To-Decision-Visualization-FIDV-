@@ -19,12 +19,18 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.0</string>
+	<string>2.2</string>
 	<key>CFBundleVersion</key>
-	<string>1</string>
+	<string>4</string>
+	<key>LSApplicationCategoryType</key>
+	<string>public.app-category.finance</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>11.0</string>
+	<key>LSMultipleInstancesProhibited</key>
+	<true/>
 	<key>NSHighResolutionCapable</key>
 	<true/>
+	<key>NSHumanReadableCopyright</key>
+	<string>Standard-Financial-Charting. Data and computation stay on this Mac.</string>
 </dict>
 </plist>

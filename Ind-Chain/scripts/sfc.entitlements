@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<!--
+  Minimal on purpose: hardened runtime with NO exceptions.
+  - WKWebView's WebContent / GPU / Networking processes are separate, system-signed processes: no JIT entitlement here.
+  - No App Sandbox, no network entitlement (the back end is a local child process; the app never needs to be a client of anything).
+  - The app and the embedded Python are signed by one identity. With a real Developer ID they share a Team ID, so hardened-runtime
+    library validation passes without com.apple.security.cs.disable-library-validation (to be re-verified with a real identity).
+    An ad hoc signature has no Team ID and the interpreter then refuses its own libraries ("different Team IDs", measured), so
+    package-standard-financial-charting.sh adds that one entitlement to the interpreter executable ONLY for ad hoc builds (not here).
+  Add a key below only with a measured reason, and write the reason on the line above it.
+-->
+<dict/>
+</plist>

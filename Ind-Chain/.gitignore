@@ -5,4 +5,7 @@ data/ind_chain.db
 data/ind_chain.db-journal
 data/ai_chain.db
 data/ai_chain.db-journal
+# legacy: no longer written (P4)
 data/launcher-last.log
+# legacy: no longer written (P4)
+data/shell-last.log

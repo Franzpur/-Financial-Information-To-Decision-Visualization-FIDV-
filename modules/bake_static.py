@@ -30,7 +30,7 @@ BAR_W = 30               # hub bars (BE-HTTP, FE-API)
 TIP = 1.5                # arrow tip stops this far outside the target box
 CH_X = 450               # (documentation only)
 
-VB_W, VB_H = 690, 528
+VB_W, VB_H = 690, 626
 
 # column centres
 XC_C, XC_B = 69, 203               # BE: leaf column, mid column
@@ -42,6 +42,7 @@ R_NAV, R_GATE, R_LIST = 56, 106, 156
 R_LUI = (R_GATE + R_LIST) // 2     # 131
 R1, R2, R3, R4 = 234, 284, 334, 384  # cube rows
 BE_DEMO, BE_SHELL, BE_CHAIN, BE_NVDA = 230, 280, 330, 380
+R_SHELL = 462                      # shell-layer row
 BE_BUNDLE = (BE_SHELL + BE_CHAIN) // 2   # 305
 
 NODES: dict[str, tuple[float, float, float, float]] = {
@@ -69,6 +70,10 @@ NODES: dict[str, tuple[float, float, float, float]] = {
     "FE-SCENE": (XC_L, R3, NW, NHF),
     "FE-COORDONE": (XC_R, R3, NW, NHF),
     "FE-FOCUS": (XC_L, R4, NW, NHF),
+    # shell layer (own zone below FE/BE)
+    "SHELL-WINDOW": (XC_L, R_SHELL, NW, NHF),
+    "SHELL-PROC": (X_HTTP, R_SHELL, NW, NHF),
+    "SHELL-PACK": (XC_C, R_SHELL, NW, NHF),
 }
 
 HUBS = {"BE-HTTP", "FE-API"}
@@ -80,6 +85,7 @@ REGION_FALLBACK = {
     "FE-SCENE": "fe-cube", "FE-PANEL": "fe-cube", "FE-FOCUS": "fe-cube",
     "FE-AESTHETIC": "fe-cube",
     "FE-API": "fe-api",
+    "SHELL-WINDOW": "shell", "SHELL-PROC": "shell", "SHELL-PACK": "shell",
     "BE-HTTP": "be", "BE-BUNDLE": "be", "BE-DEMO-DB": "be", "BE-SHELL": "be",
     "BE-CHAIN-LAYOUT": "be", "BE-NVDA-LINKS": "be", "BE-BICS-HIER": "be",
     "BE-ENTITY": "be", "BE-LISTING": "be", "BE-INGEST": "be", "MODULES-TRACK": "be",
@@ -90,11 +96,13 @@ ZONES = {
     "be": (8, 22, 320, 412),
     "fe-decision": (388, 22, 682, 184),
     "fe-cube": (388, 200, 682, 412),
+    "shell": (8, 428, 682, 502),
 }
 ZONE_STYLE = {
     "be": dict(fill="#fbf4dd", stroke="#c2a557", node="#8c7326", chip="后端"),
     "fe-decision": dict(fill="#e9f5ec", stroke="#6fa77c", node="#3f7a4d", chip="决策路径"),
     "fe-cube": dict(fill="#e7f0f9", stroke="#6f94bb", node="#3d6896", chip="立方体面"),
+    "shell": dict(fill="#eeede8", stroke="#9a968a", node="#5b574c", chip="壳层"),
 }
 CHIP_W, CHIP_H = 56, 16   # tab straddling the top border, left aligned at +10
 
@@ -221,6 +229,21 @@ def build_routes() -> dict[str, list[tuple[float, float]]]:
         [L("BE-BUNDLE", 9), (144, BE_BUNDLE + 9), (144, BE_NVDA), tipR(R("BE-NVDA-LINKS"))])
     add("BE-CHAIN-LAYOUT", "BE-NVDA-LINKS", "depends",
         [B("BE-CHAIN-LAYOUT"), tipT(T("BE-NVDA-LINKS"))])
+    # ── shell layer: window depends on proc; proc calls HTTP; window's contract rides the gap band ──
+    add("SHELL-WINDOW", "SHELL-PROC", "depends", [L("SHELL-WINDOW"), tipR(R("SHELL-PROC"))])
+    add("SHELL-PROC", "BE-HTTP", "calls", [T("SHELL-PROC"), tipB(B("BE-HTTP"))])
+    gap_y = 420                   # between BE/FE zones (bottom 412) and shell zone (top 428)
+    add("SHELL-WINDOW", "BE-HTTP", "contract",
+        [T("SHELL-WINDOW"), (NODES["SHELL-WINDOW"][0], gap_y), (X_HTTP + 10, gap_y),
+         tipB(B("BE-HTTP", 10))])
+    # build-time packaging: PACK → BE-HTTP rides the gap band left of the PROC line; PACK → WINDOW under PROC
+    pack_gap = 416
+    add("SHELL-PACK", "BE-HTTP", "depends",
+        [T("SHELL-PACK", 26), (NODES["SHELL-PACK"][0] + 26, pack_gap), (X_HTTP - 10, pack_gap), tipB(B("BE-HTTP", -10))])
+    low_y = 494
+    add("SHELL-PACK", "SHELL-WINDOW", "depends",
+        [B("SHELL-PACK"), (NODES["SHELL-PACK"][0], low_y), (NODES["SHELL-WINDOW"][0], low_y),
+         tipB(B("SHELL-WINDOW"))])
     return r
 
 
@@ -427,6 +450,7 @@ def check_geometry(edges: list[dict]) -> tuple[list[str], list[str]]:
 
 # ───────────────────────── SVG rendering ─────────────────────────
 EDGE_FE, EDGE_BE, EDGE_X = "#00a86b", "#5dade2", "#e02020"
+EDGE_SHELL = "#4a5560"   # graphite: shell-internal
 INK, MUTED = "#1a1f26", "#4a5560"
 SANS = "'Helvetica Neue', Helvetica, Arial, 'PingFang SC', sans-serif"
 SERIF = "'Iowan Old Style', 'Palatino Linotype', Palatino, 'Songti SC', 'Noto Serif SC', serif"
@@ -441,6 +465,8 @@ def fmt(n: float) -> str:
 
 
 def edge_color(sa: str, sb: str) -> str:
+    if sa == "SHELL" and sb == "SHELL":
+        return EDGE_SHELL
     if sa == "FE" and sb == "FE":
         return EDGE_FE
     if sa == "BE" and sb == "BE":
@@ -448,7 +474,7 @@ def edge_color(sa: str, sb: str) -> str:
     return EDGE_X
 
 
-MARKER = {EDGE_FE: "arrow-fe", EDGE_BE: "arrow-be", EDGE_X: "arrow-x"}
+MARKER = {EDGE_FE: "arrow-fe", EDGE_BE: "arrow-be", EDGE_X: "arrow-x", EDGE_SHELL: "arrow-shell"}
 DASH = {"calls": "", "depends": "5 3", "contract": "1.6 3"}
 
 
@@ -533,7 +559,7 @@ def _svg_edges(data: dict, mods: dict) -> list[str]:
 
 def _svg_legend() -> list[str]:
     out: list[str] = []
-    ly = 436
+    ly = 518
     out.append(f'<line x1="8" y1="{ly - 10}" x2="{VB_W - 8}" y2="{ly - 10}" stroke="#c5ccd4" stroke-width="0.8"/>')
 
     def head(x, t):
@@ -545,20 +571,21 @@ def _svg_legend() -> list[str]:
 
     out.append(head(16, "分区"))
     zone_items = [("fe-decision", "决策路径 · NAV → LIST"), ("fe-cube", "立方体面 · OPENCUBE → AESTHETIC"),
-                  ("be", "后端 · BE-HTTP 起")]
+                  ("be", "后端 · BE-HTTP 起"), ("shell", "壳层 · SHELL-WINDOW / SHELL-PROC / SHELL-PACK（本地应用）")]
     for i, (zid, label) in enumerate(zone_items):
         st = ZONE_STYLE[zid]
         y = item_y(i)
         out.append(f'<rect x="16" y="{y - 9}" width="20" height="11" rx="2.5" fill="{st["fill"]}" '
                    f'stroke="{st["stroke"]}" stroke-width="1.2"/>'
                    f'<text x="44" y="{y}" font-size="9.4" fill="{MUTED}">{esc(label)}</text>')
-    y = item_y(3)
+    y = item_y(4)
     out.append(f'<rect x="16" y="{y - 9}" width="20" height="11" rx="2.5" fill="#e3e8ee" stroke="#3a4552" '
                f'stroke-width="1.5"/><text x="44" y="{y}" font-size="9.4" fill="{MUTED}">枢纽条 · FE-API / BE-HTTP（框外 / 框缘）</text>')
 
     out.append(head(330, "边色"))
     for i, (c, label) in enumerate(((EDGE_FE, "翠绿 · 前端内部"), (EDGE_BE, "天青 · 后端内部"),
-                                    (EDGE_X, "亮红 · 跨侧"))):
+                                    (EDGE_X, "亮红 · 跨侧"),
+                                    (EDGE_SHELL, "石墨 · 壳层内部"))):
         y = item_y(i)
         out.append(f'<path d="M330 {y - 3.5} L364 {y - 3.5}" stroke="{c}" stroke-width="2" fill="none"/>'
                    f'<text x="372" y="{y}" font-size="9.4" fill="{MUTED}">{label}</text>')
@@ -580,7 +607,7 @@ def render_svg(data: dict) -> str:
     out.append(f'<svg id="graph-svg" viewBox="0 0 {VB_W} {VB_H}" xmlns="http://www.w3.org/2000/svg" '
                f'role="img" aria-label="FIDV module relation graph" font-family="{SANS}">')
     out.append("<defs>" + arrow_marker("arrow-fe", EDGE_FE) + arrow_marker("arrow-be", EDGE_BE)
-               + arrow_marker("arrow-x", EDGE_X) + "</defs>")
+               + arrow_marker("arrow-x", EDGE_X) + arrow_marker("arrow-shell", EDGE_SHELL) + "</defs>")
     out += _svg_zones()
     out += _svg_nodes(mods)
     out += _svg_edges(data, mods)
@@ -639,6 +666,7 @@ code { font-family: "SF Mono", ui-monospace, Menlo, Consolas, monospace; font-si
 .tables { break-before: page; }
 .side-FE { color: var(--fe); }
 .side-BE { color: var(--be); }
+.side-SHELL { color: #5b574c; }
 .side-other { color: var(--other); }
 @media print {
   body { background: white; padding: 0; max-width: none; }
@@ -686,7 +714,7 @@ __GRAPH_JSON__
   const edgeBody = document.querySelector("#edge-table tbody");
   const data = JSON.parse(document.getElementById("graph-data").textContent);
   const REGION_FALLBACK = __REGION_FALLBACK_JSON__;
-  const REGION_LABEL = { "fe-decision": "决策路径", "fe-cube": "立方体面", "fe-api": "API 枢纽（框外）", "be": "后端" };
+  const REGION_LABEL = { "fe-decision": "决策路径", "fe-cube": "立方体面", "fe-api": "API 枢纽（框外）", "be": "后端", "shell": "壳层" };
   function esc(s) {
     return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
   }
