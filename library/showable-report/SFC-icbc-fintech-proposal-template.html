@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>First Test · AI Industry Financial Risk · SFC 计划书版式模板</title>
+<!--
+  SFC · ICBC FinTech 计划书 · 纸面版式模板（美工部）
+  秘书套用：只改 <body> 内文字与 .toc 页码；样式勿动。
+  组件类名与用法见文末 COMPONENTS 注释。
+  打印：Chrome 打开 → 打印 → A4 纵向 → 边距「默认」→ 勾选「背景图形」→ 关闭「页眉和页脚」→ 存 PDF。
+-->
+<style>
+/* ---------- 0. 字体：Jost Light 子集（仅 A–Z + 空格；SIL OFL 1.1）内嵌，无 CDN ---------- */
+@font-face {
+  font-family: "Jost";
+  font-weight: 300;
+  font-style: normal;
+  font-display: block;
+  src: url("data:font/woff2;base64,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") format("woff2");
+  unicode-range: U+0020, U+0041-005A;
+}
+
+/* ---------- 1. Token：纸面 5 色 + 屏幕桌面；封面深色只在 .cover 作用域内 ---------- */
+:root {
+  --ink:   #1a1f26;
+  --muted: #4a5560;
+  --rule:  #c5ccd4;
+  --paper: #f7f5f0;   /* 仅屏幕预览；打印转白 */
+  --fill:  #ece8e0;   /* 表头、提示框底 */
+  --desk:  #d8d5ce;   /* 仅屏幕预览：纸外桌面 */
+
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Songti SC", "Noto Serif SC", serif;
+  --sans:  -apple-system, "SF Pro Text", "PingFang SC", "Helvetica Neue", system-ui, sans-serif;
+  --brand: "Jost", -apple-system, "SF Pro Display", "PingFang SC", system-ui, sans-serif;
+  --mono:  ui-monospace, "SF Mono", Menlo, monospace;
+
+  /* 页眉页脚文字（@page 边距盒读取）；只写大写 A–Z 以走 Jost */
+  --run-l: "STANDARD FINANCIAL CHARTING";
+  --run-r: "FIRST TEST · AI INDUSTRY FINANCIAL RISK";
+  --run-foot: "标准金融制图 · 参赛计划书";
+}
+
+* { box-sizing: border-box; }
+html {
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;          /* 深色封面、表头、提示框底在打印时保留 */
+  background: var(--desk);
+}
+body {
+  margin: 0;
+  padding: 10mm 0 16mm;
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 10.5pt;
+  line-height: 1.75;
+  text-align: justify;
+  text-align-last: left;
+  font-variant-numeric: lining-nums;
+  hanging-punctuation: allow-end;
+  line-break: strict;
+  word-break: normal;
+  overflow-wrap: break-word;
+}
+
+/* ---------- 2. 分页：@page A4 + 命名页 ---------- */
+@page {
+  size: A4;
+  margin: 24mm 22mm 24mm 22mm;
+  @top-left {
+    content: var(--run-l);
+    font: 300 7pt/1 "Jost", sans-serif;
+    letter-spacing: .26em;
+    color: #4a5560;
+    text-align: left;
+    vertical-align: bottom;
+    padding-bottom: 3mm;
+    border-bottom: .5pt solid #c5ccd4;
+    margin-bottom: 6mm;
+  }
+  @top-right {
+    content: var(--run-r);
+    font: 300 7pt/1 "Jost", sans-serif;
+    letter-spacing: .26em;
+    color: #4a5560;
+    text-align: right;
+    vertical-align: bottom;
+    padding-bottom: 3mm;
+    border-bottom: .5pt solid #c5ccd4;
+    margin-bottom: 6mm;
+  }
+  @bottom-left {
+    content: var(--run-foot);
+    font: 8pt/1 -apple-system, "PingFang SC", sans-serif;
+    letter-spacing: .12em;
+    color: #4a5560;
+    text-align: left;
+    vertical-align: top;
+    padding-top: 4mm;
+  }
+  @bottom-right {
+    content: counter(page);
+    font: 300 9pt/1 -apple-system, "SF Pro Text", sans-serif;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: .08em;
+    color: #1a1f26;
+    text-align: right;
+    vertical-align: top;
+    padding-top: 4mm;
+  }
+}
+/* 封面：满版、无页眉页脚页码 */
+@page cover {
+  margin: 0;
+  @top-left { content: none; border: 0; }
+  @top-right { content: none; border: 0; }
+  @bottom-left { content: none; }
+  @bottom-right { content: none; }
+}
+/* 章首页：无页眉，保留页脚页码 */
+@page opener {
+  @top-left { content: none; border: 0; }
+  @top-right { content: none; border: 0; }
+}
+
+/* ---------- 3. 屏幕预览：纸张即页 ---------- */
+.no-print {
+  width: 210mm;
+  margin: 0 auto 6mm;
+  font: 9.5pt/1.5 var(--sans);
+  color: var(--muted);
+  text-align: left;
+}
+.sheet, .cover {
+  width: 210mm;
+  margin: 0 auto 10mm;
+  background: var(--paper);
+  box-shadow: 0 1px 2px rgba(26,31,38,.14), 0 10px 30px rgba(26,31,38,.14);
+  position: relative;
+}
+.sheet { min-height: 297mm; padding: 24mm 22mm; }
+.sheet--opener { page: opener; }
+.screen-run {
+  display: flex;
+  justify-content: space-between;
+  margin: -6mm 0 10mm;
+  padding-bottom: 3mm;
+  border-bottom: .5pt solid var(--rule);
+  font: 300 7pt/1 var(--brand);
+  letter-spacing: .26em;
+  color: var(--muted);
+  text-align: left;
+}
+.sheet--opener .screen-run { visibility: hidden; }
+
+.cover, .sheet { break-after: page; }
+.sheet:last-child { break-after: auto; }
+
+@media print {
+  html, body { background: #fff; }
+  body { padding: 0; }
+  .no-print, .screen-run { display: none !important; }
+  .sheet { width: auto; min-height: 0; margin: 0; padding: 0; background: none; box-shadow: none; }
+  .cover { margin: 0; box-shadow: none; }
+  a { color: inherit; text-decoration: none; }
+}
+
+/* ---------- 4. 封面（深色：延续产品玻璃深色 + 绿线；加 .cover--paper 即纸面反相） ---------- */
+.cover {
+  --cv-bg:    #0b0d10;
+  --cv-ink:   #e8edf4;
+  --cv-muted: #9aa6b5;
+  --cv-line:  #2a313c;
+  --cv-accent:#8be0c0;
+  --cv-facet: #9aa6b5;
+  page: cover;
+  height: 297mm;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 30mm 20mm 28mm;
+  background: var(--cv-bg);
+  color: var(--cv-ink);
+  font-family: -apple-system, "SF Pro Display", "PingFang SC", "Helvetica Neue", system-ui, sans-serif;
+  font-weight: 300;
+  text-align: center;
+  text-align-last: center;
+  line-height: 1.4;
+}
+.cover--paper {
+  --cv-bg:    var(--paper);
+  --cv-ink:   var(--ink);
+  --cv-muted: var(--muted);
+  --cv-line:  var(--rule);
+  --cv-accent:var(--rule);
+  --cv-facet: #8d97a3;
+}
+@media print { .cover--paper { --cv-bg: #fff; } }
+
+.cover-brand { display: flex; flex-direction: column; align-items: center; }
+.cover-logo {              /* 三框：18×44 · 步距 14 · rx 1.5 · 0.95/0.55/0.28 */
+  display: block;
+  width: 26mm; height: auto;
+  margin: 0 0 11mm;
+  overflow: visible;
+  fill: none;
+  stroke: var(--cv-ink);
+  stroke-width: 1.25;
+  stroke-linejoin: round;
+  shape-rendering: geometricPrecision;
+}
+.cover-word {              /* SFC 方角斜切字标：path 内联，非字体 */
+  display: block;
+  width: 66mm; height: auto;
+  margin: 0;
+  overflow: visible;
+  shape-rendering: geometricPrecision;
+}
+.cover-word .sfc-word { fill: var(--cv-ink); }
+.cover-word .sfc-facet { fill: var(--cv-facet); }
+.cover-word .sfc-facet-dim { fill: var(--cv-facet); opacity: .5; }
+.cover-rule {              /* 与字标等宽的绿线（与 lockup 的 .sfc-rule 同族） */
+  width: 66mm; height: 0;
+  margin: 7mm 0 8mm;
+  border: 0;
+  border-top: 1px solid var(--cv-accent);
+  opacity: .55;
+}
+.cover-en {
+  margin: 0;
+  font-size: 11.5pt;
+  font-weight: 300;
+  letter-spacing: .2em;
+  text-indent: .2em;       /* 抵消末字距，视觉居中 */
+}
+.cover-zh {
+  margin: 3.2mm 0 0;
+  font-size: 12.5pt;
+  font-weight: 300;
+  letter-spacing: .5em;
+  text-indent: .5em;
+  color: var(--cv-muted);
+}
+.cover-title { display: flex; flex-direction: column; align-items: center; }
+.cover-t1 {
+  margin: 0;
+  font-size: 34pt;
+  font-weight: 300;
+  letter-spacing: .06em;
+  line-height: 1.15;
+}
+.cover-t2 {
+  margin: 5mm 0 0;
+  font-size: 12.5pt;
+  font-weight: 300;
+  letter-spacing: .16em;
+  text-indent: .16em;
+  color: var(--cv-muted);
+}
+.cover-team {
+  display: flex; flex-direction: column; align-items: center;
+  padding-top: 8mm;
+  border-top: 1px solid var(--cv-line);
+  min-width: 56mm;
+  font-size: 10.5pt;
+  letter-spacing: .16em;
+  line-height: 2.1;
+}
+.cover-team p { margin: 0; text-indent: .16em; }
+
+/* ---------- 5. 目录 ---------- */
+.toc-head { margin: 0 0 11mm; text-align: left; }
+.toc-head .kicker {
+  display: block;
+  font: 300 8pt/1 var(--brand);
+  letter-spacing: .3em;
+  color: var(--muted);
+  margin-bottom: 4mm;
+}
+.toc-head h1 {
+  margin: 0;
+  font-size: 22pt;
+  font-weight: 600;
+  letter-spacing: .5em;
+  line-height: 1.2;
+}
+.toc-head::after {
+  content: "";
+  display: block;
+  width: 14mm;
+  margin-top: 5mm;
+  border-top: 2pt solid var(--ink);
+}
+.toc { list-style: none; margin: 0; padding: 0; text-align: left; text-align-last: left; }
+.toc li { margin: 0; }
+.toc a, .toc .toc-row {
+  display: flex;
+  align-items: baseline;
+  color: inherit;
+}
+.toc-dots {                /* 点线引导 */
+  flex: 1 1 auto;
+  min-width: 8mm;
+  margin: 0 2.5mm;
+  border-bottom: 1.4pt dotted #8b96a3;
+  transform: translateY(-.28em);
+}
+.toc-pg {
+  flex: 0 0 auto;
+  min-width: 9mm;
+  text-align: right;
+  font: 300 10pt/1 var(--sans);
+  font-variant-numeric: tabular-nums;
+}
+.toc .toc-1 { margin-top: 5.5mm; font-size: 11.5pt; font-weight: 600; line-height: 1.5; }
+.toc-1 .toc-no { font: 300 10pt var(--sans); color: var(--muted); margin-right: 4mm; font-variant-numeric: tabular-nums; }
+.toc-2 { padding-left: 9mm; font-size: 10.5pt; line-height: 1.9; }
+.toc-3 { padding-left: 18mm; font-size: 9.5pt; line-height: 1.8; color: var(--muted); }
+.toc-2 .toc-no, .toc-3 .toc-no { font: 300 8.5pt var(--sans); color: var(--muted); margin-right: 3mm; font-variant-numeric: tabular-nums; }
+.toc .toc-part { margin-top: 8mm; padding-top: 3mm; border-top: 1px solid var(--rule); }
+.toc .is-todo { color: var(--muted); }
+.toc-note {
+  margin: 12mm 0 0;
+  font: 8.5pt/1.6 var(--sans);
+  color: var(--muted);
+  text-align: left;
+}
+/* 可选：用支持 target-counter 的排版引擎（Prince / WeasyPrint / Paged.js）时，在 <html> 加 data-toc="auto"，自动页码并隐藏手填占位。
+   Chrome / Safari / Firefox 现不渲染该函数，勿开。 */
+@supports (content: target-counter(attr(href url), page)) {
+  html[data-toc="auto"] .toc a[href] .toc-pg { display: none; }
+  html[data-toc="auto"] .toc a[href]::after {
+    content: target-counter(attr(href url), page);
+    flex: 0 0 auto; min-width: 9mm; text-align: right;
+    font: 300 10pt/1 var(--sans);
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* ---------- 6. 章首页 ---------- */
+.chapter-opener {
+  display: flex;
+  flex-direction: column;
+  min-height: 238mm;
+  text-align: left; text-align-last: left;
+}
+.opener-mark {
+  width: 14mm; height: auto; overflow: visible;
+  fill: none; stroke: var(--ink); stroke-width: 1.25; stroke-linejoin: round;
+}
+.opener-num {
+  margin: 2mm 0 0;
+  font: 200 88pt/1 var(--sans);
+  letter-spacing: -.02em;
+  color: var(--rule);
+  font-variant-numeric: tabular-nums;
+}
+.opener-kicker {
+  margin: 40mm 0 0;
+  font: 300 8pt/1 var(--brand);
+  letter-spacing: .3em;
+  color: var(--muted);
+}
+.chapter-opener h1 {
+  margin: 6mm 0 0;
+  font-size: 30pt;
+  font-weight: 600;
+  letter-spacing: .08em;
+  line-height: 1.25;
+}
+.opener-en {
+  margin: 3mm 0 0;
+  font: 300 11pt/1.4 var(--sans);
+  letter-spacing: .14em;
+  color: var(--muted);
+}
+.opener-lede {
+  max-width: 118mm;
+  margin: 12mm 0 0;
+  padding-top: 6mm;
+  border-top: 2pt solid var(--ink);
+  font-size: 11.5pt;
+  line-height: 1.85;
+  color: var(--muted);
+}
+.opener-toc {
+  margin: auto 0 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--rule);
+  font: 9.5pt/1.5 var(--sans);
+  color: var(--muted);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 12mm;
+}
+.opener-toc li { margin: 0; padding: 2.2mm 0; border-bottom: 1px solid var(--rule); }
+.opener-toc .toc-no { margin-right: 3mm; font-variant-numeric: tabular-nums; color: var(--ink); }
+
+/* ---------- 7. 标题 · 段落 · 列表 ---------- */
+h1, h2, h3, h4 { text-align: left; text-align-last: left; break-after: avoid; }
+h1 { font-size: 18pt; font-weight: 600; letter-spacing: .04em; line-height: 1.3; }
+h2 {
+  margin: 9mm 0 4mm;
+  padding-bottom: 2mm;
+  font-size: 15pt; font-weight: 600; letter-spacing: .04em; line-height: 1.35;
+  border-bottom: 1px solid var(--rule);
+}
+h3 { margin: 7mm 0 2.5mm; font-size: 12pt; font-weight: 600; letter-spacing: .03em; line-height: 1.4; }
+h4 {
+  margin: 5mm 0 1.5mm;
+  font: 600 10pt/1.5 var(--serif);
+  letter-spacing: .08em;
+  color: var(--muted);
+}
+h2 .num, h3 .num {
+  display: inline-block;
+  margin-right: .7em;
+  font-family: var(--sans);
+  font-weight: 300;
+  letter-spacing: .02em;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.chapter-body > h2:first-child { margin-top: 0; }
+p { margin: 0 0 .75em; orphans: 3; widows: 3; }
+.lede { font-size: 11.5pt; line-height: 1.85; color: var(--muted); }
+ul, ol { margin: 0 0 .9em; padding-left: 1.6em; }
+li { margin: .15em 0; }
+li::marker { color: var(--muted); }
+code, .mono { font-family: var(--mono); font-size: 9pt; }
+strong { font-weight: 600; }
+.small { font-size: 9pt; line-height: 1.6; }
+.keep { break-inside: avoid; }
+.page-break { break-before: page; }
+
+/* ---------- 8. 重点提示框 ---------- */
+.callout {
+  margin: 5mm 0;
+  padding: 3.5mm 5mm 3mm;
+  background: var(--fill);
+  border-left: 2.5pt solid var(--ink);
+  break-inside: avoid;
+  text-align: left;
+}
+.callout-label {
+  display: block;
+  margin-bottom: 1.5mm;
+  font: 600 7.5pt/1.2 var(--sans);
+  letter-spacing: .22em;
+  color: var(--muted);
+}
+.callout p:last-child { margin-bottom: 0; }
+.callout--note { background: none; border: 1px solid var(--rule); border-left: 2.5pt solid var(--rule); }
+.callout--warn { background: none; border: 1px solid var(--ink); border-left: 2.5pt solid var(--ink); }
+
+/* ---------- 9. 数据表格 ---------- */
+.tbl { margin: 5mm 0; break-inside: avoid; }
+.tbl-cap, .fig-cap {
+  display: flex;
+  gap: 3mm;
+  margin: 0 0 2mm;
+  font: 9pt/1.5 var(--sans);
+  color: var(--ink);
+  text-align: left;
+}
+.cap-no { flex: 0 0 auto; font-weight: 600; letter-spacing: .06em; font-variant-numeric: tabular-nums; }
+table.data {
+  width: 100%;
+  border-collapse: collapse;
+  font: 9pt/1.5 var(--sans);
+  text-align: left;
+  text-align-last: left;
+}
+table.data th, table.data td {
+  padding: .28em .55em;
+  border: 1px solid var(--rule);
+  vertical-align: top;
+}
+table.data thead th { background: var(--fill); font-weight: 600; letter-spacing: .04em; }
+table.data thead { display: table-header-group; }
+table.data tr { break-inside: avoid; }
+table.data .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+table.data tfoot td { border-top: 1pt solid var(--ink); font-weight: 600; }
+table.data tbody th { background: none; font-weight: 600; }
+table.data--tight th, table.data--tight td { padding: .18em .4em; font-size: 8.5pt; }
+.tbl--long { break-inside: auto; }   /* 跨页长表：加在 .tbl 上，表头自动重复 */
+.src, .src-note {
+  margin: 2mm 0 0;
+  font: 8pt/1.55 var(--sans);
+  color: var(--muted);
+  text-align: left;
+}
+
+/* ---------- 10. 图片 + 图注 ---------- */
+.fig { margin: 6mm 0; break-inside: avoid; }
+.fig img { display: block; width: 100%; height: auto; border: 1px solid var(--rule); }
+.fig-cap { margin: 2.2mm 0 0; }
+.fig--narrow { width: 72%; margin-left: auto; margin-right: auto; }
+.fig-ph {                  /* 图片占位 */
+  display: flex; align-items: center; justify-content: center;
+  aspect-ratio: 16 / 9;
+  border: 1px dashed #8b96a3;
+  font: 9pt var(--sans);
+  letter-spacing: .2em;
+  color: var(--muted);
+}
+.fig-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 6mm; margin: 6mm 0; break-inside: avoid; }
+.fig-pair .fig { margin: 0; }
+.fig-pair .fig-ph { aspect-ratio: 4 / 3; }
+
+/* ---------- 11. 指标卡片 ---------- */
+.kpi-row {
+  display: grid;
+  grid-template-columns: repeat(var(--cols, 4), 1fr);
+  margin: 6mm 0;
+  border-top: 2pt solid var(--ink);
+  border-bottom: 1px solid var(--rule);
+  break-inside: avoid;
+  text-align: left;
+}
+.kpi-row--3 { --cols: 3; }
+.kpi { padding: 4mm 4mm 3.5mm; border-left: 1px solid var(--rule); }
+.kpi:first-child { padding-left: 0; border-left: 0; }
+.kpi-label { font: 600 7.5pt/1.3 var(--sans); letter-spacing: .14em; color: var(--muted); }
+.kpi-val {
+  margin-top: 2.5mm;
+  font: 200 26pt/1.1 var(--sans);
+  letter-spacing: -.01em;
+  font-variant-numeric: tabular-nums;
+}
+.kpi-unit { margin-left: .15em; font-size: 11pt; font-weight: 300; color: var(--muted); letter-spacing: 0; }
+.kpi-note { margin-top: 1.5mm; font: 8.5pt/1.5 var(--sans); color: var(--muted); }
+
+/* ---------- 12. 时间线 ---------- */
+.timeline { list-style: none; margin: 6mm 0; padding: 0; text-align: left; text-align-last: left; break-inside: avoid; }
+.timeline--long { break-inside: auto; }   /* 条目很多、需跨页时加上 */
+.tl-item {
+  display: grid;
+  grid-template-columns: 26mm 8mm 1fr;
+  margin: 0;
+  padding-bottom: 5mm;
+  break-inside: avoid;
+}
+.tl-date {
+  padding-right: 3mm;
+  text-align: right;
+  font: 300 9.5pt/1.75 var(--sans);
+  letter-spacing: .04em;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.tl-rail { position: relative; }
+.tl-rail::before {         /* 轨线 */
+  content: "";
+  position: absolute; left: 50%; top: 0; bottom: -5mm;
+  border-left: 1px solid var(--rule);
+}
+.tl-item:last-child .tl-rail::before { bottom: auto; height: .9em; }
+.tl-rail::after {          /* 方形节点：呼应方角字标 */
+  content: "";
+  position: absolute; left: 50%; top: .55em;
+  width: 2.6mm; height: 2.6mm; margin-left: -1.3mm;
+  background: var(--ink);
+  border: 1.25px solid var(--ink);
+}
+.tl-item.is-now .tl-rail::after { background: var(--paper); }
+.tl-item.is-next .tl-rail::after { background: var(--paper); border-color: #8b96a3; }
+@media print { .tl-item.is-now .tl-rail::after, .tl-item.is-next .tl-rail::after { background: #fff; } }
+.tl-title { margin: 0; font: 600 10.5pt/1.75 var(--serif); letter-spacing: .03em; color: var(--ink); }
+.tl-body p { margin: 0; font-size: 9.5pt; line-height: 1.7; color: var(--muted); }
+
+/* ---------- 13. 引文 ---------- */
+.quote {
+  margin: 7mm 0;
+  padding: 1mm 0 1mm 7mm;
+  border-left: 1px solid var(--ink);
+  font-size: 12.5pt;
+  line-height: 1.85;
+  break-inside: avoid;
+  text-align: left;
+}
+.quote p { margin: 0; }
+.quote cite {
+  display: block;
+  margin-top: 2.5mm;
+  font: normal 8.5pt/1.5 var(--sans);
+  letter-spacing: .06em;
+  color: var(--muted);
+}
+.quote cite::before { content: "—— "; }
+
+/* ---------- 14. 脚注 / 来源注 ---------- */
+sup.fn { font: 300 7pt/0 var(--sans); vertical-align: super; padding-left: .1em; font-variant-numeric: tabular-nums; }
+sup.fn a { color: var(--ink); }
+.footnotes {
+  margin-top: 9mm;
+  padding-top: 3mm;
+  font: 8.5pt/1.6 var(--sans);
+  color: var(--muted);
+  break-inside: avoid;
+  text-align: left;
+}
+.footnotes::before { content: ""; display: block; width: 28mm; margin-bottom: 3mm; border-top: 1px solid var(--ink); }
+.footnotes ol { margin: 0; padding-left: 1.6em; }
+.footnotes li { margin: .25em 0; }
+
+/* ---------- 15. 附录 ---------- */
+.appendix-head { margin: 0 0 7mm; text-align: left; }
+.appendix-head .kicker {
+  display: block;
+  margin-bottom: 3mm;
+  font: 300 8pt/1 var(--brand);
+  letter-spacing: .3em;
+  color: var(--muted);
+}
+.appendix-head h1 {
+  margin: 0;
+  padding-bottom: 3mm;
+  font-size: 18pt;
+  border-bottom: 2pt solid var(--ink);
+}
+.appendix-head h1 .num { font: 300 12pt var(--sans); letter-spacing: .1em; color: var(--muted); margin-right: 3mm; }
+.appendix-lede { font-size: 9.5pt; color: var(--muted); }
+table.gloss td:first-child, table.gloss th:first-child { width: 26%; font-weight: 600; }
+table.gloss td:nth-child(2), table.gloss th:nth-child(2) { width: 22%; color: var(--muted); }
+table.sources td:first-child { width: 8%; }
+</style>
+</head>
+<body>
+
+<p class="no-print">屏幕预览 · A4 纵向。打印：浏览器打开本页 → 打印 → 目的地「另存为 PDF」→ 边距「默认」→ 勾选「背景图形」→ 关闭「页眉和页脚」→ 保存。</p>
+
+<!-- ============================ 封面（须逐字，勿改文字） ============================ -->
+<section class="cover" aria-label="封面">
+  <div class="cover-brand">
+    <!-- 1. logo（三框） -->
+    <svg class="cover-logo" viewBox="7 13 48 46" role="img" aria-label="SFC logo">
+      <rect x="8" y="14" width="18" height="44" rx="1.5" opacity="0.95"/>
+      <rect x="22" y="14" width="18" height="44" rx="1.5" opacity="0.55"/>
+      <rect x="36" y="14" width="18" height="44" rx="1.5" opacity="0.28"/>
+    </svg>
+    <!-- 2. SFC（自制方角斜切字标：path，130 单位字高网格） -->
+    <svg class="cover-word" viewBox="0 0 439 130" role="img" aria-label="SFC">
+      <path class="sfc-word" d="M30 0H145V30H30V50H115L145 80V100L115 130H0V100H115V80H30L0 50V30Z"/>
+      <path class="sfc-word" d="M165 0H291V30H195Z M165 30H195V50H288V80H195V130H165Z"/>
+      <path class="sfc-facet" d="M165 0V30H195Z"/>
+      <path class="sfc-word" d="M338 0H439V30H338V100H439L424 130H338L308 100V30Z"/>
+      <path class="sfc-facet-dim" d="M439 100V130H424Z"/>
+    </svg>
+    <hr class="cover-rule" />
+    <!-- 3. 英文全称  4. 中文全称 -->
+    <p class="cover-en">Standard Financial Charting</p>
+    <p class="cover-zh">标准金融制图</p>
+  </div>
+
+  <!-- 5. 6. 题名 -->
+  <div class="cover-title">
+    <p class="cover-t1">First Test</p>
+    <p class="cover-t2">AI Industry Financial Risk</p>
+  </div>
+
+  <!-- 7. 8. 9. 团队 -->
+  <div class="cover-team">
+    <p>队长：隋宇博</p>
+    <p>队员：周晖</p>
+    <p>队员：徐国安</p>
+  </div>
+</section>
+
+<!-- ============================ 目录 ============================ -->
+<section class="sheet sheet--toc" id="toc">
+  <div class="screen-run"><span>STANDARD FINANCIAL CHARTING</span><span>FIRST TEST · AI INDUSTRY FINANCIAL RISK</span></div>
+  <header class="toc-head">
+    <span class="kicker">CONTENTS</span>
+    <h1>目录</h1>
+  </header>
+  <ol class="toc">
+    <li class="toc-1"><a href="#ch1"><span class="toc-no">01</span><span class="toc-t">项目概述</span><span class="toc-dots"></span><span class="toc-pg">3</span></a></li>
+    <li class="toc-2"><a href="#s1-1"><span class="toc-no">1.1</span><span class="toc-t">背景与问题</span><span class="toc-dots"></span><span class="toc-pg">4</span></a></li>
+    <li class="toc-3"><a href="#s1-1-1"><span class="toc-no">1.1.1</span><span class="toc-t">行业背景</span><span class="toc-dots"></span><span class="toc-pg">4</span></a></li>
+    <li class="toc-3"><a href="#s1-1-2"><span class="toc-no">1.1.2</span><span class="toc-t">风险缺口</span><span class="toc-dots"></span><span class="toc-pg">4</span></a></li>
+    <li class="toc-2"><a href="#s1-2"><span class="toc-no">1.2</span><span class="toc-t">关键指标</span><span class="toc-dots"></span><span class="toc-pg">4</span></a></li>
+    <li class="toc-2"><a href="#s1-3"><span class="toc-no">1.3</span><span class="toc-t">方案示意</span><span class="toc-dots"></span><span class="toc-pg">5</span></a></li>
+    <li class="toc-2"><a href="#s1-4"><span class="toc-no">1.4</span><span class="toc-t">实施路径</span><span class="toc-dots"></span><span class="toc-pg">6</span></a></li>
+
+    <li class="toc-1 is-todo"><span class="toc-row"><span class="toc-no">02</span><span class="toc-t">第二章标题（占位）</span><span class="toc-dots"></span><span class="toc-pg">—</span></span></li>
+    <li class="toc-1 is-todo"><span class="toc-row"><span class="toc-no">03</span><span class="toc-t">第三章标题（占位）</span><span class="toc-dots"></span><span class="toc-pg">—</span></span></li>
+
+    <li class="toc-1 toc-part"><a href="#app-a"><span class="toc-no">A</span><span class="toc-t">附录　术语表</span><span class="toc-dots"></span><span class="toc-pg">7</span></a></li>
+    <li class="toc-1"><a href="#app-b"><span class="toc-no">B</span><span class="toc-t">附录　来源与许可表</span><span class="toc-dots"></span><span class="toc-pg">8</span></a></li>
+  </ol>
+  <p class="toc-note">页码手填于 .toc-pg（以 PDF 页序计：封面为第 1 页、不印页码）。排版引擎支持 target-counter 时，给 html 加 data-toc="auto" 即自动生成。</p>
+</section>
+
+<!-- ============================ 第 1 章：章首页 ============================ -->
+<section class="sheet sheet--opener" id="ch1">
+  <div class="screen-run"><span>STANDARD FINANCIAL CHARTING</span><span>FIRST TEST · AI INDUSTRY FINANCIAL RISK</span></div>
+  <div class="chapter-opener">
+    <svg class="opener-mark" viewBox="7 13 48 46" aria-hidden="true">
+      <rect x="8" y="14" width="18" height="44" rx="1.5" opacity="0.95"/>
+      <rect x="22" y="14" width="18" height="44" rx="1.5" opacity="0.55"/>
+      <rect x="36" y="14" width="18" height="44" rx="1.5" opacity="0.28"/>
+    </svg>
+    <p class="opener-kicker">CHAPTER</p>
+    <p class="opener-num">01</p>
+    <h1>项目概述</h1>
+    <p class="opener-en">Project Overview</p>
+    <p class="opener-lede">章首导语占位：用两到三句话交代本章回答什么问题、读完应得到什么判断。此处不放数据，数据在正文。</p>
+    <ul class="opener-toc">
+      <li><span class="toc-no">1.1</span>背景与问题</li>
+      <li><span class="toc-no">1.2</span>关键指标</li>
+      <li><span class="toc-no">1.3</span>方案示意</li>
+      <li><span class="toc-no">1.4</span>实施路径</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============================ 第 1 章：正文 ============================ -->
+<section class="sheet sheet--body">
+  <div class="screen-run"><span>STANDARD FINANCIAL CHARTING</span><span>FIRST TEST · AI INDUSTRY FINANCIAL RISK</span></div>
+  <div class="chapter-body">
+
+    <h2 id="s1-1"><span class="num">1.1</span>背景与问题</h2>
+    <p class="lede">导语占位（.lede）：一两句话概括本节要点，字号略大、色略淡。</p>
+    <p>正文段落占位。此处为内阁整理后的正文，秘书只需套用本模板的段落样式：两端对齐、行距 1.75、段间距 0.75 行。English words and numbers like 2026 or 12.5% 与中文混排时保持基线对齐。<sup class="fn"><a href="#fn1">1</a></sup></p>
+
+    <h3 id="s1-1-1"><span class="num">1.1.1</span>行业背景</h3>
+    <p>三级标题下的正文占位。段落占位段落占位段落占位段落占位段落占位段落占位段落占位段落占位段落占位段落占位段落占位段落占位。</p>
+    <ul>
+      <li>列表项占位，列表标记使用次字色。</li>
+    </ul>
+
+    <h3 id="s1-1-2"><span class="num">1.1.2</span>风险缺口</h3>
+    <p>段落占位段落占位段落占位段落占位段落占位段落占位。</p>
+    <h4>四级小标题（h4）</h4>
+    <p>段落占位段落占位。</p>
+
+    <div class="callout">
+      <span class="callout-label">重点　KEY POINT</span>
+      <p><strong>重点提示框（.callout）：</strong>一条需要评委记住的结论，置于段落之间，左侧墨色竖线，浅底。</p>
+    </div>
+
+    <h2 id="s1-2"><span class="num">1.2</span>关键指标</h2>
+
+    <div class="kpi-row">
+      <div class="kpi"><div class="kpi-label">指标一</div><div class="kpi-val">00.0<span class="kpi-unit">%</span></div><div class="kpi-note">口径说明占位</div></div>
+      <div class="kpi"><div class="kpi-label">指标二</div><div class="kpi-val">000<span class="kpi-unit">家</span></div><div class="kpi-note">口径说明占位</div></div>
+      <div class="kpi"><div class="kpi-label">指标三</div><div class="kpi-val">0.00<span class="kpi-unit">x</span></div><div class="kpi-note">口径说明占位</div></div>
+      <div class="kpi"><div class="kpi-label">指标四</div><div class="kpi-val">00<span class="kpi-unit">层</span></div><div class="kpi-note">口径说明占位</div></div>
+    </div>
+
+    <div class="tbl">
+      <div class="tbl-cap"><span class="cap-no">表 1-1</span><span>数据表格标题占位</span></div>
+      <table class="data">
+        <thead>
+          <tr><th>项目</th><th>口径</th><th class="num">2025</th><th class="num">2026E</th><th class="num">变动</th></tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row">行项目一</th><td>口径占位</td><td class="num">1,234.5</td><td class="num">1,456.7</td><td class="num">+18.0%</td></tr>
+          <tr><th scope="row">行项目二</th><td>口径占位</td><td class="num">567.8</td><td class="num">601.2</td><td class="num">+5.9%</td></tr>
+          <tr><th scope="row">行项目三</th><td>口径占位</td><td class="num">89.0</td><td class="num">76.5</td><td class="num">−14.0%</td></tr>
+        </tbody>
+        <tfoot>
+          <tr><td colspan="2">合计</td><td class="num">1,891.3</td><td class="num">2,134.4</td><td class="num">+12.9%</td></tr>
+        </tfoot>
+      </table>
+      <p class="src">来源：数据来源占位（.src）。单位：亿元。</p>
+    </div>
+
+    <h2 id="s1-3"><span class="num">1.3</span>方案示意</h2>
+
+    <figure class="fig fig--narrow">
+      <img src="briefing/assets/05-cube.png" alt="图片占位：产品界面截图" />
+      <figcaption class="fig-cap"><span class="cap-no">图 1-1</span><span>图注占位（.fig-cap）。截图保持原样，细边框；.fig--narrow 为 72% 宽。</span></figcaption>
+    </figure>
+
+    <div class="fig-pair">
+      <figure class="fig">
+        <div class="fig-ph">图片占位 4:3</div>
+        <figcaption class="fig-cap"><span class="cap-no">图 1-2</span><span>左图图注占位</span></figcaption>
+      </figure>
+      <figure class="fig">
+        <div class="fig-ph">图片占位 4:3</div>
+        <figcaption class="fig-cap"><span class="cap-no">图 1-3</span><span>右图图注占位</span></figcaption>
+      </figure>
+    </div>
+
+    <blockquote class="quote">
+      <p>引文占位：一句值得单独成段的原话或原则，使用较大字号与细竖线。</p>
+      <cite>出处占位，年份</cite>
+    </blockquote>
+
+    <h2 id="s1-4"><span class="num">1.4</span>实施路径</h2>
+
+    <ol class="timeline">
+      <li class="tl-item is-done"><span class="tl-date">2026.10</span><span class="tl-rail"></span><div class="tl-body"><h4 class="tl-title">阶段一　已完成</h4><p>时间线条目说明占位：实心方块表示已完成。</p></div></li>
+      <li class="tl-item is-now"><span class="tl-date">2026.11</span><span class="tl-rail"></span><div class="tl-body"><h4 class="tl-title">阶段二　进行中</h4><p>空心墨框方块表示当前阶段。</p></div></li>
+      <li class="tl-item is-next"><span class="tl-date">2026.12</span><span class="tl-rail"></span><div class="tl-body"><h4 class="tl-title">阶段三　待启动</h4><p>灰框方块表示计划中。</p></div></li>
+      <li class="tl-item is-next"><span class="tl-date">2027.01</span><span class="tl-rail"></span><div class="tl-body"><h4 class="tl-title">阶段四　待启动</h4><p>末项轨线自动收短。</p></div></li>
+    </ol>
+
+    <div class="callout callout--warn">
+      <span class="callout-label">风险　RISK</span>
+      <p>警示提示框（.callout--warn）：墨色细框，用于风险、限制与前提。</p>
+    </div>
+    <div class="callout callout--note">
+      <span class="callout-label">说明　NOTE</span>
+      <p>说明提示框（.callout--note）：灰框，用于口径与阅读提示。</p>
+    </div>
+
+    <aside class="footnotes" aria-label="脚注">
+      <ol>
+        <li id="fn1">脚注占位（.footnotes）：正文上标 <sup class="fn">1</sup> 对应此处；章末集中排列。</li>
+        <li id="fn2">第二条脚注占位。来源注单独成行时用 <span class="mono">.src-note</span>。</li>
+      </ol>
+    </aside>
+
+  </div>
+</section>
+
+<!-- ============================ 附录 A：术语表 ============================ -->
+<section class="sheet sheet--appendix" id="app-a">
+  <div class="screen-run"><span>STANDARD FINANCIAL CHARTING</span><span>FIRST TEST · AI INDUSTRY FINANCIAL RISK</span></div>
+  <header class="appendix-head">
+    <span class="kicker">APPENDIX A</span>
+    <h1><span class="num">附录 A</span>术语表</h1>
+  </header>
+  <p class="appendix-lede">按首字母或拼音排序。首次出现处以脚注或括注给出，此表供集中查阅。</p>
+  <table class="data gloss">
+    <thead><tr><th>术语</th><th>英文</th><th>释义</th></tr></thead>
+    <tbody>
+      <tr><td>术语占位一</td><td>Term One</td><td>释义占位：一到两句，说明口径与适用范围。</td></tr>
+      <tr><td>术语占位二</td><td>Term Two</td><td>释义占位。</td></tr>
+      <tr><td>术语占位三</td><td>Term Three</td><td>释义占位。</td></tr>
+      <tr><td>术语占位四</td><td>Term Four</td><td>释义占位。</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ============================ 附录 B：来源与许可表 ============================ -->
+<section class="sheet sheet--appendix" id="app-b">
+  <div class="screen-run"><span>STANDARD FINANCIAL CHARTING</span><span>FIRST TEST · AI INDUSTRY FINANCIAL RISK</span></div>
+  <header class="appendix-head">
+    <span class="kicker">APPENDIX B</span>
+    <h1><span class="num">附录 B</span>来源与许可表</h1>
+  </header>
+  <p class="appendix-lede">数据、字体、图片与第三方材料的出处与使用条件。</p>
+  <table class="data sources">
+    <thead><tr><th>编号</th><th>来源</th><th>提供方</th><th>许可 / 使用条件</th><th>用途</th><th>取得日期</th></tr></thead>
+    <tbody>
+      <tr><td>S1</td><td>来源名称占位</td><td>提供方占位</td><td>授权占位</td><td>用途占位</td><td class="num">2026-00-00</td></tr>
+      <tr><td>S2</td><td>来源名称占位</td><td>提供方占位</td><td>授权占位</td><td>用途占位</td><td class="num">2026-00-00</td></tr>
+      <tr><td>F1</td><td>Jost Light 300（A–Z 子集）</td><td>Indestructible Type</td><td>SIL OFL 1.1，随仓附 OFL.txt</td><td>字标全称、页眉页脚</td><td class="num">2026-10-15</td></tr>
+      <tr><td>F2</td><td>PingFang SC · Songti SC · SF</td><td>Apple（系统字体）</td><td>随系统，未再分发</td><td>中文正文与数字</td><td class="num">—</td></tr>
+    </tbody>
+  </table>
+  <p class="src-note">编号规则：S＝数据与文献，F＝字体，G＝图片，T＝工具。</p>
+</section>
+
+<!--
+COMPONENTS（秘书速查）
+封面       .cover [.cover--paper]       深色默认；加 .cover--paper 即纸面反相（省墨 / 打印机不能满版时用）。9 项文字勿改。
+目录       页码手填 .toc-pg（Chrome 不渲染 target-counter）；html[data-toc=auto] 供 Prince/WeasyPrint/Paged.js
+           .toc > li.toc-1/.toc-2/.toc-3 > a[href=#id] > .toc-no .toc-t .toc-dots .toc-pg；未成稿条目 li.is-todo；附录分隔 .toc-part
+章首       section.sheet.sheet--opener > .chapter-opener：.opener-mark .opener-kicker .opener-num h1 .opener-en .opener-lede .opener-toc
+正文容器   section.sheet > .chapter-body
+标题       h2>.num ；h3>.num ；h4（四级小标题）
+段落       p ；p.lede ；ul/ol ；strong ；.small ；.mono ；.keep ；.page-break
+提示框     .callout（重点） / .callout--note（说明） / .callout--warn（风险）＋ .callout-label
+表格       .tbl > .tbl-cap(.cap-no) + table.data(thead/tbody/tfoot；td.num 右对齐) + p.src ；变体 table.data--tight ；长表 .tbl.tbl--long
+图片       figure.fig > img|.fig-ph + figcaption.fig-cap(.cap-no) ；.fig--narrow ；成对 .fig-pair
+指标卡片   .kpi-row[.kpi-row--3] > .kpi > .kpi-label .kpi-val(.kpi-unit) .kpi-note
+时间线     ol.timeline[.timeline--long 可跨页] > li.tl-item.is-done|is-now|is-next > .tl-date .tl-rail .tl-body(h4.tl-title + p)
+引文       blockquote.quote > p + cite
+脚注       正文 sup.fn>a[href=#fnN] ；章末 aside.footnotes > ol > li#fnN ；来源注 p.src-note / p.src
+附录       section.sheet > header.appendix-head(.kicker + h1>.num) + p.appendix-lede + table.data.gloss | table.data.sources
+页眉页脚   :root 里的 --run-l / --run-r / --run-foot；页码 @page @bottom-right counter(page)；封面 @page cover 无页码
+屏幕页眉   .screen-run（仅屏幕；打印时由 @page 页眉取代）
+-->
+</body>
+</html>

@@ -112,6 +112,14 @@
 - 空态一条 muted 短句。
 - 进立方体只靠名单行（点公司）；无页眉玻璃链、无页底第二条、非 chip 条。
 
+### 计划书纸面（ICBC FinTech 模板）
+
+真源：`library/showable-report/SFC-icbc-fintech-proposal-template.html`（秘书套用；正文纸面规则仍以 clerk 技能 token 为准）。
+
+- **封面**默认深色（`--bg` / `--text` / `--muted` / `--accent` 同产品，仅限 `.cover` 作用域），`print-color-adjust: exact`；打印机无法满版或需省墨时加 `.cover--paper` 反相（绿线退为 `--rule`）。正文页一律白底纸面。
+- 封面自上而下：三框（Logo 标准）→ SFC 矢量字标（path，同 `#sfc-mark`）→ 与字标等宽 accent 线 → 英文 / 中文全称 → 题名 → 团队。mixed-case 英文用系统无衬线 Light（Jost 子集仅 A–Z）；页眉页脚全大写走内嵌 Jost。
+- 正文衬线 + 数据 / 标签无衬线；节题底边 `--rule`；提示框、KPI、时间线节点只用墨 / 灰层级，无圆角、无第二套色。时间线节点为**方形**（呼应方角字标）。
+
 ---
 
 ## 2. 延展原则（新功能 / 新分页）
