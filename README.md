@@ -1,4 +1,4 @@
-# Financial Information To Decision Visualization (FIDV)
+# Standard-Financial-Charting (SFC)
 
 To standardly visualize statistics to fit human perception, so managers can make decisions more easily.
 

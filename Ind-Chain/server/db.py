@@ -5,6 +5,7 @@ import json
 import math
 import os
 import sqlite3
+import time
 from pathlib import Path
 from typing import Any
 
@@ -303,3 +304,49 @@ def meta() -> dict[str, Any]:
         "countries": COUNTRY_LABEL,
         "version": 1,
     }
+
+
+def _quarantine_db() -> None:
+    """Rename an unreadable DB (and its journal) aside, keep the newest 2 copies, so ensure_demo_db can rebuild."""
+    stamp = time.strftime("%Y%m%dT%H%M%SZ", time.gmtime())
+    for suffix in ("", "-journal"):
+        src = DB_PATH.with_name(DB_PATH.name + suffix)
+        if src.exists():
+            src.rename(DB_PATH.with_name(f"{DB_PATH.name}.corrupt-{stamp}{suffix}"))
+    old = sorted(DB_PATH.parent.glob(f"{DB_PATH.name}.corrupt-*[0-9Z]"))
+    for stale in old[:-2]:
+        stale.unlink(missing_ok=True)
+        stale.with_name(stale.name + "-journal").unlink(missing_ok=True)
+
+
+def _open_checked_db() -> sqlite3.Connection | None:
+    conn = connect()
+    try:
+        init_schema(conn)
+        if conn.execute("PRAGMA quick_check").fetchone()[0] != "ok":
+            raise sqlite3.DatabaseError("quick_check failed")
+    except sqlite3.OperationalError:
+        conn.close()
+        raise  # locked / cannot open: not corruption, never set a healthy DB aside
+    except sqlite3.DatabaseError:
+        conn.close()
+        return None
+    return conn
+
+
+def ensure_demo_db() -> None:
+    """Check or rebuild ind_chain.db and seed from JSON when empty."""
+    conn = _open_checked_db()
+    if conn is None:
+        print(f"[Ind-Chain] SQLite unreadable, set aside and rebuilding → {DB_PATH}", flush=True)
+        _quarantine_db()
+        conn = connect()
+        init_schema(conn)
+    n = conn.execute("SELECT COUNT(*) AS n FROM companies").fetchone()["n"]
+    if n == 0:
+        seed_from_json(conn)
+        n = conn.execute("SELECT COUNT(*) AS n FROM companies").fetchone()["n"]
+        print(f"[Ind-Chain] seeded SQLite → {DB_PATH} ({n} companies)")
+    else:
+        print(f"[Ind-Chain] using SQLite → {DB_PATH} ({n} companies)")
+    conn.close()

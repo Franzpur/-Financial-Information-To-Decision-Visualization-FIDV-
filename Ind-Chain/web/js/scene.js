@@ -36,6 +36,11 @@ import {
   SHELL_ANCHOR,
   SHELL_SPAN_LAYERS,
 } from "./coords.js?v=51";
+import { focusPointTargets } from "./bondChart.js?v=2";
+
+/* ============================================================================
+ * Section 1 · Geometry & Slices ([C-SLICE], [C-RING], [C-POINT], [C-REV-LINK])
+ * ========================================================================== */
 
 /** Axis palette matched to concentric rings (cool steel / ice blue). */
 /** Demo chain: layers.length. Shell: virtual 11 so user s=5 is mid-stack. */
@@ -880,6 +885,10 @@ function lerpPullOut(ctx) {
   });
 }
 
+/* ============================================================================
+ * Section 2 · Camera & Standard View ([C-STDVIEW], [C-VIEW-SPACE])
+ * ========================================================================== */
+
 function framingDistance() {
   const span = Math.max(gapNow(), (N_LAYERS() - 1) * gapNow());
   return Math.max(7.2, Math.hypot(span, FACE) * 1.15);
@@ -986,6 +995,10 @@ function resetCamera(ctx) {
   queueVisibilityTargets(ctx);
   ctx.hooks.onReset?.();
 }
+
+/* ============================================================================
+ * Section 3 · Focus Transitions, Raycast & Input ([C-FOCUS], [C-PICK], [C-PIN])
+ * ========================================================================== */
 
 /** [C-FOCUS-ACT][C-PULL][C-RETRACT][C-CAM-HOLD] Toggle/set focus; hide non-stay; do not move camera. */
 function focusSlice(ctx, i) {
@@ -1105,27 +1118,13 @@ function queueVisibilityTargets(ctx) {
     }
     const selected = c.id === state.selectedId;
     const hovered = c.id === state.hoverId;
-    const targetEmissive = state.shellCube
-      ? null
-      : selected
-        ? 2.2
-        : hovered
-          ? 1.9
-          : lit
-            ? c.country === "US"
-              ? 0.75
-              : 0.7
-            : 0.06;
-    const targetOpacity = lit ? 1 : 0;
-    const targetHoverScale = selected
-      ? state.shellCube
-        ? 1.45
-        : 1.4
-      : hovered
-        ? 1.5
-        : lit
-          ? 1
-          : 0.55;
+    const { targetEmissive, targetOpacity, targetHoverScale } = focusPointTargets({
+      shellCube: state.shellCube,
+      selected,
+      hovered,
+      lit,
+      country: c.country,
+    });
     mesh.userData.targetEmissive = targetEmissive;
     mesh.userData.targetOpacity = targetOpacity;
     mesh.userData.targetHoverScale = targetHoverScale;

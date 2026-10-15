@@ -5,7 +5,7 @@
 **任务周期** 新周期（前后端分离验收补齐 + `modules/` 动态跟踪可视化）  
 **本周期内阁下令计数** **1 / 5 · 已结**（本令为该周期第 1 次；三监第 1 次送审通过后内阁判定满意，**不再令**；余 4 次作废；谏言不计次）  
 **来源** 业主 Purkniv 原话「电内阁，执行模块化的其中前后端分离任务…创建 modules…动态跟踪…可视化」；内阁代指挥拍板并下令  
-**依据** `cabinet/AUTHORITY.md` · `cabinet/reports/FIDV-modularization-plan-v2.html`（§2 前后端定义 · §5.2 打开权 · §7.6 仓级路径 · §8 W1 · FE/BE 表）· 既有令 `cabinet/orders/GS-20261014-modularization-M1-M4.md`（已验收，勿空转重做）· worklog-006 #209–210  
+**依据** `cabinet/AUTHORITY.md` · `cabinet/reports/SFC-modularization-plan-v2.html`（§2 前后端定义 · §5.2 打开权 · §7.6 仓级路径 · §8 W1 · FE/BE 表）· 既有令 `cabinet/orders/GS-20261014-modularization-M1-M4.md`（已验收，勿空转重做）· worklog-006 #209–210  
 **父代理动作** 将本文**完整**转交 `general-staff`，立意志与任务单；实施由主代理；产品码变更后按既有规则送监理部。内阁不亲自改 `ind-chain`；不令监理部 / 档案部。
 
 > **旁注（2026-10-14 · 业主改令 · 内阁自落，不另开总参周期）**  
@@ -83,7 +83,7 @@
 
 **可视化投影**  
 - **一个 HTML**（建议 `modules/index.html` 或 `modules/track.html`）。  
-- **设计**：与 `cabinet/reports/` 纸面族同系（clerk 纸面感 / 对齐 `FIDV-modularization-plan-v2.html` 的纸面 token：暖纸底、墨色字、细线表/图，非产品玻璃壳、非仪表盘堆砌）。  
+- **设计**：与 `cabinet/reports/` 纸面族同系（clerk 纸面感 / 对齐 `SFC-modularization-plan-v2.html` 的纸面 token：暖纸底、墨色字、细线表/图，非产品玻璃壳、非仪表盘堆砌）。  
 - **动态跟踪**：打开该 HTML 须反映**当前** modules 真源——**不是**一次性静态报告截图或写死节点的死页。  
 - **实现方式**（总参/实施择一写清并落地）：  
   1. 同源 JSON `fetch`（经现有 `:8787` 增加只读静态/API 暴露 `modules/` 真源；或  

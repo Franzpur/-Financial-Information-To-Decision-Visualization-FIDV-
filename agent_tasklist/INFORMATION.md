@@ -1,4 +1,4 @@
-# FIDV 数据真源（信息部）
+# SFC 数据真源（信息部）
 
 信息部判断数据目录、调用词条、乱缺与补数公式时，只以本文及三分部文件为准。产品是否服务金融决策，以 `DESIGN.md` 为准（理念贯彻属；终裁为监理部三监报告）。立方体概念与坐标语义以 `Ind-Chain/CONCEPTS.md` 为准（信息部不改 C-*）。
 
@@ -20,7 +20,7 @@
 | 缺口 | `INFORMATION-clean.md` |
 | 补数公式 | `INFORMATION-request.md`；产出落 `BE-DATA/` |
 
-不独占：立方体 `Ind-Chain/data/companies.json` 演示链、C-CUBE 几何。不提交 `~$*.xlsx`。不要把 `BQLX.pdf` 当成 FIDV 拉数说明书。
+不独占：立方体 `Ind-Chain/data/companies.json` 演示链、C-CUBE 几何。不提交 `~$*.xlsx`。不要把 `BQLX.pdf` 当成 SFC 拉数说明书。
 
 ---
 

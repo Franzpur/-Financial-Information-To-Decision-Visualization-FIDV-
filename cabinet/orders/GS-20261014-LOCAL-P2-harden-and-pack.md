@@ -65,7 +65,7 @@
 3. **体量**：`BE-CLASS` 28 MB（其中 `bics_entities_20261003.db` **未被 git 跟踪**——`PUBLIC-PRIVATE.md`「生成的 `.db` 仍不跟踪」）、`BE-DATA` 17 MB（**运行期不读**，仅 ingest 离线脚本用，W1 之外）、`Ind-Chain` 500 KB、`modules` 80 KB、现 `.app` 280 KB。
 4. **外部依赖实查**：`web/` 内仅一处外联——`cube.html` 的 importmap（`three@0.170.0` 的 `build/three.module.js` 与 `examples/jsm/`）；`scene.js` 引 `three` 与 `three/addons/controls/OrbitControls.js`；全站无 webfont、无其它 CDN。
 5. **工具链**：`swiftc 6.3.3`（须显式 `-sdk`，P1 脚本已探测）、`clang`、`lipo`、`iconutil`、`sips` 均在；**本机有 Rosetta**（`arch -x86_64` 可跑 x86_64 切片，用于验通用二进制）；`/usr/bin/python3` 3.9.6 universal；无 node。
-6. **图标**：`Contents/Resources/AppIcon.icns` 46 KB（P1 前即有）；`Ind-Chain/assets/fidv-launcher-1024.png`（若在）为其母图，位置以 `Ind-Chain/assets/` 实查为准。
+6. **图标**：`Contents/Resources/AppIcon.icns` 46 KB（P1 前即有）；`Ind-Chain/assets/sfc-launcher-1024.png`（若在）为其母图，位置以 `Ind-Chain/assets/` 实查为准。
 7. **Python 垫片陷阱**：未装 Command Line Tools 的 Mac 上，`/usr/bin/python3` 是个**垫片**，执行会**弹系统安装对话框**。P1 的 `findPython()` 直接执行它做版本探测，在这类机器上会触发弹窗而非给人话报错。
 8. **黄金集**：`/tmp/sfc-golden-p1/`（55 条，P1 抓取，不入仓）；若已不存在，须在改 `app.py` 前对 `:8787` 开发路径**重抓**到新目录，并在笔记里说明（P1 已证 shell 路径与 8787 逐条一致，故可沿用）。
 9. **P1 已定的不变量继续有效**：壳每次自选空闲端口；FE 无 `localStorage` / `indexedDB`，仅会话级 `sessionStorage`——**换端口 / 重启后端不丢任何用户状态**，故「崩溃自救换端口重载」无副作用，只有「回到冷启动页」。

@@ -6,10 +6,8 @@ import {
   companyById,
 } from "./state.js?v=55";
 import { formatCoord } from "./coords.js?v=51";
-import { bondChartHtml } from "./bondChart.js?v=1";
+import { createCompanyFocusStage } from "./bondChart.js?v=2";
 import { STDVIEW_MS } from "./scene.js?v=71";
-
-const ZOOM_MS = 450;
 
 export function createUI(sceneApi) {
   const detail = document.getElementById("detail");
@@ -22,21 +20,10 @@ export function createUI(sceneApi) {
   const companyFocusBody = document.getElementById("companyFocusBody");
   const companyFocusClose = document.getElementById("companyFocusClose");
   let searchTimer = null;
-  let zoomToken = 0;
-  let zoomOpen = false;
-  let zoomExitTimer = null;
-  let pendingZoomTimer = null;
 
   // Layer list chrome removed — focus via plane click / [ ] / search / right float roster.
   function renderLayers() {}
   function syncLayerActive() {}
-
-  function cancelPendingZoom() {
-    if (pendingZoomTimer != null) {
-      clearTimeout(pendingZoomTimer);
-      pendingZoomTimer = null;
-    }
-  }
 
   function updateStatus() {
     /* Bottom status line removed — detail / focus chrome carry state. */
@@ -96,69 +83,15 @@ export function createUI(sceneApi) {
     detail.innerHTML = detailMarkup(c);
   }
 
-  /** [C-COMPANY-ZOOM] Search-open path only: enter while a slice is focused (2D). */
-  function enterCompanyZoom(c) {
-    if (!companyFocus || !viewport || !c) return;
-    if (state.focusLayer == null) return;
-    cancelPendingZoom();
-    if (zoomExitTimer != null) {
-      clearTimeout(zoomExitTimer);
-      zoomExitTimer = null;
-    }
-    zoomToken += 1;
-    companyFocusBody.innerHTML = detailMarkup(c) + bondChartHtml(c.bondSchedule);
-    companyFocus.hidden = false;
-    companyFocus.setAttribute("aria-hidden", "false");
-    renderDetail(c);
-    requestAnimationFrame(() => {
-      if (state.focusLayer == null || state.selectedId !== c.id) return;
-      viewport.classList.add("company-zoom");
-      companyFocus.classList.add("is-open");
-      zoomOpen = true;
-    });
-  }
-
-  function exitCompanyZoom() {
-    cancelPendingZoom();
-    if (!companyFocus || !viewport) return;
-    if (!zoomOpen && companyFocus.hidden) return;
-    const token = ++zoomToken;
-    viewport.classList.remove("company-zoom");
-    companyFocus.classList.remove("is-open");
-    zoomOpen = false;
-    if (zoomExitTimer != null) clearTimeout(zoomExitTimer);
-    zoomExitTimer = setTimeout(() => {
-      zoomExitTimer = null;
-      if (token !== zoomToken) return;
-      companyFocus.hidden = true;
-      companyFocus.setAttribute("aria-hidden", "true");
-      companyFocusBody.innerHTML = "";
-    }, ZOOM_MS);
-  }
-
-  function scheduleCompanyZoom(c, delayMs) {
-    cancelPendingZoom();
-    const id = c.id;
-    pendingZoomTimer = setTimeout(() => {
-      pendingZoomTimer = null;
-      if (state.selectedId !== id || state.focusLayer == null) return;
-      enterCompanyZoom(c);
-    }, delayMs);
-  }
-
-  if (companyFocusClose) {
-    companyFocusClose.addEventListener("click", (e) => {
-      e.stopPropagation();
-      sceneApi.clearFocus();
-    });
-  }
-  if (companyFocus) {
-    companyFocus.addEventListener("click", (e) => {
-      if (e.target.closest(".company-focus-inner")) return;
-      if (e.target.closest(".company-focus-close")) return;
-      sceneApi.clearFocus();
-    });
-  }
+  const { exitCompanyZoom, scheduleCompanyZoom } = createCompanyFocusStage({
+    viewport,
+    companyFocus,
+    companyFocusBody,
+    companyFocusClose,
+    detailMarkup,
+    renderDetail,
+    onRequestClearFocus: () => sceneApi.clearFocus(),
+  });
 
   function renderLayerRoster(layerIdx) {
     const L = state.layers[layerIdx];

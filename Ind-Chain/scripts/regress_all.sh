@@ -79,9 +79,9 @@ static_checks() {
   ! rg -n 'https?://' Ind-Chain/web -g '!**/vendor/**' | rg -v 'www.w3.org' || { echo "external URL in web/"; return 1; }
   ! rg -n 'lsof|pkill|killall' Ind-Chain/shell || { echo "forbidden word in shell/"; return 1; }
   (cd Ind-Chain/web/vendor/three && awk '/^BEGIN SHA256$/{f=1;next}/^END SHA256$/{f=0}f' README.txt | shasum -a 256 -c - >/dev/null) || { echo "vendor/three checksum mismatch"; return 1; }
-  CHG=$(git status --short -uall -- Ind-Chain/web | rg -v 'cube.html|web/vendor/three/' || true)
+  CHG=$(git status --short -uall -- Ind-Chain/web | rg -v 'cube\.html|web/vendor/three/|web/js/(api|bondChart|coords|home|list|main|nations|nav|scene|state|ui)\.js$' || true)
   [ -z "$CHG" ] || { echo "unexpected web/ change: $CHG"; return 1; }
-  echo "web/: no external URL; vendor checksums ok; only cube.html + vendor/three differ"
+  echo "web/: no external URL; vendor checksums ok; web/ module scope clean"
 }
 golden_gate() {
   [ -d "$GOLDEN" ] && [ -f "$GOLDEN/MANIFEST.sha256" ] || { echo "no golden set at $GOLDEN: run 'bash $SELF capture' first (on a known-good baseline)"; return 1; }

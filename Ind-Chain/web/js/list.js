@@ -3,6 +3,15 @@
 import { renderNations } from "./nations.js?v=33";
 import { displayIndustryCoord } from "./coords.js?v=35";
 import { fetchBicsEntities } from "./api.js?v=51";
+import {
+  currentBics,
+  currentListing,
+  currentQuery,
+  gateHref,
+  listHref,
+  cubeCompanyHref,
+  wireBackspaceNav,
+} from "./nav.js?v=1";
 
 if ("scrollRestoration" in history) history.scrollRestoration = "manual";
 
@@ -20,29 +29,6 @@ function escapeHtml(s) {
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;");
-}
-
-function currentBics() {
-  return new URLSearchParams(location.search).get("bics") || "";
-}
-
-function currentListing() {
-  return new URLSearchParams(location.search).get("listingCountry") || "";
-}
-
-function gateHref(bics, country) {
-  const p = new URLSearchParams();
-  if (bics) p.set("bics", bics);
-  if (country) p.set("listingCountry", country);
-  const q = p.toString();
-  return q ? `/?${q}` : "/";
-}
-
-function listHref(bics, country) {
-  const p = new URLSearchParams();
-  p.set("bics", bics);
-  if (country) p.set("listingCountry", country);
-  return `/list?${p.toString()}`;
 }
 
 function trailHtml(ancestors, node, country) {
@@ -78,12 +64,6 @@ function otherNote(e) {
   if (!segs.length) return "";
   const bits = segs.map((s) => `${escapeHtml(s.l1)} ${fmtPct(s.pct)}`);
   return `<span class="list-other">Also ${bits.join(" · ")}</span>`;
-}
-
-function cubeCompanyHref(ticker) {
-  const t = String(ticker || "").trim();
-  if (!t) return "/cube";
-  return `/cube?ticker=${encodeURIComponent(t)}`;
 }
 
 function rowHtml(e) {
@@ -215,7 +195,7 @@ async function loadList() {
   }
 }
 
-const presetQ = new URLSearchParams(location.search).get("q") || "";
+const presetQ = currentQuery();
 if (filterEl && presetQ) filterEl.value = presetQ;
 filterEl?.addEventListener("input", () => render(filterEl.value));
 document.getElementById("listSortRev")?.addEventListener("click", (e) => {
@@ -224,14 +204,9 @@ document.getElementById("listSortRev")?.addEventListener("click", (e) => {
   render(filterEl?.value || "");
 });
 function wireBackspaceUp() {
-  window.addEventListener("keydown", (e) => {
-    if (e.key !== "Backspace" || e.ctrlKey || e.metaKey || e.altKey || e.isComposing) return;
-    const el = document.activeElement;
-    if (el && (el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.isContentEditable)) return;
-    e.preventDefault();
+  wireBackspaceNav(() => {
     const links = trail?.querySelectorAll("a");
-    const href = links?.length ? links[links.length - 1].getAttribute("href") : "";
-    if (href) location.assign(href);
+    return links?.length ? links[links.length - 1].getAttribute("href") : "";
   });
 }
 

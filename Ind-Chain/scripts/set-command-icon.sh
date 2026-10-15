@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
-# Sync FIDV launcher icon into Standard-Financial-Charting.app.
-# Source of truth remains Ind-Chain/assets/fidv-launcher.icns.
+# Sync SFC launcher icon into Standard-Financial-Charting.app.
+# Source of truth remains Ind-Chain/assets/sfc-launcher.icns.
 # Preferred path after changing the master icon: run build-standard-financial-charting-app.sh (copies and signs).
 # This script is the quick path: if the icon actually changed it re-signs (ad hoc) and verifies, because editing
 # a signed .app breaks its seal. SFC_APP may point at another copy (used for testing).
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 REPO="$(cd "$ROOT/.." && pwd)"
-ICNS="$ROOT/assets/fidv-launcher.icns"
+ICNS="$ROOT/assets/sfc-launcher.icns"
 APP="${SFC_APP:-$REPO/Standard-Financial-Charting.app}"
 DEST="$APP/Contents/Resources/AppIcon.icns"
 

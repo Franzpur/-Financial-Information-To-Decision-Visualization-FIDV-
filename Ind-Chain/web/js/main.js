@@ -2,6 +2,7 @@ import { fetchBundle } from "./api.js?v=51";
 import { state, readHash, resolveBicsLabel } from "./state.js?v=55";
 import { createScene } from "./scene.js?v=71";
 import { createUI } from "./ui.js?v=68";
+import { listHref, wireBackspaceNav } from "./nav.js?v=1";
 
 const bootError = document.getElementById("bootError");
 const app = document.getElementById("app");
@@ -63,13 +64,9 @@ async function boot() {
 }
 
 function wireShellBackspace() {
-  window.addEventListener("keydown", (e) => {
-    if (e.key !== "Backspace" || e.ctrlKey || e.metaKey || e.altKey || e.isComposing) return;
-    const el = document.activeElement;
-    if (el && (el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.isContentEditable)) return;
-    e.preventDefault();
+  wireBackspaceNav(() => {
     const detail = state.shellCube ? state.companies[0]?.sourceDetail : "";
-    if (detail) location.assign("/list?bics=" + encodeURIComponent(detail));
+    return detail ? listHref(detail, "") : "";
   });
 }
 

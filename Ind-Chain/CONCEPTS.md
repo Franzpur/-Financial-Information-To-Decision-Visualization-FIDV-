@@ -7,7 +7,7 @@
 > 中英对照；封存、移植或隔久再开时，**先读本文再改三维/交互**。  
 >
 > **Canonical home / 真源**  
-> Repo: FIDV · path: `Ind-Chain/` · entry: `Standard-Financial-Charting.app` (GUI) · port **8787**  
+> Project: SFC (Standard-Financial-Charting) · path: `Ind-Chain/` · entry: `Standard-Financial-Charting.app` (GUI) · port **8787**  
 >
 > **Code tags / 代码标注**  
 > Comments use `[C-ID]` matching rows below (e.g. `[C-SLICE]`, `[C-STDVIEW]`).
@@ -179,7 +179,7 @@ Removed / 已废弃：旧「角视图 corner view」与 **V / Home** 绑定（�
 | **C-LISTING** | listing country | 上市地 | ISO from Bloomberg yellow-key **exchange token** (second-last before `Equity`/`Corp`/…), mapped in `server/listing.py`. **Not** headquarters. **Not** an 8th industry axis. Unmapped venues stay **Unmapped**. Distinct from cube **C-US / C-INTL**. Changing country on C-HOME / C-LIST is in-page `history` + refetch — no document reload, no splash, keep board scroll. |
 | **C-CUBE** | decision cube SPA | 决策立方体页 | Full-bleed cube. Bundle **`meta.mode`**: `demo` \| `shell` \| `chain` (`BE-BUNDLE` / `bundle_dispatch`). Bare `/cube` = **demo** (演示库). `?ticker=` = **shell** unless ticker matches a **chain registry** instance (today NVDA → **chain** template; not a permanent HTTP `if NVDA` architecture). Shell: empty walls, firm at (5,5,5). Chain: dynamic BICS-L4 slices + C-REV-LINK. FE HTTP only via `web/js/api.js` (**FE-API**). | `bundle_dispatch`, `web/js/api.js`, `web/cube.html` |
 | **W1** | FE/BE open rights | 前后端打开权 | Browser (FE) only HTTP JSON + static under `web/`; server (BE) alone opens DBs, chain docs, BE-DATA. Single process `127.0.0.1:8787` allowed. Repo-root `modules/` is a narrow read-only mouth (`/modules/`), not a general static mount. | `server/app.py`, `modules/graph.json` |
-| **C-SPLASH** | splash | 开屏 | Only on **C-HOME**: FIDV wordmark → clear hold ~**2s** → fade ~**4s**. `/list` and `/cube` play no splash. | `#splash` in `index.html`, `home.js` |
+| **C-SPLASH** | splash | 开屏 | Only on **C-HOME**: SFC wordmark → clear hold ~**2s** → fade ~**4s**. `/list` and `/cube` play no splash. | `#splash` in `index.html`, `home.js` |
 | **C-RING-SCORE** | ring score | 环分数 | Per-slice min–max → 0–100; **100 = exact center** |
 
 ---
@@ -234,12 +234,15 @@ Removed / 已废弃：旧「角视图 corner view」与 **V / Home** 绑定（�
 | **This file** | Concept targets (agent-facing) |
 | [`library/worklog-001.md`](../library/worklog-001.md) | Session asks/answers + history |
 | [`README.md`](./README.md) | Run / API |
-| `web/js/scene.js` | 3D + camera + pick (`[C-*]` tags) |
+| `web/js/scene.js` | **FE-SCENE**: 3D + camera + pick (`[C-*]` tags; Section 1 Geometry & Slices, Section 2 Camera & Standard View, Section 3 Focus Transitions, Raycast & Input) |
+| `web/js/nav.js` | **FE-NAV**: URL query helpers, route builders (`/`, `/list`, `/cube`), Backspace upward navigation |
+| `web/js/bondChart.js` | **FE-FOCUS**: Focus-stage transitions (`[C-COMPANY-ZOOM]`), point focus targets, and bond schedule sparkline |
 | `web/index.html` + `home.js` | **C-HOME** L1–L3 board + **C-SPLASH**; L4 cells → **C-LIST** |
 | `web/list.html` + `list.js` | **C-LIST** L4 company table (no splash) |
 | `web/cube.html` + `web/css/app.css` | **C-CUBE** full-bleed cube; floating chrome; **no splash**; aesthetics → `agent_tasklist/AESTHETIC.md` |
-| `web/js/main.js` | Cube boot only; reads `?bics=` |
-| `assets/fidv-launcher*` + `scripts/set-command-icon.sh` | Launcher icons（美工部管辖）；**Logo** 三框比例与明暗两用 → `agent_tasklist/AESTHETIC.md`「Logo 标准」 |
+| `web/js/main.js` | **FE-OPENCUBE**: Cube boot + mode hydration |
+| `server/*.py` | **1:1 backend modules**: `app.py` (`BE-HTTP`), `bics_hier.py` (`BE-BICS-HIER`), `bics_entity.py` (`BE-BICS-ENTITY`), `listing.py` (`BE-BICS-AREA`), `bundle_dispatch.py` (`BE-BUNDLE`), `db.py` (`BE-DB-DEMO`), `db_shadow.py` (`BE-DB-SHADOW`), `nvda_links.py` (`BE-NVDA-LINKS`), `chain_layout.py` (`BE-NVDA-LAYOUT`) |
+| `assets/sfc-launcher*` + `scripts/set-command-icon.sh` | Launcher icons（美工部管辖）；**Logo** 三框比例与明暗两用 → `agent_tasklist/AESTHETIC.md`「Logo 标准」 |
 | `GET /api/bics/children` | C-COORD-3 children of `parent` (empty = L1) |
 | `GET /api/bics/entities` | member companies whose primary L4 is `?bics=`（含空 `% Tot Rev` 胜出；此时 `legal_entity_coord` 带 `-`） |
 | `GET /api/bics/node` | One BICS node by `code` (any level) |

@@ -27,7 +27,7 @@ enum StartFailure {
     var detail: String {
         switch self {
         case .resourcesMissing:
-            return "应用包不完整或已被移动。仓内开发版须放在 FIDV 仓库根目录（与 Ind-Chain/ 同级）；分发版请重新解压完整的应用。"
+            return "应用包不完整或已被移动。仓内开发版须放在 SFC 仓库根目录（与 Ind-Chain/ 同级）；分发版请重新解压完整的应用。"
         case .noPython:
             return "本应用需要本机已安装 Python 3.9 或更高版本。请在终端运行 xcode-select --install 安装 Xcode Command Line Tools，装好后点「重试」。"
         case let .readyTimeout(seconds, log):

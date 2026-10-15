@@ -9,7 +9,7 @@ import fitz
 
 ROOT = Path("/Volumes/DATA/FIDV/cabinet")
 OUT = Path("/Volumes/DATA/FIDV/cabinet/reports/plates")
-HTML_PATH = Path("/Volumes/DATA/FIDV/cabinet/reports/FIDV-all-charts.html")
+HTML_PATH = Path("/Volumes/DATA/FIDV/cabinet/reports/SFC-all-charts.html")
 ZOOM = 3.6
 
 HOUSE_ORDER = [

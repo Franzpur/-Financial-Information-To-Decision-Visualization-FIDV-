@@ -59,7 +59,16 @@
 | `MODULES-TRACK` | `MODULES-TRACK` | 静态模块跟踪 |
 | `BE-BUNDLE` | `BE-BUNDLE` | 捆绑编排（第四轮） |
 
-品牌字样：冷启动页与页眉 logo 的 `FIDV` 改 `SFC`（仓库 / 项目名 `FIDV` 不改）。
+品牌字样：冷启动页与页眉 logo 的 `FIDV` 改 `SFC`。
+
+## 总项目名称改名对照（2026-10-15；令文 `orders/GS-20261015-RENAME-FIDV-SFC.md`）
+
+| 旧称呼 | 新称呼 |
+|--------|--------|
+| `Financial Information To Decision Visualization (FIDV)` | `Standard-Financial-Charting (SFC)` |
+| `FIDV`（总项目简称） | `SFC` |
+
+不改：本机磁盘目录 `/Volumes/DATA/FIDV` 与 GitHub 远端 URL（交业主自行操作）、两份改名令文件名中的 `RENAME-FIDV-SFC`、以及历史档案正文中的史实叙述（指向现存且已改名的报告/图标/手册的路径已同步更新为 `SFC-*` / `sfc-launcher*`；当年旧位置的路径如 `library/FIDV-*.html`、PDF 题名等史实描述保留原文）。第二轮令文：`orders/GS-20261015-RENAME-FIDV-SFC-R2.md`。
 
 ## 模块跟踪（静态）
 

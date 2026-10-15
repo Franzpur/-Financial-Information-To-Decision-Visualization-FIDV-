@@ -3,7 +3,7 @@
 **令号** GS-20261014-MOD-M1M4  
 **日期** 2026-10-14  
 **来源** 业主 Purkniv 宪制赋权后，内阁拍板并下令  
-**依据** `cabinet/AUTHORITY.md` · `cabinet/reports/FIDV-modularization-plan-v2.html` · worklog-006 #207–208  
+**依据** `cabinet/AUTHORITY.md` · `cabinet/reports/SFC-modularization-plan-v2.html` · worklog-006 #207–208  
 **父代理动作** 将本文完整转交 `general-staff`，立意志与任务单；内阁不亲自改产品码。
 
 ---

@@ -3,6 +3,16 @@
 import { renderNations } from "./nations.js?v=33";
 import { displayIndustryCoord } from "./coords.js?v=35";
 import { fetchBicsChildren, fetchBicsLocate } from "./api.js?v=51";
+import {
+  currentBics,
+  currentListing,
+  gateHref,
+  listHref,
+  listLocateHref,
+  cubeHref,
+  isDemoCubeQuery,
+  wireBackspaceNav,
+} from "./nav.js?v=1";
 
 if ("scrollRestoration" in history) history.scrollRestoration = "manual";
 
@@ -19,40 +29,8 @@ function waitTwoFrames() {
   });
 }
 
-function currentBics() {
-  return new URLSearchParams(location.search).get("bics") || "";
-}
-
-function currentListing() {
-  return new URLSearchParams(location.search).get("listingCountry") || "";
-}
-
-function gateHref(bics, country) {
-  const p = new URLSearchParams();
-  if (bics) p.set("bics", bics);
-  if (country) p.set("listingCountry", country);
-  const q = p.toString();
-  return q ? `/?${q}` : "/";
-}
-
-function listHref(bics, country) {
-  const p = new URLSearchParams();
-  p.set("bics", bics);
-  if (country) p.set("listingCountry", country);
-  return `/list?${p.toString()}`;
-}
-
-function cubeHref() {
-  return "/cube";
-}
-
-/** Alt locate token: bare demo cube (not company→cube). */
-function isDemoCubeQuery(q) {
-  return String(q || "").trim().toLowerCase() === "/cube";
-}
-
 function skipSplash() {
-  return Boolean(currentBics()) || sessionStorage.getItem("fidvSplashSeen") === "1";
+  return Boolean(currentBics()) || sessionStorage.getItem("sfcSplashSeen") === "1";
 }
 
 /** Fade out splash (~4s); remove when done. */
@@ -95,13 +73,6 @@ function mountHomeLocate() {
   if (!slot || !slot.contains(results)) return;
   if (slot.parentElement !== brand) brand.appendChild(slot);
   if (lede.nextElementSibling !== slot) lede.after(slot);
-}
-
-function listLocateHref(bics, ticker) {
-  const p = new URLSearchParams();
-  p.set("bics", bics);
-  p.set("q", ticker);
-  return `/list?${p.toString()}`;
 }
 
 function wireHomeLocate() {
@@ -416,7 +387,7 @@ async function bootHome() {
     await waitTwoFrames();
     await sleep(2000);
     await dismissSplash();
-    sessionStorage.setItem("fidvSplashSeen", "1");
+    sessionStorage.setItem("sfcSplashSeen", "1");
     revealHome();
     await loadPromise;
   } catch (err) {
@@ -427,14 +398,9 @@ async function bootHome() {
 }
 
 function wireBackspaceUp() {
-  window.addEventListener("keydown", (e) => {
-    if (e.key !== "Backspace" || e.ctrlKey || e.metaKey || e.altKey || e.isComposing) return;
-    const el = document.activeElement;
-    if (el && (el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.isContentEditable)) return;
-    e.preventDefault();
+  wireBackspaceNav(() => {
     const links = document.getElementById("homeTrail")?.querySelectorAll("a");
-    const href = links?.length ? links[links.length - 1].getAttribute("href") : "";
-    if (href) location.assign(href);
+    return links?.length ? links[links.length - 1].getAttribute("href") : "";
   });
 }
 

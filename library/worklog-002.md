@@ -16,7 +16,7 @@
 |56| 电总参谋部：开屏居中 logo；进项目时淡出；简洁优雅。 | 任务：splash。总参谋部：#loading→FIDV SVG；boot 绘立方体后 1.0–1.2s 淡出；不跳过会话。主代理：index.html #splash、app.css splash-out、main.js dismissSplash；CONCEPTS 指针。总监第 1 次通过。 |
 |57| 电总参谋部：splash 淡出太短，至少 2 秒。 | 任务：加长 splash。总参谋部：CSS 2.0s + JS ~2200ms fallback。主代理已实现。总监第 1 次打回（DESIGN 简洁偏短）；业主覆盖后第 2 次通过。路径未提供。 |
 |58| 电总参谋部：还是好短，翻两倍。 | splash 2s→4s CSS, 2200→4200ms JS; CONCEPTS/?v=14; inspector pass #1 with owner override. |
-|59| 电总参谋部：command 加 quit 退出；改 command 图标更好看；开屏 logo 清晰态维持 3 秒。 | Open-AI-Chain.command quit+trap; fidv-launcher.icns + set-command-icon.sh applied to both launchers; splash sleep(3000) before 4s fade; README/CONCEPTS. Inspector pass #1. |
+|59| 电总参谋部：command 加 quit 退出；改 command 图标更好看；开屏 logo 清晰态维持 3 秒。 | Open-AI-Chain.command quit+trap; sfc-launcher.icns + set-command-icon.sh applied to both launchers; splash sleep(3000) before 4s fade; README/CONCEPTS. Inspector pass #1. |
 |60| 电总参谋部：检查启动图标/开屏/logo/网页设计代码，划归美工部子代理，统一美学并延展。 | GS will → created art-department agent + AESTHETIC.md ownership inventory; RULE/README/CONCEPTS/root README; no code folder move. Inspector pass #1. |
 |61| 电总参谋部：赋予调度除总监书记外所有 subagents 之权；在我安排下可编辑管理除总监书记外所有 subagent。 | GS will → updated general-staff + RULE + READMEs + AESTHETIC + art-department; hard exclude 总监/书记; parent Task dispatch + file apply; inspector pass #1. |
 |62| 书记：撰写权利架构表——子代理权利-责任、任务文件、权力关系（谁受谁管理）。 | 任务：权利架构表入册。主代理派书记。书记据 agents/README、RULE、各任务真源核对名册后写入本节下方「2. 权利架构表」。无其它子代理。路径：library/worklog-002.md。 |

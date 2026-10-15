@@ -6,7 +6,7 @@
 
 目的写死：**风险隔离**。不同功能通过特定接口连接。一块失败，别的模块只看见接口上约定的空、缺或旧值，各自继续。一块失败不得拖垮另一块。
 
-方案接在现有工程上：`ind-chain/`（概念在 `ind-chain/CONCEPTS.md`，路由在 `ind-chain/README.md` 的 API 表），行业库在 `class-3-coords/BICS-Classification/`。仍是一个本机进程 `127.0.0.1:8787`，仍是 `/`、`/list`、`/cube` 这三处入口。不另起一套服务，不把 FIDV 写成与现有页面无关的微服务说明书。
+方案接在现有工程上：`ind-chain/`（概念在 `ind-chain/CONCEPTS.md`，路由在 `ind-chain/README.md` 的 API 表），行业库在 `class-3-coords/BICS-Classification/`。仍是一个本机进程 `127.0.0.1:8787`，仍是 `/`、`/list`、`/cube` 这三处入口。不另起一套服务，不把 SFC 写成与现有页面无关的微服务说明书。
 
 这是方案，不是实施。
 

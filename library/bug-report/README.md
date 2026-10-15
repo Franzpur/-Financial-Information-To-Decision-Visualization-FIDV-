@@ -4,4 +4,4 @@
 
 当前册：[`ops-log-001.md`](./ops-log-001.md)
 
-可打印问题手册 PDF（与 showable-report 中 clone 空名单读本同题）：[`FIDV 问题手册 · GitHub 克隆后分类空.pdf`](./FIDV%20问题手册%20·%20GitHub%20克隆后分类空.pdf)
+可打印问题手册 PDF（与 showable-report 中 clone 空名单读本同题）：[`SFC 问题手册 · GitHub 克隆后分类空.pdf`](./SFC%20问题手册%20·%20GitHub%20克隆后分类空.pdf)

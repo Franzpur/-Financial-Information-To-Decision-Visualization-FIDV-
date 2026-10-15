@@ -9,9 +9,11 @@ Modular 3D industry-chain explorer backed by SQLite.
 ```
 Ind-Chain/
   data/           layers.json, companies.json, nvda-revenue-links.json (source of truth); ind_chain.db (generated)
-  server/         db.py (schema + queries), app.py (HTTP API + static)
+  server/         1:1 backend modules: app.py (BE-HTTP), bics_hier.py (BE-BICS-HIER), bics_entity.py (BE-BICS-ENTITY),
+                  listing.py (BE-BICS-AREA), bundle_dispatch.py (BE-BUNDLE), db.py (BE-DB-DEMO),
+                  db_shadow.py (BE-DB-SHADOW), nvda_links.py (BE-NVDA-LINKS), chain_layout.py (BE-NVDA-LAYOUT)
   CONCEPTS.md     bilingual concept target library (agent continuity)
-  web/            index.html, list.html, cube.html, css/, js/, vendor/three/ (local three.js 0.170.0)
+  web/            index.html, list.html, cube.html, css/, js/ (incl. nav.js FE-NAV, bondChart.js FE-FOCUS), vendor/three/
   shell/          Swift sources of the native app shell (window, back-end child, error panel, selftest)
   scripts/        build-standard-financial-charting-app.sh, package-standard-financial-charting.sh,
                   regress_all.sh, regress_api_golden.py, regress_app_lifecycle.sh, seed.py, set-command-icon.sh
@@ -65,7 +67,7 @@ Golden responses contain third-party derived data: keep them outside the repo. `
 
 Open http://127.0.0.1:8787/ — **engineering homepage** (BICS L1). The header search on L1–L3 lists matches over the page. Up/down moves the highlight; Enter fills the box with that ticker, and Enter again opens its primary L4 list (`/list?bics=<L4>&q=<ticker>`). Type `/cube` in that same box for a demo-cube hit; click or Enter opens bare `/cube` (no header button). An L4 list can sort by primary-row revenue. From an L4 list, click a company to open `/cube?ticker=`. Backspace there returns to /list?bics=<primary L4>; on the list and each home board it follows the breadcrumb’s previous link, and the level-1 board goes to /. On bare `/cube`, search `DEMO` for Demo Company (focus stage + bond sparkline). On `/cube?ticker=NVDA`, the cube builds **dynamic BICS L4 slices** (one wall per distinct primary L4 among NVIDIA and screenshot-visible peers; slice name = L4 classification) with point-to-point **C-REV-LINK** edges (`data/nvda-revenue-links.json`). No demo-layer bridge; no shell fan/sector draw. Bare `/cube` has no revenue links.
 
-Finder / Dock icon: `assets/fidv-launcher.icns` → `Standard-Financial-Charting.app/Contents/Resources/AppIcon.icns`. After replacing the asset, rebuild the app (preferred), or sync and re-sign with:
+Finder / Dock icon: `assets/sfc-launcher.icns` → `Standard-Financial-Charting.app/Contents/Resources/AppIcon.icns`. After replacing the asset, rebuild the app (preferred), or sync and re-sign with:
 
 ```bash
 ./scripts/set-command-icon.sh

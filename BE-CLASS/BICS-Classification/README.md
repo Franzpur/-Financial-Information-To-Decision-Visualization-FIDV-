@@ -1,6 +1,6 @@
 # BICS Classification — 3类坐标 / 行业坐标（C-COORD-3）
 
-Bloomberg **BICS Equity Hierarchy 2024** 层级库。这是 FIDV 的第三类坐标：**行业坐标**（产品字段仍名 `legalEntityCoord`）。不参与立方体摆放。
+Bloomberg **BICS Equity Hierarchy 2024** 层级库。这是 SFC 的第三类坐标：**行业坐标**（产品字段仍名 `legalEntityCoord`）。不参与立方体摆放。
 
 ## 真源
 

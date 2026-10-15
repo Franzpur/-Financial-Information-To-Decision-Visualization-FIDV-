@@ -218,6 +218,6 @@ python3 ind-chain/scripts/launcher_gui.py
 
 ## 11. 打印
 
-可用浏览器打开同目录 `FIDV-engineering-history-report.html`，选「打印」或「存储为 PDF」，纸张 A4。
+可用浏览器打开同目录 `SFC-engineering-history-report.html`，选「打印」或「存储为 PDF」，纸张 A4。
 
 工作日志真源仍是 `worklog-001.md`（#1–#52）、`worklog-002.md`（#53–#87）、`worklog-003.md`（#90 起）。本报告是给队员的压缩本，不以本报告改写旧日志行。

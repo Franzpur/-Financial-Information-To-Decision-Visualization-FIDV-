@@ -1,10 +1,10 @@
-# FIDV 第一版设计理念
+# SFC 第一版设计理念
 
 设计任何功能、界面或可视化之前，先读本文。本文是产品判断的依据，不是实现笔记。
 
 来源：仓库根目录 `First Version Product Idea.pdf`。
 
-**Financial Information to Decision Visualization (FIDV)**  
+**Standard-Financial-Charting (SFC)**  
 大量信息下的金融风险可视化辅助工具。
 
 第一版只服务一件事：帮金融工作者在大量信息里做判断和决策。当前阶段的重心是人工智能相关科技行业、风险控制、债务风险，以及以企业为节点的风险扩散与传导。

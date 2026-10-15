@@ -6,7 +6,7 @@ import re
 from pathlib import Path
 
 GROUPS = json.loads(Path("/tmp/plate_groups.json").read_text(encoding="utf-8"))
-OUT = Path("/Volumes/DATA/FIDV/cabinet/reports/FIDV-all-charts.html")
+OUT = Path("/Volumes/DATA/FIDV/cabinet/reports/SFC-all-charts.html")
 
 CSS = """<!DOCTYPE html>
 <html lang="zh-CN">

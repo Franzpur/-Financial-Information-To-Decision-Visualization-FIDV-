@@ -956,7 +956,7 @@
     "ticker": "DEMO",
     "country": "US",
     "layer_index": 10,
-    "note": "Synthetic showcase firm for FIDV demos (not a live issuer).",
+    "note": "Synthetic showcase firm for SFC demos (not a live issuer).",
     "value_m": null,
     "bond_schedule": [
       {

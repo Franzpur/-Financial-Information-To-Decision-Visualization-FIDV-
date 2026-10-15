@@ -90,7 +90,7 @@ ARCHS="$(lipo -archs "$APP/Contents/MacOS/Standard-Financial-Charting")"
 # 3. allow-list for Resources/sfc
 EXPECTED="$BUILD/expected.txt"
 {
-  for f in app db bundle_dispatch chain_layout listing; do echo "Ind-Chain/server/$f.py"; done
+  for f in app db db_shadow bundle_dispatch chain_layout nvda_links bics_hier bics_entity listing; do echo "Ind-Chain/server/$f.py"; done
   (cd "$ROOT/web" && find . -type f ! -name .DS_Store | sed 's#^\./#Ind-Chain/web/#')
   for f in companies layers nvda-revenue-links; do echo "Ind-Chain/data/$f.json"; done
   echo "BE-CLASS/BICS-Classification/bics-equity-hierarchy-2024.json"

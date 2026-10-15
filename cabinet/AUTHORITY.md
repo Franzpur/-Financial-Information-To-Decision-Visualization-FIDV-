@@ -78,9 +78,12 @@
 
 ## 相关落盘
 
-- 模块化纲：`cabinet/reports/FIDV-modularization-plan-v2.html`（文首「宪制」节 + §10.3 定夺）
+- 模块化纲：`cabinet/reports/SFC-modularization-plan-v2.html`（文首「宪制」节 + §10.3 定夺）
 - 前一任务周期总参令：`cabinet/orders/GS-20261014-modularization-M1-M4.md`（M1–M4；该周期计数已结）
 - W1 总参令（第 1 次 / 至多 5 · **已结**）：`cabinet/orders/GS-20261014-W1-modules-track.md`（W1 打开权 + 仓根 `modules/`；原「动态跟踪」已由业主改静态，见该令旁注与上节义务）
 - 名单勿借闸门下级整板（第 1 次 / 至多 5 · **已结**）：`cabinet/orders/GS-20261014-list-board-not-children.md`（`list_bics_entities` 不再调用 `bics_children`；三监第 1 次通过后不再令；余 4 次作废）
+- 模块与代码 1:1 结合（第 1 次 / 至多 5 · **已结**）：`cabinet/orders/GS-20261015-MOD-COMPLETE.md`（后端 `bics_hier`/`bics_entity`/`db_shadow`/`nvda_links` 四模块独立成文、`app.py` 瘦身至 352 行、前端 `nav.js` 独立与 `bondChart.js`/`scene.js` 职责归位；三监第 1 次全票通过后不再加令；余 4 次作废）
+- 总项目名称 FIDV → SFC 改名（第 1 次 / 至多 5 · **已结**）：`cabinet/orders/GS-20261015-RENAME-FIDV-SFC.md`（活文档/活配置/角色定义/运行期提示中总项目名称 `FIDV` → `SFC`、全称 `Standard-Financial-Charting`；`modules/graph.json` title 改 `SFC` 并重烘 `modules/index.html`，26/35 节点边不变；三监第 1 次全票通过后不再加令；余 4 次作废）
+- 总项目名称 FIDV → SFC 改名第二轮：保留项全改（第 1 次 / 至多 5 · **已结**）：`cabinet/orders/GS-20261015-RENAME-FIDV-SFC-R2.md`（`companies.json` 演示 `note`、`fidv-launcher*` / `FIDV-*` 报告与问题手册文件名及全仓现存文件链接、`local.fidv.Standard-Financial-Charting` Bundle ID、`fidvSplashSeen` 全部改为 `SFC`/`sfc`，重采 Golden 并重建 `.app`；三监第 3 次送审通过后不再加令；余 4 次作废）
 - 模块真源 / 静态页：`modules/graph.json` · `modules/index.html` · `modules/bake_static.py`
 - 公开流程措辞：`POWER-KNOWLEDGE.md` §3

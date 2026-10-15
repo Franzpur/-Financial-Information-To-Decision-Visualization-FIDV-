@@ -1,4 +1,4 @@
-# FIDV 美学真源（美工部）
+# SFC 美学真源（美工部）
 
 美工部判断网页与启动表层美学时，只以本文为准。产品是否服务金融决策，以 `DESIGN.md` 为准（理念贯彻属；终裁为监理部三监报告）。概念与坐标以 `Ind-Chain/CONCEPTS.md` 为准。
 
@@ -55,9 +55,9 @@
 
 **组与露出**
 
-- 可与右侧 **FIDV** 衬线字标（Iowan / Palatino / Georgia 栈）+ `--accent` 底线同组（splash / home）。
+- 可与右侧 **SFC** 衬线字标（Iowan / Palatino / Georgia 栈）+ `--accent` 底线同组（splash / home）。
 - **单独露出**时只保留三框（纸面封面、仅标露出等），不另起第二套皮。
-- 启动图标 `Ind-Chain/assets/fidv-launcher*` 同族；纸面只用同族反相矢量。
+- 启动图标 `Ind-Chain/assets/sfc-launcher*` 同族；纸面只用同族反相矢量。
 
 **禁止**
 
@@ -67,7 +67,7 @@
 
 ### 字标与开屏（C-SPLASH）
 
-- 居中 **FIDV** 字标 + 左侧 **Logo 标准**三框 + accent 细线（几何见上节；现稿勿擅自改形）。
+- 居中 **SFC** 字标 + 左侧 **Logo 标准**三框 + accent 细线（几何见上节；现稿勿擅自改形）。
 - 入场：约 **0.4s** 轻淡入（`splash-in`）。
 - **仅挂在工程首页 `/`（C-HOME）**：清晰态维持约 **2s**，再 **约 4s** opacity 淡出（JS fade fallback **4200ms**）。开屏期实心 `--bg` 盖住门厅，避免与 `.home-logo` 双标叠影；淡出后再露格阵。`?bics=` 下钻不重播。
 - **进 `/cube`（含分类入口）不播开屏。**
@@ -76,7 +76,7 @@
 ### 启动图标与原生壳面板
 
 - 暗底上 **Logo 标准**三框同族 + accent 细线（与 splash 左标同族，非另皮）。
-- 源与产物：`Ind-Chain/assets/fidv-launcher-1024.png`、`fidv-launcher.icns`。
+- 源与产物：`Ind-Chain/assets/sfc-launcher-1024.png`、`sfc-launcher.icns`。
 - 施加：`Ind-Chain/scripts/set-command-icon.sh` → 根 `Standard-Financial-Charting.app/Contents/Resources/AppIcon.icns`（访达双击 `.app`，无 Terminal）。
 - 原 tkinter 启动窗已于 P4 退役；色板见上（BG `#0b0d10`、MUTED `#9aa6b5` 等），原生壳错误面板与窗背景沿用同一板（`Ind-Chain/shell/ErrorPanel.swift`）。
 
@@ -102,7 +102,7 @@
 
 1. **先复用 token**：新面只用上表 CSS 变量，不引入第二套色名。
 2. **浮于工程区**：新面板默认玻璃浮层，不恢复实心双栏。
-3. **一字标族**：品牌露出用 **Logo 标准**三框（可加 FIDV 字标 + accent 底线）；不另做吉祥物、不另起第二套皮。
+3. **一字标族**：品牌露出用 **Logo 标准**三框（可加 SFC 字标 + accent 底线）；不另做吉祥物、不另起第二套皮。
 4. **动效克制**：以 opacity / 轻微 scale 为主；不为装饰加粒子或 3D logo。
 5. **语义色不动**：US / 非美 / 环导读色变更须同时过 CONCEPTS，不单走美工部。
 
@@ -119,7 +119,7 @@
 | 立方体壳 | `Ind-Chain/web/cube.html`（C-CUBE；无 splash） |
 | splash 时序 | `Ind-Chain/web/js/home.js`（hold ~2s → fade ~4s） |
 | 面板类名与 HUD 外观 | `Ind-Chain/web/js/ui.js`（视觉层） |
-| 启动图标 | `Ind-Chain/assets/fidv-launcher*` |
+| 启动图标 | `Ind-Chain/assets/sfc-launcher*` |
 | 图标脚本 | `Ind-Chain/scripts/set-command-icon.sh` |
 | 启动器附着面 | 根 `Standard-Financial-Charting.app` 图标资源；原生壳错误面板色板（沿用本文，`Ind-Chain/shell/ErrorPanel.swift`） |
 | Logo 几何真源 | `Ind-Chain/web/index.html`（`.splash-logo` 三框）；纸面同族 `library/showable-report/assets/sfc-logo-frames-paper.svg`（秘书纸面附着；几何以本文 Logo 标准为准） |

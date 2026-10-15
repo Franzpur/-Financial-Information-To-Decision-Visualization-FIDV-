@@ -1,11 +1,13 @@
 /**
- * Bond schedule sparkline for [C-COMPANY-ZOOM] (search-open path).
- * Units: $bn. Hidden entirely when schedule is missing/empty.
+ * FE-FOCUS — Focus-stage transitions ([C-FOCUS], [C-COMPANY-ZOOM]), point focus targets,
+ * and bond schedule sparkline ($bn, hidden when schedule is missing/empty).
  */
+import { state } from "./state.js?v=55";
 
 const W = 560;
 const H = 140;
 const PAD = { l: 36, r: 10, t: 12, b: 26 };
+const ZOOM_MS = 450;
 
 function seriesPoints(rows, key, x0, y0, plotW, plotH, yMax) {
   const n = rows.length;
@@ -92,4 +94,127 @@ export function bondChartHtml(schedule) {
       </svg>
     </section>
   `;
+}
+
+/**
+ * Compute target emissive, opacity, and hover scale for a company point under [C-FOCUS].
+ */
+export function focusPointTargets({ shellCube, selected, hovered, lit, country }) {
+  const targetEmissive = shellCube
+    ? null
+    : selected
+      ? 2.2
+      : hovered
+        ? 1.9
+        : lit
+          ? country === "US"
+            ? 0.75
+            : 0.7
+          : 0.06;
+  const targetOpacity = lit ? 1 : 0;
+  const targetHoverScale = selected
+    ? shellCube
+      ? 1.45
+      : 1.4
+    : hovered
+      ? 1.5
+      : lit
+        ? 1
+        : 0.55;
+  return { targetEmissive, targetOpacity, targetHoverScale };
+}
+
+/**
+ * [C-COMPANY-ZOOM] Focus-stage controller for search-opened companies on a focused slice.
+ */
+export function createCompanyFocusStage({
+  viewport,
+  companyFocus,
+  companyFocusBody,
+  companyFocusClose,
+  detailMarkup,
+  renderDetail,
+  onRequestClearFocus,
+}) {
+  let zoomToken = 0;
+  let zoomOpen = false;
+  let zoomExitTimer = null;
+  let pendingZoomTimer = null;
+
+  function cancelPendingZoom() {
+    if (pendingZoomTimer != null) {
+      clearTimeout(pendingZoomTimer);
+      pendingZoomTimer = null;
+    }
+  }
+
+  function enterCompanyZoom(c) {
+    if (!companyFocus || !viewport || !c) return;
+    if (state.focusLayer == null) return;
+    cancelPendingZoom();
+    if (zoomExitTimer != null) {
+      clearTimeout(zoomExitTimer);
+      zoomExitTimer = null;
+    }
+    zoomToken += 1;
+    companyFocusBody.innerHTML = detailMarkup(c) + bondChartHtml(c.bondSchedule);
+    companyFocus.hidden = false;
+    companyFocus.setAttribute("aria-hidden", "false");
+    renderDetail(c);
+    requestAnimationFrame(() => {
+      if (state.focusLayer == null || state.selectedId !== c.id) return;
+      viewport.classList.add("company-zoom");
+      companyFocus.classList.add("is-open");
+      zoomOpen = true;
+    });
+  }
+
+  function exitCompanyZoom() {
+    cancelPendingZoom();
+    if (!companyFocus || !viewport) return;
+    if (!zoomOpen && companyFocus.hidden) return;
+    const token = ++zoomToken;
+    viewport.classList.remove("company-zoom");
+    companyFocus.classList.remove("is-open");
+    zoomOpen = false;
+    if (zoomExitTimer != null) clearTimeout(zoomExitTimer);
+    zoomExitTimer = setTimeout(() => {
+      zoomExitTimer = null;
+      if (token !== zoomToken) return;
+      companyFocus.hidden = true;
+      companyFocus.setAttribute("aria-hidden", "true");
+      companyFocusBody.innerHTML = "";
+    }, ZOOM_MS);
+  }
+
+  function scheduleCompanyZoom(c, delayMs) {
+    cancelPendingZoom();
+    const id = c.id;
+    pendingZoomTimer = setTimeout(() => {
+      pendingZoomTimer = null;
+      if (state.selectedId !== id || state.focusLayer == null) return;
+      enterCompanyZoom(c);
+    }, delayMs);
+  }
+
+  if (companyFocusClose) {
+    companyFocusClose.addEventListener("click", (e) => {
+      e.stopPropagation();
+      onRequestClearFocus?.();
+    });
+  }
+  if (companyFocus) {
+    companyFocus.addEventListener("click", (e) => {
+      if (e.target.closest(".company-focus-inner")) return;
+      if (e.target.closest(".company-focus-close")) return;
+      onRequestClearFocus?.();
+    });
+  }
+
+  return {
+    enterCompanyZoom,
+    exitCompanyZoom,
+    scheduleCompanyZoom,
+    cancelPendingZoom,
+  };
 }

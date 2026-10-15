@@ -15,7 +15,7 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 REPO="$(cd "$ROOT/.." && pwd)"
 APP_DIR="${SFC_APP_DIR:-$REPO}"
 APP="$APP_DIR/Standard-Financial-Charting.app"
-ICNS_SRC="$ROOT/assets/fidv-launcher.icns"
+ICNS_SRC="$ROOT/assets/sfc-launcher.icns"
 if [[ $# -gt 0 ]]; then
   if [[ "$1" == "--legacy" ]]; then
     echo "--legacy was retired in P4; the last commit that still has the old launcher is 019af67" >&2
@@ -127,7 +127,7 @@ cat >"$STAGE/Contents/Info.plist" <<'PLIST'
 	<key>CFBundleIconFile</key>
 	<string>AppIcon</string>
 	<key>CFBundleIdentifier</key>
-	<string>local.fidv.Standard-Financial-Charting</string>
+	<string>local.sfc.Standard-Financial-Charting</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
