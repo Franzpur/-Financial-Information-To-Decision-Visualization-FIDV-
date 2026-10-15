@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>SFC 交互性与自主作图：从静态展厅到约束坐标制图台 · 内阁读本</title>
+<style>
+:root {
+  --paper: #f7f5f0;
+  --ink: #1a1f26;
+  --muted: #4a5560;
+  --rule: #c5ccd4;
+  --fill: #ece8e0;
+}
+@page { size: A4; margin: 14mm 14mm 16mm; }
+* { box-sizing: border-box; }
+body {
+  margin: 0 auto;
+  padding: 16mm 16mm 22mm;
+  max-width: 180mm;
+  color: var(--ink);
+  background: var(--paper);
+  font-family: "Iowan Old Style", "Palatino Linotype", Palatino, "Songti SC", "Noto Serif SC", serif;
+  font-size: 11pt;
+  line-height: 1.45;
+}
+h1 { font-size: 18pt; font-weight: 600; letter-spacing: 0.04em; margin: 0.2em 0 0.3em; }
+.brand { letter-spacing: 0.07em; font-size: 13pt; margin: 0; }
+h2 { font-size: 12.5pt; border-bottom: 1px solid var(--rule); padding-bottom: 0.15em; margin-top: 1.35em; page-break-after: avoid; }
+h3 { font-size: 11.5pt; font-weight: 600; margin: 1.05em 0 0.25em; page-break-after: avoid; }
+p { margin: 0.45em 0; }
+.cover-meta { color: var(--muted); font-size: 10pt; }
+.lede { color: var(--muted); font-size: 10pt; }
+.no-print { font-size: 10pt; color: var(--muted); border-bottom: 1px solid var(--rule); padding-bottom: 0.6em; margin-bottom: 1em; }
+ul, ol { margin: 0.35em 0 0.7em; padding-left: 1.3em; }
+li { margin: 0.22em 0; }
+table { width: 100%; border-collapse: collapse; font-size: 9.5pt; margin: 0.6em 0 1em; page-break-inside: avoid; }
+th, td { border: 1px solid var(--rule); padding: 0.28em 0.45em; text-align: left; vertical-align: top; }
+th { background: var(--fill); font-weight: 600; }
+code, pre { font-family: "SF Mono", ui-monospace, Menlo, Consolas, monospace; }
+code { font-size: 0.86em; }
+pre { background: #efece6; border: 1px solid var(--rule); padding: 0.55em 0.7em; font-size: 9pt; line-height: 1.4; page-break-inside: avoid; overflow-x: auto; }
+@media print {
+  body { background: white; }
+  .no-print { display: none; }
+  a { color: inherit; text-decoration: none; }
+}
+</style>
+</head>
+<body>
+<p class="no-print">浏览器打开 → 打印 → 存 PDF → 关掉页眉网址。</p>
+<p class="brand">FIDV · SFC</p>
+<h1>交互性与自主作图：从静态展厅到约束坐标制图台</h1>
+<p class="cover-meta">内阁深度读本（重写版） · 2026-10-15 · 架构与产品判断（非令） · 供业主 Purkniv 审阅</p>
+<p class="lede">产品路径 <code>Ind-Chain/</code> · 品牌字样 SFC · 姊妹篇 <code>SFC-three-interaction-modes-and-llm-view.html</code> · 模块真源 <code>modules/graph.json</code>（26 模块 / 35 边）</p>
+
+<p><strong>业主原话：</strong>「目前很多演示都是静态的，就是我把图搭好，关系搭好，让你把映射函数写好，然后展示出来看，这是很不足的，作为一个工具，他应该更多的是交互性的，自主作图的，只是格式被我们限制住，可做的图的形式被我们大大扩展，你对此有什么看法，写一个 report。」</p>
+
+<h2>1. 核心论断：为什么「限制格式」恰恰是「扩展图的形式」的数学前提</h2>
+<p>业主这句话点破了 Standard-Financial-Charting（SFC）从「演示沙盘」蜕变为「专业金融制图工具」的根本辩证法：<strong>格式（Format）越严格、越正交，可承载的图的形式（Forms）反而越广阔。</strong></p>
+<p>在可视化工程中，常见的误区是把「自主作图」等同于「无约束自由画布」（如白板工具或任意 3D 建模软件，允许用户随便摆放 <code>(X, Y, Z)</code>、随便改颜色与形状）。一旦放开格式，每一张图都退化为孤立的手工插画：两张图之间无法对比，相机无法保持标准视角（<code>C-STDVIEW</code>），切片间距 <code>d</code> 的拉合失去几何意义，更谈不上 <code>DESIGN.md</code> 所要求的「标准化」与「基于坐标的全局移动」。</p>
+<p>反之，回顾笛卡尔平面直角坐标系或五线谱：五线谱把纵轴严格锁死在音高、横轴严格锁死在节拍，正因为<strong>谱面格式被死死限制住</strong>，它才得以脱离单首乐曲的死记硬背，通用于交响乐、赋格、爵士与室内乐。同理，SFC 已经在代码与契约层建立了一套<strong>三维金融坐标语法（Coordinate Grammar）</strong>：</p>
+
+<table>
+  <thead>
+    <tr><th>约束维度</th><th>代码与契约真源</th><th>锁死的不变量（Format Invariants）</th><th>由此解放的制图自由度（Form Expressiveness）</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>1 类坐标（位置坐标）</strong><br><code>C-COORD</code></td>
+      <td><code>web/js/coords.js</code><br><code>coordToLocal(coord, nLayers, gap)</code></td>
+      <td>唯一空间元组 <code>(s, x, y)</code>。<code>s</code> 为切片序，<code>x, y ∈ [0, 10]</code>（物理边长 <code>FACE = 4.2m</code>，<code>UNIT = 0.42m</code>）；层间距 <code>gap = d · UNIT</code>（<code>d ∈ [0, 2]</code>）。严禁直接写 Three.js 原始 XYZ。</td>
+      <td>任意有序阶段、行业分层、期限桶（Maturity Bucket）或时间快照均可映射至 <code>s</code> 轴；拉动 <code>d</code> 即可在「压缩叠合比对（<code>d → 0</code>）」与「三维展开穿透（<code>d = 1..2</code>）」间无损切换。</td>
+    </tr>
+    <tr>
+      <td><strong>2 类坐标（相对坐标）</strong><br><code>C-COORD-2</code></td>
+      <td><code>coords.js: companyCoord()</code><br><code>LAYOUT.ringRadius = 3.8</code></td>
+      <td>切片面内位置唯一由极坐标投影 <code>ringCos, ringSin ∈ [-1, 1]</code> 决定：<code>x = 5 - 3.8·ringCos</code>，<code>y = 5 + 3.8·ringSin</code>；离散同心环 <code>ring ∈ 0..10</code>（10 为面心 <code>(5, 5)</code>）。</td>
+      <td>极径 <code>r</code> 可编码任意归一化核心度指标（营收规模、采购/销售占比、杠杆率、违约距离）；极角 <code>θ</code> 可编码任意二元或扇区划分（供应/客户半盘、美/非美、业务分部）。</td>
+    </tr>
+    <tr>
+      <td><strong>3 类坐标（行业坐标）</strong><br><code>C-COORD-3</code></td>
+      <td><code>BE-BICS-HIER</code> / <code>BE-BICS-ENTITY</code><br><code>legalEntityCoord</code></td>
+      <td>Bloomberg BICS 7×2 连字符编码（主业空 <code>% Tot Rev</code> 前置 <code>-</code>，门板/列表展示前 4 段）。不直接充当三维坐标，但作为每个法人实体的权威分类锚。</td>
+      <td>任何进入制图台的公司无需手工标注行业属性，天然携带 1–7 级行业树基因，随时可按 L1/L2/L3/L4 聚合、切分或着色对照。</td>
+    </tr>
+    <tr>
+      <td><strong>四项几何原语</strong><br><code>C-SLICE</code> / <code>C-POINT</code> / <code>C-RING</code> / <code>C-REV-LINK</code></td>
+      <td><code>web/js/scene.js</code><br><code>buildCube</code> / <code>buildRevenueLinks</code></td>
+      <td>仅允许四类视觉构件：共面玻璃切片（<code>C-SLICE</code>）、与面共面的米白实心盘+美/非美色环（<code>C-POINT</code>）、同心环导轨（<code>C-RING</code>）、点对点双描边传导曲线（<code>C-REV-LINK</code>，墨绿 <code>#1f7a5a</code> / 暗红 <code>#9e3a34</code>）。</td>
+      <td>一切「节点属性 + 层间/层内有向传导关系」的金融风险网络，无须修改一行前端 Three.js 渲染代码，即可直接成图、聚焦（<code>C-FOCUS</code>）、钉住（<code>C-PIN</code>）与缩放检视（<code>C-COMPANY-ZOOM</code>）。</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>结论一：</strong>SFC 的三维渲染管线（<code>FE-OPENCUBE</code> + <code>FE-SCENE</code> + <code>FE-COORDONE</code> + <code>FE-FOCUS</code>）实际上已经是一台<strong>通用三维金融图渲染机</strong>。今天之所以显得「静态、单一」，绝不是因为三维格式限制太死，而是因为后端把「数据、选股、分片规则、排环规则」写死在了具体的 Python 函数里，没有把这套坐标语法的<strong>映射控制权（Mapping Sovereignty）</strong>交给运行时用户。</p>
+
+<h2>2. 代码级解剖：为什么当前工程困在「静态展厅样板」？</h2>
+<p>检视当前仓库的 <code>Ind-Chain/server/bundle_dispatch.py</code>、<code>chain_layout.py</code> 与 <code>app.py</code>，可以清晰看到「业主仓外搭关系 → 代理仓内写死映射函数 → 前端静态展示」的工程症结所在。</p>
+
+<h3>2.1 捆绑编排（<code>BE-BUNDLE</code>）的三分法与结构断层</h3>
+<p>在 <code>bundle_dispatch.py</code> 中，<code>GET /api/bundle?ticker=...</code> 根据参数分发至三种 <code>meta.mode</code>：</p>
+
+<table>
+  <thead>
+    <tr><th><code>meta.mode</code></th><th>后端入口与依赖模块</th><th>代码实际行为</th><th>为什么它是「静态展厅」而非「自主制图台」</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>demo</code><br>（演示集）</td>
+      <td><code>build_demo_bundle()</code><br><code>BE-DB-DEMO</code> (<code>db.py</code>)</td>
+      <td>读取 <code>ind_chain.db</code> 中由 <code>layers.json</code>（6 层）与 <code>companies.json</code>（96 家公司）种入的静态表；调用 <code>db.assign_rings()</code> 按同层 <code>revBn</code> min-max 排同心环，连线为空。</td>
+      <td>层定义（0 电力 → 5 大模型）与 96 个节点完全固化在 JSON/SQLite 种子里；用户无法在运行时增删一个节点、无法画一条传导边、无法切换环半径指标。</td>
+    </tr>
+    <tr>
+      <td><code>shell</code><br>（影集/空墙）</td>
+      <td><code>bundle_shell_ticker()</code><br><code>BE-DB-SHADOW</code> + <code>BE-BICS-ENTITY</code></td>
+      <td>从 <code>bics_entities_20261003.db</code> 解析任意非 NVDA 的 ticker，返回 <code>layers: []</code>、<code>revenueLinks: []</code>，仅将该单家公司塞在硬编码坐标 <code>{"s": 5, "x": 5, "y": 5}</code>。</td>
+      <td><strong>这是最大的交互断头路：</strong>用户从 2.8 万家 BICS 公司名单（<code>FE-LIST</code>）点击任意一家公司（如 <code>TSM</code>、<code>ORCL</code>、<code>GOOGL</code>）进入制图台（<code>FE-OPENCUBE</code>），看到的却是一堵没有任何切片、没有任何同业与上下游、也无法添加任何东西的空墙。名义上叫「跳转制图台」，实际上只是一个单点陈列柜。</td>
+    </tr>
+    <tr>
+      <td><code>chain</code><br>（链实例）</td>
+      <td><code>bundle_nvda_chain()</code><br><code>BE-NVDA-LINKS</code> + <code>BE-NVDA-LAYOUT</code></td>
+      <td>在 <code>app.py:1253</code> 通过 <code>register_chain("nvda", lambda key: key.split(" ", 1)[0] == "NVDA", bundle_nvda_chain)</code> 唯一注册。读取 <code>data/nvda-revenue-links.json</code>，按主业 BICS L4 切层，调用 <code>assign_nvda_chain_rings</code> 排左右半盘。</td>
+      <td>虽然抽象出了注册表与 <code>chain_layout.py</code>，但<strong>关系数据源、分片逻辑、排序逻辑、中心兜底全部硬编码在 <code>bundle_nvda_chain</code> 的 360 行 Python 代码（<code>app.py:576–939</code>）中</strong>。要看 AMD、博通或甲骨文的链，必须由代理再造一份 JSON 并再注册一个 builder。</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>2.2 映射函数的「五重耦合」解剖</h3>
+<p>为什么每次业主想看一张新图，都要「我把图搭好、关系搭好，让你把映射函数写好」？因为当前在 <code>app.py</code> 与 <code>chain_layout.py</code> 中，以下<strong>五个本应正交解耦的制图算子</strong>被焊接在了一起：</p>
+<ol>
+  <li><strong>实体集合算子（Entity Selection）</strong>：哪些公司进入当前立方体？目前要么是 <code>companies.json</code> 全集，要么是 <code>nvda-revenue-links.json</code> 的 <code>peers</code> 列表，要么是 <code>shell</code> 模式的单点。运行时没有「画布实体池（Active Working Set）」的概念。</li>
+  <li><strong><code>s</code> 轴切片算子（Slice Partition &amp; Ordering Rule）</strong>：在 <code>_order_nvda_l4_slices()</code>（<code>app.py:622</code>）中，分片规则被写死为「供应商主业 BICS L4（按编码升序，居 <code>-s</code>）→ 中心公司 BICS L4 → 客户主业 BICS L4（居 <code>+s</code>），若双侧共现则归入供应商侧」。如果用户想按 BICS L3 分片、按产业链自定义阶段分片、或把中心公司单独拎成一层，就必须改 Python 代码。</li>
+  <li><strong>面内极径算子（Radial Metric &amp; Normalization Rule）</strong>：在 <code>db.py:135</code>（<code>_score_company</code>）中极径写死读 <code>revBn</code> 且按层内（per-slice）min-max 归一化；而在 <code>chain_layout.py:44</code> 中极径写死读 <code>linkPct</code> 且按全局半盘（global half-disk）线性映射 <code>radial = 0.92 - (score / 100.0) * 0.74</code>。这两套算子本是同一极径公式的不同参数，却分裂在两个模块里。</li>
+  <li><strong>面内极角算子（Angular Sector Rule）</strong>：在 <code>db.py:146</code> 中极角是黄金角/层偏置均匀撒点；在 <code>chain_layout.py:39–41</code> 中极角被硬编码为左半盘（<code>supplier: [-π/2+0.28, π/2-0.28]</code> → <code>ringCos &gt; 0</code> → <code>x &lt; 5</code>）与右半盘（<code>customer: [π/2+0.28, 3π/2-0.28]</code> → <code>ringCos &lt; 0</code> → <code>x &gt; 5</code>）。</li>
+  <li><strong>连线生成算子（Edge / Link Rule）</strong>：在 <code>_nvda_build_links()</code>（<code>app.py:831</code>）中，连线被写死为星型拓扑（全部从 <code>nvda_id</code> 连向 <code>peer_id</code>）。若要表达多跳传导（如「台积电 → 英伟达 → 微软 → OpenAI」）或同层交叉担保，现有 builder 无法表达，尽管前端 <code>scene.js: buildRevenueLinks</code> 本身支持任意 <code>fromId → toId</code> 的点对点三维连线！</li>
+</ol>
+<p><strong>关键发现：前端 <code>scene.js</code> 的能力远大于后端 <code>bundle_nvda_chain</code> 喂给它的数据！</strong> 前端 <code>buildRevenueLinks</code> 只需要 <code>{fromId, toId, side, pct, name, country}</code> 就能在任意两个切片（甚至同一切片）的任意两个 <code>C-POINT</code> 之间画出带权重的双描边曲线；前端 <code>buildCube</code> 只需要 <code>layers[]</code> 和带 <code>(layer, ringCos, ringSin)</code> 的 <code>companies[]</code> 就能渲染出任意层数的立方体。瓶颈 100% 在于后端缺少一层<strong>声明式的制图规约（ChartSpec）与通用布局编译器</strong>。</p>
+
+<h2>3. 在锁死的 SFC 格式下，「图的形式大大扩展」究竟能长出哪些图种？</h2>
+<p>只要我们严格守住 SFC 的格式契约（<code>(s, x, y)</code> 坐标、<code>ringCos/ringSin</code> 环投影、<code>C-SLICE / C-POINT / C-RING / C-REV-LINK</code> 四原语、美/非美双色环、墨绿/暗红双描边线），仅通过组合不同的 <strong><code>(s 轴分片算子, 极径 r 算子, 极角 θ 算子, 连线 Link 算子)</code></strong>，SFC 就能在不改任何前端视觉标准的前提下，从今天的 1 种图（单中心星型供应链图）直接扩展出至少 <strong>6 种服务于金融风险判断与决策（<code>DESIGN.md</code> §1）的标准图式</strong>：</p>
+
+<table>
+  <thead>
+    <tr><th>图的形式（Chart Form）</th><th><code>s</code> 轴（切片层）语义</th><th>面内极径 <code>r</code>（同心环）语义</th><th>面内极角 <code>θ</code>（扇区/半盘）语义</th><th><code>C-REV-LINK</code>（有向边）语义</th><th>直接服务的金融决策（对照 <code>DESIGN.md</code>）</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>形式 I：单锚点上下游传导图</strong><br>（Ego Supply/Rev Chain，当前 NVDA 范式泛化至全库）</td>
+      <td>锚点与关联方的 BICS L4（或 L3）：上游居 <code>-s</code>，锚点居中，下游居 <code>+s</code></td>
+      <td>对锚点的采购占比 <code>spendPct</code> 或销售占比 <code>revPct</code>（占比越高越贴近圆心）</td>
+      <td>左半盘（<code>x &lt; 5</code>）= 供应商；右半盘（<code>x &gt; 5</code>）= 客户；锚点居圆心 <code>(5, 5)</code></td>
+      <td>锚点 ↔ 上下游节点的成本/收入暴露权重</td>
+      <td>识别单一科技巨头（如 NVDA、TSM、GOOGL、ORCL）的供应链单点故障与收入集中度风险。</td>
+    </tr>
+    <tr>
+      <td><strong>形式 II：多跳产业链级联图</strong><br>（Multi-Hop Cascade Cube）</td>
+      <td>按价值链传导跳数或自定义工序分层：<code>s=0</code> 能源/公用事业 → <code>s=1</code> 晶圆/设备 → <code>s=2</code> 算力芯片 → <code>s=3</code> 云厂/CSP → <code>s=4</code> 模型与应用</td>
+      <td>节点自身行业营收规模 <code>ind_rev</code>（<code>revBn</code>）或资本开支强度</td>
+      <td>按上市属地或法域分扇区（<code>US</code> 左半盘 vs <code>INTL</code> 右半盘，或按 BICS 子类分扇区）</td>
+      <td>跨层多跳有向边（<code>A → B → C → D</code>），支持任意层间与同层连线</td>
+      <td>追踪资本开支（CapEx）泡沫或断供冲击如何从终端需求逐层向晶圆与电力传导。</td>
+    </tr>
+    <tr>
+      <td><strong>形式 III：债务到期墙与信用风险传导图</strong><br>（Debt Maturity &amp; Credit Contagion Cube）</td>
+      <td>按<strong>债务到期年份桶（Maturity Wall）</strong>或信用评级档位切分：如 <code>s=0 (2026)</code> → <code>s=1 (2027)</code> → <code>s=2 (2028)</code> → <code>s=3 (2029+)</code>（直接复用并升维现有 <code>bondSchedule</code> 数据）</td>
+      <td>当年到期本息规模 <code>totalBn</code> 或净债务/EBITDA 杠杆率（到期压力越大越逼近靶心 <code>ring=10</code>）</td>
+      <td>左半盘 = 经营现金流可覆盖（安全区）；右半盘 = 需再融资/滚动发债（高危区）</td>
+      <td>跨期同一企业的滚续轨迹，或企业间的交叉违约、租赁承诺、应收账款敞口（如雲厂对 AI 算力租赁商的长期租约）</td>
+      <td><strong>直击 <code>DESIGN.md</code> §1 核心：</strong>「风险类型上尤其注重债务风险；可视化上尤其注重以企业为节点的风险扩散与传导关系」。一眼看清哪一年、哪几家高杠杆节点构成再融资悬崖。</td>
+    </tr>
+    <tr>
+      <td><strong>形式 IV：同业切片集中度与对标图</strong><br>（Sub-Industry Cohort &amp; Monopoly Stack）</td>
+      <td>用户在 BICS 树中任选 N 个 L3/L4 细分行业并排为切片（如「晶圆代工」「半导体设备」「HBM 存储」「光模块」）</td>
+      <td>该企业在所属 L4 内的营收份额 <code>pct_tot_rev</code> 或绝对营收 <code>ind_rev</code></td>
+      <td>按地区 <code>listingCountry</code> 扇区排布，保持同心环间距均匀</td>
+      <td>跨细分行业的整合并购、交叉持股或战略绑定关系（无连线时可纯看同心环分布）</td>
+      <td>通过观察各切片靶心是「单寡头独占（1 点居 <code>ring=10</code>，其余散落外环）」还是「群雄割据（多点密集于中环）」，瞬间判断产业链哪一环具有不可替代的定价权。</td>
+    </tr>
+    <tr>
+      <td><strong>形式 V：主业与副业跨界渗透图</strong><br>（Cross-Segment Penetration Cube）</td>
+      <td>利用 <code>bics_entities_20261003.db</code> 中同一 ticker 的多条 <code>entity_memberships</code> 记录，以涉及的多个 BICS L1/L4 为切片</td>
+      <td>该企业在该切片行业的营收占比 <code>pct_tot_rev</code>（主业接近靶心，副业居外环）</td>
+      <td>主业节点居内环，跨界渗透节点居外侧扇区</td>
+      <td>同一法人主体在不同行业切片上的分身连线（跨层同名锚定线）</td>
+      <td>看清大型科技巨头（如 Alphabet、Microsoft、Amazon）如何在云计算、芯片自研、能源采购等多个切片同时卡位。</td>
+    </tr>
+    <tr>
+      <td><strong>形式 VI：时序 / 压力情景演进图</strong><br>（Temporal / Stress-Scenario Cube）</td>
+      <td><code>s</code> 轴代表时间截面或压力测试梯度：<code>s=0</code> 基准期 → <code>s=1</code> 利率 +100bp → <code>s=2</code> AI 算力需求下修 30%</td>
+      <td>压力情景下的利息覆盖倍数倒数或流动性缺口评分</td>
+      <td>固定极角 <code>θ_i</code>（同一公司在所有 <code>s</code> 切片保持相同方位角，仅极径随风险恶化向靶心收缩）</td>
+      <td>连接同一公司在 <code>s=0 → s=1 → s=2</code> 的状态迁移轨迹线</td>
+      <td>拉动右下角间距滑块 <code>d</code>（从 <code>0%</code> 到 <code>150%</code>）时，直观看到哪些节点在压力下从外环安全区急速坠入中心高危区。</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>请看上表：<strong>这六种截然不同的专业金融分析图，没有破坏任何一条 <code>CONCEPTS.md</code> 的冻结约定！</strong> 它们全部使用 <code>(s, x, y)</code> 摆放、全部在 <code>[0, 10]²</code> 的切片面上用 <code>ringCos/ringSin</code> 投射同心环、全部使用 <code>C-REV-LINK</code> 绘制传导边、全部支持 <code>[</code> / <code>]</code> 切层、<code>Shift</code> 钉住多层比对、<code>d</code> 滑块抽拉间距、<code>C</code> 键标准视角、以及 <code>A/F</code> 隐藏切片环导轨只看纯三维骨架。这就是业主所言「格式被我们限制住，可做的图的形式被我们大大扩展」在工程与数学上的精确落地。</p>
+
+<h2>4. 破局枢纽：引入声明式「图方案规约（<code>ChartSpec</code>）」与通用布局引擎</h2>
+<p>要从「每次让代理改 Python 写死映射函数」转向「运行时交互式自主作图」，工程上绝不是去改前端的三维渲染器，而是在后端 <code>BE-BUNDLE</code> 内部，把原本硬编码在 <code>bundle_nvda_chain</code> 里的逻辑，提炼为一份<strong>可序列化、可编辑、可校验、可保存的声明式图方案（<code>ChartSpec</code>）</strong>，并由一个<strong>通用链/立方体编译器（Generic Layout Compiler）</strong>将其编译为现有的标准 Bundle JSON。</p>
+
+<h3>4.1 <code>ChartSpec</code> 的最小完备结构设计（概念草案）</h3>
+<p>一份图方案不需要知道任何 Three.js 细节，它只需要声明四个正交槽位：</p>
+<pre>{
+  "specVersion": 1,
+  "chartId": "semi-capex-contagion-01",
+  "title": "AI Semiconductor &amp; Cloud CapEx Contagion",
+  "formPreset": "ego_chain | multi_hop | cohort_compare | debt_wall",
+
+  "workingSet": {
+    "anchorTicker": "NVDA US Equity",
+    "nodes": [
+      { "ticker": "NVDA US Equity", "role": "center",   "stageOverride": null, "metricOverride": null },
+      { "ticker": "2330 TT Equity", "role": "supplier", "stageOverride": null, "metricOverride": 37.35 },
+      { "ticker": "MSFT US Equity", "role": "customer", "stageOverride": null, "metricOverride": 18.88 }
+    ],
+    "cohortBicsPrefixes": []
+  },
+
+  "sAxisRule": {
+    "partitionBy": "bics_l4 | bics_l3 | custom_stage | maturity_year",
+    "orderPolicy": "supplier_center_customer | bics_code_asc | custom_list",
+    "customOrder": []
+  },
+
+  "faceRule": {
+    "radialMetric": "link_pct | ind_rev | pct_tot_rev | debt_total_bn | custom_metric",
+    "normalization": "global_half_disk | per_slice_minmax | global_minmax",
+    "invertRadial": false,
+    "angularPartition": "supplier_customer_halves | us_intl_halves | uniform_spiral | fixed_by_ticker"
+  },
+
+  "linkRule": {
+    "edges": [
+      { "fromTicker": "NVDA US Equity", "toTicker": "2330 TT Equity", "side": "supplier", "weightPct": 37.35 },
+      { "fromTicker": "NVDA US Equity", "toTicker": "MSFT US Equity", "side": "customer", "weightPct": 18.88 }
+    ]
+  }
+}</pre>
+
+<h3>4.2 编译流水线：如何完美复用现有 26 模块架构？</h3>
+<p>当引入 <code>ChartSpec</code> 后，前后端契约与模块边界不仅不会被打乱，反而使 <code>BE-BUNDLE</code>、<code>BE-DB-SHADOW</code>、<code>BE-NVDA-LAYOUT</code> 的职责彻底理顺：</p>
+<ol>
+  <li><strong>实体自动富化（Entity Enrichment）</strong>：<code>ChartSpec.workingSet</code> 里只需要给出 <code>ticker</code>（或通过搜索定位到的 BICS 节点），后端调 <code>BE-BICS-ENTITY</code>（<code>bics_entities_20261003.db</code>）与 <code>BE-BICS-AREA</code>（<code>listing.py</code>）自动补齐公司的标准名称、主业 L4 编码与名称、7×2 <code>legalEntityCoord</code>、<code>ind_rev</code>（自动换算 <code>revBn</code>）以及 <code>US / INTL</code> 属地。用户制图时根本不用手填这些基础金融元数据！</li>
+  <li><strong><code>s</code> 轴切片编排（Slice Compiler）</strong>：根据 <code>sAxisRule</code>，将富化后的实体集合分配到对应的切片 <code>layers[]</code> 中，生成连续整数索引 <code>idx = 0..K-1</code>（即用户坐标 <code>s = 0..K-1</code>）。现有的 <code>_order_nvda_l4_slices</code> 只是 <code>partitionBy = "bics_l4"</code> + <code>orderPolicy = "supplier_center_customer"</code> 的一个内置策略分支。</li>
+  <li><strong>面内 2 类坐标解算（Ring &amp; Angle Compiler）</strong>：根据 <code>faceRule</code>，计算每个节点的 <code>revScore ∈ [0, 100]</code>、<code>ring ∈ 0..10</code>、<code>radial ∈ [0, 1]</code> 与 <code>(ringCos, ringSin)</code>。现有的 <code>db.assign_rings</code> 只是 <code>per_slice_minmax + uniform_spiral</code> 分支；现有的 <code>chain_layout.assign_chain_rings</code> 只是 <code>global_half_disk + supplier_customer_halves</code> 分支。</li>
+  <li><strong>标准 Bundle 吐出</strong>：最终仍由 <code>BE-BUNDLE</code> 输出完全符合现有契约的 <code>{ meta, layers, companies, revenueLinks }</code> JSON。前端 <code>FE-API → FE-OPENCUBE → FE-SCENE → FE-COORDONE</code> <strong>一行几何代码都不用改</strong>，直接渲染！</li>
+</ol>
+
+<h3>4.3 让 <code>shell</code> 模式从「空墙死胡同」升级为「空白标准制图台」</h3>
+<p>在当前代码中，从列表点击一家未预置链文档的公司进入 <code>/cube?ticker=TSM</code>，触发的是 <code>meta.mode = "shell"</code>，画面只有 <code>(5, 5, 5)</code> 处孤零零的一个圆环。一旦有了 <code>ChartSpec</code> 架构：</p>
+<ul>
+  <li><code>/cube?ticker=TSM</code> 初始打开时，实际上是加载了一份<strong>以 TSM 为中心锚点的初始空白 <code>ChartSpec</code></strong>（只有 1 个中心节点）。</li>
+  <li>此时它不再是一个只能按退格键退出的「死胡同」，而是<strong>一张已经架好三维坐标轴、等待用户往里添砖加瓦的制图台</strong>：用户可以一键把同属该 BICS L4 的前 10 大同业拉进来做同心环对标（即切换为形式 IV），或者导入/点选它的上下游生成传导链（即升级为形式 I/II），并把编好的图方案保存在本地用户数据目录（<code>SFC_DATA_DIR</code>，即 <code>~/Library/Application Support/Standard-Financial-Charting/</code>）中随时复盘。</li>
+</ul>
+
+<h2>5. 交互层次的严格分野：「读图交互」与「作图交互」</h2>
+<p>为了防止后续工程实现走偏，内阁认为必须在概念上把 SFC 的交互明确划分为两层：</p>
+
+<table>
+  <thead>
+    <tr><th>维度</th><th>第一层：读图与空间检视交互（View / Navigation）</th><th>第二层：自主作图与编成交互（Chart Authoring / Composition）</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>当前状态</strong></td>
+      <td><strong>已高度成熟（Frozen &amp; Solid）</strong></td>
+      <td><strong>缺失（目前由代理在仓外写 Python 代替）</strong></td>
+    </tr>
+    <tr>
+      <td><strong>操作对象</strong></td>
+      <td>作用于前端状态 <code>state.js</code>（<code>focusLayer</code>, <code>pinnedLayers</code>, <code>selectedId</code>, <code>filterMode</code>, <code>d</code>, 相机姿态）</td>
+      <td>作用于后端的 <code>ChartSpec</code>（实体增删、切片规则、极径指标、极角分区、传导连线）</td>
+    </tr>
+    <tr>
+      <td><strong>具体动作</strong></td>
+      <td>点面抽出/留驻（<code>C-PULL</code>）、<code>Shift</code> 钉住多层（<code>C-PIN</code>）、拉动 <code>d</code> 滑块（<code>C-D</code>）、<code>C</code> 键标准视角（<code>C-STDVIEW</code>）、搜索放大检视债券到期线（<code>C-COMPANY-ZOOM</code>）、<code>A/F</code> 开关（<code>C-ALT</code>）</td>
+      <td>挑入/剔除公司节点、指定锚点、切换分片依据（L4/L3/自定义阶段/期限）、切换环半径度量（营收/占比/债务）、声明/导入上下游或信用传导边、保存/加载图方案</td>
+    </tr>
+    <tr>
+      <td><strong>核心铁律</strong></td>
+      <td><strong>绝不重算环布局</strong>（<code>CONCEPTS.md</code> §9.7：Server owns ring layout; browser does not re-scale rings on filter）。</td>
+      <td><strong>绝不手搓原始坐标</strong>：任何作图操作只修改 <code>ChartSpec</code>，交由后端通用布局引擎重算 <code>(s, ringCos, ringSin)</code> 后返回标准 Bundle。</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>6. 演进路线图与风险防范（内阁看法，非令）</h2>
+<p>若业主决定将 SFC 从静态演示推向自主制图台，内阁建议按以下四阶秩序稳步推进（<strong>先完成模块与代码 1:1 物理对位，再进入交互化改革</strong>），避免在巨石文件上叠加交互逻辑或冲击现有稳定壳与测试金线（<code>regress_api_golden.py</code>）：</p>
+<ol>
+  <li><strong>第零阶（交互化改革前的必经前置）：彻底完成模块与功能代码 1:1 物理对位</strong>
+    <ul>
+      <li>终结 M1–M4 时「契约已立、目录未拆」的过渡妥协：将仍混居在 1,352 行 <code>app.py</code> 中的 <code>BE-BICS-HIER</code>（<code>bics_hier.py</code>）、<code>BE-BICS-ENTITY</code>（<code>bics_entity.py</code>）、<code>BE-DB-SHADOW</code>（<code>db_shadow.py</code>）、<code>BE-NVDA-LINKS</code>（<code>nvda_links.py</code>）彻底拆出为独立物理模块，消灭跨模块直接调用私有 <code>_</code> 函数的「你中有我、我中有你」局面；前端将散落在三页的 <code>FE-NAV</code> 收归 <code>nav.js</code>，并厘清 <code>FE-SCENE</code>（<code>scene.js</code>）与 <code>FE-FOCUS</code> 的物理边界。</li>
+      <li>此步以 <strong>100% 行为零变化</strong>（<code>regress_all.sh full</code> 60 项 Golden API 与打包自检零差异）为铁律，为后续 <code>ChartSpec</code> 编译器提供干净的模块调用底座。</li>
+    </ul>
+  </li>
+  <li><strong>第一阶：抽离通用 <code>ChartSpec</code> 与参数化布局引擎（后端解耦）</strong>
+    <ul>
+      <li>将 <code>bundle_nvda_chain</code> 重构为「读取 <code>nvda-revenue-links.json</code> → 转换为标准 <code>ChartSpec</code> → 送入通用编译器 <code>compile_chart_spec(spec)</code>」的特例。</li>
+      <li>此时 Golden API 回归测试 100% 保持字节级兼容，但后端已经具备了无需写新 Python 函数即可编译任意公司、任意分片策略、任意环指标的能力。</li>
+    </ul>
+  </li>
+  <li><strong>第二阶：打通本地持久化的图方案读写接口（<code>SFC_DATA_DIR</code>）</strong>
+    <ul>
+      <li>利用已完成本地化的用户可写目录 <code>SFC_DATA_DIR</code>，支持将用户自制的 <code>ChartSpec</code> 保存为本地文件或 SQLite 表，使「空墙 <code>shell</code>」能够原地生长并保存为用户自己的命名图方案。</li>
+      <li>严格遵守 <code>W1</code> 前后端打开权与 <code>PUBLIC-PRIVATE.md</code>：浏览器只通过 <code>FE-API</code> 发送结构化作图请求，后端独占 <code>BE-BICS-ENTITY</code> 与用户图方案存储。</li>
+    </ul>
+  </li>
+  <li><strong>第三阶：开放前端三大作图入口（详见姊妹篇）</strong>
+    <ul>
+      <li>在 <code>ChartSpec</code> 底座之上，依次接入<strong>表类数据输入</strong>、<strong>手动制图操作</strong>与<strong>受约束的自然语言指令</strong>。</li>
+    </ul>
+  </li>
+</ol>
+
+<p><strong>三条红线警告：</strong></p>
+<ul>
+  <li><strong>红线一：严禁破坏 <code>C-COORD</code> / <code>C-COORD-2</code> 几何定律。</strong> 自主作图绝不允许用户在画布上把某家公司随便拖到 <code>(x=2.1, y=8.4)</code>——因为面内半径代表金融数值（营收或风险权重），任意拖拽等于伪造金融数据！</li>
+  <li><strong>红线二：严禁突破美学真源（<code>AESTHETIC.md</code>）。</strong> 无论扩展出多少种图的形式，永远只用冷暗深空底、磨砂玻璃切片、米白盘面+美/非美双色环、墨绿/暗红双描边线，绝不允许用户自定义五颜六色的节点或花哨连线。</li>
+  <li><strong>红线三：严禁无来源的自动胡画。</strong> 依据 <code>DESIGN.md</code> §1，「无法追溯来源的数字，不算本产品的功能」。一切进入图方案的边与权重，要么来自 <code>BE-BICS-ENTITY</code> / <code>BE-DATA</code> 权威库，要么来自研究员明确导入/录入的带源表格。</li>
+</ul>
+
+<h2>7. 结语与谏言状态</h2>
+<p>业主关于「格式限制住、图的形式大大扩展、从静态展示转向交互式自主作图」的判断，切中了 SFC 架构演进的命门。现有的三维坐标系与渲染管线正是为此而生，唯缺后端将硬编码映射解耦为声明式 <code>ChartSpec</code>。</p>
+<p>本文为内阁深度研判读本，<strong>不直接向总参谋部下达产品改造指令</strong>；待业主审阅本篇与姊妹篇并拍板首期范围后，内阁再行拟令。本次交回：<strong>不发问</strong>。</p>
+
+<h2>附录 · 当前模块清单与关系（26 模块 / 35 边）</h2>
+<p>义务依据：<code>cabinet/AUTHORITY.md</code>「模块跟踪展示义务」。真源 <code>modules/graph.json</code>（updated 2026-10-14）；静态投影 <code>modules/index.html</code>（<code>python3 modules/bake_static.py</code>）。</p>
+
+<h3>模块清单（按侧，26 模块）</h3>
+<table>
+  <thead>
+    <tr><th>侧</th><th>id</th><th>中文名</th><th>在本议题（自主作图架构）中的角色定位</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>FE</td><td>FE-NAV</td><td>导航</td><td>顶栏搜索与跨页跳转入口，保持不变</td></tr>
+    <tr><td>FE</td><td>FE-BOARD</td><td>展板</td><td>BICS L1–L3 行业门板，可作为按行业切片选入图方案的来源</td></tr>
+    <tr><td>FE</td><td>FE-LIST</td><td>列表</td><td>BICS L4 公司名单，可作为挑选节点加入制图台的来源</td></tr>
+    <tr><td>FE</td><td>FE-LISTAREA</td><td>列表属地</td><td>上市地过滤组件，保持不变</td></tr>
+    <tr><td>FE</td><td>FE-OPENCUBE</td><td>跳转制图台</td><td>立方体页启动器，负责向接口请求 Bundle 或提交图方案变更</td></tr>
+    <tr><td>FE</td><td>FE-ACTION</td><td>操作</td><td>前端状态与交互动作分发</td></tr>
+    <tr><td>FE</td><td>FE-COORDONE</td><td>摆放坐标</td><td><code>coords.js</code>：将 <code>(s, ringCos, ringSin)</code> 投影为 Three.js 坐标，<strong>锁死不动</strong></td></tr>
+    <tr><td>FE</td><td>FE-SCENE</td><td>场景</td><td>Three.js 渲染四原语（切片/点环/导轨/传导边），<strong>格式锁死不动</strong></td></tr>
+    <tr><td>FE</td><td>FE-PANEL</td><td>面板</td><td>浮动玻璃 Chrome，未来承载作图控制与方案切换</td></tr>
+    <tr><td>FE</td><td>FE-FOCUS</td><td>聚焦</td><td>单企放大聚焦与债券到期火花线（<code>bondChart.js</code>）</td></tr>
+    <tr><td>FE</td><td>FE-API</td><td>接口</td><td>前端唯一 HTTP 出口（守 W1）</td></tr>
+    <tr><td>FE</td><td>FE-AESTHETIC</td><td>前端设计</td><td>暗底玻璃与双色环美学约束，<strong>锁死不动</strong></td></tr>
+    <tr><td>SHELL</td><td>SHELL-WINDOW</td><td>壳窗口</td><td>原生 macOS 窗口与 WKWebView，不注入桥</td></tr>
+    <tr><td>SHELL</td><td>SHELL-PROC</td><td>内嵌后端</td><td>管理子进程与传递 <code>SFC_DATA_DIR</code>（可存放用户自制图方案）</td></tr>
+    <tr><td>SHELL</td><td>SHELL-PACK</td><td>打包</td><td>自包含 <code>.app</code> 打包管线</td></tr>
+    <tr><td>BE</td><td>BE-HTTP</td><td>（HTTP 口；图中无 zh 字段）</td><td>服务端路由分发</td></tr>
+    <tr><td>BE</td><td>BE-BUNDLE</td><td>捆绑编排</td><td><strong>核心演进枢纽：</strong>从三模式硬分发升级为编译 <code>ChartSpec → Bundle JSON</code></td></tr>
+    <tr><td>BE</td><td>BE-DB-DEMO</td><td>演示集</td><td>内置 6 层 96 企演示数据源</td></tr>
+    <tr><td>BE</td><td>BE-DB-SHADOW</td><td>影集</td><td>单企壳入口，未来演进为「单锚点初始空白制图台」</td></tr>
+    <tr><td>BE</td><td>BE-NVDA-LAYOUT</td><td>N布局规划</td><td>面内极坐标布局算子，未来泛化支持多种极径/极角规则</td></tr>
+    <tr><td>BE</td><td>BE-NVDA-LINKS</td><td>N关系集</td><td>NVDA 静态边文档，未来泛化为通用图方案关系存储</td></tr>
+    <tr><td>BE</td><td>BE-BICS-HIER</td><td>BICS分类树</td><td>提供 L1–L7 分类树，支撑按行业层级自动切分 <code>s</code> 轴</td></tr>
+    <tr><td>BE</td><td>BE-BICS-ENTITY</td><td>BICS公司树</td><td>提供 2.8 万家企业主业、营收与 3 类坐标自动富化</td></tr>
+    <tr><td>BE</td><td>BE-BICS-AREA</td><td>BICS地区映射</td><td>由证券黄键解析上市国家与 US/INTL</td></tr>
+    <tr><td>BE</td><td>BE-BICS-INGEST</td><td>BICS导入</td><td>彭博离线表入库脚本</td></tr>
+    <tr><td>other</td><td>MODULES-TRACK</td><td>静态模块跟踪</td><td>架构模块真源与静态投影</td></tr>
+  </tbody>
+</table>
+
+<h3>模块关系（35 边）</h3>
+<table>
+  <thead>
+    <tr><th>from</th><th>to</th><th>type</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>FE-NAV</td><td>FE-BOARD</td><td>calls</td></tr>
+    <tr><td>FE-BOARD</td><td>FE-LIST</td><td>calls</td></tr>
+    <tr><td>FE-LIST</td><td>FE-OPENCUBE</td><td>calls</td></tr>
+    <tr><td>FE-BOARD</td><td>FE-API</td><td>calls</td></tr>
+    <tr><td>FE-LIST</td><td>FE-API</td><td>calls</td></tr>
+    <tr><td>FE-OPENCUBE</td><td>FE-API</td><td>calls</td></tr>
+    <tr><td>FE-API</td><td>BE-HTTP</td><td>contract</td></tr>
+    <tr><td>FE-BOARD</td><td>FE-LISTAREA</td><td>depends</td></tr>
+    <tr><td>FE-LIST</td><td>FE-LISTAREA</td><td>depends</td></tr>
+    <tr><td>FE-OPENCUBE</td><td>FE-ACTION</td><td>depends</td></tr>
+    <tr><td>FE-OPENCUBE</td><td>FE-COORDONE</td><td>depends</td></tr>
+    <tr><td>FE-OPENCUBE</td><td>FE-SCENE</td><td>depends</td></tr>
+    <tr><td>FE-OPENCUBE</td><td>FE-PANEL</td><td>depends</td></tr>
+    <tr><td>FE-SCENE</td><td>FE-COORDONE</td><td>calls</td></tr>
+    <tr><td>FE-SCENE</td><td>FE-FOCUS</td><td>depends</td></tr>
+    <tr><td>FE-AESTHETIC</td><td>FE-BOARD</td><td>depends</td></tr>
+    <tr><td>FE-AESTHETIC</td><td>FE-LIST</td><td>depends</td></tr>
+    <tr><td>FE-AESTHETIC</td><td>FE-PANEL</td><td>depends</td></tr>
+    <tr><td>BE-HTTP</td><td>BE-BUNDLE</td><td>calls</td></tr>
+    <tr><td>BE-HTTP</td><td>BE-BICS-HIER</td><td>calls</td></tr>
+    <tr><td>BE-HTTP</td><td>BE-BICS-ENTITY</td><td>calls</td></tr>
+    <tr><td>BE-HTTP</td><td>BE-BICS-AREA</td><td>calls</td></tr>
+    <tr><td>BE-HTTP</td><td>MODULES-TRACK</td><td>contract</td></tr>
+    <tr><td>BE-BUNDLE</td><td>BE-DB-DEMO</td><td>calls</td></tr>
+    <tr><td>BE-BUNDLE</td><td>BE-DB-SHADOW</td><td>calls</td></tr>
+    <tr><td>BE-BUNDLE</td><td>BE-NVDA-LAYOUT</td><td>calls</td></tr>
+    <tr><td>BE-BUNDLE</td><td>BE-NVDA-LINKS</td><td>calls</td></tr>
+    <tr><td>BE-NVDA-LAYOUT</td><td>BE-NVDA-LINKS</td><td>depends</td></tr>
+    <tr><td>BE-BICS-ENTITY</td><td>BE-BICS-AREA</td><td>depends</td></tr>
+    <tr><td>BE-BICS-INGEST</td><td>BE-BICS-ENTITY</td><td>depends</td></tr>
+    <tr><td>SHELL-WINDOW</td><td>SHELL-PROC</td><td>depends</td></tr>
+    <tr><td>SHELL-PROC</td><td>BE-HTTP</td><td>calls</td></tr>
+    <tr><td>SHELL-WINDOW</td><td>BE-HTTP</td><td>contract</td></tr>
+    <tr><td>SHELL-PACK</td><td>SHELL-WINDOW</td><td>depends</td></tr>
+    <tr><td>SHELL-PACK</td><td>BE-HTTP</td><td>depends</td></tr>
+  </tbody>
+</table>
+
+</body>
+</html>

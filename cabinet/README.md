@@ -42,6 +42,23 @@
 | `FE-API` | `FE-API` | 接口 |
 | `FE-AESTHETIC` | `FE-AESTHETIC` | 前端设计 |
 
+## BE 模块改名对照（2026-10-15 第三轮；取代上节「`BE-*` 与 `MODULES-TRACK` 不改」）
+
+只改模块图 / 文档 / 注释里的模块 id；Python 文件名、函数名、bundle 的 `meta.mode`（`demo` / `shell` / `chain`）不改。`BE-HTTP` 不改；`BE-BUNDLE` id 不改，第四轮（同日）加中文名「捆绑编排」。旧令文、笔记、报告不改写史实，读旧文按下表翻译。
+
+| 旧 id | 新 id | 中文名 |
+|-------|-------|--------|
+| `BE-BICS-HIER` | `BE-BICS-HIER` | BICS分类树 |
+| `BE-ENTITY` | `BE-BICS-ENTITY` | BICS公司树 |
+| `BE-LISTING` | `BE-BICS-AREA` | BICS地区映射 |
+| `BE-INGEST` | `BE-BICS-INGEST` | BICS导入 |
+| `BE-DEMO-DB` | `BE-DB-DEMO` | 演示集 |
+| `BE-SHELL` | `BE-DB-SHADOW` | 影集 |
+| `BE-CHAIN-LAYOUT` | `BE-NVDA-LAYOUT` | N布局规划 |
+| `BE-NVDA-LINKS` | `BE-NVDA-LINKS` | N关系集 |
+| `MODULES-TRACK` | `MODULES-TRACK` | 静态模块跟踪 |
+| `BE-BUNDLE` | `BE-BUNDLE` | 捆绑编排（第四轮） |
+
 品牌字样：冷启动页与页眉 logo 的 `FIDV` 改 `SFC`（仓库 / 项目名 `FIDV` 不改）。
 
 ## 模块跟踪（静态）

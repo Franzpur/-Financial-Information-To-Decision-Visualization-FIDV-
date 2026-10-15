@@ -57,7 +57,7 @@ def _stamp_mode(payload: dict[str, Any], mode: str) -> dict[str, Any]:
 
 
 def build_demo_bundle() -> dict[str, Any]:
-    """BE-DEMO-DB path only — requires demo SQLite."""
+    """BE-DB-DEMO path only — requires demo SQLite."""
     conn = connect()
     try:
         return _stamp_mode(
@@ -73,7 +73,7 @@ def build_demo_bundle() -> dict[str, Any]:
 
 
 def build_bundle(ticker: str | None) -> dict[str, Any]:
-    """Unique mode dispatch. shell/chain never open BE-DEMO-DB."""
+    """Unique mode dispatch. shell/chain never open BE-DB-DEMO."""
     mode = resolve_bundle_mode(ticker)
     if mode == "demo":
         return build_demo_bundle()

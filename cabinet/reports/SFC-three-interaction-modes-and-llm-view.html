@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>SFC 三种交互方式与大模型架构裁决 · 内阁读本</title>
+<style>
+:root {
+  --paper: #f7f5f0;
+  --ink: #1a1f26;
+  --muted: #4a5560;
+  --rule: #c5ccd4;
+  --fill: #ece8e0;
+}
+@page { size: A4; margin: 14mm 14mm 16mm; }
+* { box-sizing: border-box; }
+body {
+  margin: 0 auto;
+  padding: 16mm 16mm 22mm;
+  max-width: 180mm;
+  color: var(--ink);
+  background: var(--paper);
+  font-family: "Iowan Old Style", "Palatino Linotype", Palatino, "Songti SC", "Noto Serif CJK SC", "Noto Serif SC", serif;
+  font-size: 11pt;
+  line-height: 1.45;
+}
+h1 { font-size: 18pt; font-weight: 600; letter-spacing: 0.04em; margin: 0.2em 0 0.3em; }
+.brand { letter-spacing: 0.07em; font-size: 13pt; margin: 0; }
+h2 { font-size: 12.5pt; border-bottom: 1px solid var(--rule); padding-bottom: 0.15em; margin-top: 1.35em; page-break-after: avoid; }
+h3 { font-size: 11.5pt; font-weight: 600; margin: 1.05em 0 0.25em; page-break-after: avoid; }
+p { margin: 0.45em 0; }
+.cover-meta { color: var(--muted); font-size: 10pt; }
+.lede { color: var(--muted); font-size: 10pt; }
+.no-print { font-size: 10pt; color: var(--muted); border-bottom: 1px solid var(--rule); padding-bottom: 0.6em; margin-bottom: 1em; }
+ul, ol { margin: 0.35em 0 0.7em; padding-left: 1.3em; }
+li { margin: 0.22em 0; }
+table { width: 100%; border-collapse: collapse; font-size: 9.5pt; margin: 0.6em 0 1em; page-break-inside: avoid; }
+th, td { border: 1px solid var(--rule); padding: 0.28em 0.45em; text-align: left; vertical-align: top; }
+th { background: var(--fill); font-weight: 600; }
+code, pre { font-family: "SF Mono", ui-monospace, Menlo, Consolas, monospace; }
+code { font-size: 0.86em; }
+pre { background: #efece6; border: 1px solid var(--rule); padding: 0.55em 0.7em; font-size: 9pt; line-height: 1.4; page-break-inside: avoid; overflow-x: auto; }
+@media print {
+  body { background: white; }
+  .no-print { display: none; }
+  a { color: inherit; text-decoration: none; }
+}
+</style>
+</head>
+<body>
+<p class="no-print">浏览器打开 → 打印 → 存 PDF → 关掉页眉网址。</p>
+<p class="brand">FIDV · SFC</p>
+<h1>三种目标交互方式与大模型架构裁决</h1>
+<p class="cover-meta">内阁深度读本（重写版） · 2026-10-15 · 架构与产品判断（非令） · 供业主 Purkniv 审阅</p>
+<p class="lede">产品路径 <code>Ind-Chain/</code> · 品牌字样 SFC · 姊妹篇 <code>SFC-interactive-autonomous-charting-view.html</code> · 模块真源 <code>modules/graph.json</code>（26 模块 / 35 边）</p>
+
+<p><strong>业主原话：</strong>「我给你三种目标交互方式，你思考一下能否实现，你有什么看法，是否接入大模型会有利于实现，接入大模型会不会导致整个工程混乱和需要重塑。一、简单自然语言指令；二、表类数据输入；三、手动制图操作。」</p>
+
+<h2>0. 总纲：三种交互不是三套系统，而是同一状态机的三个输入面</h2>
+<p>在姊妹篇《交互性与自主作图》中，内阁论证了 SFC 从「静态展厅」迈向「自主制图台」的核心枢纽：在严格锁死三维坐标语法（1 类坐标 <code>(s, x, y)</code>、2 类坐标 <code>ringCos/ringSin</code>、3 类坐标 <code>legalEntityCoord</code> 及四项几何原语）的前提下，后端 <code>BE-BUNDLE</code> 只需引入一层声明式的<strong>图方案规约（<code>ChartSpec</code>）与原子操作集（<code>ChartOps</code>）</strong>，即可扩展出单中心上下游链、多跳级联链、债务到期墙、同业集中度对标等丰富的图种。</p>
+<p>站在这个架构基点上审视业主提出的三种目标交互方式，内阁的首要结论是：<strong>这三种方式完全可以实现，而且它们在工程上绝不能写成三条各自直通 Three.js 的独立管线，而必须收敛为修改同一份 <code>ChartSpec</code> 的三个前端/后端适配器（Three Surfaces, One State Machine）：</strong></p>
+
+<pre>
+┌──────────────────────────┐
+│ 一、简单自然语言指令      │──► [ 指令解析 / 槽位编译器 ] ──┐
+│ (NL Command / Prompt)    │    (确定性 DSL 或受控 LLM)    │
+└──────────────────────────┘                              │
+                                                          ▼
+┌──────────────────────────┐                     ┌─────────────────┐      ┌────────────────────────┐
+│ 二、表类数据输入          │──► [ 表格校验与 BICS 富化 ] ──►│  标准图方案状态  │─────►│ BE-BUNDLE 通用布局编译 │
+│ (CSV / TSV / 粘贴关系表)  │    (对齐 BE-BICS-ENTITY)     │ ChartSpec + OPS │      │ (s 分片 + r/θ 极坐标)   │
+└──────────────────────────┘                     └─────────────────┘      └───────────┬────────────┘
+                                                          ▲                           │
+┌──────────────────────────┐                              │                           ▼
+│ 三、手动制图操作          │──► [ UI 动作序列化 ] ────────┘              ┌────────────────────────┐
+│ (选点 / 切层 / 连边 / 调参)│    (FE-ACTION / FE-PANEL)                   │ 标准 Bundle JSON        │
+└──────────────────────────┘                                             │ FE-SCENE / FE-COORDONE │
+                                                                         └────────────────────────┘
+</pre>
+
+<p>因为三者汇入同一个 <code>ChartSpec</code>，研究员在实际工作流中可以<strong>无缝混用三种方式</strong>：先粘贴一张从 Bloomberg 导出的 20 行供应链或债券到期表（<strong>方式二</strong>，瞬间搭起 80% 的骨架），然后在三维画面上手动点选剔除两个噪音节点、把某个 BICS L4 切片钉住并调整层序（<strong>方式三</strong>，精细修图），最后敲入一句简短指令「按净债务排环，只看非美供应商」（<strong>方式一</strong>，快速切视图与规则）。</p>
+
+<h2>1. 逐项深剖：三种交互方式的实现机理、边界与难点</h2>
+
+<h3>1.1 方式一：简单自然语言指令（Simple Natural Language Commands）</h3>
+<p><strong>（1）在 SFC 里的精确语义：</strong><br>
+自然语言指令在 SFC 中绝不是「陪聊机器人」，也不是让语言直接描述三维空间里的像素位置，而是<strong>对受控图方案状态（<code>ChartSpec</code>）或视图状态（<code>ViewState</code>）发射结构化原子操作（<code>OPS</code>）</strong>。按照指令作用的层次，严格分为两类：</p>
+<ul>
+  <li><strong>A 类 · 构图与映射指令（作用于后端 <code>ChartSpec</code>，触发 <code>BE-BUNDLE</code> 重算）</strong>：
+    <ul>
+      <li>实体与关系编成：<em>「以 TSMC 为中心，加入 NVDA、AAPL、AMD 作为客户，权重按营收占比」</em> → 编译为 <code>SET_ANCHOR("2330 TT Equity")</code> + <code>ADD_PEERS([...])</code>。</li>
+      <li>切片轴（<code>s</code>）重排：<em>「按 BICS 三级行业分片」「把上游设备商切片移到最前（+s）」</em> → 编译为 <code>SET_S_RULE(partition="bics_l3")</code>。</li>
+      <li>面内极坐标（<code>r, θ</code>）切换：<em>「环半径改按总营收排」「左右半盘改按美股与非美股划分」</em> → 编译为 <code>SET_FACE_RULE(radial="ind_rev", angular="us_intl_halves")</code>。</li>
+    </ul>
+  </li>
+  <li><strong>B 类 · 导航与检视指令（作用于前端 <code>FE-ACTION / FE-SCENE</code>，不重算布局）</strong>：
+    <ul>
+      <li><em>「切片间距拉到 150%」「聚焦晶圆代工层并钉住」「只显示非美企业」「隐藏环导轨只看点与连线」</em> → 直接映射为现有 <code>state.d = 1.5</code>、<code>focusSlice(i)</code>、<code>state.filterMode = 'intl'</code>、<code>state.altHideRingsSlices = true</code>。</li>
+    </ul>
+  </li>
+</ul>
+
+<p><strong>（2）工程实现难点与容错机制：</strong></p>
+<ul>
+  <li><strong>实体指称消歧（Entity Resolution）</strong>：用户输入「台积电」「TSMC」或「Google」，而 <code>bics_entities_20261003.db</code> 中存储的是彭博黄键（如 <code>2330 TT Equity</code>、<code>TSM US Equity</code>、<code>GOOGL US Equity</code>）。目前 <code>app.py:464</code> 的 <code>locate_bics(q)</code> 已具备按 ticker 前缀与英文公司名片段检索并按 <code>MAX(ind_rev)</code> 排序的能力。实现自然语言指令时，必须复用 <code>locate_bics</code> 作为唯一实体解析器；当命中多条候选（如本股与 ADR）或中文俗称时，应在面板上弹出候选确认칩（Disambiguation Chip），而非盲目猜选。</li>
+  <li><strong>越界指令拦截（Guardrails）</strong>：若用户输入违反 <code>CONCEPTS.md</code> 或 <code>AESTHETIC.md</code> 的指令（例如「把英伟达涂成亮紫色」「画一个二维饼图」「把台积电拖到坐标 (2, 9, 1)」），编译器必须明确拒绝并提示 SFC 的标准映射规则，维护产品概念标准化。</li>
+</ul>
+
+<h3>1.2 方式二：表类数据输入（Tabular Data Input）</h3>
+<p><strong>（1）为什么这是金融研究员最硬核、最高频的生产力底座：</strong><br>
+<code>DESIGN.md</code> §3 明确规定：「数据可操作化：支持导入导出、合并拆分、添加删减，以及金融函数操作。」金融工作者的日常研究介质就是 Bloomberg Excel（<code>BE-DATA</code> 中的 <code>.xlsx</code>）、BQLX 公式表、CSV 以及研报数据表。如果让研究员在三维界面里一笔一划手敲 30 家供应链公司及其采购占比，效率极低；而允许其<strong>直接从 Excel 复制粘贴一块区域（TSV/CSV）或拖入一张表</strong>，3 秒钟就能生成一座完整的三维风险立方体。</p>
+
+<p><strong>（2）表类输入的两种标准模板与「BICS 自动富化」乘数效应：</strong><br>
+很多系统做表格导入之所以繁琐，是因为要求用户填全所有字段（行业分类、国家、总营收、坐标等）。但在 SFC 中，因为后端坐拥 <code>BE-BICS-ENTITY</code>（2.8 万家公司完整主业/副业与行业营收库）和 <code>BE-BICS-AREA</code>（全球交易所上市地映射），<strong>用户输入的表格可以极度精简，其余 80% 的维度由后端自动左连接（Left Join）富化补齐！</strong></p>
+
+<table>
+  <thead>
+    <tr><th>表格类型</th><th>用户只需提供的最小列（Minimum Columns）</th><th>后端 <code>BE-BICS-ENTITY</code> + <code>BE-BICS-AREA</code> 自动补齐列</th><th>编译生成的图形式</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>表模板 A：关系与传导边表</strong><br>（Edge / Contagion Table，泛化自 <code>nvda-revenue-links.json</code>）</td>
+      <td><code>from_ticker</code>, <code>to_ticker</code>, <code>side</code> (<code>supplier|customer</code>), <code>weight_pct</code>（可选）</td>
+      <td>自动查库补齐两端企业的标准名称、<code>country (US/INTL)</code>、主业 <code>bics_code_l4</code>、<code>l4_name</code>、7×2 <code>legalEntityCoord</code>、以及企业自身 <code>ind_rev</code>。</td>
+      <td>单锚点上下游链（形式 I）或多跳产业链级联图（形式 II），自动按 BICS L4 切分 <code>C-SLICE</code> 并绘制 <code>C-REV-LINK</code>。</td>
+    </tr>
+    <tr>
+      <td><strong>表模板 B：节点与风险指标表</strong><br>（Node / Risk Cohort Table，对齐 <code>bondSchedule</code> 与财务表）</td>
+      <td><code>ticker</code>, <code>slice_key</code>（可选，如到期年份 <code>2026</code> 或自定义阶段；不填则默认用主业 BICS L4）, <code>metric_value</code>（如到期债务额、杠杆率、CapEx）</td>
+      <td>自动补齐公司名、<code>US/INTL</code> 色环属性、<code>legalEntityCoord</code>、BICS 层级树路径。</td>
+      <td>债务到期墙（形式 III）、同业切片集中度对标（形式 IV）或时序压力演进图（形式 VI）。</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>（3）与信息部（<code>information-department</code>）工作流的天然咬合：</strong><br>
+当用户在制图时发现某几家公司的传导权重或债券到期数据缺失，表类输入接口可以直接导出带有缺失 ticker 列表的「待补数模板」，无缝衔接信息部 <code>desk=request</code> 生成 Bloomberg BQLX 公式拉取表，拉回数据后一键贴回制图台。这形成了一条完整的「制图发现缺失 → BQLX 拉数 → 贴表成图」闭环。</p>
+
+<h3>1.3 方式三：手动制图操作（Manual Charting Operations）</h3>
+<p><strong>（1）核心正名：什么是「约束坐标下的手动制图」？</strong><br>
+提到「手动制图」，外行容易联想到在 PowerPoint 或 Blender 里用鼠标把一个球随便拖到左边或上边。在 SFC 中，<strong>必须严格禁止自由拖拽篡改 <code>(x, y)</code> 坐标！</strong> 原因极其深刻：在 SFC 的切片面（<code>C-SLICE</code>）上，点到面心的距离 <code>r</code> 代表该企业在该层的核心度分值（<code>revScore ∈ [0, 100]</code>），左半盘（<code>x &lt; 5</code>）代表供应商，右半盘（<code>x &gt; 5</code>）代表客户。如果允许鼠标把一个 <code>spendPct = 1.2%</code> 的边缘供应商直接拖到靶心 <code>(5, 5)</code>，几何位置就与金融事实发生了背离，整个图的信用体系当场崩塌。</p>
+<p>因此，SFC 的手动制图操作，本质上是<strong>在三维场景与浮动玻璃面板（<code>FE-PANEL</code>）上，对图方案的「结构关系与映射算子」进行可视化直接操纵（Direct Structural Manipulation）</strong>：</p>
+
+<table>
+  <thead>
+    <tr><th>手动操作维度</th><th>具体交互手势与界面承载</th><th>底层触发的 <code>ChartSpec</code> 原子操作（<code>OPS</code>）</th><th>三维场景（<code>FE-SCENE</code>）的确定性响应</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>1. 节点拣选与入台</strong><br>（Node Curation）</td>
+      <td>在 <code>FE-LIST</code> 名单页或立方体顶栏搜索框中勾选/点击「+ 加入当前制图台」；或在立方体选中某噪音点后点击「剔除」。</td>
+      <td><code>ADD_NODE(ticker, role)</code><br><code>REMOVE_NODE(ticker)</code></td>
+      <td>后端自动解析该 ticker 的 BICS L4 与营收，重算受影响切片的环分布，新节点平滑落位至对应切片与同心环。</td>
+    </tr>
+    <tr>
+      <td><strong>2. 切片轴（<code>s</code>）编排</strong><br>（Slice Manipulation）</td>
+      <td>在面板或切片框（<code>C-PULL-ZONE</code>）上执行：新增一个 BICS L4 切片、合并两个相邻切片、将某切片沿 <code>-s / +s</code> 前后调序。</td>
+      <td><code>REORDER_SLICES(layerIds[])</code><br><code>SET_S_PARTITION(mode)</code></td>
+      <td>整张切片墙带着其上的所有共面点环与连线端点，沿着 <code>s</code> 轴移动到新的整数层位 <code>s = i</code>。</td>
+    </tr>
+    <tr>
+      <td><strong>3. 传导边点选搭接</strong><br>（Link Authoring）</td>
+      <td>在制图模式下，依次点选源公司环（<code>fromId</code>）与目标公司环（<code>toId</code>），在浮动小框中选择角色（<code>supplier</code> 墨绿 / <code>customer</code> 暗红）并填入权重 <code>pct</code>。</td>
+      <td><code>UPSERT_LINK(from, to, side, pct)</code><br><code>DELETE_LINK(from, to)</code></td>
+      <td><code>buildRevenueLinks</code> 立即在两点间生成双描边三维传导曲线；若当前极径规则为 <code>link_pct</code>，受影响节点同步沿同心环径向滑移至新分位。</td>
+    </tr>
+    <tr>
+      <td><strong>4. 映射规则拨盘切换</strong><br>（Mapping Rule Switch）</td>
+      <td>在左上角或右侧浮动玻璃面板（<code>FE-PANEL</code>）拨动规则开关：极径指标（<code>营收 revBn</code> / <code>关联占比 linkPct</code> / <code>到期债 totalBn</code>）、极角分区（<code>供应-客户半盘</code> / <code>美-非美半盘</code> / <code>均匀螺旋</code>）。</td>
+      <td><code>SET_FACE_RULE(radial, angular, norm)</code></td>
+      <td>切片数不变，所有 <code>C-POINT</code> 根据新算出的 <code>(ringCos, ringSin)</code> 在各自切片面上同步重排，瞬间切换分析视角。</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>2. 大模型（LLM）深度裁决：有利在哪？何时会乱？为何无需重塑工程？</h2>
+<p>业主在提问中追问了两个极具战略穿透力的问题：<strong>「是否接入大模型会有利于实现？」</strong>以及<strong>「接入大模型会不会导致整个工程混乱和需要重塑？」</strong>内阁对此做出最坦率、最严密的工程裁决。</p>
+
+<h3>2.1 裁决一：接入大模型是否有利于实现？——「一强、一弱、一零」</h3>
+<p>不能笼统地说「大模型有用」或「没用」，必须拆开三种交互方式与两级实现梯度来看：</p>
+
+<table>
+  <thead>
+    <tr><th>交互方式</th><th>不接大模型（纯确定性算法）能做到什么程度？</th><th>接入大模型（LLM）带来什么增量价值？</th><th>内阁裁定</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>方式三：手动制图操作</strong></td>
+      <td><strong>100% 完美实现。</strong> UI 点击 → 发射 <code>OPS</code> → <code>BE-BUNDLE</code> 重算 → <code>FE-SCENE</code> 渲染，全链路毫秒级响应、100% 可复现。</td>
+      <td><strong>0% 增量价值。</strong> 手动点选与调参如果经过大模型中转，反而引入数秒延迟与不确定性。</td>
+      <td><strong>绝对不接 LLM。</strong> 保持纯确定性状态机。</td>
+    </tr>
+    <tr>
+      <td><strong>方式二：表类数据输入</strong></td>
+      <td><strong>90% 核心场景直接实现。</strong> 标准 CSV/TSV 或固定表头粘贴，用 100 行 Python 解析器 + <code>locate_bics</code> 即可瞬间完成校验与富化。</td>
+      <td><strong>10% 辅助价值（仅限脏表清洗）。</strong> 当用户从 PDF 研报或杂乱网页复制了非标准列名、带自然语言备注的脏表时，LLM 可辅助做「列名对齐与结构化抽取建议」。</td>
+      <td><strong>主干管线不依赖 LLM；</strong> LLM 仅可作为脏表导入前的可选预清洗助手。</td>
+    </tr>
+    <tr>
+      <td><strong>方式一：简单自然语言指令</strong></td>
+      <td><strong>能解决 60%–70% 的受控短指令（Tier 1A：确定性 DSL / 正则槽位解析）。</strong> 例如类似 Bloomberg 命令行或快捷指令语法（<code>anchor NVDA; add TSM supplier 37.35; ring link_pct</code> 或固定中文句式），零延迟、零网络依赖即可跑通。</td>
+      <td><strong>解决剩余 30%–40% 的口语化与复合意图（Tier 1B：语义意图编译）。</strong> 当用户用任意中文语序表达复合意图（如<em>「把台积电和日月光算作英伟达上游，再把微软和 Meta 放下游，按采购和收入占比排环」</em>）时，LLM 的 Tool-Calling / Structured Output 能极好地将其消歧并拆解为标准 <code>OPS[]</code> 序列。</td>
+      <td><strong>显著有利（但仅作为「自然语言 → <code>OPS</code>」的前端语义编译器）。</strong></td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>2.2 裁决二：接入大模型会不会导致整个工程混乱和需要重塑？</h3>
+<p><strong>答案非常明确：如果放任大模型越界，必定导致工程与金融逻辑的双重灾难；但如果用「单向窄口契约（Schema Firewall）」将大模型关进笼子，现有 26 模块 / 35 边架构连一行核心代码都无需重塑！</strong></p>
+
+<h4>（A）哪两种错误接法会导致彻底混乱？（严令禁止的死路）</h4>
+<ol>
+  <li><strong>工程架构混乱（让 LLM 直接吐坐标或改场景代码）：</strong> 如果让大模型直接输出 Bundle JSON 里的 <code>(s, x, y)</code> 或 <code>(ringCos, ringSin)</code> 浮点数，甚至让大模型动态生成前端 JavaScript / Three.js 代码，那么 <code>coords.js</code> 的几何不变量、<code>chain_layout.py</code> 的精确半盘归一化、<code>AESTHETIC.md</code> 的色板约束将全部失控。每次生成的图都无法复现，<code>regress_api_golden.py</code> 回归测试体系将彻底报废。</li>
+  <li><strong>金融认识论混乱（让 LLM 凭记忆编造财务数字与产业链关系）：</strong> 这是更隐蔽也更致命的风险。<code>DESIGN.md</code> §1 铁律写明：<strong>「可信的信息来源……无法追溯来源的数字，不算本产品的功能。」</strong> 大模型参数里记着大量过时甚至幻觉出的供应链传闻与营收数字。如果用户在制图台输入「帮我画出博通的上下游并填上采购占比」，而系统让 LLM 凭自身预训练权重胡乱编造出一串百分比画在立方体上，SFC 就会从一个严肃的金融风险决策工具堕落为「AI 幻觉玩具」。</li>
+</ol>
+
+<h4>（B）为什么只要守住三条架构铁律，现有工程「零重塑、零混乱」？</h4>
+<p>只要我们在架构上确立以下三条铁律，引入 LLM 就只是在后端挂接一个<strong>完全解耦的叶子模块（例如 <code>BE-NL-COMPILER</code>）</strong>，对现有 26 个模块形成零冲击：</p>
+<ol>
+  <li><strong>铁律一：LLM 只翻译「操作意图（<code>OPS</code>）」，绝不输出「几何坐标」与「无源数据」。</strong><br>
+    LLM 的输出被严格限制在 JSON Schema 定义的有限枚举操作集内（如 <code>{"op": "set_face_rule", "radialMetric": "ind_rev"}</code>）。一切坐标计算仍 100% 由确定性的 Python 函数（<code>BE-BUNDLE</code> + <code>BE-NVDA-LAYOUT</code>）与前端 <code>FE-COORDONE</code> 执行；一切企业主业、属地、营收数据仍 100% 查自本地 SQLite 库（<code>BE-BICS-ENTITY</code>）或用户显式导入的表格。</li>
+  <li><strong>铁律二：保护本地自包含应用（<code>Standard-Financial-Charting.app</code>）的离线独立性。</strong><br>
+    我们在本地化改革（<code>LOCAL-P1..P5</code>）中刚刚实现了「内嵌 Python 3.14.8 + 本地化 Three.js + 零外部依赖、断网即开即用」的原生 macOS 应用（<code>SHELL-WINDOW</code> / <code>SHELL-PROC</code> / <code>SHELL-PACK</code>）。如果把云端大模型 API 写成制图台的必经脊骨，一旦断网、未配 API Key 或处于金融机构内网隔离环境，整个制图台就会瘫痪！因此，<strong>核心制图台（方式二表输入 + 方式三手动操作 + 方式一确定性快捷指令）必须 100% 离线原生可用</strong>；大模型只作为可选挂载的「自然语言口语翻译增强包（Optional Semantic Adapter）」。</li>
+  <li><strong>铁律三：先过确认门（Confirmation Gate），再改主画布。</strong><br>
+    当 LLM 将一句复杂自然语言编译为一组 <code>OPS</code> 补丁时，前端面板（<code>FE-PANEL</code>）可先展示为清晰可读的操作预览（例如：<em>「即将执行：① 锚点设为 2330 TT Equity；② 新增 4 家客户节点；③ 极径切换为 revPct — [确认应用]」</em>）。研究员一键确认后才写入图方案，彻底杜绝「模型误解一句话把辛辛苦苦搭好的图毁掉」。</li>
+</ol>
+
+<h2>3. 对照现有 26 模块架构的影响评估（零重塑证明）</h2>
+<p>为证明上述设计无需推翻重来，我们将三种交互方式与可选 LLM 映射回当前 <code>modules/graph.json</code> 的四大板块：</p>
+
+<table>
+  <thead>
+    <tr><th>模块板块</th><th>涉及模块</th><th>是否需要重塑？</th><th>具体演进内容（纯增量扩展）</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>原生壳与打包</strong><br><code>SHELL-*</code></td>
+      <td><code>SHELL-WINDOW</code>, <code>SHELL-PROC</code>, <code>SHELL-PACK</code></td>
+      <td><strong>零改动（0%）</strong></td>
+      <td>已支持将 <code>SFC_DATA_DIR</code> 指向 <code>~/Library/Application Support/Standard-Financial-Charting/</code>，天然可存储用户保存的图方案文件。</td>
+    </tr>
+    <tr>
+      <td><strong>三维渲染与坐标</strong><br><code>FE-SCENE</code> / <code>FE-COORDONE</code> / <code>FE-FOCUS</code> / <code>FE-AESTHETIC</code></td>
+      <td><code>scene.js</code>, <code>coords.js</code>, <code>bondChart.js</code>, <code>app.css</code></td>
+      <td><strong>零重塑（0%）</strong></td>
+      <td>三维格式与四项几何原语完全保持冻结约定；只需在拿到后端重编后的 Bundle JSON 时触发平滑刷新。</td>
+    </tr>
+    <tr>
+      <td><strong>前端面板与操作</strong><br><code>FE-PANEL</code> / <code>FE-ACTION</code> / <code>FE-OPENCUBE</code> / <code>FE-API</code></td>
+      <td><code>ui.js</code>, <code>state.js</code>, <code>main.js</code>, <code>api.js</code></td>
+      <td><strong>轻量增量扩展</strong></td>
+      <td>在 <code>FE-PANEL</code> 增加制图抽屉（含：① 映射规则下拉切换、② 粘贴/导入表格框、③ 简短指令输入框）；经 <code>FE-API</code> 向后端发送 <code>POST /api/chart/ops</code> 或 <code>POST /api/chart/table</code>。</td>
+    </tr>
+    <tr>
+      <td><strong>后端捆绑编排与布局</strong><br><code>BE-HTTP</code> / <code>BE-BUNDLE</code> / <code>BE-NVDA-LAYOUT</code></td>
+      <td><code>app.py</code>, <code>bundle_dispatch.py</code>, <code>chain_layout.py</code></td>
+      <td><strong>核心收敛演进（内部泛化，契约兼容）</strong></td>
+      <td>在 <code>BE-BUNDLE</code> 内引入 <code>ChartSpec</code> 编译器，将 <code>BE-NVDA-LAYOUT</code> 从单一半盘函数扩展为支持多指标（<code>link_pct / ind_rev / debt</code>）与多分区策略的参数化布局器；旧 <code>GET /api/bundle</code> 100% 保持兼容。</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>4. 落地优先级排序与内阁总结建议</h2>
+<p>综合可行性、金融研究员真实痛点、以及工程稳健性，内阁给出的明确推进次序如下：</p>
+<ol>
+  <li><strong>第一优先级（底座与脊骨，不接大模型）：打通 <code>ChartSpec</code> + 「方式二：表类数据输入」+ 「方式三：手动制图操作（规则切换与节点/连边增删）」。</strong><br>
+    理由：这两项直接消灭「每次做图都要找代理改 Python」的痛点，且 100% 确定性、100% 离线可用、100% 符合 <code>DESIGN.md</code> 的数据与可视化可操作化原则。一旦表输入与 BICS 2.8 万企数据库自动左连接打通，研究员贴入一张 15 行 Excel 表就能立刻在立方体里拉出多跳传导链。</li>
+  <li><strong>第二优先级（效率层，先做确定性快捷指令，再可选挂载 LLM）：接入「方式一：简单自然语言指令」。</strong><br>
+    理由：当底座的 <code>ChartSpec</code> 与原子操作 <code>OPS</code> 已经稳固后，先提供一个零延迟的确定性命令栏（支持中英关键词槽位匹配）；随后若需更灵活的自然语言表达，再以 JSON Schema 约束的方式将 LLM 接入 <code>OPS</code> 编译口。如此，大模型成为锦上添花的加速器，而绝不会成为拖垮或搞乱工程的定时炸弹。</li>
+</ol>
+
+<h2>5. 结语与谏言状态</h2>
+<p>三种交互方式不仅全部可行，而且只要收束于同一份声明式 <code>ChartSpec</code>，就能与 SFC 现有的三维坐标契约、BICS 权威实体库及 macOS 本地化应用完美咬合；大模型只需严格限定在「自然语言 → <code>ChartSpec/OPS</code>」的编译层，绝不会引发工程混乱或推倒重塑。</p>
+<p>本文为内阁深度研判读本，<strong>不直接向总参谋部下达产品改造指令</strong>；待业主审阅拍板后，内阁再行拟令。本次交回：<strong>不发问</strong>。</p>
+
+<h2>附录 · 当前模块清单与关系（26 模块 / 35 边）</h2>
+<p>义务依据：<code>cabinet/AUTHORITY.md</code>「模块跟踪展示义务」。真源 <code>modules/graph.json</code>（updated 2026-10-14）；静态投影 <code>modules/index.html</code>（<code>python3 modules/bake_static.py</code>）。</p>
+
+<h3>模块清单（按侧，26 模块）</h3>
+<table>
+  <thead>
+    <tr><th>侧</th><th>id</th><th>中文名</th><th>在三种交互方式与 LLM 架构中的边界约束</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>FE</td><td>FE-NAV</td><td>导航</td><td>顶栏搜索框可复用于实体挑选入台</td></tr>
+    <tr><td>FE</td><td>FE-BOARD</td><td>展板</td><td>BICS L1–L3 展板，支持整类行业选入对标切片</td></tr>
+    <tr><td>FE</td><td>FE-LIST</td><td>列表</td><td>BICS L4 名单，支持勾选公司加入制图工作集</td></tr>
+    <tr><td>FE</td><td>FE-LISTAREA</td><td>列表属地</td><td>属地筛选，保持不变</td></tr>
+    <tr><td>FE</td><td>FE-OPENCUBE</td><td>跳转制图台</td><td>加载默认 Bundle 或用户自制 <code>ChartSpec</code></td></tr>
+    <tr><td>FE</td><td>FE-ACTION</td><td>操作</td><td>承载手动制图手势与视图导航指令分发</td></tr>
+    <tr><td>FE</td><td>FE-COORDONE</td><td>摆放坐标</td><td><strong>严禁 LLM 触碰：</strong>纯数学投影 <code>(s, x, y)</code></td></tr>
+    <tr><td>FE</td><td>FE-SCENE</td><td>场景</td><td><strong>严禁 LLM 触碰：</strong>只渲染校验后的标准 Bundle</td></tr>
+    <tr><td>FE</td><td>FE-PANEL</td><td>面板</td><td>承载表粘贴入口、规则切换拨盘与指令栏</td></tr>
+    <tr><td>FE</td><td>FE-FOCUS</td><td>聚焦</td><td>单企放大与债务到期曲线展示</td></tr>
+    <tr><td>FE</td><td>FE-API</td><td>接口</td><td>前端唯一通信窄口（守 W1）</td></tr>
+    <tr><td>FE</td><td>FE-AESTHETIC</td><td>前端设计</td><td><strong>严禁越界：</strong>锁死暗底玻璃与标准色板</td></tr>
+    <tr><td>SHELL</td><td>SHELL-WINDOW</td><td>壳窗口</td><td>原生窗口，保持零 JS 桥注入</td></tr>
+    <tr><td>SHELL</td><td>SHELL-PROC</td><td>内嵌后端</td><td>保持离线零依赖即可启动，不强制要求外部 LLM 网络</td></tr>
+    <tr><td>SHELL</td><td>SHELL-PACK</td><td>打包</td><td>保持内/外发包分流与自包含结构</td></tr>
+    <tr><td>BE</td><td>BE-HTTP</td><td>（HTTP 口；图中无 zh 字段）</td><td>路由层，新增图方案与表导入端点</td></tr>
+    <tr><td>BE</td><td>BE-BUNDLE</td><td>捆绑编排</td><td><strong>唯一汇合口：</strong>三种交互均编译为 <code>ChartSpec</code> 由此出图</td></tr>
+    <tr><td>BE</td><td>BE-DB-DEMO</td><td>演示集</td><td>静态演示基准库</td></tr>
+    <tr><td>BE</td><td>BE-DB-SHADOW</td><td>影集</td><td>单企壳，升级为单锚点空白制图画布起点</td></tr>
+    <tr><td>BE</td><td>BE-NVDA-LAYOUT</td><td>N布局规划</td><td>通用化为多指标、多扇区极坐标解算器</td></tr>
+    <tr><td>BE</td><td>BE-NVDA-LINKS</td><td>N关系集</td><td>预设链关系模板</td></tr>
+    <tr><td>BE</td><td>BE-BICS-HIER</td><td>BICS分类树</td><td>供分片算子按 L1–L4 自动归类</td></tr>
+    <tr><td>BE</td><td>BE-BICS-ENTITY</td><td>BICS公司树</td><td><strong>表输入与指令的核心底座：</strong>自动左连接富化企业属性与营收</td></tr>
+    <tr><td>BE</td><td>BE-BICS-AREA</td><td>BICS地区映射</td><td>自动解析 US/INTL 与上市国家</td></tr>
+    <tr><td>BE</td><td>BE-BICS-INGEST</td><td>BICS导入</td><td>离线库导入管线</td></tr>
+    <tr><td>other</td><td>MODULES-TRACK</td><td>静态模块跟踪</td><td>架构真源</td></tr>
+  </tbody>
+</table>
+
+<h3>模块关系（35 边）</h3>
+<table>
+  <thead>
+    <tr><th>from</th><th>to</th><th>type</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>FE-NAV</td><td>FE-BOARD</td><td>calls</td></tr>
+    <tr><td>FE-BOARD</td><td>FE-LIST</td><td>calls</td></tr>
+    <tr><td>FE-LIST</td><td>FE-OPENCUBE</td><td>calls</td></tr>
+    <tr><td>FE-BOARD</td><td>FE-API</td><td>calls</td></tr>
+    <tr><td>FE-LIST</td><td>FE-API</td><td>calls</td></tr>
+    <tr><td>FE-OPENCUBE</td><td>FE-API</td><td>calls</td></tr>
+    <tr><td>FE-API</td><td>BE-HTTP</td><td>contract</td></tr>
+    <tr><td>FE-BOARD</td><td>FE-LISTAREA</td><td>depends</td></tr>
+    <tr><td>FE-LIST</td><td>FE-LISTAREA</td><td>depends</td></tr>
+    <tr><td>FE-OPENCUBE</td><td>FE-ACTION</td><td>depends</td></tr>
+    <tr><td>FE-OPENCUBE</td><td>FE-COORDONE</td><td>depends</td></tr>
+    <tr><td>FE-OPENCUBE</td><td>FE-SCENE</td><td>depends</td></tr>
+    <tr><td>FE-OPENCUBE</td><td>FE-PANEL</td><td>depends</td></tr>
+    <tr><td>FE-SCENE</td><td>FE-COORDONE</td><td>calls</td></tr>
+    <tr><td>FE-SCENE</td><td>FE-FOCUS</td><td>depends</td></tr>
+    <tr><td>FE-AESTHETIC</td><td>FE-BOARD</td><td>depends</td></tr>
+    <tr><td>FE-AESTHETIC</td><td>FE-LIST</td><td>depends</td></tr>
+    <tr><td>FE-AESTHETIC</td><td>FE-PANEL</td><td>depends</td></tr>
+    <tr><td>BE-HTTP</td><td>BE-BUNDLE</td><td>calls</td></tr>
+    <tr><td>BE-HTTP</td><td>BE-BICS-HIER</td><td>calls</td></tr>
+    <tr><td>BE-HTTP</td><td>BE-BICS-ENTITY</td><td>calls</td></tr>
+    <tr><td>BE-HTTP</td><td>BE-BICS-AREA</td><td>calls</td></tr>
+    <tr><td>BE-HTTP</td><td>MODULES-TRACK</td><td>contract</td></tr>
+    <tr><td>BE-BUNDLE</td><td>BE-DB-DEMO</td><td>calls</td></tr>
+    <tr><td>BE-BUNDLE</td><td>BE-DB-SHADOW</td><td>calls</td></tr>
+    <tr><td>BE-BUNDLE</td><td>BE-NVDA-LAYOUT</td><td>calls</td></tr>
+    <tr><td>BE-BUNDLE</td><td>BE-NVDA-LINKS</td><td>calls</td></tr>
+    <tr><td>BE-NVDA-LAYOUT</td><td>BE-NVDA-LINKS</td><td>depends</td></tr>
+    <tr><td>BE-BICS-ENTITY</td><td>BE-BICS-AREA</td><td>depends</td></tr>
+    <tr><td>BE-BICS-INGEST</td><td>BE-BICS-ENTITY</td><td>depends</td></tr>
+    <tr><td>SHELL-WINDOW</td><td>SHELL-PROC</td><td>depends</td></tr>
+    <tr><td>SHELL-PROC</td><td>BE-HTTP</td><td>calls</td></tr>
+    <tr><td>SHELL-WINDOW</td><td>BE-HTTP</td><td>contract</td></tr>
+    <tr><td>SHELL-PACK</td><td>SHELL-WINDOW</td><td>depends</td></tr>
+    <tr><td>SHELL-PACK</td><td>BE-HTTP</td><td>depends</td></tr>
+  </tbody>
+</table>
+
+</body>
+</html>

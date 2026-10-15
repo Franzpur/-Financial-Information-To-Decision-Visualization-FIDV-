@@ -24,8 +24,8 @@ GRAPH_PATH = ROOT / "graph.json"
 OUT_PATH = ROOT / "index.html"
 
 # ───────────────────────── geometry ─────────────────────────
-NW, NH = 98, 28          # standard node (BE)
-NHF = 36                 # FE node: id line + 中文 line
+NW = 98                  # node width
+NHF = 36                 # two-line node: id line + 中文 line
 BAR_W = 30               # hub bars (BE-HTTP, FE-API)
 TIP = 1.5                # arrow tip stops this far outside the target box
 CH_X = 450               # (documentation only)
@@ -48,16 +48,16 @@ BE_BUNDLE = (BE_SHELL + BE_CHAIN) // 2   # 305
 NODES: dict[str, tuple[float, float, float, float]] = {
     # id: (cx, cy, w, h)
     "BE-HTTP": (X_HTTP, 221, BAR_W, 354),
-    "BE-BICS-HIER": (XC_B, R_NAV, NW, NH),
-    "BE-ENTITY": (XC_B, R_GATE, NW, NH),
-    "BE-INGEST": (XC_C, R_GATE, NW, NH),
-    "BE-LISTING": (XC_B, R_LIST, NW, NH),
-    "BE-BUNDLE": (XC_B, BE_BUNDLE, NW, NH),
-    "BE-DEMO-DB": (XC_C, BE_DEMO, NW, NH),
-    "BE-SHELL": (XC_C, BE_SHELL, NW, NH),
-    "BE-CHAIN-LAYOUT": (XC_C, BE_CHAIN, NW, NH),
-    "BE-NVDA-LINKS": (XC_C, BE_NVDA, NW, NH),
-    "MODULES-TRACK": (XC_B, BE_NVDA, NW, NH),
+    "BE-BICS-HIER": (XC_B, R_NAV, NW, NHF),
+    "BE-BICS-ENTITY": (XC_B, R_GATE, NW, NHF),
+    "BE-BICS-INGEST": (XC_C, R_GATE, NW, NHF),
+    "BE-BICS-AREA": (XC_B, R_LIST, NW, NHF),
+    "BE-BUNDLE": (XC_B, BE_BUNDLE, NW, NHF),
+    "BE-DB-DEMO": (XC_C, BE_DEMO, NW, NHF),
+    "BE-DB-SHADOW": (XC_C, BE_SHELL, NW, NHF),
+    "BE-NVDA-LAYOUT": (XC_C, BE_CHAIN, NW, NHF),
+    "BE-NVDA-LINKS": (XC_C, BE_NVDA, NW, NHF),
+    "MODULES-TRACK": (XC_B, BE_NVDA, NW, NHF),
     "FE-API": (X_API, 166, BAR_W, 156),
     "FE-NAV": (XC_L, R_NAV, NW, NHF),
     "FE-BOARD": (XC_L, R_GATE, NW, NHF),
@@ -86,9 +86,9 @@ REGION_FALLBACK = {
     "FE-AESTHETIC": "fe-cube",
     "FE-API": "fe-api",
     "SHELL-WINDOW": "shell", "SHELL-PROC": "shell", "SHELL-PACK": "shell",
-    "BE-HTTP": "be", "BE-BUNDLE": "be", "BE-DEMO-DB": "be", "BE-SHELL": "be",
-    "BE-CHAIN-LAYOUT": "be", "BE-NVDA-LINKS": "be", "BE-BICS-HIER": "be",
-    "BE-ENTITY": "be", "BE-LISTING": "be", "BE-INGEST": "be", "MODULES-TRACK": "be",
+    "BE-HTTP": "be", "BE-BUNDLE": "be", "BE-DB-DEMO": "be", "BE-DB-SHADOW": "be",
+    "BE-NVDA-LAYOUT": "be", "BE-NVDA-LINKS": "be", "BE-BICS-HIER": "be",
+    "BE-BICS-ENTITY": "be", "BE-BICS-AREA": "be", "BE-BICS-INGEST": "be", "MODULES-TRACK": "be",
 }
 
 # zone frames: id -> (x0, y0, x1, y1)
@@ -210,25 +210,25 @@ def build_routes() -> dict[str, list[tuple[float, float]]]:
 
     # ── BE: HTTP bar → children, all horizontal ──
     hx = box("BE-HTTP")[0]
-    for child, y in (("BE-BICS-HIER", R_NAV), ("BE-ENTITY", R_GATE), ("BE-LISTING", R_LIST),
+    for child, y in (("BE-BICS-HIER", R_NAV), ("BE-BICS-ENTITY", R_GATE), ("BE-BICS-AREA", R_LIST),
                      ("BE-BUNDLE", BE_BUNDLE)):
         add("BE-HTTP", child, "calls", [(hx, y), tipR(R(child))])
     add("BE-HTTP", "MODULES-TRACK", "contract", [(hx, BE_NVDA), tipR(R("MODULES-TRACK"))])
 
-    add("BE-ENTITY", "BE-LISTING", "depends", [B("BE-ENTITY"), tipT(T("BE-LISTING"))])
-    add("BE-INGEST", "BE-ENTITY", "depends", [R("BE-INGEST"), tipL(L("BE-ENTITY"))])
+    add("BE-BICS-ENTITY", "BE-BICS-AREA", "depends", [B("BE-BICS-ENTITY"), tipT(T("BE-BICS-AREA"))])
+    add("BE-BICS-INGEST", "BE-BICS-ENTITY", "depends", [R("BE-BICS-INGEST"), tipL(L("BE-BICS-ENTITY"))])
 
     # ── BE: BUNDLE → four leaves via two nested gap channels (x=144 inner, 132 outer) ──
-    add("BE-BUNDLE", "BE-DEMO-DB", "calls",
-        [L("BE-BUNDLE", -9), (144, BE_BUNDLE - 9), (144, BE_DEMO), tipR(R("BE-DEMO-DB"))])
-    add("BE-BUNDLE", "BE-SHELL", "calls",
-        [L("BE-BUNDLE", -3), (132, BE_BUNDLE - 3), (132, BE_SHELL), tipR(R("BE-SHELL"))])
-    add("BE-BUNDLE", "BE-CHAIN-LAYOUT", "calls",
-        [L("BE-BUNDLE", 3), (132, BE_BUNDLE + 3), (132, BE_CHAIN), tipR(R("BE-CHAIN-LAYOUT"))])
+    add("BE-BUNDLE", "BE-DB-DEMO", "calls",
+        [L("BE-BUNDLE", -9), (144, BE_BUNDLE - 9), (144, BE_DEMO), tipR(R("BE-DB-DEMO"))])
+    add("BE-BUNDLE", "BE-DB-SHADOW", "calls",
+        [L("BE-BUNDLE", -3), (132, BE_BUNDLE - 3), (132, BE_SHELL), tipR(R("BE-DB-SHADOW"))])
+    add("BE-BUNDLE", "BE-NVDA-LAYOUT", "calls",
+        [L("BE-BUNDLE", 3), (132, BE_BUNDLE + 3), (132, BE_CHAIN), tipR(R("BE-NVDA-LAYOUT"))])
     add("BE-BUNDLE", "BE-NVDA-LINKS", "calls",
         [L("BE-BUNDLE", 9), (144, BE_BUNDLE + 9), (144, BE_NVDA), tipR(R("BE-NVDA-LINKS"))])
-    add("BE-CHAIN-LAYOUT", "BE-NVDA-LINKS", "depends",
-        [B("BE-CHAIN-LAYOUT"), tipT(T("BE-NVDA-LINKS"))])
+    add("BE-NVDA-LAYOUT", "BE-NVDA-LINKS", "depends",
+        [B("BE-NVDA-LAYOUT"), tipT(T("BE-NVDA-LINKS"))])
     # ── shell layer: window depends on proc; proc calls HTTP; window's contract rides the gap band ──
     add("SHELL-WINDOW", "SHELL-PROC", "depends", [L("SHELL-WINDOW"), tipR(R("SHELL-PROC"))])
     add("SHELL-PROC", "BE-HTTP", "calls", [T("SHELL-PROC"), tipB(B("BE-HTTP"))])
@@ -605,7 +605,7 @@ def render_svg(data: dict) -> str:
     mods = {m["id"]: m for m in data.get("modules", [])}
     out: list[str] = []
     out.append(f'<svg id="graph-svg" viewBox="0 0 {VB_W} {VB_H}" xmlns="http://www.w3.org/2000/svg" '
-               f'role="img" aria-label="FIDV module relation graph" font-family="{SANS}">')
+               f'role="img" aria-label="SFC module relation graph" font-family="{SANS}">')
     out.append("<defs>" + arrow_marker("arrow-fe", EDGE_FE) + arrow_marker("arrow-be", EDGE_BE)
                + arrow_marker("arrow-x", EDGE_X) + arrow_marker("arrow-shell", EDGE_SHELL) + "</defs>")
     out += _svg_zones()
@@ -621,7 +621,7 @@ TEMPLATE = r"""<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<title>FIDV 模块关系 · 静态跟踪</title>
+<title>SFC 静态模块关系图</title>
 <style>
 :root {
   --paper: #f7f5f0;
@@ -678,7 +678,7 @@ code { font-family: "SF Mono", ui-monospace, Menlo, Consolas, monospace; font-si
 <body>
 <p class="no-print">静态页 · 可 <code>file://</code> 直接打开 · 真源 <code>modules/graph.json</code> · 版式与布线在 <code>modules/bake_static.py</code> · 改后运行 <code>python3 modules/bake_static.py</code> 重烘焙</p>
 <header class="head">
-  <h1>FIDV 模块关系图</h1>
+  <h1>SFC 模块关系图</h1>
   <p class="brand">MODULE MAP · __N_MODS__ 模块 · __N_EDGES__ 边</p>
 </header>
 <p class="lede">左后端、右前端；中间一根 <strong>FE-API</strong> 枢纽条立在所有框外，是前后端唯一契约口。右侧上淡绿＝决策路径（NAV → LIST），下淡蓝＝立方体面（OPENCUBE → AESTHETIC）；后端淡黄，<code>BE-HTTP</code> 为总线，分派至各子模块。</p>

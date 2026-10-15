@@ -1,4 +1,4 @@
-"""BE-CHAIN-LAYOUT fixture test (M3 acceptance)."""
+"""BE-NVDA-LAYOUT fixture test (M3 acceptance)."""
 from __future__ import annotations
 
 from chain_layout import assign_chain_rings

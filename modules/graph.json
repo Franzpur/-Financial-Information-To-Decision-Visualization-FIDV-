@@ -117,60 +117,70 @@
     },
     {
       "id": "BE-BUNDLE",
+      "zh": "捆绑编排",
       "side": "BE",
       "region": "be",
       "role": "mode-first bundle dispatch demo|shell|chain"
     },
     {
-      "id": "BE-DEMO-DB",
+      "id": "BE-DB-DEMO",
+      "zh": "演示集",
       "side": "BE",
       "region": "be",
       "role": "Demo SQLite companies/layers"
     },
     {
-      "id": "BE-SHELL",
+      "id": "BE-DB-SHADOW",
+      "zh": "影集",
       "side": "BE",
       "region": "be",
       "role": "Empty-wall shell for non-chain ticker"
     },
     {
-      "id": "BE-CHAIN-LAYOUT",
+      "id": "BE-NVDA-LAYOUT",
+      "zh": "N布局规划",
       "side": "BE",
       "region": "be",
       "role": "Server-side ring / slice layout"
     },
     {
       "id": "BE-NVDA-LINKS",
+      "zh": "N关系集",
       "side": "BE",
       "region": "be",
       "role": "NVDA revenue-link chain document"
     },
     {
       "id": "BE-BICS-HIER",
+      "zh": "BICS分类树",
       "side": "BE",
       "region": "be",
       "role": "BICS hierarchy JSON index"
     },
     {
-      "id": "BE-ENTITY",
+      "id": "BE-BICS-ENTITY",
+      "zh": "BICS公司树",
       "side": "BE",
       "region": "be",
       "role": "Entity membership / counts DB"
     },
     {
-      "id": "BE-LISTING",
+      "id": "BE-BICS-AREA",
+      "zh": "BICS地区映射",
       "side": "BE",
       "region": "be",
       "role": "Listing-country from yellow-key"
     },
     {
-      "id": "BE-INGEST",
+      "id": "BE-BICS-INGEST",
+      "zh": "BICS导入",
       "side": "BE",
       "region": "be",
       "role": "BE-DATA ingest scripts (offline)"
     },
     {
       "id": "MODULES-TRACK",
+      "zh": "静态模块跟踪",
       "side": "other",
       "region": "be",
       "role": "Repo-root modules graph + paper HTML"
@@ -279,12 +289,12 @@
     },
     {
       "from": "BE-HTTP",
-      "to": "BE-ENTITY",
+      "to": "BE-BICS-ENTITY",
       "type": "calls"
     },
     {
       "from": "BE-HTTP",
-      "to": "BE-LISTING",
+      "to": "BE-BICS-AREA",
       "type": "calls"
     },
     {
@@ -294,17 +304,17 @@
     },
     {
       "from": "BE-BUNDLE",
-      "to": "BE-DEMO-DB",
+      "to": "BE-DB-DEMO",
       "type": "calls"
     },
     {
       "from": "BE-BUNDLE",
-      "to": "BE-SHELL",
+      "to": "BE-DB-SHADOW",
       "type": "calls"
     },
     {
       "from": "BE-BUNDLE",
-      "to": "BE-CHAIN-LAYOUT",
+      "to": "BE-NVDA-LAYOUT",
       "type": "calls"
     },
     {
@@ -313,18 +323,18 @@
       "type": "calls"
     },
     {
-      "from": "BE-CHAIN-LAYOUT",
+      "from": "BE-NVDA-LAYOUT",
       "to": "BE-NVDA-LINKS",
       "type": "depends"
     },
     {
-      "from": "BE-ENTITY",
-      "to": "BE-LISTING",
+      "from": "BE-BICS-ENTITY",
+      "to": "BE-BICS-AREA",
       "type": "depends"
     },
     {
-      "from": "BE-INGEST",
-      "to": "BE-ENTITY",
+      "from": "BE-BICS-INGEST",
+      "to": "BE-BICS-ENTITY",
       "type": "depends"
     },
     {

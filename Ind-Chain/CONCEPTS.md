@@ -264,7 +264,7 @@ The page became an app without changing its module structure (see `modules/`). T
 
 | Term / 名 | Meaning / 含义 |
 |-----------|----------------|
-| **App shell / 应用壳** (SHELL-WINDOW) | *Not* the bundle's `meta.mode = shell` empty-wall template (`BE-SHELL`). / 与 bundle 的 `meta.mode = shell` 空墙模板（`BE-SHELL`）无关。Swift/AppKit window + `WKWebView` loading `http://127.0.0.1:<port>/`. Window frame is remembered; error panel on failure. / 原生窗口与 WKWebView，只载 loopback；失败出面板。 |
+| **App shell / 应用壳** (SHELL-WINDOW) | *Not* the bundle's `meta.mode = shell` empty-wall template (`BE-DB-SHADOW`). / 与 bundle 的 `meta.mode = shell` 空墙模板（`BE-DB-SHADOW`）无关。Swift/AppKit window + `WKWebView` loading `http://127.0.0.1:<port>/`. Window frame is remembered; error panel on failure. / 原生窗口与 WKWebView，只载 loopback；失败出面板。 |
 | **Embedded back end / 内嵌后端** (SHELL-PROC) | The shell owns one `server/app.py` child: free port, exits with the shell (parent-PID watcher), restarted on crash or hang (bounded). / 壳拥有的后端子进程，随壳退出，崩溃或卡死有限次重启。 |
 | **Package / 打包** (SHELL-PACK) | Allow-list copy of the repo layout into `Contents/Resources/sfc/`, zip + SHA-256. / 白名单拷贝，布局与仓库同构。 |
 | **Data dir / 数据目录** | `~/Library/Application Support/Standard-Financial-Charting/` (user data, separate from the package); logs in `~/Library/Logs/Standard-Financial-Charting/`. / 在用户目录，与包分离。 |

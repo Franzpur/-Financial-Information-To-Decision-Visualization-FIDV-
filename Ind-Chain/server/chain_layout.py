@@ -1,4 +1,4 @@
-"""BE-CHAIN-LAYOUT — pure chain face placement (link-hemisphere).
+"""BE-NVDA-LAYOUT — pure chain face placement (link-hemisphere).
 
 Input: company rows with side / linkPct + center_id.
 Output: same rows with revScore / ring / radial / ringCos / ringSin.

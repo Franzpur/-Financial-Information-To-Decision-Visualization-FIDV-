@@ -1216,7 +1216,7 @@ class Handler(BaseHTTPRequestHandler):
         self._send_json(200, {"company": company})
 
     def _api_bundle(self, qs: dict) -> None:
-        """BE-BUNDLE via bundle_dispatch — shell/chain never open BE-DEMO-DB."""
+        """BE-BUNDLE via bundle_dispatch — shell/chain never open BE-DB-DEMO."""
         ticker = self._qs0(qs, "ticker")
         self._send_json(200, build_bundle(ticker))
 

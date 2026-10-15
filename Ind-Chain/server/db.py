@@ -198,7 +198,7 @@ def assign_rings(companies: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return companies
 
 
-# BE-CHAIN-LAYOUT lives in chain_layout.py; import it from there, not via db.
+# BE-NVDA-LAYOUT lives in chain_layout.py; import it from there, not via db.
 
 
 def row_company(r: sqlite3.Row) -> dict[str, Any]:
