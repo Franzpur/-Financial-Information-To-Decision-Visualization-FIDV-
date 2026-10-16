@@ -15,3 +15,5 @@
 `SFC-interactive-autonomous-charting-view.html` 是《交互性与自主作图：从静态展厅到约束坐标制图台》：深度剖析为何严格锁死 SFC 三类坐标与四项原语恰恰是扩展金融图种（单中心链、多跳级联链、债务到期墙、同业集中度对标、跨界渗透、压力演进）的数学前提，解剖当前 `bundle_nvda_chain` 的五重耦合与 `shell` 空墙断头路，并提出声明式 `ChartSpec` 架构（非令）。
 
 `SFC-three-interaction-modes-and-llm-view.html` 是《三种目标交互方式与大模型架构裁决》：深度剖析简单自然语言指令、表类数据输入（含 BICS 2.8 万企自动左连接富化）、手动制图操作（约束结构操作而非自由拖拽 XYZ）如何汇入同一 `ChartSpec` 状态机，并裁决大模型在何处有利、哪两条红线防乱、为何现有 26 模块架构零重塑（非令；姊妹篇）。
+
+`SFC-double-mapping-reform-plan.html` 是《二重映射改革方案》的可打印版（2026-10-16，业主令「把它写成html」；非令）：第二重映射 Φ2（立方体坐标与元素 → 平面图）的概念定义、对业主原话的三处纠偏、映射目录 `PM-*`、`MapInput / Descriptor / PlotSpec` 接口、拟增模块区 `fe-map`、UI 草图、P0–P4 分阶段、风险 R1–R13、待拍板 Q1–Q12 与令文触发条件。白底纸面、A4、封面 `.cover--paper`、无 CDN；纸面 token 与组件类名取自 `library/showable-report/SFC-icbc-fintech-proposal-template.html`（只读借用，未改）。ASCII 草图已改为内联 SVG。原文在 `cabinet/notes/20261016-double-mapping-reform-plan.md`，未改。`SFC-double-mapping-reform-plan.pdf` 是同页 Chrome headless 打印件（26 页，供核对分页；以 html 为准）。

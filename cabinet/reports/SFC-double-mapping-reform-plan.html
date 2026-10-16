@@ -1,0 +1,1378 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>二重映射改革方案 · SFC 内阁可打印版</title>
+<!--
+  SFC 内阁 · 二重映射改革方案 · 可打印版（2026-10-16）
+  原文：cabinet/notes/20261016-double-mapping-reform-plan.md
+  纸面：复用 library/showable-report/SFC-icbc-fintech-proposal-template.html 的 token 与组件类名；封面 .cover--paper。
+  本地字体，无 CDN；Jost 仅用于页眉英文（base64 内嵌子集）。
+  打印：Chrome 打开 → 打印 → A4 纵向 → 边距「默认」→ 勾选「背景图形」→ 关闭「页眉和页脚」→ 存 PDF。
+-->
+<style>
+
+/* ---------- 0. 字体：Jost Light 子集（仅 A–Z + 空格；SIL OFL 1.1）内嵌，无 CDN ---------- */
+@font-face {
+  font-family: "Jost";
+  font-weight: 300;
+  font-style: normal;
+  font-display: block;
+  src: url("data:font/woff2;base64,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") format("woff2");
+  unicode-range: U+0020, U+0041-005A;
+}
+
+/* ---------- 1. Token：纸面 5 色 + 屏幕桌面；封面深色只在 .cover 作用域内 ---------- */
+:root {
+  --ink:   #1a1f26;
+  --muted: #4a5560;
+  --rule:  #c5ccd4;
+  --paper: #f7f5f0;   /* 仅屏幕预览；打印转白 */
+  --fill:  #ece8e0;   /* 表头、提示框底 */
+  --desk:  #d8d5ce;   /* 仅屏幕预览：纸外桌面 */
+
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Songti SC", "Noto Serif SC", serif;
+  --sans:  -apple-system, "SF Pro Text", "PingFang SC", "Helvetica Neue", system-ui, sans-serif;
+  --brand: "Jost", -apple-system, "SF Pro Display", "PingFang SC", system-ui, sans-serif;
+  --mono:  ui-monospace, "SF Mono", Menlo, monospace;
+
+  /* 页眉页脚文字（@page 边距盒读取）；只写大写 A–Z 以走 Jost */
+  --run-l: "SFC CABINET";
+  --run-r: "DOUBLE MAPPING REFORM PLAN";
+  --run-foot: "内阁方案 · 二重映射改革 · 2026-10-16";
+}
+
+* { box-sizing: border-box; }
+html {
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;          /* 深色封面、表头、提示框底在打印时保留 */
+  background: var(--desk);
+}
+body {
+  margin: 0;
+  padding: 10mm 0 16mm;
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 10.5pt;
+  line-height: 1.75;
+  text-align: justify;
+  text-align-last: left;
+  font-variant-numeric: lining-nums;
+  hanging-punctuation: allow-end;
+  line-break: strict;
+  word-break: normal;
+  overflow-wrap: break-word;
+}
+
+/* ---------- 2. 分页：@page A4 + 命名页 ---------- */
+@page {
+  size: A4;
+  margin: 24mm 22mm 24mm 22mm;
+  @top-left {
+    content: var(--run-l);
+    font: 300 7pt/1 "Jost", sans-serif;
+    letter-spacing: .26em;
+    color: #4a5560;
+    text-align: left;
+    vertical-align: bottom;
+    padding-bottom: 3mm;
+    border-bottom: .5pt solid #c5ccd4;
+    margin-bottom: 6mm;
+  }
+  @top-right {
+    content: var(--run-r);
+    font: 300 7pt/1 "Jost", sans-serif;
+    letter-spacing: .26em;
+    color: #4a5560;
+    text-align: right;
+    vertical-align: bottom;
+    padding-bottom: 3mm;
+    border-bottom: .5pt solid #c5ccd4;
+    margin-bottom: 6mm;
+  }
+  @bottom-left {
+    content: var(--run-foot);
+    font: 8pt/1 -apple-system, "PingFang SC", sans-serif;
+    letter-spacing: .12em;
+    color: #4a5560;
+    text-align: left;
+    vertical-align: top;
+    padding-top: 4mm;
+  }
+  @bottom-right {
+    content: counter(page);
+    font: 300 9pt/1 -apple-system, "SF Pro Text", sans-serif;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: .08em;
+    color: #1a1f26;
+    text-align: right;
+    vertical-align: top;
+    padding-top: 4mm;
+  }
+}
+/* 封面：满版、无页眉页脚页码 */
+@page cover {
+  margin: 0;
+  @top-left { content: none; border: 0; }
+  @top-right { content: none; border: 0; }
+  @bottom-left { content: none; }
+  @bottom-right { content: none; }
+}
+/* 章首页：无页眉，保留页脚页码 */
+@page opener {
+  @top-left { content: none; border: 0; }
+  @top-right { content: none; border: 0; }
+}
+
+/* ---------- 3. 屏幕预览：纸张即页 ---------- */
+.no-print {
+  width: 210mm;
+  margin: 0 auto 6mm;
+  font: 9.5pt/1.5 var(--sans);
+  color: var(--muted);
+  text-align: left;
+}
+.sheet, .cover {
+  width: 210mm;
+  margin: 0 auto 10mm;
+  background: var(--paper);
+  box-shadow: 0 1px 2px rgba(26,31,38,.14), 0 10px 30px rgba(26,31,38,.14);
+  position: relative;
+}
+.sheet { min-height: 297mm; padding: 24mm 22mm; }
+.sheet--opener { page: opener; }
+.screen-run {
+  display: flex;
+  justify-content: space-between;
+  margin: -6mm 0 10mm;
+  padding-bottom: 3mm;
+  border-bottom: .5pt solid var(--rule);
+  font: 300 7pt/1 var(--brand);
+  letter-spacing: .26em;
+  color: var(--muted);
+  text-align: left;
+}
+.sheet--opener .screen-run { visibility: hidden; }
+
+.cover, .sheet { break-after: page; }
+.sheet:last-child { break-after: auto; }
+
+@media print {
+  html, body { background: #fff; }
+  body { padding: 0; }
+  .no-print, .screen-run { display: none !important; }
+  .sheet { width: auto; min-height: 0; margin: 0; padding: 0; background: none; box-shadow: none; }
+  .cover { margin: 0; box-shadow: none; }
+  a { color: inherit; text-decoration: none; }
+}
+
+/* ---------- 4. 封面（深色：延续产品玻璃深色 + 绿线；加 .cover--paper 即纸面反相） ---------- */
+.cover {
+  --cv-bg:    #0b0d10;
+  --cv-ink:   #e8edf4;
+  --cv-muted: #9aa6b5;
+  --cv-line:  #2a313c;
+  --cv-accent:#8be0c0;
+  --cv-facet: #9aa6b5;
+  page: cover;
+  height: 297mm;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 30mm 20mm 28mm;
+  background: var(--cv-bg);
+  color: var(--cv-ink);
+  font-family: -apple-system, "SF Pro Display", "PingFang SC", "Helvetica Neue", system-ui, sans-serif;
+  font-weight: 300;
+  text-align: center;
+  text-align-last: center;
+  line-height: 1.4;
+}
+.cover--paper {
+  --cv-bg:    var(--paper);
+  --cv-ink:   var(--ink);
+  --cv-muted: var(--muted);
+  --cv-line:  var(--rule);
+  --cv-accent:var(--rule);
+  --cv-facet: #8d97a3;
+}
+@media print { .cover--paper { --cv-bg: #fff; } }
+
+.cover-brand { display: flex; flex-direction: column; align-items: center; }
+.cover-logo {              /* 三框：18×44 · 步距 14 · rx 1.5 · 0.95/0.55/0.28 */
+  display: block;
+  width: 26mm; height: auto;
+  margin: 0 0 11mm;
+  overflow: visible;
+  fill: none;
+  stroke: var(--cv-ink);
+  stroke-width: 1.25;
+  stroke-linejoin: round;
+  shape-rendering: geometricPrecision;
+}
+.cover-word {              /* SFC 方角斜切字标：path 内联，非字体 */
+  display: block;
+  width: 66mm; height: auto;
+  margin: 0;
+  overflow: visible;
+  shape-rendering: geometricPrecision;
+}
+.cover-word .sfc-word { fill: var(--cv-ink); }
+.cover-word .sfc-facet { fill: var(--cv-facet); }
+.cover-word .sfc-facet-dim { fill: var(--cv-facet); opacity: .5; }
+.cover-rule {              /* 与字标等宽的绿线（与 lockup 的 .sfc-rule 同族） */
+  width: 66mm; height: 0;
+  margin: 7mm 0 8mm;
+  border: 0;
+  border-top: 1px solid var(--cv-accent);
+  opacity: .55;
+}
+.cover-en {
+  margin: 0;
+  font-size: 11.5pt;
+  font-weight: 300;
+  letter-spacing: .2em;
+  text-indent: .2em;       /* 抵消末字距，视觉居中 */
+}
+.cover-zh {
+  margin: 3.2mm 0 0;
+  font-size: 12.5pt;
+  font-weight: 300;
+  letter-spacing: .5em;
+  text-indent: .5em;
+  color: var(--cv-muted);
+}
+.cover-title { display: flex; flex-direction: column; align-items: center; }
+.cover-t1 {
+  margin: 0;
+  font-size: 34pt;
+  font-weight: 300;
+  letter-spacing: .06em;
+  line-height: 1.15;
+}
+.cover-t2 {
+  margin: 5mm 0 0;
+  font-size: 12.5pt;
+  font-weight: 300;
+  letter-spacing: .16em;
+  text-indent: .16em;
+  color: var(--cv-muted);
+}
+.cover-team {
+  display: flex; flex-direction: column; align-items: center;
+  padding-top: 8mm;
+  border-top: 1px solid var(--cv-line);
+  min-width: 56mm;
+  font-size: 10.5pt;
+  letter-spacing: .16em;
+  line-height: 2.1;
+}
+.cover-team p { margin: 0; text-indent: .16em; }
+
+/* ---------- 5. 目录 ---------- */
+.toc-head { margin: 0 0 11mm; text-align: left; }
+.toc-head .kicker {
+  display: block;
+  font: 300 8pt/1 var(--brand);
+  letter-spacing: .3em;
+  color: var(--muted);
+  margin-bottom: 4mm;
+}
+.toc-head h1 {
+  margin: 0;
+  font-size: 22pt;
+  font-weight: 600;
+  letter-spacing: .5em;
+  line-height: 1.2;
+}
+.toc-head::after {
+  content: "";
+  display: block;
+  width: 14mm;
+  margin-top: 5mm;
+  border-top: 2pt solid var(--ink);
+}
+.toc { list-style: none; margin: 0; padding: 0; text-align: left; text-align-last: left; }
+.toc li { margin: 0; }
+.toc a, .toc .toc-row {
+  display: flex;
+  align-items: baseline;
+  color: inherit;
+}
+.toc-dots {                /* 点线引导 */
+  flex: 1 1 auto;
+  min-width: 8mm;
+  margin: 0 2.5mm;
+  border-bottom: 1.4pt dotted #8b96a3;
+  transform: translateY(-.28em);
+}
+.toc-pg {
+  flex: 0 0 auto;
+  min-width: 9mm;
+  text-align: right;
+  font: 300 10pt/1 var(--sans);
+  font-variant-numeric: tabular-nums;
+}
+.toc .toc-1 { margin-top: 5.5mm; font-size: 11.5pt; font-weight: 600; line-height: 1.5; }
+.toc-1 .toc-no { font: 300 10pt var(--sans); color: var(--muted); margin-right: 4mm; font-variant-numeric: tabular-nums; }
+.toc-2 { padding-left: 9mm; font-size: 10.5pt; line-height: 1.9; }
+.toc-3 { padding-left: 18mm; font-size: 9.5pt; line-height: 1.8; color: var(--muted); }
+.toc-2 .toc-no, .toc-3 .toc-no { font: 300 8.5pt var(--sans); color: var(--muted); margin-right: 3mm; font-variant-numeric: tabular-nums; }
+.toc .toc-part { margin-top: 8mm; padding-top: 3mm; border-top: 1px solid var(--rule); }
+.toc .is-todo { color: var(--muted); }
+.toc-note {
+  margin: 12mm 0 0;
+  font: 8.5pt/1.6 var(--sans);
+  color: var(--muted);
+  text-align: left;
+}
+/* 可选：用支持 target-counter 的排版引擎（Prince / WeasyPrint / Paged.js）时，在 <html> 加 data-toc="auto"，自动页码并隐藏手填占位。
+   Chrome / Safari / Firefox 现不渲染该函数，勿开。 */
+@supports (content: target-counter(attr(href url), page)) {
+  html[data-toc="auto"] .toc a[href] .toc-pg { display: none; }
+  html[data-toc="auto"] .toc a[href]::after {
+    content: target-counter(attr(href url), page);
+    flex: 0 0 auto; min-width: 9mm; text-align: right;
+    font: 300 10pt/1 var(--sans);
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* ---------- 6. 章首页 ---------- */
+.chapter-opener {
+  display: flex;
+  flex-direction: column;
+  min-height: 238mm;
+  text-align: left; text-align-last: left;
+}
+.opener-mark {
+  width: 14mm; height: auto; overflow: visible;
+  fill: none; stroke: var(--ink); stroke-width: 1.25; stroke-linejoin: round;
+}
+.opener-num {
+  margin: 2mm 0 0;
+  font: 200 88pt/1 var(--sans);
+  letter-spacing: -.02em;
+  color: var(--rule);
+  font-variant-numeric: tabular-nums;
+}
+.opener-kicker {
+  margin: 40mm 0 0;
+  font: 300 8pt/1 var(--brand);
+  letter-spacing: .3em;
+  color: var(--muted);
+}
+.chapter-opener h1 {
+  margin: 6mm 0 0;
+  font-size: 30pt;
+  font-weight: 600;
+  letter-spacing: .08em;
+  line-height: 1.25;
+}
+.opener-en {
+  margin: 3mm 0 0;
+  font: 300 11pt/1.4 var(--sans);
+  letter-spacing: .14em;
+  color: var(--muted);
+}
+.opener-lede {
+  max-width: 118mm;
+  margin: 12mm 0 0;
+  padding-top: 6mm;
+  border-top: 2pt solid var(--ink);
+  font-size: 11.5pt;
+  line-height: 1.85;
+  color: var(--muted);
+}
+.opener-toc {
+  margin: auto 0 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--rule);
+  font: 9.5pt/1.5 var(--sans);
+  color: var(--muted);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 12mm;
+}
+.opener-toc li { margin: 0; padding: 2.2mm 0; border-bottom: 1px solid var(--rule); }
+.opener-toc .toc-no { margin-right: 3mm; font-variant-numeric: tabular-nums; color: var(--ink); }
+
+/* ---------- 7. 标题 · 段落 · 列表 ---------- */
+h1, h2, h3, h4 { text-align: left; text-align-last: left; break-after: avoid; }
+h1 { font-size: 18pt; font-weight: 600; letter-spacing: .04em; line-height: 1.3; }
+h2 {
+  margin: 9mm 0 4mm;
+  padding-bottom: 2mm;
+  font-size: 15pt; font-weight: 600; letter-spacing: .04em; line-height: 1.35;
+  border-bottom: 1px solid var(--rule);
+}
+h3 { margin: 7mm 0 2.5mm; font-size: 12pt; font-weight: 600; letter-spacing: .03em; line-height: 1.4; }
+h4 {
+  margin: 5mm 0 1.5mm;
+  font: 600 10pt/1.5 var(--serif);
+  letter-spacing: .08em;
+  color: var(--muted);
+}
+h2 .num, h3 .num {
+  display: inline-block;
+  margin-right: .7em;
+  font-family: var(--sans);
+  font-weight: 300;
+  letter-spacing: .02em;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.chapter-body > h2:first-child { margin-top: 0; }
+p { margin: 0 0 .75em; orphans: 3; widows: 3; }
+.lede { font-size: 11.5pt; line-height: 1.85; color: var(--muted); }
+ul, ol { margin: 0 0 .9em; padding-left: 1.6em; }
+li { margin: .15em 0; }
+li::marker { color: var(--muted); }
+code, .mono { font-family: var(--mono); font-size: 9pt; }
+strong { font-weight: 600; }
+.small { font-size: 9pt; line-height: 1.6; }
+.keep { break-inside: avoid; }
+.page-break { break-before: page; }
+
+/* ---------- 8. 重点提示框 ---------- */
+.callout {
+  margin: 5mm 0;
+  padding: 3.5mm 5mm 3mm;
+  background: var(--fill);
+  border-left: 2.5pt solid var(--ink);
+  break-inside: avoid;
+  text-align: left;
+}
+.callout-label {
+  display: block;
+  margin-bottom: 1.5mm;
+  font: 600 7.5pt/1.2 var(--sans);
+  letter-spacing: .22em;
+  color: var(--muted);
+}
+.callout p:last-child { margin-bottom: 0; }
+.callout--note { background: none; border: 1px solid var(--rule); border-left: 2.5pt solid var(--rule); }
+.callout--warn { background: none; border: 1px solid var(--ink); border-left: 2.5pt solid var(--ink); }
+
+/* ---------- 9. 数据表格 ---------- */
+.tbl { margin: 5mm 0; break-inside: avoid; }
+.tbl-cap, .fig-cap {
+  display: flex;
+  gap: 3mm;
+  margin: 0 0 2mm;
+  font: 9pt/1.5 var(--sans);
+  color: var(--ink);
+  text-align: left;
+}
+.cap-no { flex: 0 0 auto; font-weight: 600; letter-spacing: .06em; font-variant-numeric: tabular-nums; }
+table.data {
+  width: 100%;
+  border-collapse: collapse;
+  font: 9pt/1.5 var(--sans);
+  text-align: left;
+  text-align-last: left;
+}
+table.data th, table.data td {
+  padding: .28em .55em;
+  border: 1px solid var(--rule);
+  vertical-align: top;
+}
+table.data thead th { background: var(--fill); font-weight: 600; letter-spacing: .04em; }
+table.data thead { display: table-header-group; }
+table.data tr { break-inside: avoid; }
+table.data .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+table.data tfoot td { border-top: 1pt solid var(--ink); font-weight: 600; }
+table.data tbody th { background: none; font-weight: 600; }
+table.data--tight th, table.data--tight td { padding: .18em .4em; font-size: 8.5pt; }
+.tbl--long { break-inside: auto; }   /* 跨页长表：加在 .tbl 上，表头自动重复 */
+.src, .src-note {
+  margin: 2mm 0 0;
+  font: 8pt/1.55 var(--sans);
+  color: var(--muted);
+  text-align: left;
+}
+
+/* ---------- 10. 图片 + 图注 ---------- */
+.fig { margin: 6mm 0; break-inside: avoid; }
+.fig img { display: block; width: 100%; height: auto; border: 1px solid var(--rule); }
+.fig-cap { margin: 2.2mm 0 0; }
+.fig--narrow { width: 72%; margin-left: auto; margin-right: auto; }
+.fig-ph {                  /* 图片占位 */
+  display: flex; align-items: center; justify-content: center;
+  aspect-ratio: 16 / 9;
+  border: 1px dashed #8b96a3;
+  font: 9pt var(--sans);
+  letter-spacing: .2em;
+  color: var(--muted);
+}
+.fig-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 6mm; margin: 6mm 0; break-inside: avoid; }
+.fig-pair .fig { margin: 0; }
+.fig-pair .fig-ph { aspect-ratio: 4 / 3; }
+
+/* ---------- 11. 指标卡片 ---------- */
+.kpi-row {
+  display: grid;
+  grid-template-columns: repeat(var(--cols, 4), 1fr);
+  margin: 6mm 0;
+  border-top: 2pt solid var(--ink);
+  border-bottom: 1px solid var(--rule);
+  break-inside: avoid;
+  text-align: left;
+}
+.kpi-row--3 { --cols: 3; }
+.kpi { padding: 4mm 4mm 3.5mm; border-left: 1px solid var(--rule); }
+.kpi:first-child { padding-left: 0; border-left: 0; }
+.kpi-label { font: 600 7.5pt/1.3 var(--sans); letter-spacing: .14em; color: var(--muted); }
+.kpi-val {
+  margin-top: 2.5mm;
+  font: 200 26pt/1.1 var(--sans);
+  letter-spacing: -.01em;
+  font-variant-numeric: tabular-nums;
+}
+.kpi-unit { margin-left: .15em; font-size: 11pt; font-weight: 300; color: var(--muted); letter-spacing: 0; }
+.kpi-note { margin-top: 1.5mm; font: 8.5pt/1.5 var(--sans); color: var(--muted); }
+
+/* ---------- 12. 时间线 ---------- */
+.timeline { list-style: none; margin: 6mm 0; padding: 0; text-align: left; text-align-last: left; break-inside: avoid; }
+.timeline--long { break-inside: auto; }   /* 条目很多、需跨页时加上 */
+.tl-item {
+  display: grid;
+  grid-template-columns: 26mm 8mm 1fr;
+  margin: 0;
+  padding-bottom: 5mm;
+  break-inside: avoid;
+}
+.tl-date {
+  padding-right: 3mm;
+  text-align: right;
+  font: 300 9.5pt/1.75 var(--sans);
+  letter-spacing: .04em;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.tl-rail { position: relative; }
+.tl-rail::before {         /* 轨线 */
+  content: "";
+  position: absolute; left: 50%; top: 0; bottom: -5mm;
+  border-left: 1px solid var(--rule);
+}
+.tl-item:last-child .tl-rail::before { bottom: auto; height: .9em; }
+.tl-rail::after {          /* 方形节点：呼应方角字标 */
+  content: "";
+  position: absolute; left: 50%; top: .55em;
+  width: 2.6mm; height: 2.6mm; margin-left: -1.3mm;
+  background: var(--ink);
+  border: 1.25px solid var(--ink);
+}
+.tl-item.is-now .tl-rail::after { background: var(--paper); }
+.tl-item.is-next .tl-rail::after { background: var(--paper); border-color: #8b96a3; }
+@media print { .tl-item.is-now .tl-rail::after, .tl-item.is-next .tl-rail::after { background: #fff; } }
+.tl-title { margin: 0; font: 600 10.5pt/1.75 var(--serif); letter-spacing: .03em; color: var(--ink); }
+.tl-body p { margin: 0; font-size: 9.5pt; line-height: 1.7; color: var(--muted); }
+
+/* ---------- 13. 引文 ---------- */
+.quote {
+  margin: 7mm 0;
+  padding: 1mm 0 1mm 7mm;
+  border-left: 1px solid var(--ink);
+  font-size: 12.5pt;
+  line-height: 1.85;
+  break-inside: avoid;
+  text-align: left;
+}
+.quote p { margin: 0; }
+.quote cite {
+  display: block;
+  margin-top: 2.5mm;
+  font: normal 8.5pt/1.5 var(--sans);
+  letter-spacing: .06em;
+  color: var(--muted);
+}
+.quote cite::before { content: "—— "; }
+
+/* ---------- 14. 脚注 / 来源注 ---------- */
+sup.fn { font: 300 7pt/0 var(--sans); vertical-align: super; padding-left: .1em; font-variant-numeric: tabular-nums; }
+sup.fn a { color: var(--ink); }
+.footnotes {
+  margin-top: 9mm;
+  padding-top: 3mm;
+  font: 8.5pt/1.6 var(--sans);
+  color: var(--muted);
+  break-inside: avoid;
+  text-align: left;
+}
+.footnotes::before { content: ""; display: block; width: 28mm; margin-bottom: 3mm; border-top: 1px solid var(--ink); }
+.footnotes ol { margin: 0; padding-left: 1.6em; }
+.footnotes li { margin: .25em 0; }
+
+/* ---------- 15. 附录 ---------- */
+.appendix-head { margin: 0 0 7mm; text-align: left; }
+.appendix-head .kicker {
+  display: block;
+  margin-bottom: 3mm;
+  font: 300 8pt/1 var(--brand);
+  letter-spacing: .3em;
+  color: var(--muted);
+}
+.appendix-head h1 {
+  margin: 0;
+  padding-bottom: 3mm;
+  font-size: 18pt;
+  border-bottom: 2pt solid var(--ink);
+}
+.appendix-head h1 .num { font: 300 12pt var(--sans); letter-spacing: .1em; color: var(--muted); margin-right: 3mm; }
+.appendix-lede { font-size: 9.5pt; color: var(--muted); }
+table.gloss td:first-child, table.gloss th:first-child { width: 26%; font-weight: 600; }
+table.gloss td:nth-child(2), table.gloss th:nth-child(2) { width: 22%; color: var(--muted); }
+table.sources td:first-child { width: 8%; }
+/* ---------- 16. 内阁方案补充组件（均由纸面五色派生，无新色） ---------- */
+pre.code {
+  margin: 4mm 0; padding: 2.5mm 3.5mm;
+  background: #efece6; border: 1px solid var(--rule);
+  font: 7.2pt/1.5 var(--mono);
+  text-align: left; text-align-last: left;
+  white-space: pre-wrap; overflow-wrap: anywhere;
+  break-inside: avoid;
+}
+pre.code--long { break-inside: auto; }
+table.data code, .callout code, .tl-body code, table.kv code { overflow-wrap: anywhere; font-size: 8pt; }
+table.kv { width: 100%; border-collapse: collapse; font: 9pt/1.55 var(--sans); text-align: left; text-align-last: left; margin: 3mm 0 5mm; break-inside: avoid; }
+table.kv th, table.kv td { padding: .28em .55em; border: 1px solid var(--rule); vertical-align: top; }
+table.kv th { width: 17%; background: var(--fill); font-weight: 600; letter-spacing: .04em; }
+table.data tr.grp th, table.data tr.grp td { background: var(--fill); font-weight: 600; letter-spacing: .06em; color: var(--muted); }
+table.data td.ctr, table.data th.ctr { text-align: center; white-space: nowrap; }
+table.data td.nw { white-space: nowrap; }
+table.data td.rec, table.data th.rec { font-weight: 600; }
+.cover-meta { margin: 0; text-align: center; text-align-last: center; font: 10.5pt/2.1 var(--sans); letter-spacing: .16em; }
+.svgfig { display: block; width: 100%; height: auto; }
+.svgfig text { font-family: -apple-system, "SF Pro Text", "PingFang SC", "Helvetica Neue", system-ui, sans-serif; fill: #1a1f26; }
+.svgfig .t-m { fill: #4a5560; }
+.svgfig .t-s { font-size: 10px; }
+.svgfig .t-xs { font-size: 8.6px; }
+.svgfig .t-b { font-weight: 600; }
+.fig-box { margin: 6mm 0; break-inside: avoid; }
+.fig-box .fig-cap { margin-top: 2.2mm; }
+.toc .toc-1 .toc-no { min-width: 8mm; display: inline-block; }
+.toc .toc-1.toc-part { margin-top: 7mm; }
+ol.plain { margin: 0 0 .9em; padding-left: 1.6em; }
+.q-sub { margin: 4mm 0 1.5mm; font: 600 9pt/1.5 var(--sans); letter-spacing: .14em; color: var(--muted); text-align: left; }
+blockquote.quote--sm { font-size: 10.5pt; line-height: 1.8; margin: 4mm 0; }
+
+.tbl { break-inside: auto; }
+.tbl .tbl-cap { break-after: avoid; }
+.tbl.keep-tbl { break-inside: avoid; }
+
+</style>
+</head>
+<body>
+
+<p class="no-print">屏幕预览 · A4 纵向。打印：浏览器打开本页 → 打印 → 目的地「另存为 PDF」→ 边距「默认」→ 勾选「背景图形」→ 关闭「页眉和页脚」→ 保存。</p>
+
+<section class="cover cover--paper" aria-label="封面">
+  <div class="cover-brand">
+    <svg class="cover-logo" viewBox="7 13 48 46" role="img" aria-label="SFC logo">
+      <rect x="8" y="14" width="18" height="44" rx="1.5" opacity="0.95"/>
+      <rect x="22" y="14" width="18" height="44" rx="1.5" opacity="0.55"/>
+      <rect x="36" y="14" width="18" height="44" rx="1.5" opacity="0.28"/>
+    </svg>
+    <svg class="cover-word" viewBox="0 0 439 130" role="img" aria-label="SFC">
+      <path class="sfc-word" d="M30 0H145V30H30V50H115L145 80V100L115 130H0V100H115V80H30L0 50V30Z"/>
+      <path class="sfc-word" d="M165 0H291V30H195Z M165 30H195V50H288V80H195V130H165Z"/>
+      <path class="sfc-facet" d="M165 0V30H195Z"/>
+      <path class="sfc-word" d="M338 0H439V30H338V100H439L424 130H338L308 100V30Z"/>
+      <path class="sfc-facet-dim" d="M439 100V130H424Z"/>
+    </svg>
+    <hr class="cover-rule" />
+    <p class="cover-en">Standard Financial Charting</p>
+    <p class="cover-zh">标准金融制图</p>
+  </div>
+  <div class="cover-title">
+    <p class="cover-t1">二重映射改革方案</p>
+    <p class="cover-t2">Double Mapping Reform Plan</p>
+  </div>
+  <div class="cover-team">
+    <p>内阁方案（非令）</p>
+    <p>业主　Purkniv</p>
+    <p>2026-10-16</p>
+  </div>
+</section>
+
+<section class="sheet sheet--toc" id="toc">
+  <div class="screen-run"><span>SFC CABINET</span><span>DOUBLE MAPPING REFORM PLAN</span></div>
+  <header class="toc-head">
+    <span class="kicker">CONTENTS</span>
+    <h1>目录</h1>
+  </header>
+  <ol class="toc">
+<li class="toc-1"><a href="#s0"><span class="toc-no">00</span><span class="toc-t">一页摘要</span><span class="toc-dots"></span><span class="toc-pg">3</span></a></li>
+<li class="toc-1"><a href="#s1"><span class="toc-no">01</span><span class="toc-t">我对业主原话的理解（含三处纠偏）</span><span class="toc-dots"></span><span class="toc-pg">4</span></a></li>
+<li class="toc-1"><a href="#s2"><span class="toc-no">02</span><span class="toc-t">现状真源核实</span><span class="toc-dots"></span><span class="toc-pg">5</span></a></li>
+<li class="toc-1"><a href="#s3"><span class="toc-no">03</span><span class="toc-t">概念定义</span><span class="toc-dots"></span><span class="toc-pg">9</span></a></li>
+<li class="toc-1"><a href="#s4"><span class="toc-no">04</span><span class="toc-t">映射目录设想</span><span class="toc-dots"></span><span class="toc-pg">10</span></a></li>
+<li class="toc-1"><a href="#s5"><span class="toc-no">05</span><span class="toc-t">接口设计</span><span class="toc-dots"></span><span class="toc-pg">12</span></a></li>
+<li class="toc-1"><a href="#s6"><span class="toc-no">06</span><span class="toc-t">模块图增补方案</span><span class="toc-dots"></span><span class="toc-pg">14</span></a></li>
+<li class="toc-1"><a href="#s7"><span class="toc-no">07</span><span class="toc-t">UI 方案</span><span class="toc-dots"></span><span class="toc-pg">17</span></a></li>
+<li class="toc-1"><a href="#s8"><span class="toc-no">08</span><span class="toc-t">数据与合规</span><span class="toc-dots"></span><span class="toc-pg">19</span></a></li>
+<li class="toc-1"><a href="#s9"><span class="toc-no">09</span><span class="toc-t">分阶段落地</span><span class="toc-dots"></span><span class="toc-pg">20</span></a></li>
+<li class="toc-1"><a href="#s10"><span class="toc-no">10</span><span class="toc-t">风险与取舍</span><span class="toc-dots"></span><span class="toc-pg">23</span></a></li>
+<li class="toc-1"><a href="#s11"><span class="toc-no">11</span><span class="toc-t">待业主拍板</span><span class="toc-dots"></span><span class="toc-pg">24</span></a></li>
+<li class="toc-1"><a href="#s12"><span class="toc-no">12</span><span class="toc-t">令文判断</span><span class="toc-dots"></span><span class="toc-pg">25</span></a></li>
+<li class="toc-1"><a href="#s13"><span class="toc-no">13</span><span class="toc-t">本次落盘与未动之物</span><span class="toc-dots"></span><span class="toc-pg">26</span></a></li>
+  </ol>
+  <p class="toc-note">页码以 PDF 页序计（封面为第 1 页、不印页码）。方案原文章号（§0–§13）沿用，正文内「§」互引即指本册对应章。</p>
+</section>
+
+<section class="sheet sheet--body" id="body">
+  <div class="screen-run"><span>SFC CABINET</span><span>DOUBLE MAPPING REFORM PLAN</span></div>
+  <div class="chapter-body">
+    <h2 id="s-doc" class="no-toc"><span class="num">·</span>文件说明</h2>
+    <table class="kv">
+      <tr><th>日期</th><td>2026-10-16</td></tr>
+      <tr><th>性质</th><td>内阁方案（<strong>非令</strong>）。只出方案；未令总参谋部（理由见第 12 章）；未改产品代码；未改 <code>modules/</code>；未留截图。</td></tr>
+      <tr><th>业主令</th><td>电内阁，要求为「二重映射改革」制定方案。</td></tr>
+      <tr><th>引用约定</th><td><code>路径:行号</code> 为 2026-10-16 工作区实测。CONCEPTS 指 <code>Ind-Chain/CONCEPTS.md</code>。章号沿用方案原文（§0–§13），正文中的「§」即指本册对应章。</td></tr>
+      <tr><th>原文</th><td><code>cabinet/notes/20261016-double-mapping-reform-plan.md</code>（本册为其可打印版，内容等价，ASCII 草图改为示意图）。</td></tr>
+    </table>
+    <p class="q-sub">业主原话</p>
+    <blockquote class="quote quote--sm">
+      <p>我正在思考关于二重映射改革的问题，这个意思是，原有的 cube 结构是为 3 种交互提供解决摆放、拖动问题，过程可视化，大模型按坐标工作问题的方案，也就是模块中的立方体面那一组，但是这对于成图却又不方便，所以我希望建立基于立方体坐标和元素的二重映射，二重映射未来也将成为一组模块，通过在立方体页面右侧添加一下拉列表，提供非常多样的映射选择，平面制图效果预览，来解决立方体到平面 chart 的投影问题，为我制定一下方案。</p>
+      <cite>业主 Purkniv，2026-10-16</cite>
+    </blockquote>
+
+    <h2 id="s0"><span class="num">0</span>一页摘要</h2>
+    <div class="callout">
+      <span class="callout-label">一句话　DEFINITION</span>
+      <p><strong>二重映射 = 第一重 Φ1（元素 → 立方体坐标，已有）＋ 第二重 Φ2（立方体坐标与元素 → 平面图，新增）。</strong>Φ2 只读、纯函数、输出与渲染分离，不写回立方体。</p>
+    </div>
+    <div class="kpi-row">
+      <div class="kpi"><div class="kpi-label">新增模块</div><div class="kpi-val">6<span class="kpi-unit">+1</span></div><div class="kpi-note">区 fe-map；+1 为 P4 可选 BE-MAPNL</div></div>
+      <div class="kpi"><div class="kpi-label">模块 / 边</div><div class="kpi-val">26→33<span class="kpi-unit">/48</span></div><div class="kpi-note">现 26 / 35；P4 终态 33 / 48</div></div>
+      <div class="kpi"><div class="kpi-label">首批映射</div><div class="kpi-val">3<span class="kpi-unit">个</span></div><div class="kpi-note">FRONT · STRIP · HEAT-SC</div></div>
+      <div class="kpi"><div class="kpi-label">待拍板</div><div class="kpi-val">12<span class="kpi-unit">项</span></div><div class="kpi-note">阻塞 P0 的仅 Q1–Q5</div></div>
+    </div>
+    <ol class="plain">
+      <li><strong>新增一组模块</strong>「平面映射」（区 <code>fe-map</code>）：<code>FE-MAPIN</code>、<code>FE-MAPREG</code>、<code>FE-MAPPROJ</code>、<code>FE-MAPDRAW</code>、<code>FE-MAPDOCK</code>、<code>FE-MAPOUT</code>，另留 P4 可选 <code>BE-MAPNL</code>。现图 26 模块 / 35 边，按 P1→P4 逐步到 33 / 48。P1–P3 <strong>后端零改动</strong>（W1 不动）。</li>
+      <li><strong>先做三个</strong>（仓内数据现成）：<code>PM-FRONT</code> 正视、<code>PM-STRIP</code> 带状点图、<code>PM-HEAT-SC</code> 切片×上市地热力矩阵；P2 加 <code>PM-LADDER</code> 债务期限梯，与现有 <code>bondChart</code> 对照。</li>
+      <li><strong>三条纠偏</strong>（§1）：(a) 立方体面今天落地的只有「读图交互」，作图三交互与 <code>ChartSpec</code> 仍是研判、仓内无代码；(b)「拖动」在仓里是<strong>禁止拖对象、只平移相机</strong>；(c) <code>x, y</code> 在两种出图模式里信息含量很低（角度是装饰），<strong>三视图的分析价值被高估</strong>，真正有信息的是 <code>s</code>、环半径、半盘侧别和属性通道。</li>
+      <li><strong>最大的三个风险</strong>：链模式 <code>revBn</code> 有三级回退而载荷里不标出（R3）；<code>.app</code> 的 WKWebView 没有下载委托，导出通道要另选（§8、Q6）；本机没有 node，纯函数的单测要换办法（§9 P1）。</li>
+      <li>待业主拍板 12 项（§11），阻塞 P0 的只有 Q1–Q5，均已给推荐。</li>
+    </ol>
+
+
+    <!-- ============================ §1 ============================ -->
+    <h2 id="s1"><span class="num">1</span>我对业主原话的理解（含三处纠偏）</h2>
+    <h3 id="s1-1"><span class="num">1.1</span>采用的理解</h3>
+    <ul>
+      <li><strong>「3 种交互」</strong>：按内阁 2026-10-15 读本 <code>cabinet/reports/SFC-three-interaction-modes-and-llm-view.html</code>，即 ① 简单自然语言指令、② 表类数据输入、③ 手动制图操作。<em>这是我的理解，业主若另指（例如三类坐标），请更正</em>；两种读法下本方案的 Φ2 设计不变，变的只是 §1.2(a) 的叙述。</li>
+      <li><strong>「摆放、拖动、过程可视化、大模型按坐标工作」</strong>：立方体把对象放进一套<strong>唯一的坐标语言</strong>（<code>coords.js</code>），人与模型都按这套坐标说话，不碰像素和 Three.js 原始坐标。</li>
+      <li><strong>「立方体面那一组」</strong>：<code>modules/graph.json</code> 中 <code>region = fe-cube</code>（图上标签「立方体面」），7 个模块：<code>FE-OPENCUBE</code>、<code>FE-ACTION</code>、<code>FE-COORDONE</code>、<code>FE-SCENE</code>、<code>FE-PANEL</code>、<code>FE-FOCUS</code>、<code>FE-AESTHETIC</code>（<code>graph.json</code> 各模块 <code>region</code> 字段；<code>modules/bake_static.py:104</code> 的 <code>chip="立方体面"</code>）。</li>
+      <li><strong>「二重映射成为一组模块」</strong>：新开一区，与「决策路径」「立方体面」并列，不并入立方体面。</li>
+    </ul>
+
+    <h3 id="s1-2"><span class="num">1.2</span>三处纠偏</h3>
+    <h4>(a) 作图三交互今天并未落地</h4>
+    <p>立方体面现在实现的是<strong>读图交互</strong>：聚焦、钉住、过滤、A/F、间距 d、标准视角、公司放大（<code>state.js:35-65</code>；CONCEPTS 96-103、114-120）。作图侧（节点增删、切片重排、传导边编辑、表粘贴、自然语言）停在研判层：全仓 <code>rg -i chartspec|compile_chart</code> 在 <code>Ind-Chain/</code> 下无命中。<code>ChartSpec</code> 只存在于 <code>cabinet/reports/SFC-interactive-autonomous-charting-view.html</code> §4。所以「立方体为 3 种交互提供方案」应读作：<strong>坐标语言与渲染面已备好、作图入口未建</strong>。</p>
+
+    <h4>(b)「拖动」今天是平移相机，不是拖对象</h4>
+    <p>CONCEPTS 148-149：左键拖动 = pan，右键拖动 = orbit。三交互读本明确<strong>禁止拖拽对象改 <code>(x, y)</code></strong>（§1.3：面内半径代表金融数值，拖动等于伪造数据）。立方体解决「拖动问题」的办法是：不给对象拖动，位置只由 Φ1 算出。这条对 Φ2 很要紧：<strong>平面图一律只读，不提供拖点改数。</strong></p>
+
+    <h4>(c) <code>x, y</code> 的信息含量很低</h4>
+    <div class="tbl keep-tbl">
+      <div class="tbl-cap"><span class="cap-no">表 1-1</span><span>三种出图模式下 <code>(ringCos, ringSin)</code> 的来源与真正携带信息的量</span></div>
+      <table class="data">
+        <thead><tr><th style="width:15%">模式</th><th>(ringCos, ringSin) 来源</th><th style="width:20%">真正携带信息的量</th><th style="width:25%">出处</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">demo<br>（演示集 96 家 / 11 层）</th><td>半径 = 层内营收 min–max 环分数；<strong>角度 = 均匀撒点 + 环号与层号偏置（装饰）</strong></td><td>半径、层号</td><td><code>db.py:148</code>；<code>db.py:166-184</code>；CONCEPTS 183</td></tr>
+          <tr><th scope="row">chain<br>（NVDA，48 对手方）</th><td>半径 = 全局半盘内关联占比线性映射；<strong>角度 = 同侧按名称排序后均分（装饰）</strong>；半盘侧别 = 供应商 / 客户</td><td>半径、侧别（<code>x&lt;5</code> 供应商，<code>x&gt;5</code> 客户）</td><td><code>chain_layout.py:23-52</code>（<code>:45</code> 半径公式）；<code>nvda_links.py:393-394</code>（<code>placeMode: link-hemisphere</code>）</td></tr>
+          <tr><th scope="row">shell<br>（一家公司）</th><td>无；固定 <code>(5, 5, 5)</code></td><td>无</td><td><code>db_shadow.py:42-60</code>；<code>coords.js:155-159</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout callout--warn">
+      <span class="callout-label">结论　CONCLUSION</span>
+      <p>沿 <code>s</code>、<code>x</code>、<code>y</code> 的<strong>正交三视图</strong>主要是「把立方体压平」，其中 <code>y</code> 基本是噪声；分析价值在<strong>属性通道</strong>（营收、占比、行业码、上市地、债务期限）和<strong>聚合</strong>。目录里据此降级侧视，升级通道类与聚合类（§4）。</p>
+    </div>
+
+    <!-- ============================ §2 ============================ -->
+    <h2 id="s2"><span class="num">2</span>现状真源核实</h2>
+    <h3 id="s2-1"><span class="num">2.1</span>三类坐标</h3>
+    <div class="tbl">
+      <div class="tbl-cap"><span class="cap-no">表 2-1</span><span>三类坐标的字段、含义与出处</span></div>
+      <table class="data">
+        <thead><tr><th style="width:9%">类</th><th style="width:11%">名</th><th style="width:15%">字段</th><th>含义与来源</th><th style="width:21%">出处</th></tr></thead>
+        <tbody>
+          <tr><td>1 类</td><td>位置坐标</td><td><code>(s, x, y)</code></td><td>立方体里<strong>唯一</strong>摆放语言。<code>s</code> 切片序（层 <code>i</code> ⇒ <code>s = i</code>）；面内 <code>x, y ∈ [0,10]</code>；<code>1 s = 1 x = 1 y = UNIT</code>；右 <code>+x</code>、上 <code>+y</code>、前 <code>+s</code>；<code>USER_X_SIGN = -1</code></td><td>CONCEPTS 42、63-72；<code>coords.js:25-36, 38-69, 96-103</code></td></tr>
+          <tr><td>2 类</td><td>相对坐标</td><td><code>ringCos</code>, <code>ringSin</code> ∈ [-1,1]</td><td>环上位置，<strong>不叫 x、y</strong>；<code>companyCoord()</code> 把它投成位置：<code>x = 5 + (-1)·ringCos·3.8</code>，<code>y = 5 + ringSin·3.8</code></td><td>CONCEPTS 72；<code>coords.js:146-152</code>；<code>LAYOUT.ringRadius = 3.8</code>（<code>coords.js:42</code>）</td></tr>
+          <tr><td>3 类</td><td>行业坐标</td><td><code>legalEntityCoord</code></td><td>BICS 7×2 连字符；企业主业空 <code>% Tot Rev</code> 时前加 <code>-</code>；chrome 只画前 4 段；<strong>不参与摆放、不画在立方体上</strong>。demo 公司此字段恒为 <code>""</code></td><td>CONCEPTS 73；<code>coords.js:224-232</code>；<code>db.py:237</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>另有 <code>C-MAP</code> 用户→Three（<code>coordToLocal</code>，随 <code>gap = d·UNIT</code>）。<strong><code>d</code> 与相机只影响世界米数，不改用户坐标</strong>（CONCEPTS 70；<code>coords.js:96-103</code>）。这决定了 Φ2 的输入里<strong>不含相机、不含 d</strong>。</p>
+
+    <h3 id="s2-2"><span class="num">2.2</span>立方体怎么摆放 / 抽出 / 焦点</h3>
+    <div class="tbl">
+      <div class="tbl-cap"><span class="cap-no">表 2-2</span><span>立方体的摆放、抽出、焦点与相机约定</span></div>
+      <table class="data">
+        <thead><tr><th style="width:13%">事项</th><th>现状</th><th style="width:30%">出处</th></tr></thead>
+        <tbody>
+          <tr><td>摆放</td><td>场景只经 <code>applyCoord</code> / <code>applySliceCoord</code>；公司 <code>c.coord</code> 由场景在建点时写入</td><td><code>scene.js:188-203</code>；写入点 <code>scene.js:611</code>（壳）、<code>scene.js:624</code>（片内）</td></tr>
+          <tr><td>壳层坐标</td><td><code>shellCompanyCoord</code> 住在 <code>scene.js:309-316</code>，不在 <code>coords.js</code></td><td>同左</td></tr>
+          <tr><td>抽出 / 留驻</td><td>Stay = 钉住 ∪ 焦点；非 stay 就地隐藏（无 −x 停靠）</td><td>CONCEPTS 96-97、114；<code>state.js:81-89</code>；<code>scene.js:1004-1021</code></td></tr>
+          <tr><td>焦点 / 选中</td><td><code>focusLayer</code>、<code>selectedId</code>；选中非壳公司会<strong>同时设焦点</strong>，从而改变 stay 集</td><td><code>scene.js:1073-1089</code></td></tr>
+          <tr><td>过滤</td><td><code>filterMode</code> = all / us / intl（<code>country === "US"</code>）</td><td><code>state.js:71-75</code></td></tr>
+          <tr><td>相机约定</td><td>改焦点 / 抽回<strong>不动相机</strong>；正视位姿 <code>(s*+10, 5, 5)</code> 看向 <code>(s*, 5, 5)</code>，即从 <code>+s</code> 正对面心</td><td>CONCEPTS 123-125、137</td></tr>
+          <tr><td>服务端排环</td><td>浏览器不重算环</td><td>CONCEPTS 225（冻结约定 7）</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 id="s2-3"><span class="num">2.3</span>「过程可视化」与「大模型按坐标工作」今天指什么</h3>
+    <ul>
+      <li><strong>过程可视化</strong>：对象状态变化在同一三维空间里连续可见——切片抽出 / 淡出（<code>lerpPullOut</code>、<code>lerpVisibility</code>）、间距 d 拖拽、标准视角动画、公司放大舞台（CONCEPTS 194-212 符号表）。今天它可视化的是<strong>读图过程</strong>；作图过程（增删节点、改规则）尚无。</li>
+      <li><strong>大模型按坐标工作</strong>：CONCEPTS 首段把本文定义为「agent-pointing 概念靶向库」（CONCEPTS 5-6、17-24）：模型用概念 ID 与坐标元组指称对象，不指像素、不指 mesh。三交互读本进一步规定：模型只输出<strong>操作意图</strong>，不输出坐标浮点，不写无源数据（读本 §2.2 铁律一）。<code>modular-interface-scheme.md:169-177</code>、<code>181-193</code> 同旨：场景不读 sqlite、不按风险上色、不写 Three 原始坐标。</li>
+      <li>以上两点是<strong>契约</strong>：Φ2 必须沿用同一套词汇与同一条「只给意图、不给数值」的线。</li>
+    </ul>
+
+    <h3 id="s2-4"><span class="num">2.4</span>现有平面图与取数</h3>
+    <p>仓内唯一一张平面图：<code>bondChart.js</code> 的债券期限折线（<code>bondChart.js:26-97</code> <code>bondChartHtml</code>），手写 SVG（<code>viewBox 560×140</code>，三条线 total / principal / interest）。</p>
+    <pre class="code">db.py:205-240  row_company：bond_schedule(JSON 文本) → bondSchedule[{year,principalBn,interestBn,totalBn}]
+bondChart.js:160  companyFocusBody.innerHTML = detailMarkup(c) + bondChartHtml(c.bondSchedule)
+ui.js:427-443     onSelect(meta.standardView) → scheduleCompanyZoom → enterCompanyZoom</pre>
+    <ul>
+      <li>触发条件窄：<strong>仅搜索命中路径</strong>进入公司放大舞台（CONCEPTS 119）；点面、点名单行不触发。</li>
+      <li>数据窄：全仓只有 Demo Company 一家有 <code>bond_schedule</code>（<code>companies.json:961</code>；README 66），30 个年度、<strong>演示数值</strong>。</li>
+      <li>渲染与数据<strong>耦合在一个函数里</strong>（取数 + 刻度 + 拼 SVG 字符串）；无 chart-spec 层。</li>
+      <li>同文件还承载 <code>focusPointTargets</code>（点高亮目标，<code>bondChart.js:99-125</code>），被 <code>scene.js:39</code> 引用，调用处 <code>scene.js:1121</code>。</li>
+    </ul>
+
+    <h3 id="s2-5"><span class="num">2.5</span><code>cube.html</code> 右侧现有版面</h3>
+    <div class="tbl">
+      <div class="tbl-cap"><span class="cap-no">表 2-3</span><span>右侧及周边现有元素的位置与出处</span></div>
+      <table class="data">
+        <thead><tr><th style="width:24%">元素</th><th>位置</th><th style="width:28%">出处</th></tr></thead>
+        <tbody>
+          <tr><td><code>?</code> 帮助钮</td><td>右上 <code>top:14 right:14</code>，28×28</td><td><code>css/app.css:1133-1148</code>；<code>cube.html:52</code></td></tr>
+          <tr><td>Home 链</td><td><code>top:14 right:50</code></td><td><code>app.css:180-186</code>；<code>cube.html:51</code></td></tr>
+          <tr><td><code>#detailPanel</code>（<code>.float-detail</code>）</td><td><code>top:64 right:14</code>，宽 <code>min(300px, 100%-28px)</code>，<code>max-height: 100%-140px</code>，可滚动</td><td><code>app.css:244-267</code>；<code>cube.html:54-59</code></td></tr>
+          <tr><td><code>#dBox</code>（间距 d）</td><td>右下 <code>bottom:14 right:14</code>，宽 220</td><td><code>app.css:973-989</code>；<code>cube.html:82-92</code></td></tr>
+          <tr><td>公司放大舞台 <code>#companyFocus</code></td><td>左下大面，宽 <code>min(64%,760px)</code>，高 <code>min(82%,…)</code></td><td><code>app.css:283-308</code>；<code>cube.html:61-66</code></td></tr>
+          <tr><td>左侧 Filter / A/F、顶栏搜索、<code>nav-hint</code>（<code>top:64 left:14</code>）</td><td>左上</td><td><code>app.css:95-112, 188-198, 1098-1116</code></td></tr>
+          <tr><td>公司放大时隐藏全部 chrome</td><td><code>.company-zoom</code> 选择器列表</td><td><code>app.css:76-93</code></td></tr>
+          <tr><td>≤980px 时右卡缩为 <code>280px</code>，<code>top:64</code></td><td>媒体查询</td><td><code>app.css:1248-1266</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>右栏上段（<code>top:64</code> 起）已被 detail 占用，右下是 d 盒；<code>top:56</code> 一行目前是空的（左侧 A/F 在 <code>top:56</code>）。</p>
+
+    <h3 id="s2-6"><span class="num">2.6</span>当前数据能给 Φ2 什么</h3>
+    <div class="tbl">
+      <div class="tbl-cap"><span class="cap-no">表 2-4</span><span>三种模式的载荷可用通道（<code>meta.mode</code>）</span></div>
+      <table class="data">
+        <thead><tr><th style="width:15%">来源</th><th style="width:15%">元素</th><th>可用通道</th><th style="width:28%">要点</th></tr></thead>
+        <tbody>
+          <tr><td>demo（裸 <code>/cube</code>）</td><td>96 家、11 层</td><td><code>layer</code>、<code>revBn</code>（<strong>演示数值</strong>，CONCEPTS 175）、<code>country</code>（ISO 码：美 70，其余 13 国）、<code>ring</code>、<code>revScore</code>、<code>ringCos/Sin</code>、<code>valueM</code>（仅 16 家非空）、<code>note</code></td><td><code>legalEntityCoord</code> 恒空；<code>bondSchedule</code> 仅 1 家</td></tr>
+          <tr><td>chain（<code>?ticker=NVDA</code>）</td><td>中心 + 48 对手方（供 24 / 客 24）</td><td><code>layer</code>（= 主业 L4 切片序）、<code>side</code>、<code>linkPct</code>、<code>revBn</code>、<code>country</code>（只有 <code>US</code>/<code>INTL</code>）、<code>legalEntityCoord</code>、<code>revenueLinks[{fromId,toId,side,pct}]</code></td><td><code>linkPct</code> 非空：供应商 <strong>1/24</strong>、客户 <strong>14/24</strong>；<code>revBn</code> 为<strong>三级回退</strong>（见 R3）</td></tr>
+          <tr><td>shell（其余 ticker）</td><td>1 家</td><td><code>revBn</code>、<code>country</code>、<code>legalEntityCoord</code>、<code>s=x=y=5</code></td><td>无切片、无环、无连线</td></tr>
+          <tr><td>仓内有数据、<strong>载荷里没有</strong></td><td>—</td><td>成员库主业行（<code>pct_tot_rev</code>、<code>ind_rev</code>、<code>segments</code>，<code>GET /api/bics/entities</code>）、BICS 节点名（<code>GET /api/bics/node</code>，<code>api.js:47-50</code>）、<code>BE-DATA/ICBC C/928/googl_bond_full.xlsx</code>（债券 82 行：到期日、在外金额、票息、利差等）、<code>googl_fa_bs.xlsx</code>（FY2016–FY2025 资产负债表）</td><td>需要新取数口或摄入；债券与财务表<strong>无摄入、无 API</strong>（<code>modular-interface-scheme.md:197-207</code> 债务线仍是预留）</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 id="s2-7"><span class="num">2.7</span>模块图现状（附展示义务）</h3>
+    <p><code>modules/graph.json</code>：<strong>26 模块 / 35 边</strong>（实测：模块 FE 12 + SHELL 3 + BE 10 + other 1；边 calls 16 / depends 16 / contract 3）。立方体面一区 7 模块与区内外连线：</p>
+    <pre class="code">FE-OPENCUBE ──depends──► FE-ACTION / FE-COORDONE / FE-SCENE / FE-PANEL
+FE-SCENE    ──calls────► FE-COORDONE        FE-SCENE ──depends──► FE-FOCUS
+FE-AESTHETIC ─depends──► FE-BOARD / FE-LIST / FE-PANEL
+FE-OPENCUBE ──calls────► FE-API ──contract──► BE-HTTP</pre>
+    <p>Φ2 新区接入点见第 6 章。</p>
+
+    <h3 id="s2-8"><span class="num">2.8</span>旧文漂移（读旧文请注意，不改史实）</h3>
+    <ul>
+      <li><code>cabinet/modular-interface-scheme.md</code> 仍写 <code>ind-chain/</code>、<code>class-3-coords/</code>，并称收入线文件有 <code>links</code> / <code>held</code>；现文件顶层键是 <code>peers</code>（<code>nvda_links.py:347</code>）。</li>
+      <li>2026-10-15 两份读本引用 <code>app.py</code> 行号（如 <code>:1253</code>、<code>:576–939</code>）已失效（拆分后 <code>app.py</code> 为 354 行）；写「6 层」，实为 11 层（<code>layers.json</code>）；连线色 <code>#1f7a5a/#9e3a34</code> 与现 <code>state.js:15-17</code> 的 <code>0x3d8f6a/0xa04848</code> 不一致。本方案以 <code>state.js</code> 为准。</li>
+    </ul>
+
+    <!-- ============================ §3 ============================ -->
+    <h2 id="s3"><span class="num">3</span>概念定义</h2>
+    <h3 id="s3-1"><span class="num">3.1</span>形式化</h3>
+    <pre class="code">E   元素集：公司点、收入线、切片（今天的 state.companies / revenueLinks / layers）
+C   立方体坐标：每个元素的 (s, x, y) ⊕ (ringCos, ringSin) ⊕ legalEntityCoord
+Φ1  E → C         第一重映射（已有，位于服务端排环 + coords.js；不在本改革范围）
+Φ2  (E, C, p) → P 第二重映射（新增）：P 为平面图规约 PlotSpec
+R   P → 像素/SVG   渲染（与 Φ2 分离）</pre>
+    <div class="fig-box"><svg class="svgfig" viewBox="0 0 640 128" role="img" aria-label="二重映射流程示意"><defs>
+<marker id="f1a" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L8 4L0 8Z" fill="#1a1f26"/></marker>
+<marker id="f1g" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L8 4L0 8Z" fill="#8b96a3"/></marker>
+</defs><rect x="8" y="14" width="100" height="56" fill="none" stroke="#1a1f26" stroke-width="1"/><text x="58" y="36" text-anchor="middle" class="t-b t-s">E　元素集</text><text x="58" y="52" text-anchor="middle" class="t-xs t-m">公司点 · 收入线</text><text x="58" y="62" text-anchor="middle" class="t-xs t-m">切片</text><rect x="178" y="14" width="140" height="56" fill="none" stroke="#1a1f26" stroke-width="1"/><text x="248" y="32" text-anchor="middle" class="t-b t-s">C　立方体坐标</text><text x="248" y="46" text-anchor="middle" class="t-xs t-m">(s, x, y) ⊕ (ringCos, ringSin)</text><text x="248" y="57" text-anchor="middle" class="t-xs t-m">⊕ legalEntityCoord</text><rect x="398" y="14" width="100" height="56" fill="#ece8e0" stroke="#1a1f26" stroke-width="1.4"/><text x="448" y="36" text-anchor="middle" class="t-b t-s">P　PlotSpec</text><text x="448" y="52" text-anchor="middle" class="t-xs t-m">平面图规约</text><text x="448" y="62" text-anchor="middle" class="t-xs t-m">渲染无关</text><rect x="558" y="14" width="74" height="56" fill="#ece8e0" stroke="#1a1f26" stroke-width="1.4"/><text x="595" y="38" text-anchor="middle" class="t-b t-s">SVG</text><text x="595" y="54" text-anchor="middle" class="t-xs t-m">只读预览</text><line x1="108" y1="42" x2="178" y2="42" stroke="#8b96a3" stroke-width="1.2" stroke-dasharray="4 3" marker-end="url(#f1g)"/><text x="143" y="34" text-anchor="middle" class="t-b" font-size="11">Φ1</text><text x="143" y="56" text-anchor="middle" class="t-xs t-m">已有</text><line x1="318" y1="42" x2="398" y2="42" stroke="#1a1f26" stroke-width="2" marker-end="url(#f1a)"/><text x="358" y="34" text-anchor="middle" class="t-b" font-size="11">Φ2</text><text x="358" y="56" text-anchor="middle" class="t-xs">新增</text><line x1="498" y1="42" x2="558" y2="42" stroke="#1a1f26" stroke-width="1" marker-end="url(#f1a)"/><text x="528" y="34" text-anchor="middle" class="t-b" font-size="11">R</text><text x="528" y="56" text-anchor="middle" class="t-xs t-m">FE-MAPDRAW</text><path d="M8 90V96H178V90" fill="none" stroke="#8b96a3" stroke-width="1" stroke-dasharray="4 3"/><text x="93" y="110" text-anchor="middle" class="t-xs t-m">第一重 Φ1 · 已有 · 本改革不碰</text><path d="M318 90V96H632V90" fill="none" stroke="#1a1f26" stroke-width="1.4"/><text x="475" y="110" text-anchor="middle" class="t-xs">第二重 Φ2 + 渲染 R · 本改革范围：只读 · 纯函数 · 输出与渲染分离</text><text x="475" y="122" text-anchor="middle" class="t-xs t-m">project(MapInput, params) → PlotSpec</text></svg><div class="fig-cap"><span class="cap-no">图 3-1</span><span>二重映射的数据流：Φ1 已有（虚线），Φ2 与渲染 R 为新增（粗线）。Φ2 不写回立方体。</span></div></div>
+    <ul>
+      <li>Φ1 今天硬编码在 <code>db.assign_rings</code>（<code>db.py:187-202</code>）与 <code>chain_layout.assign_chain_rings</code>（<code>chain_layout.py:55-88</code>）。内阁读本设想把它声明化为 <code>ChartSpec</code>（3D 作图规约）。<strong>本改革不碰 Φ1。</strong></li>
+      <li>两份规约对称、互不替代：<code>ChartSpec</code> 决定<strong>立方体里放什么</strong>（作图）；<code>PlotSpec</code> 决定<strong>把立方体里已有的东西投到哪张平面图</strong>（成图）。命名上避开冲突：平面规约一律叫 <strong>PlotSpec</strong>，映射 ID 前缀 <strong><code>PM-</code></strong>。</li>
+    </ul>
+
+    <h3 id="s3-2"><span class="num">3.2</span>与三类坐标的关系</h3>
+    <div class="tbl">
+      <div class="tbl-cap"><span class="cap-no">表 3-1</span><span>Φ2 读取什么、不读什么</span></div>
+      <table class="data">
+        <thead><tr><th style="width:18%">Φ2 读取</th><th>方式</th></tr></thead>
+        <tbody>
+          <tr><td>1 类 <code>(s, x, y)</code></td><td>经 <code>coords.js</code> 的 <code>companyCoord</code> / <code>SHELL_ANCHOR</code> 取得，<strong>不读 mesh、不读 <code>c.coord</code></strong>（后者由场景副作用写入，<code>scene.js:611, 624</code>）</td></tr>
+          <tr><td>2 类</td><td>经 <code>radial = hypot(ringCos, ringSin)</code>、<code>side</code> 等<strong>派生通道</strong>使用；原始 <code>ringCos/Sin</code> 仍可读</td></tr>
+          <tr><td>3 类</td><td>经 <code>legalEntityCoord</code> 切成 <code>seg1..seg4</code>（沿用 <code>displayIndustryCoord</code> 的 4 段口径，<code>coords.js:224-232</code>）</td></tr>
+          <tr><td>属性</td><td><code>revBn</code>、<code>linkPct</code>、<code>country</code>、<code>valueM</code>、<code>bondSchedule</code>…… 按载荷白名单</td></tr>
+          <tr><td>不读</td><td>相机、<code>d</code>、mesh、DOM、sqlite、BE-DATA 文件</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 id="s3-3"><span class="num">3.3</span>不破坏「大模型按坐标工作」的五条</h3>
+    <ol class="plain">
+      <li><strong>词汇同源</strong>：映射通道名 = 字段名 = CONCEPTS 的概念名（<code>s, x, y, ringCos, ringSin, legalEntityCoord</code>），不另起术语（DESIGN §2「同一概念只用一个名字」）。</li>
+      <li><strong>Φ2 只读</strong>：不写回 <code>state</code> 的坐标与布局；联动只经「标记集」（§7.3），不经 <code>selectCompany</code> 的焦点副作用。</li>
+      <li><strong>共用量原值输出</strong>：凡与立方体共用的量（<code>s, x, y, radial</code>）在 PlotSpec 里<strong>原值</strong>，不重标定；Φ2 可有自己的刻度，但不得反写 Φ1（CONCEPTS 225）。</li>
+      <li><strong>模型只给意图</strong>：P4 里模型输出限于 <code>{mappingId, params, selector}</code>，经描述符 schema 校验；不输出数值、不输出名称之外的明细、不输出 SVG/JS。</li>
+      <li><strong>选择器是坐标谓词</strong>：<code>selector</code> 用坐标语言写，如 <code>{ s:[3,5], industry:"10-10", side:"customer" }</code>，由 Φ2 确定性求值；人在面板里、模型在命令里用<strong>同一个</strong>选择器。</li>
+    </ol>
+
+    <!-- ============================ §4 ============================ -->
+    <h2 id="s4"><span class="num">4</span>映射目录设想</h2>
+    <p class="small">记法：数据层级 <strong>✔</strong> 载荷内现成；<strong>◐</strong> 仓内有数据，需新取数口或摄入；<strong>✘</strong> 需新数据 / 新模型。★ = 按 DESIGN §1（债务风险、传导关系、集中度）应优先。「模式」说明 demo / chain / shell 三种载荷下是否有意义。</p>
+
+    <h3 id="s4-1"><span class="num">4.1</span>目录</h3>
+    <div class="tbl tbl--long">
+      <div class="tbl-cap"><span class="cap-no">表 4-1</span><span>平面映射目录 v1（<code>PM-</code> 前缀；共 21 项）</span></div>
+      <table class="data data--tight">
+        <thead><tr><th style="width:12%">ID</th><th style="width:10%">名称</th><th style="width:22%">输入通道 → 输出平面轴</th><th>金融场景 · 模式要点</th><th class="ctr" style="width:6%">数据</th><th class="ctr" style="width:7%">阶段</th></tr></thead>
+        <tbody>
+          <tr class="grp"><td colspan="6">家族 A　正交</td></tr>
+          <tr><td><code>PM-FRONT</code></td><td>正视</td><td><code>x, y</code>；<code>revBn</code>→大小；<code>country</code>→色。X=<code>x</code>，Y=<code>y</code>（保留 0–10 与环导线）</td><td>把单片 / stay 片压成一张面图；<strong>即「标准聚焦视角」的平面版</strong>。chain 有义（侧别+半径）；demo 角度装饰→默认 <code>radial-only</code>；shell 1 点</td><td class="ctr">✔</td><td class="ctr"><strong>P1</strong></td></tr>
+          <tr><td><code>PM-TOP</code></td><td>俯视</td><td><code>s, x</code>。X=<code>s</code>，Y=<code>x</code></td><td>供应 / 客户半盘随切片序的分布。chain 有义；demo 弱</td><td class="ctr">✔</td><td class="ctr">P3</td></tr>
+          <tr><td><code>PM-SIDE</code></td><td>侧视</td><td><code>s, y</code>。X=<code>s</code>，Y=<code>y</code></td><td>完整性；<code>y</code> 近乎噪声（§1.2c）。低信息量；P3 末，可不做</td><td class="ctr">✔</td><td class="ctr">P3 末</td></tr>
+          <tr class="grp"><td colspan="6">家族 B　通道</td></tr>
+          <tr><td><code>PM-STRIP</code> ★</td><td>带状点图</td><td><code>s</code>；<code>revBn</code>；<code>country</code>。带=切片，X=<code>revBn</code>（线性/对数）</td><td>同切片内规模分布、头部离散度。demo/chain 有义</td><td class="ctr">✔</td><td class="ctr"><strong>P1</strong></td></tr>
+          <tr><td><code>PM-RANK</code></td><td>排名条形</td><td><code>revBn</code>、名称、<code>s</code>。条长=<code>revBn</code>，可按切片分面</td><td>规模排序、成图导出主力。全模式</td><td class="ctr">✔</td><td class="ctr">P3</td></tr>
+          <tr><td><code>PM-SCATTER</code></td><td>双通道散点</td><td>任选两个数值通道（<code>revBn, linkPct, score, radial, s</code>），大小、色。轴自选</td><td>规模 vs 关联占比。chain 的 <code>linkPct</code> 稀疏（供 1/24），缺值入「n/a 带」，<strong>不插补</strong></td><td class="ctr">✔</td><td class="ctr">P3</td></tr>
+          <tr class="grp"><td colspan="6">家族 C　矩阵</td></tr>
+          <tr><td><code>PM-HEAT-SC</code> ★</td><td>切片×上市地矩阵</td><td><code>s</code>；<code>country</code>。行=切片，列=国家 / 美非美；格=家数或 Σ<code>revBn</code></td><td>地域集中度、非美暴露。demo 列为 ISO 国家；chain 列仅 US/INTL</td><td class="ctr">✔</td><td class="ctr"><strong>P1</strong></td></tr>
+          <tr><td><code>PM-HEAT-RING</code></td><td>切片×环号占用</td><td><code>s, ring</code>。行=切片，列=环 0–10</td><td>环分数分布（信息量低）。全模式</td><td class="ctr">✔</td><td class="ctr">P3</td></tr>
+          <tr><td><code>PM-HEAT-BICS</code></td><td>行业码×上市地矩阵</td><td><code>seg1..seg4</code>；<code>country</code>。行=BICS 前缀，列=国家</td><td>行业×地域对标。chain/shell 有；<strong>demo ✘（码为空）</strong></td><td class="ctr">✔</td><td class="ctr">P3</td></tr>
+          <tr class="grp"><td colspan="6">家族 D　层级</td></tr>
+          <tr><td><code>PM-TREE</code></td><td>BICS 层级树</td><td><code>seg1..seg4</code>；BICS 节点名。缩进树 / 节点链接</td><td>当前元素在 BICS 树上的位置。L1–L3 名称需 <code>fetchBicsNode</code>；chain/shell</td><td class="ctr">◐</td><td class="ctr">P3</td></tr>
+          <tr><td><code>PM-TREEMAP</code></td><td>树图</td><td>同上 + <code>revBn</code> 面积。嵌套矩形</td><td>规模占比（样本内）。chain</td><td class="ctr">◐</td><td class="ctr">P3</td></tr>
+          <tr class="grp"><td colspan="6">家族 E　关系</td></tr>
+          <tr><td><code>PM-SANKEY</code> ★</td><td>桑基</td><td><code>revenueLinks{side,pct}</code>、<code>s</code>。左供应商 → 中心 → 右客户，宽=<code>pct</code></td><td>单锚点上下游暴露、传导关系。chain；<strong>供应商侧 1/24 有占比</strong>，无占比者画细线并标 n/a</td><td class="ctr">✔</td><td class="ctr">P3</td></tr>
+          <tr><td><code>PM-NET</code></td><td>径向网络（确定性布局）</td><td>连线 + <code>s</code> + <code>radial</code>。极坐标：角=侧别/切片序，径=<code>radial</code></td><td>传导关系平面化、可导出。chain（现星型）</td><td class="ctr">✔</td><td class="ctr">P3</td></tr>
+          <tr><td><code>PM-CHORD</code></td><td>弦图</td><td>切片×切片连线量。圆周弦</td><td>跨层传导。现数据为星型，退化；待多跳数据</td><td class="ctr">✘</td><td class="ctr">暂缓</td></tr>
+          <tr class="grp"><td colspan="6">家族 F　时间</td></tr>
+          <tr><td><code>PM-LADDER</code> ★</td><td>债务期限梯</td><td><code>bondSchedule{year,principalBn,interestBn,totalBn}</code>。X=年，Y=$bn（本金/利息堆叠）</td><td>再融资悬崖、到期集中；<strong>DESIGN §1 债务风险</strong>。仅 Demo Company（演示值）；GOOGL 债券表未摄入；单公司</td><td class="ctr">✔ / ◐</td><td class="ctr"><strong>P2</strong></td></tr>
+          <tr><td><code>PM-LINE-FA</code></td><td>财务科目时序</td><td>资产负债表科目×年。X=年，Y=科目值</td><td>杠杆 / 流动性趋势。<code>googl_fa_bs.xlsx</code> 未摄入；单公司</td><td class="ctr">◐</td><td class="ctr">P3 之后</td></tr>
+          <tr><td><code>PM-STRESS</code></td><td>情景演进</td><td>情景梯度。小多图</td><td>压力测试。需新数据 + 新模型（对应 ChartSpec 形式 VI）</td><td class="ctr">✘</td><td class="ctr">远期</td></tr>
+          <tr class="grp"><td colspan="6">家族 H　占比</td></tr>
+          <tr><td><code>PM-CONC</code> ★</td><td>集中度</td><td><code>revBn</code>，按 <code>s</code>。条 / 曲线（CR1/CR3/HHI、洛伦兹）</td><td>切片内寡头程度；<strong>必须标「样本内」</strong>（样本不是市场）。demo/chain</td><td class="ctr">✔</td><td class="ctr">P3</td></tr>
+        </tbody>
+      </table>
+      <p class="src">注：家族字母沿用原方案（无 G 类）。<strong>小多图不立 ID</strong>：它是通用参数 <code>facet: "slice" | "side" | "country"</code>，任何映射都可开（P3）。</p>
+    </div>
+
+    <h3 id="s4-2"><span class="num">4.2</span>数据层级汇总</h3>
+    <ul>
+      <li><strong>✔ 现成可做</strong>：<code>PM-FRONT/TOP/SIDE/STRIP/RANK/SCATTER/HEAT-SC/HEAT-RING/HEAT-BICS/SANKEY/NET/CONC</code>，及 <code>PM-LADDER</code>（仅演示公司）。</li>
+      <li><strong>◐ 仓内有数据、缺取数口</strong>：<code>PM-TREE/TREEMAP</code>（要 BICS 名）、<code>PM-LADDER</code> 的真实债券、<code>PM-LINE-FA</code>。</li>
+      <li><strong>✘ 需新数据</strong>：<code>PM-CHORD</code>（多跳）、<code>PM-STRESS</code>、其他公司的债务期限。</li>
+    </ul>
+
+    <h3 id="s4-3"><span class="num">4.3</span>对目录的两条取舍</h3>
+    <ol class="plain">
+      <li>以<strong>属性通道与聚合</strong>为主，坐标直投为辅（§1.2c）。</li>
+      <li><code>PM-CONC</code>、<code>PM-TREEMAP</code> 的占比若基于对手方样本，会被读成市场结构。描述符里设 <code>basis: "sample"</code>，图上固定写「样本内 / sample only」。</li>
+    </ol>
+
+    <!-- ============================ §5 ============================ -->
+    <h2 id="s5"><span class="num">5</span>接口设计</h2>
+    <h3 id="s5-1"><span class="num">5.1</span>三个数据件</h3>
+    <p class="q-sub">MapInput · FE-MAPIN 生成的只读快照，v1</p>
+    <pre class="code">{
+  v: 1,
+  meta:   { mode:"demo|shell|chain", placeMode, title, illustrative:bool,
+            sources:[…],               // 由各元素 source/sourceDetail 去重
+            thirdParty:bool },         // 含 bics-entity / nvda-revenue-links 来源即 true
+  slices: [{ s, id, name, count }],
+  elements:[{ id, name, ticker, s, x, y, ringCos, ringSin, radial, score, side,
+              country, revBn, revBnBasis, linkPct, valueM,
+              industry:{ coord, seg:[…≤4] }, bond:[…]?, inScope:bool }],
+  links:  [{ fromId, toId, side, pct }],
+  view:   { focusLayer, pinned:[…], selectedId, filterMode }   // 仅作选择器与标记，不含相机、不含 d
+}</pre>
+    <p class="q-sub">Descriptor · 描述符：JSON 可序列化，随映射文件导出</p>
+    <pre class="code">{
+  id:"PM-STRIP", v:1, name:{zh:"带状点图", en:"Strip plot"}, family:"channel",
+  requires:{ channels:["s","revBn"], modes:["demo","chain"], minElements:2 },
+  coordUse:{ coords:["s"], attrs:["revBn","country"] },
+  channelSemantics:{ revBn:"demo=illustrative; chain=see revBnBasis" },
+  params:[ {key:"scale", type:"enum", values:["linear","log"], default:"log"},
+           {key:"scope", type:"enum", values:["follow","all"], default:"follow"} ],
+  facetable:true, basis:"sample|population", disclosure:"aggregate|named",
+  dataTier:"bundle|bundle+api|new-data"
+}</pre>
+    <p class="q-sub">PlotSpec · Φ2 的输出，渲染无关，v1</p>
+    <pre class="code">{
+  v:1, mappingId, params:{…有效值…},
+  basis:{ mode, placeMode, n, excluded:[{reason, count}] },
+  title, subtitle,
+  scales:[{ id:"x", kind:"linear|log|band", domain:[…], label, unit }],
+  axes:[…],
+  marks:[{ type:"point|rect|line|text|link", ref:[元素id…],   // 聚合格可含多个 ref
+           x, y, w, h, size, tone:"us|intl|neutral|supplier|customer|muted|mark",
+           label? }],
+  legend:[{ tone, text }],
+  notes:["demo values are illustrative", "linkPct missing for 23/24 suppliers"],
+  provenance:{ sources:[…], illustrative:bool, thirdParty:bool }
+}</pre>
+
+    <h3 id="s5-2"><span class="num">5.2</span>契约（写进 P0 冻结）</h3>
+    <pre class="code">project(input: MapInput, params: object): PlotSpec        // 纯函数</pre>
+    <ul>
+      <li><strong>纯</strong>：无 DOM、无 fetch、无 <code>Date.now</code> / <code>Math.random</code>；同输入同输出，<strong>字节相同</strong>（数字定精度，元素按 <code>id</code> 稳定排序）。这是可做 golden 的前提（<code>regress_api_golden.py</code> 的思路，<code>Ind-Chain/README.md:64</code>）。</li>
+      <li><strong>不抛</strong>：不满足 <code>requires</code> 或参数非法时返回 <code>{ ok:false, reason, hint }</code> 的空规约，上游只见「缺」，不见异常（对应 <code>modular-interface-scheme.md:7</code> 风险隔离原则）。</li>
+      <li><strong><code>tone</code> 不是颜色</strong>：规约只写语义色标，渲染器映射到现有 token（us/intl 来自 <code>--us/--intl</code>，supplier/customer 来自 <code>COLORS.LINK_*</code>，<code>state.js:15-17</code>；其余来自 AESTHETIC 色板）。参数里<strong>不允许</strong>出现颜色，等于把 AESTHETIC §2「语义色不动」写进接口。</li>
+      <li><strong><code>ref</code></strong>：每个标记回指元素 <code>id</code>，这是联动与导出脱敏的共同基础。</li>
+      <li><strong>与业主建议的签名对照</strong>：业主建议 <code>project(elements, coords, params)</code>。我把 <code>elements</code> 与 <code>coords</code> 合入 <code>MapInput</code>，避免二者错位（坐标本就是元素的字段）；语义等价。</li>
+    </ul>
+
+    <h3 id="s5-3"><span class="num">5.3</span>注册表</h3>
+    <ul>
+      <li>一映射一文件，文件导出 <code>{ desc, project }</code>；<code>desc</code> 必须 <code>JSON.stringify</code> 往返不变（自检项）。</li>
+      <li>目录：<code>Ind-Chain/web/js/map/</code>（<code>in.js</code>、<code>reg.js</code>、<code>proj.js</code>、<code>draw.js</code>、<code>dock.js</code>、<code>out.js</code>），映射放 <code>map/catalog/pm-*.js</code>。沿用仓内 <code>?v=NN</code> 缓存口令的导入惯例。</li>
+      <li>业主建议「JSON 描述 + 纯函数」：推荐 <strong>JS 模块里的 JSON 纯对象 <code>desc</code></strong>，而不是独立 <code>.json</code> 文件。理由：浏览器 ES 模块导入 JSON 需 import attributes，<code>.app</code> 内 WKWebView 的最低系统版本未核；独立 <code>.json</code> 则需异步 <code>fetch</code> + 打包白名单多一项。<code>reg.js</code> 提供 <code>descriptorsJson()</code> 导出整份目录给文档与 P4 模型，等效于「JSON 描述」。</li>
+      <li>注册表职责：<code>list(input)</code> → 带「可用 / 不可用+原因」的目录（按模式过滤，如 demo 下 <code>PM-HEAT-BICS</code> 置灰「行业码为空」）；<code>get(id)</code>；<code>run(id, input, params)</code> = 校验 + <code>project</code> + 兜底。</li>
+    </ul>
+
+    <h3 id="s5-4"><span class="num">5.4</span>渲染与参数面板</h3>
+    <ul>
+      <li><code>FE-MAPDRAW</code>：<code>PlotSpec → SVG 字符串</code>，只认 5 种标记、3 种刻度，<strong>不知道数据来自哪</strong>。后续 <code>bondChart</code> 可改为调用它（P3 评估）。</li>
+      <li>参数面板：由描述符 <code>params</code> <strong>自动生成</strong>（enum → 小下拉，bool → 开关，number → 步进滑块）；不为单个映射手写表单。</li>
+    </ul>
+
+    <h3 id="s5-5"><span class="num">5.5</span>取数口与 W1</h3>
+    <p>P1–P3 <code>MAP*</code> <strong>不 fetch</strong>，不新增 <code>/api/*</code>。需要 BICS 名（<code>PM-TREE</code>）或成员库（cohort）时，唯一路径是 <code>FE-API</code> 新增函数（<code>api.js</code> 单一出口，M2 已收拢），并由 <code>FE-MAPIN</code> 调用；该改动单列、不进 P1–P2。</p>
+
+    <!-- ============================ §6 ============================ -->
+    <h2 id="s6"><span class="num">6</span>模块图增补方案</h2>
+    <h3 id="s6-1"><span class="num">6.1</span>命名惯例（取自 <code>graph.json</code> 与 1:1 令）</h3>
+    <ul>
+      <li>id 全大写、<code>FE-</code> / <code>BE-</code> 前缀、单词连写（<code>FE-OPENCUBE</code>、<code>FE-COORDONE</code>、<code>FE-LISTAREA</code>）；中文名 2–5 字（<code>摆放坐标</code>、<code>跳转制图台</code>）。</li>
+      <li>一模块对应一个物理文件或一个目录（<code>GS-20261015-MOD-COMPLETE.md</code> 总表）；边方向服从 import 方向。</li>
+      <li>新区 <code>region</code> 值用小写连字符（现有 <code>fe-decision</code>、<code>fe-cube</code>、<code>fe-api</code>、<code>be</code>、<code>shell</code>）。</li>
+    </ul>
+
+    <h3 id="s6-2"><span class="num">6.2</span>拟增模块</h3>
+    <p>新区：<code>fe-map</code>，中文「平面映射」。</p>
+    <div class="tbl">
+      <div class="tbl-cap"><span class="cap-no">表 6-1</span><span>拟增模块（区 <code>fe-map</code>）</span></div>
+      <table class="data">
+        <thead><tr><th style="width:15%">id</th><th style="width:10%">中文</th><th style="width:19%">文件</th><th>职责</th><th class="ctr" style="width:8%">阶段</th></tr></thead>
+        <tbody>
+          <tr><td><code>FE-MAPIN</code></td><td>映射取数</td><td><code>map/in.js</code></td><td><strong>唯一</strong>读 <code>state</code> 与 <code>coords.js</code> 的映射模块；输出 <code>MapInput</code>；是隔离点</td><td class="ctr">P1</td></tr>
+          <tr><td><code>FE-MAPREG</code></td><td>映射注册</td><td><code>map/reg.js</code></td><td>目录、可用性判定、校验、<code>run</code> 兜底</td><td class="ctr">P1</td></tr>
+          <tr><td><code>FE-MAPPROJ</code></td><td>映射算子</td><td><code>map/proj.js</code> + <code>map/catalog/*</code></td><td>全部 <code>project</code> 纯函数与描述符</td><td class="ctr">P1</td></tr>
+          <tr><td><code>FE-MAPDRAW</code></td><td>平面绘图</td><td><code>map/draw.js</code></td><td><code>PlotSpec → SVG</code>；token 映射</td><td class="ctr">P1</td></tr>
+          <tr><td><code>FE-MAPDOCK</code></td><td>映射台</td><td><code>map/dock.js</code></td><td>下拉 + 参数 + 预览 + 联动 + 钉住</td><td class="ctr">P2</td></tr>
+          <tr><td><code>FE-MAPOUT</code></td><td>成图导出</td><td><code>map/out.js</code></td><td>SVG/PNG 导出、脱敏闸、来源脚注</td><td class="ctr">P3</td></tr>
+          <tr><td><code>BE-MAPNL</code></td><td>映射意图</td><td><code>server/…</code></td><td>自然语言 → <code>{mappingId, params, selector}</code>（可选叶子）</td><td class="ctr">P4，可选</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>不新增 <code>BE-*</code> 到 P3；债务摄入若做（Q11）另立 <code>BE-DEBT</code>，<strong>不计入本表</strong>。</p>
+
+    <h3 id="s6-3"><span class="num">6.3</span>拟增边</h3>
+    <div class="tbl">
+      <div class="tbl-cap"><span class="cap-no">表 6-2</span><span>拟增边（按阶段）</span></div>
+      <table class="data">
+        <thead><tr><th class="ctr" style="width:10%">阶段</th><th style="width:36%">from → to</th><th class="ctr" style="width:11%">类型</th><th>说明</th></tr></thead>
+        <tbody>
+          <tr><td class="ctr">P1</td><td><code>FE-MAPREG</code> → <code>FE-MAPPROJ</code></td><td class="ctr">depends</td><td>注册表装载算子</td></tr>
+          <tr><td class="ctr">P1</td><td><code>FE-MAPIN</code> → <code>FE-ACTION</code></td><td class="ctr">depends</td><td>读 <code>state</code>；比现图对 state 的标注更细，<strong>有意为之</strong>：<code>MAPIN</code> 是唯一接触 state 的映射模块</td></tr>
+          <tr><td class="ctr">P1</td><td><code>FE-MAPIN</code> → <code>FE-COORDONE</code></td><td class="ctr">calls</td><td><code>companyCoord</code> / <code>SHELL_ANCHOR</code></td></tr>
+          <tr><td class="ctr">P1</td><td><code>FE-AESTHETIC</code> → <code>FE-MAPDRAW</code></td><td class="ctr">depends</td><td>沿现有「AESTHETIC → 消费者」方向</td></tr>
+          <tr><td class="ctr">P2</td><td><code>FE-OPENCUBE</code> → <code>FE-MAPDOCK</code></td><td class="ctr">depends</td><td>启动时挂载、注入 <code>sceneApi</code> 与 ui 钩子</td></tr>
+          <tr><td class="ctr">P2</td><td><code>FE-MAPDOCK</code> → <code>FE-MAPREG</code> / <code>FE-MAPIN</code> / <code>FE-MAPDRAW</code></td><td class="ctr">calls ×3</td><td></td></tr>
+          <tr><td class="ctr">P2</td><td><code>FE-AESTHETIC</code> → <code>FE-MAPDOCK</code></td><td class="ctr">depends</td><td></td></tr>
+          <tr><td class="ctr">P3</td><td><code>FE-MAPDOCK</code> → <code>FE-MAPOUT</code>；<code>FE-MAPOUT</code> → <code>FE-MAPDRAW</code></td><td class="ctr">calls；depends</td><td></td></tr>
+          <tr><td class="ctr">P3（可选）</td><td><code>FE-FOCUS</code> → <code>FE-MAPDRAW</code></td><td class="ctr">calls</td><td><code>bondChart</code> 并入后；注意 <code>FE-SCENE → FE-FOCUS</code> 已存在，场景将间接带入 2D 绘图，评估后再定</td></tr>
+          <tr><td class="ctr">P4（可选）</td><td><code>BE-HTTP</code> → <code>BE-MAPNL</code>；<code>FE-MAPDOCK</code> → <code>FE-API</code></td><td class="ctr">calls ×2</td><td>唯一新增外联路径</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="tbl keep-tbl">
+      <div class="tbl-cap"><span class="cap-no">表 6-3</span><span>模块 / 边总数演进</span></div>
+      <table class="data">
+        <thead><tr><th>现状</th><th class="ctr">P1</th><th class="ctr">P2</th><th class="ctr">P3</th><th class="ctr">P4</th></tr></thead>
+        <tbody><tr><td class="num" style="text-align:left">26 / 35</td><td class="ctr">30 / 39</td><td class="ctr">31 / 44</td><td class="ctr">32 / 46（含可选 47）</td><td class="ctr">33 / 48（含可选 49）</td></tr></tbody>
+      </table>
+      <p class="src">边色按现规则：区内与 FE 内为翠绿，无跨侧边。</p>
+    </div>
+
+    <h3 id="s6-4"><span class="num">6.4</span>简图（拟增部分）</h3>
+    <div class="fig-box"><svg class="svgfig" viewBox="0 0 640 330" role="img" aria-label="模块图增补示意"><defs>
+<marker id="f2a" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L8 4L0 8Z" fill="#1a1f26"/></marker>
+<marker id="f2g" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L8 4L0 8Z" fill="#8b96a3"/></marker>
+</defs><rect x="8" y="8" width="624" height="76" fill="none" stroke="#c5ccd4" stroke-width="1"/><text x="16" y="21" text-anchor="start" class="t-xs t-m">立方体面 fe-cube（现有）</text><rect x="8" y="104" width="624" height="218" fill="none" stroke="#1a1f26" stroke-width="1.2"/><text x="16" y="118" text-anchor="start" class="t-xs t-b">平面映射 fe-map（新增）</text><rect x="20" y="38" width="110" height="30" fill="#f7f5f0" stroke="#8b96a3" stroke-width="1"/><text x="75.0" y="52" text-anchor="middle" class="t-b" font-size="9">FE-OPENCUBE</text><text x="75.0" y="64" text-anchor="middle" class="t-xs t-m">入口</text><rect x="250" y="38" width="90" height="30" fill="#f7f5f0" stroke="#8b96a3" stroke-width="1"/><text x="295.0" y="52" text-anchor="middle" class="t-b" font-size="9">FE-ACTION</text><text x="295.0" y="64" text-anchor="middle" class="t-xs t-m">state</text><rect x="360" y="38" width="100" height="30" fill="#f7f5f0" stroke="#8b96a3" stroke-width="1"/><text x="410.0" y="52" text-anchor="middle" class="t-b" font-size="9">FE-COORDONE</text><text x="410.0" y="64" text-anchor="middle" class="t-xs t-m">摆放坐标</text><rect x="510" y="38" width="100" height="30" fill="#f7f5f0" stroke="#8b96a3" stroke-width="1"/><text x="560.0" y="52" text-anchor="middle" class="t-b" font-size="9">FE-AESTHETIC</text><text x="560.0" y="64" text-anchor="middle" class="t-xs t-m">美学</text><rect x="20" y="136" width="110" height="32" fill="#ece8e0" stroke="#1a1f26" stroke-width="1.4"/><text x="75.0" y="150" text-anchor="middle" class="t-b" font-size="9">FE-MAPDOCK</text><text x="75.0" y="162" text-anchor="middle" class="t-xs t-m">映射台 · P2</text><rect x="270" y="136" width="170" height="32" fill="#ece8e0" stroke="#1a1f26" stroke-width="1.4"/><text x="355.0" y="150" text-anchor="middle" class="t-b" font-size="9">FE-MAPIN</text><text x="355.0" y="162" text-anchor="middle" class="t-xs t-m">映射取数 · P1 · 唯一读 state</text><rect x="20" y="214" width="110" height="32" fill="#ece8e0" stroke="#1a1f26" stroke-width="1.4"/><text x="75.0" y="228" text-anchor="middle" class="t-b" font-size="9">FE-MAPREG</text><text x="75.0" y="240" text-anchor="middle" class="t-xs t-m">映射注册 · P1</text><rect x="270" y="214" width="110" height="32" fill="#f7f5f0" stroke="#1a1f26" stroke-width="1.2" stroke-dasharray="4 3"/><text x="325.0" y="228" text-anchor="middle" class="t-b" font-size="9">FE-MAPOUT</text><text x="325.0" y="240" text-anchor="middle" class="t-xs t-m">成图导出 · P3</text><rect x="420" y="214" width="110" height="32" fill="#ece8e0" stroke="#1a1f26" stroke-width="1.4"/><text x="475.0" y="228" text-anchor="middle" class="t-b" font-size="9">FE-MAPDRAW</text><text x="475.0" y="240" text-anchor="middle" class="t-xs t-m">平面绘图 · P1</text><rect x="20" y="272" width="110" height="32" fill="#ece8e0" stroke="#1a1f26" stroke-width="1.4"/><text x="75.0" y="286" text-anchor="middle" class="t-b" font-size="9">FE-MAPPROJ</text><text x="75.0" y="298" text-anchor="middle" class="t-xs t-m">映射算子 · P1</text><rect x="420" y="272" width="110" height="32" fill="#f7f5f0" stroke="#1a1f26" stroke-width="1.2" stroke-dasharray="4 3"/><text x="475.0" y="286" text-anchor="middle" class="t-b" font-size="9">BE-MAPNL</text><text x="475.0" y="298" text-anchor="middle" class="t-xs t-m">映射意图 · P4 可选</text><path d="M75 68V136" stroke="#1a1f26" stroke-width="1" fill="none" marker-end="url(#f2a)"/><text x="81" y="98" text-anchor="start" class="t-xs t-m">depends · P2</text><path d="M60 168V214" stroke="#1a1f26" stroke-width="1" fill="none" marker-end="url(#f2a)"/><text x="64" y="194" text-anchor="start" class="t-xs t-m">calls</text><path d="M75 246V272" stroke="#1a1f26" stroke-width="1" fill="none" marker-end="url(#f2a)"/><text x="81" y="262" text-anchor="start" class="t-xs t-m">depends</text><path d="M130 152H270" stroke="#1a1f26" stroke-width="1" fill="none" marker-end="url(#f2a)"/><text x="200" y="147" text-anchor="middle" class="t-xs t-m">calls</text><path d="M100 168V190H475V214" stroke="#1a1f26" stroke-width="1" fill="none" marker-end="url(#f2a)"/><path d="M325 190V214" stroke="#1a1f26" stroke-width="1" fill="none" stroke-dasharray="4 3" marker-end="url(#f2a)"/><text x="150" y="184" text-anchor="start" class="t-xs t-m">calls ×3（P3 起 +MAPOUT）</text><path d="M295 136V68" stroke="#1a1f26" stroke-width="1" fill="none" marker-end="url(#f2a)"/><text x="299" y="99" text-anchor="start" class="t-xs t-m">depends · P1</text><path d="M410 136V68" stroke="#1a1f26" stroke-width="1" fill="none" marker-end="url(#f2a)"/><text x="414" y="99" text-anchor="start" class="t-xs t-m">calls · P1</text><path d="M380 230H420" stroke="#1a1f26" stroke-width="1" fill="none" marker-end="url(#f2a)"/><path d="M560 68V230H530" stroke="#1a1f26" stroke-width="1" fill="none" marker-end="url(#f2a)"/><text x="566" y="160" text-anchor="start" class="t-xs t-m">depends</text><text x="566" y="171" text-anchor="start" class="t-xs t-m">P1 / P2</text><text x="16" y="314" text-anchor="start" class="t-xs t-m">P4（可选）：FE-MAPDOCK → FE-API → BE-HTTP → BE-MAPNL（calls ×2；唯一新增外联路径）</text></svg><div class="fig-cap"><span class="cap-no">图 6-1</span><span>拟增模块与接入点。粗框 + 底色 = 新增；灰框 = 现有；虚线框 = P3 / P4 可选。区内与 FE 内边为 calls / depends。</span></div></div>
+
+    <h3 id="s6-5"><span class="num">6.5</span>对静态模块图的工程提示</h3>
+    <p><code>modules/bake_static.py</code> 的版式是<strong>硬编码</strong>：<code>NODES</code>（<code>:48</code>）、<code>ZONES</code>（<code>:95</code>）、<code>ZONE_STYLE</code>（<code>:101</code>）、<code>REGION_LABEL</code>（<code>:717</code>），烘焙器的硬检要求 0 交叉 / 0 穿框（<code>cabinet/notes/20261014-modules-graph-v3-bus-layout.md</code>）。加一区须扩视口（现 <code>VB_H = 626</code>）并重排，通过硬检方可烘焙。工作量约 0.5–1 个实施轮次，<strong>随 P1 令一并下</strong>，不在本次动。区色建议避开已用的绿 / 蓝 / 黄 / 灰，交烘焙时定。</p>
+
+    <!-- ============================ §7 ============================ -->
+    <h2 id="s7" class="page-break"><span class="num">7</span>UI 方案</h2>
+    <h3 id="s7-1"><span class="num">7.1</span>版面草图（桌面，≥980px）</h3>
+    <p>现状与方案（Map 关闭 → 打开）对照；右栏新增 <code>Map ▾</code> 面与右栏 dock 卡，下拉沿用 <code>.cube-filter-face/panel/opt</code> 的皮（<code>app.css:95-178</code>）。</p>
+    <div class="fig-box"><svg class="svgfig" viewBox="0 0 640 262" role="img" aria-label="cube.html 版面草图"><text x="8" y="12" text-anchor="start" class="t-b t-s">Map 关闭（现状）</text><rect x="8" y="20" width="300" height="236" fill="none" stroke="#1a1f26" stroke-width="1"/><rect x="16" y="28" width="50" height="16" fill="none" stroke="#c5ccd4" stroke-width="1"/><text x="41.0" y="39.5" text-anchor="middle" class="t-m" font-size="8.4">Filter ▾</text><rect x="72" y="28" width="112" height="16" fill="none" stroke="#c5ccd4" stroke-width="1"/><text x="128.0" y="39.5" text-anchor="middle" class="t-m" font-size="8.4">Search company…</text><text x="252" y="40" text-anchor="middle" class="t-m" font-size="8.4">Home</text><circle cx="289" cy="36" r="8" fill="none" stroke="#c5ccd4"/><text x="289" y="39.5" text-anchor="middle" class="t-m" font-size="8.4">?</text><rect x="16" y="52" width="50" height="16" fill="none" stroke="#c5ccd4" stroke-width="1"/><text x="41.0" y="63.5" text-anchor="middle" class="t-m" font-size="8.4">A/F ▾</text><rect x="38" y="104" width="50" height="96" fill="none" stroke="#1a1f26" stroke-opacity="0.95" stroke-width="1"/><rect x="64" y="104" width="50" height="96" fill="none" stroke="#1a1f26" stroke-opacity="0.55" stroke-width="1"/><rect x="90" y="104" width="50" height="96" fill="none" stroke="#1a1f26" stroke-opacity="0.28" stroke-width="1"/><circle cx="52" cy="124" r="2.4" fill="#4a5560"/><circle cx="76" cy="150" r="2.4" fill="#4a5560"/><circle cx="98" cy="134" r="2.4" fill="#4a5560"/><circle cx="126" cy="168" r="2.4" fill="#4a5560"/><circle cx="118" cy="118" r="2.4" fill="#4a5560"/><circle cx="62" cy="182" r="2.4" fill="#4a5560"/><text x="18" y="244" text-anchor="start" class="t-m" font-size="8.4">cube canvas</text><rect x="176" y="56" width="124" height="96" fill="none" stroke="#1a1f26" stroke-width="1"/><text x="184" y="70" text-anchor="start" class="t-m" font-size="8.4">detail · 300px</text><line x1="184" y1="82" x2="280" y2="82" stroke="#c5ccd4"/><line x1="184" y1="93" x2="266" y2="93" stroke="#c5ccd4"/><line x1="184" y1="104" x2="274" y2="104" stroke="#c5ccd4"/><line x1="184" y1="115" x2="258" y2="115" stroke="#c5ccd4"/><rect x="168" y="224" width="132" height="24" fill="none" stroke="#c5ccd4"/><text x="234" y="239.5" text-anchor="middle" class="t-m" font-size="8.4">d ▕──▽──▏</text><text x="332" y="12" text-anchor="start" class="t-b t-s">Map 打开（方案）</text><rect x="332" y="20" width="300" height="236" fill="none" stroke="#1a1f26" stroke-width="1"/><rect x="340" y="28" width="50" height="16" fill="none" stroke="#c5ccd4" stroke-width="1"/><text x="365.0" y="39.5" text-anchor="middle" class="t-m" font-size="8.4">Filter ▾</text><rect x="396" y="28" width="112" height="16" fill="none" stroke="#c5ccd4" stroke-width="1"/><text x="452.0" y="39.5" text-anchor="middle" class="t-m" font-size="8.4">Search company…</text><text x="576" y="40" text-anchor="middle" class="t-m" font-size="8.4">Home</text><circle cx="613" cy="36" r="8" fill="none" stroke="#c5ccd4"/><text x="613" y="39.5" text-anchor="middle" class="t-m" font-size="8.4">?</text><rect x="340" y="52" width="50" height="16" fill="none" stroke="#c5ccd4" stroke-width="1"/><text x="365.0" y="63.5" text-anchor="middle" class="t-m" font-size="8.4">A/F ▾</text><rect x="362" y="104" width="50" height="96" fill="none" stroke="#1a1f26" stroke-opacity="0.95" stroke-width="1"/><rect x="388" y="104" width="50" height="96" fill="none" stroke="#1a1f26" stroke-opacity="0.55" stroke-width="1"/><rect x="414" y="104" width="50" height="96" fill="none" stroke="#1a1f26" stroke-opacity="0.28" stroke-width="1"/><circle cx="376" cy="124" r="2.4" fill="#4a5560"/><circle cx="400" cy="150" r="2.4" fill="#4a5560"/><circle cx="422" cy="134" r="2.4" fill="#4a5560"/><circle cx="450" cy="168" r="2.4" fill="#4a5560"/><circle cx="442" cy="118" r="2.4" fill="#4a5560"/><circle cx="386" cy="182" r="2.4" fill="#4a5560"/><text x="342" y="244" text-anchor="start" class="t-m" font-size="8.4">cube canvas</text><circle cx="400" cy="150" r="6" fill="none" stroke="#1a1f26" stroke-width="1.3"/><circle cx="442" cy="118" r="6" fill="none" stroke="#1a1f26" stroke-width="1.3"/><rect x="564" y="52" width="60" height="16" fill="#ece8e0" stroke="#1a1f26" stroke-width="1"/><text x="594.0" y="63.5" text-anchor="middle" class="t-m" font-size="8.4">Map ▾</text><rect x="492" y="74" width="132" height="116" fill="#f7f5f0" stroke="#1a1f26" stroke-width="1.3"/><text x="498" y="87" text-anchor="start" class="t-b" font-size="8.4">PM-STRIP 带状点图</text><text x="618" y="87" text-anchor="end" class="t-m" font-size="8.4">✕</text><text x="498" y="100" text-anchor="start" class="t-m" font-size="8.0">scale ▾　scope ▾　facet ▾</text><rect x="498" y="106" width="120" height="48" fill="none" stroke="#c5ccd4"/><line x1="502" y1="116" x2="614" y2="116" stroke="#c5ccd4" stroke-width="0.6"/><circle cx="512" cy="116" r="2.1" fill="#4a5560"/><circle cx="524" cy="116" r="2.1" fill="#4a5560"/><circle cx="532" cy="116" r="2.1" fill="#4a5560"/><circle cx="558" cy="116" r="2.1" fill="#4a5560"/><circle cx="582" cy="116" r="2.1" fill="#4a5560"/><line x1="502" y1="130" x2="614" y2="130" stroke="#c5ccd4" stroke-width="0.6"/><circle cx="520" cy="130" r="2.1" fill="#4a5560"/><circle cx="546" cy="130" r="2.1" fill="#4a5560"/><circle cx="552" cy="130" r="2.1" fill="#4a5560"/><circle cx="598" cy="130" r="2.1" fill="#4a5560"/><line x1="502" y1="144" x2="614" y2="144" stroke="#c5ccd4" stroke-width="0.6"/><circle cx="516" cy="144" r="2.1" fill="#4a5560"/><circle cx="530" cy="144" r="2.1" fill="#4a5560"/><circle cx="568" cy="144" r="2.1" fill="#4a5560"/><circle cx="574" cy="144" r="2.1" fill="#4a5560"/><circle cx="602" cy="144" r="2.1" fill="#4a5560"/><circle cx="610" cy="144" r="2.1" fill="#4a5560"/><text x="498" y="166" text-anchor="start" class="t-m" font-size="8.0">48 of 49 · demo · 示意</text><text x="498" y="180" text-anchor="start" class="t-m" font-size="8.0">[Pin]  [Export ▾]  [⤢]</text><rect x="492" y="196" width="132" height="16" fill="none" stroke="#c5ccd4"/><text x="498" y="207.5" text-anchor="start" class="t-m" font-size="8.0">▸ detail（折叠成一行）</text><rect x="492" y="224" width="132" height="24" fill="none" stroke="#c5ccd4"/><text x="558" y="239.5" text-anchor="middle" class="t-m" font-size="8.4">d ▕──▽──▏</text><text x="320" y="140" text-anchor="middle" class="t-m" font-size="16">→</text></svg><div class="fig-cap"><span class="cap-no">图 7-1</span><span>cube.html 版面草图（桌面 ≥980px）：Map ▾ 面落在 top:56 right:14，dock 卡在右栏，detail 下移并折叠，d 盒不动。</span></div></div>
+    <div class="fig-box"><svg class="svgfig" viewBox="0 0 640 214" role="img" aria-label="Map 下拉列表草图"><rect x="20" y="8" width="60" height="16" fill="#ece8e0" stroke="#1a1f26" stroke-width="1.2"/><text x="50" y="19" text-anchor="middle" class="t-b" font-size="8">Map ▾</text><rect x="20" y="28" width="250" height="182" fill="#f7f5f0" stroke="#1a1f26" stroke-width="1.2"/><rect x="28" y="34" width="234" height="14" fill="none" stroke="#c5ccd4"/><text x="34" y="44" text-anchor="start" class="t-m" font-size="9">搜索映射…</text><text x="32" y="62" text-anchor="start" class="t-m" font-size="9">── 正交 ──</text><text x="36" y="78" text-anchor="start" class="" font-size="9">正视　PM-FRONT</text><text x="36" y="94" text-anchor="start" class="" font-size="9">俯视　PM-TOP</text><text x="32" y="110" text-anchor="start" class="t-m" font-size="9">── 通道 ──</text><text x="36" y="126" text-anchor="start" class="" font-size="9">带状点图　PM-STRIP</text><text x="32" y="142" text-anchor="start" class="t-m" font-size="9">── 矩阵 ──</text><text x="36" y="158" text-anchor="start" class="" font-size="9">切片×上市地　PM-HEAT-SC</text><text x="36" y="174" text-anchor="start" class="t-m" font-size="9">行业码×上市地　PM-HEAT-BICS（灰）</text><text x="32" y="190" text-anchor="start" class="t-m" font-size="9">── 关系 / 时间 ──</text><line x1="274" y1="41" x2="294" y2="39" stroke="#8b96a3" stroke-width="0.8"/><text x="300" y="42" text-anchor="start" class="t-xs t-m" font-size="9">条目 >12 时出现搜索框（沿用首页上市地下拉的可搜索样式）</text><line x1="274" y1="59" x2="294" y2="79" stroke="#8b96a3" stroke-width="0.8"/><text x="300" y="82" text-anchor="start" class="t-xs t-m" font-size="9">按家族折叠（R11：目录膨胀）</text><line x1="274" y1="171" x2="294" y2="147" stroke="#8b96a3" stroke-width="0.8"/><text x="300" y="150" text-anchor="start" class="t-xs t-m" font-size="9">不可用条目置灰；悬停说明「demo：行业码为空」</text><text x="300" y="190" text-anchor="start" class="t-xs t-m" font-size="9">沿用 .cube-filter-face / panel / opt 的面皮（app.css:95-178）</text></svg><div class="fig-cap"><span class="cap-no">图 7-2</span><span>Map ▾ 下拉列表草图：分家族、可搜索、不可用项置灰并写原因。</span></div></div>
+
+    <h3 id="s7-2"><span class="num">7.2</span>与现有右侧元素共存</h3>
+    <div class="tbl">
+      <div class="tbl-cap"><span class="cap-no">表 7-1</span><span>现有元素的处理方式</span></div>
+      <table class="data">
+        <thead><tr><th style="width:26%">现有</th><th>处理</th></tr></thead>
+        <tbody>
+          <tr><td><code>?</code> 与 Home（右上）</td><td>不动</td></tr>
+          <tr><td><code>Map ▾</code> 面</td><td>放 <code>top:56; right:14</code>，宽与 Filter 面一致（118），避开 <code>top-search</code> 的 <code>right:120</code> 区间；窄屏落到 detail 之上</td></tr>
+          <tr><td><code>#detailPanel</code></td><td>Map 开启时下移到 dock 之下并折叠成一行（点击展开）；选中公司时 detail 内容不丢，只是默认折叠</td></tr>
+          <tr><td><code>#dBox</code>（右下）</td><td>不动；dock 高度上限 <code>100% − (96 + 140)</code>，永不压 d 盒</td></tr>
+          <tr><td><code>#companyFocus</code>（公司放大）</td><td>不动；公司放大期间 dock <strong>一并隐藏</strong>（加入 <code>app.css:76-93</code> 的隐藏列表）。dock 的「⤢」放大按钮在 P3 复用同款大面，不另造</td></tr>
+          <tr><td><code>nav-hint</code> / <code>?</code> 帮助</td><td>增两行说明；不新建帮助层</td></tr>
+          <tr><td>≤980px</td><td>dock 落成底部抽屉（高 ≤45%），Map 面仍在右上；避免挡住 d 盒</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 id="s7-3"><span class="num">7.3</span>交互链</h3>
+    <ol class="plain">
+      <li><strong>选映射</strong>：下拉选 → 描述符默认参数 → <code>run</code> → 预览（一帧内）。不可用条目置灰并写原因。</li>
+      <li><strong>实时预览</strong>：触发源只有「载荷到达、焦点 / 钉住 / 过滤 / 选中变化、参数变化」。<strong>相机移动、拖动、<code>d</code> 滑块不触发</strong>（Φ2 不读它们，§2.1），这是性能与语义的同一个理由。参数滑块去抖 80ms。</li>
+      <li><strong>范围 <code>scope</code></strong>：默认「随立方体」——预览回答的就是立方体当前显示的那批元素（stay ∩ 过滤）；可改「全部」。图脚常显 <code>n of N</code>。</li>
+      <li><strong>图 → 立方体（高亮）</strong>：点标记 / 格 → 把其 <code>ref</code> 写入 <code>state.mapMarkIds</code>（新增，P2），场景读它给对应点加亮；<strong>不走 <code>selectCompany</code></strong>，因为它会同时设焦点、改 stay 集、隐藏其他切片（<code>scene.js:1073-1089</code>）。落点在 <code>focusPointTargets</code> 增 <code>marked</code> 入参（<code>bondChart.js:99-125</code>，纯函数，易测）。双击标记才等同「选中」。</li>
+      <li><strong>立方体 → 图</strong>：沿现有钩子（<code>main.js:38-45</code> 的 <code>onSelect / onFocusChange / onClear / onReset</code>）通知 dock 刷新标记；选中 / 焦点切片 / 钉住在图里加描边。</li>
+      <li><strong>钉住成图</strong>：把当前 <code>(mappingId, params, selector)</code> 三元组存入会话列表（上限 6），列表项可一键恢复。<strong>会话级，不持久</strong>：壳每次启动用随机空闲端口，<code>localStorage</code> 随源失效（CONCEPTS 271）；持久化与 <code>ChartSpec</code> 存档同做（Q8）。</li>
+      <li><strong>可分享</strong>：<code>#map=PM-STRIP&amp;p=scale:log</code> 写入 <code>writeHash</code>（<code>state.js:175-185</code>），与既有 <code>slice/filter/id</code> 并列；这个三元组即 P4 模型的输出格式。</li>
+      <li><strong>导出</strong>：见 §8.3。</li>
+      <li>动效仅 opacity / 轻微 scale（AESTHETIC §2.4）。</li>
+    </ol>
+
+    <h3 id="s7-4"><span class="num">7.4</span>与美学规范的关系；是否需美工部</h3>
+    <ul>
+      <li>全部落在 AESTHETIC §2 延展原则内：复用 token、浮于工程区、无第二套色、语义色不动（<code>agent_tasklist/AESTHETIC.md:125-131</code>）。</li>
+      <li>绘图色阶<strong>只能由现有 token 派生</strong>：<code>tone</code> → <code>--us/--intl/--muted/--stroke/--text</code>，供应/客户用 <code>COLORS.LINK_*</code>，选中 / 标记用 <code>--accent</code>。热力色阶用 <code>--text</code> 对 <code>--bg</code> 的明度单色阶（5 档），不引入新色相。建议新增 plot 专用变量 <strong>≤ 6 个</strong>（网格线、轴字、色阶 5 档），只许由现有 token 计算。</li>
+      <li><strong>需要美工部</strong>，在 P2：dock 版面与面皮、plot token、折叠 detail 的细节、窄屏抽屉。理由：AESTHETIC §3 管辖表含 <code>cube.html</code>、<code>app.css</code>、<code>ui.js</code> 视觉层，P2 主要改动正落在这些路径内。</li>
+      <li>需先补一行管辖：<code>Ind-Chain/web/js/map/**</code> 的视觉层归美工部（<code>map/draw.js</code> 的 token 映射、<code>map/dock.js</code> 的类名）。AESTHETIC.md 是公开工程真源，改它须业主令或总参任务单；内阁不改。</li>
+    </ul>
+    <div class="callout callout--note">
+      <span class="callout-label">提醒　NOTE</span>
+      <p>AESTHETIC 首页条款「<code>--accent</code> 只用于 hover/focus 与字标下划线」（<code>AESTHETIC.md:101</code>）属首页语境；本方案把 <code>--accent</code> 用作<strong>标记高亮</strong>，与「焦点」同义，请美工部在 P2 复核。</p>
+    </div>
+
+    <!-- ============================ §8 ============================ -->
+    <h2 id="s8"><span class="num">8</span>数据与合规</h2>
+    <h3 id="s8-1"><span class="num">8.1</span>现行条款要点（<code>PUBLIC-PRIVATE.md:50-57</code>）</h3>
+    <ul>
+      <li>含实体库的包 / <code>bics_entities_*.db</code> 为彭博加工物，<strong>仅限团队内部</strong>，不得上传 GitHub 或公开网站。</li>
+      <li><code>-noentities</code> 外发包由业主授权，仍含 BICS 层级 JSON、<code>companies.json</code>（其中 16 家 <code>value_m</code> 标注为彭博 Alphabet 供应商关系）、<code>nvda-revenue-links.json</code>（彭博供应链）。</li>
+      <li>API 黄金响应只放仓外（<code>Ind-Chain/README.md:64</code> 同旨）。</li>
+      <li>审查 / 验收截图用完即毁（<code>PUBLIC-PRIVATE.md:42</code>）。<code>cabinet/</code> 现已进仓（<code>PUBLIC-PRIVATE.md:20</code>），<strong>本方案只写结构性事实与计数，不含彭博明细值</strong>。</li>
+    </ul>
+
+    <h3 id="s8-2"><span class="num">8.2</span>预览与导出的边界</h3>
+    <div class="tbl">
+      <div class="tbl-cap"><span class="cap-no">表 8-1</span><span>各类输出面的披露规则</span></div>
+      <table class="data">
+        <thead><tr><th style="width:20%">面</th><th>规则</th></tr></thead>
+        <tbody>
+          <tr><td><strong>预览</strong>（应用内）</td><td>披露面不大于立方体已显示的内容：只用载荷白名单字段；<strong>不引入</strong> <code>mkt_cap</code>、<code>source_file</code>、xlsx 路径、行 id（<code>modular-interface-scheme.md:74</code> 同禁）</td></tr>
+          <tr><td><strong>导出</strong>（离开应用）</td><td>描述符声明 <code>disclosure: aggregate|named</code>。<code>aggregate</code>（计数、占比、矩阵）可导；<code>named</code>（含公司名、数值）导出必须带<strong>来源脚注</strong>与「内部使用」字样，字样依 <code>meta.thirdParty</code> 与 <code>source</code> 字段生成</td></tr>
+          <tr><td><strong>每元素 CSV</strong></td><td>默认<strong>不提供</strong>；只导出<strong>图上已画出</strong>的聚合值（Q7）</td></tr>
+          <tr><td><strong>外发包</strong>（<code>-noentities</code>）</td><td>默认只开 <code>aggregate</code> 与演示集（<code>illustrative</code>）的导出；<code>named</code> 导出须业主另令（Q7）</td></tr>
+          <tr><td><strong>夹具</strong></td><td>进仓的单测夹具一律<strong>合成数据</strong>；含真实实体的 golden 只放仓外临时目录</td></tr>
+          <tr><td><strong>出站网络</strong></td><td>P1–P3 零出站。P4 若接云端模型，出站包仅含「描述符目录 + 用户原话 + 模式与计数」，<strong>不含公司名、数值、坐标</strong>，且默认关闭（Q10）</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 id="s8-3"><span class="num">8.3</span>导出通道是个未决工程问题</h3>
+    <ul>
+      <li>设计要求：DESIGN §3「支持导出一维、二维、三维图表」（<code>agent_tasklist/DESIGN.md:59</code>）——Φ2 正是补「二维」。</li>
+      <li>但应用壳 <code>SFCShell.swift</code> 没有下载委托（<code>rg download|WKDownload|NSSavePanel</code> 无命中），仅 <code>decidePolicyFor</code> 与 <code>createWebViewWith</code>，非本页链接一律交系统打开（<code>SFCShell.swift:391-408</code>）；壳的不变量是<strong>不注入 JS 桥</strong>（CONCEPTS 275）。因此 <code>&lt;a download&gt;</code> 在 <code>.app</code> 内很可能无效，须实测。</li>
+    </ul>
+    <div class="tbl keep-tbl">
+      <div class="tbl-cap"><span class="cap-no">表 8-2</span><span>导出通道三选项与推荐</span></div>
+      <table class="data">
+        <thead><tr><th class="ctr" style="width:7%">选项</th><th>做法</th><th style="width:30%">代价与备注</th></tr></thead>
+        <tbody>
+          <tr><td class="ctr"><strong>(a)</strong></td><td>复制 PNG / SVG 到剪贴板（研究员的真实用法是贴进 PPT）</td><td>需在目标 macOS 与壳内实测 <code>navigator.clipboard.write</code></td></tr>
+          <tr><td class="ctr"><strong>(b)</strong></td><td>后端新增窄口写入 <code>SFC_DATA_DIR/exports/</code> 并在界面显示路径</td><td>要 <code>BE-HTTP</code> 与 <code>FE-API</code> 小改</td></tr>
+          <tr><td class="ctr"><strong>(c)</strong></td><td>改壳加下载委托</td><td>重建并重签 <code>.app</code>，触 <code>SHELL-*</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout">
+      <span class="callout-label">推荐　RECOMMEND</span>
+      <p><strong>(a) 为主、(b) 为 (a) 失败时的退路，不选 (c)</strong>（Q6）。</p>
+    </div>
+
+    <!-- ============================ §9 ============================ -->
+    <h2 id="s9"><span class="num">9</span>分阶段落地</h2>
+    <p class="small">工作量用「实施轮次」（一轮 = 总参任务单 → 主代理实施 → 监理部三监）与人日粗估。均为粗估，未经试做。</p>
+    <ol class="timeline">
+      <li class="tl-item is-now"><span class="tl-date">P0</span><span class="tl-rail"></span><div class="tl-body"><h4 class="tl-title">设计冻结</h4><p>CONCEPTS 增条、三件 schema v1、目录 v1；业主答 Q1–Q5；无代码改动。<strong>1 轮 / 0.5–1 人日</strong></p></div></li>
+      <li class="tl-item is-next"><span class="tl-date">P1</span><span class="tl-rail"></span><div class="tl-body"><h4 class="tl-title">注册表 + 最小映射</h4><p>MAPIN / REG / PROJ / DRAW 四模块；FRONT · STRIP · HEAT-SC；无 UI；30 / 39。<strong>1–2 轮 / 2–3 人日</strong></p></div></li>
+      <li class="tl-item is-next"><span class="tl-date">P2</span><span class="tl-rail"></span><div class="tl-body"><h4 class="tl-title">UI：下拉 + 预览 + 联动</h4><p>MAPDOCK；<code>Map ▾</code>；双向联动；钉住；<code>PM-LADDER</code> 对照；31 / 44。<strong>2 轮 / 3–4 人日</strong></p></div></li>
+      <li class="tl-item is-next"><span class="tl-date">P3</span><span class="tl-rail"></span><div class="tl-body"><h4 class="tl-title">更多映射 + 导出</h4><p>6–8 个新映射；facet；MAPOUT 与脱敏闸；32 / 46。<strong>2–3 轮 / 4–6 人日</strong></p></div></li>
+      <li class="tl-item is-next"><span class="tl-date">P4</span><span class="tl-rail"></span><div class="tl-body"><h4 class="tl-title">大模型接入（可选）</h4><p>P4a 确定性命令栏；P4b BE-MAPNL；确认门；33 / 48。<strong>2 轮 / 3–5 人日</strong></p></div></li>
+    </ol>
+
+    <h3 id="s9-0"><span class="num">9.0</span>P0　设计冻结</h3>
+    <table class="kv">
+      <tr><th>产出</th><td>CONCEPTS 增条：<code>C-MAP2</code>（第二重映射）、<code>C-PLOT</code>（PlotSpec）、<code>C-MAPREG</code>、通道词表；<code>MapInput / Descriptor / PlotSpec</code> v1 文本；目录 v1 的 ID 与优先序；拟增模块与边的静态预览；业主答 Q1–Q5</td></tr>
+      <tr><th>验收</th><td>业主签字；三件 schema 写入 CONCEPTS；<strong>无代码改动</strong>（监理部「无代码改动，不审」）</td></tr>
+      <tr><th>涉及部门</th><td>内阁（令）→ 总参谋部（任务单，必要时参谋纪要官钉口谕）；改 CONCEPTS 由主代理落</td></tr>
+      <tr><th>工作量</th><td>1 轮 / 0.5–1 人日</td></tr>
+      <tr><th>主要风险</th><td>业主对 Φ1 是否纳入本改革未定（Q2）</td></tr>
+    </table>
+
+    <h3 id="s9-1"><span class="num">9.1</span>P1　注册表 + 最小映射</h3>
+    <table class="kv">
+      <tr><th>产出</th><td><code>FE-MAPIN / REG / PROJ / DRAW</code> 四模块；<code>PM-FRONT</code>、<code>PM-STRIP</code>、<code>PM-HEAT-SC</code>；模块图重烘（30/39）；无 UI</td></tr>
+      <tr><th>验收</th><td>同输入两次输出 JSON 字节相同；三模式下 <code>requires</code> 判定正确（demo 下 <code>PM-HEAT-BICS</code> 不可用）；<code>ok:false</code> 路径不抛；<code>desc</code> 往返不变；<code>map/*</code> 不 import <code>scene/ui/api</code>；Golden API 60 项零差异（后端零改动）；<code>regress_all.sh quick</code> 含新增检查</td></tr>
+      <tr><th>涉及部门</th><td>总参谋部；主代理；监理部三属（工程测试用浏览器自检页；代码质量；理念贯彻）。<strong>不需</strong>美工部、信息部</td></tr>
+      <tr><th>工作量</th><td>1–2 轮 / 2–3 人日</td></tr>
+      <tr><th>主要风险</th><td>本机<strong>无 node</strong>：纯函数单测要换办法——浏览器内自检页 <code>web/map-selftest.html</code>，由监理部「工程测试属」打开；该页<strong>须排除出打包白名单</strong>（SHELL-PACK）；链模式 <code>revBn</code> 回退标记（R3）可能需要后端小改并 <code>--allow-changed</code></td></tr>
+    </table>
+
+    <h3 id="s9-2"><span class="num">9.2</span>P2　UI：下拉 + 预览 + 联动</h3>
+    <table class="kv">
+      <tr><th>产出</th><td><code>FE-MAPDOCK</code>；<code>cube.html</code> 加 <code>Map ▾</code> 与 dock；参数自动生成；预览；双向联动（<code>mapMarkIds</code> + <code>focusPointTargets.marked</code>）；钉住（会话级）；<code>#map=</code> 哈希；<code>PM-LADDER</code> 与 <code>bondChart</code> 对照（同一 <code>bondSchedule</code>，数值逐点一致）；31/44</td></tr>
+      <tr><th>验收</th><td>选映射到出图 &lt; 100ms（demo 96 家实测）；相机拖动与 d 滑块<strong>不触发</strong>重绘；公司放大时 dock 隐藏；≤980px 不挡 d 盒；<code>?</code> 帮助补两行；无新 <code>/api</code>；断网可用</td></tr>
+      <tr><th>涉及部门</th><td>美工部（版面、plot token）；总参谋部；主代理；监理部三属；<strong>截图用后即毁</strong></td></tr>
+      <tr><th>工作量</th><td>2 轮 / 3–4 人日</td></tr>
+      <tr><th>主要风险</th><td>版面与 detail 折叠的手感；<code>AESTHETIC §3</code> 管辖补行；改动触及 <code>bondChart.js</code>、<code>scene.js</code> 读 <code>mapMarkIds</code>（FE-SCENE 小改，须守 1:1 令的边界）</td></tr>
+    </table>
+
+    <h3 id="s9-3"><span class="num">9.3</span>P3　更多映射 + 导出</h3>
+    <table class="kv">
+      <tr><th>产出</th><td>家族 C/D/E/H 新增约 6–8 个（先 <code>PM-RANK</code>、<code>PM-SANKEY</code>、<code>PM-CONC</code>、<code>PM-TOP</code>）；<code>facet</code> 参数；<code>FE-MAPOUT</code> 与脱敏闸、来源脚注；<code>bondChart</code> 并入评估；32/46</td></tr>
+      <tr><th>验收</th><td>导出通道实测通过（Q6）；<code>named</code> 导出带脚注；外发包默认只开 <code>aggregate</code>；<code>PM-SANKEY</code> 对 NVDA 供应商侧缺占比正确标 n/a 且不插补</td></tr>
+      <tr><th>涉及部门</th><td>总参谋部；美工部（图标、色阶复核）；<strong>信息部</strong>（仅当做 ◐ 类：债券 / 财务摄入，另令）；监理部三属</td></tr>
+      <tr><th>工作量</th><td>2–3 轮 / 4–6 人日</td></tr>
+      <tr><th>主要风险</th><td>是否内嵌图表库（R4）；导出通道在壳内行不通；<code>PM-TREE</code> 需新取数函数（改 <code>api.js</code>）</td></tr>
+    </table>
+
+    <h3 id="s9-4"><span class="num">9.4</span>P4　大模型接入（可选）</h3>
+    <table class="kv">
+      <tr><th>产出</th><td>P4a：确定性命令栏 + 坐标选择器 DSL（无模型）；P4b：<code>BE-MAPNL</code>，自然语言 → <code>{mappingId, params, selector}</code>；确认门；33/48</td></tr>
+      <tr><th>验收</th><td>非法输出一律拒绝且图不变；出站包无明细（抓包核对）；断网退回 P4a</td></tr>
+      <tr><th>涉及部门</th><td>总参谋部；主代理；监理部三属；内阁复核出站合规</td></tr>
+      <tr><th>工作量</th><td>2 轮 / 3–5 人日</td></tr>
+      <tr><th>主要风险</th><td>第一条出站网络（Q10）；与 <code>ChartSpec</code> 的 OPS 编译层是否共用同一个模型入口</td></tr>
+    </table>
+    <div class="callout callout--note">
+      <span class="callout-label">顺序理由　WHY THIS ORDER</span>
+      <p>P1 不碰 UI，先把「纯函数 + 契约 + 自检」立住，再接界面；P2 才进入美工部；P3 的导出与债务摄入各自有未决工程问题，单列。</p>
+    </div>
+
+    <!-- ============================ §10 ============================ -->
+    <h2 id="s10"><span class="num">10</span>风险与取舍</h2>
+    <div class="tbl tbl--long">
+      <div class="tbl-cap"><span class="cap-no">表 10-1</span><span>风险 R1–R13 与取向</span></div>
+      <table class="data">
+        <thead><tr><th class="ctr" style="width:5%">#</th><th style="width:13%">风险 / 取舍</th><th>内容</th><th style="width:37%">取向</th></tr></thead>
+        <tbody>
+          <tr><td class="ctr">R1</td><td><strong>过度通用化</strong></td><td>描述符 + 注册表 + 渲染器 + 参数自动生成是四层抽象；P1 只有 3 个映射时，抽象成本大于收益</td><td>描述符字段<strong>只保留 P1 用得到的</strong>（<code>requires / params / disclosure / basis / dataTier</code>），其余推到出现第二个用例再加；标记类型只开 5 种；不做插件加载，只做静态导入</td></tr>
+          <tr><td class="ctr">R2</td><td><strong>性能</strong></td><td>当前载荷 ≤ 100 点，预览无压力；一旦取成员库 cohort（<code>entity_memberships</code> 实测 117,255 行），SVG 标记数与取数延迟都变成问题</td><td>P1–P3 只读载荷；cohort 作为 Q3 另议；聚合映射在 <code>project</code> 内先聚合再出标记；去抖 + 触发源收窄（§7.3）</td></tr>
+          <tr><td class="ctr">R3</td><td><strong><code>revBn</code> 语义含回退</strong></td><td>链模式 <code>_nvda_peer_rev_bn</code>：有实体则 <code>ind_rev/1e9</code>，否则取占比数值（至少 0.1），再否则 <code>1.0</code>（<code>nvda_links.py:198-203</code>）。载荷里<strong>没有字段说明用了哪一级</strong>。含 <code>revBn</code> 的映射（<code>PM-STRIP/RANK/CONC/TREEMAP</code>）可能把占位值画成规模</td><td>P1 前置二选一：(i) <code>BE-NVDA-LINKS</code> 增 <code>revBnBasis</code> 字段（后端小改，需 <code>--allow-changed</code>）；(ii) 不改后端，则 chain 模式下含 <code>revBn</code> 的映射一律加警示条并把 <code>revBnBasis</code> 置 <code>unknown</code>。<strong>推荐 (i)</strong></td></tr>
+          <tr><td class="ctr">R4</td><td><strong>离线与图表库</strong></td><td>不得用 CDN。若 P3 需要桑基 / 树图布局算法，可评估 <code>d3-hierarchy</code>、<code>d3-sankey</code>（多为 ISC / BSD-3 类许可，<strong>版本与许可文本须逐一核实，我未核</strong>），按 three 的先例本地内嵌：放 <code>web/vendor/</code>、附 <code>LICENSE</code> 与 SHA-256 清单（<code>PUBLIC-PRIVATE.md:18</code>）、并入打包白名单。不选 ECharts 类整库（体积、canvas、风格难统一）</td><td>P1–P3 手写 SVG；库只在 P3 为桑基 / 树图、且核过许可后引入</td></tr>
+          <tr><td class="ctr">R5</td><td><strong>坐标语义歧义</strong></td><td>同一个 <code>x, y</code> 在 demo 与 chain 里含义不同（§1.2c）；<code>revScore</code> 在 demo 是<strong>层内</strong> min–max，在 chain 是<strong>全局半盘</strong>（CONCEPTS 183；<code>chain_layout.py:25-31</code>），跨切片比半径只在 chain 有义</td><td>描述符 <code>channelSemantics</code> 声明；图轴标签写明刻度基准（如「层内相对分」）；不适用组合在目录里置灰，不静默出图</td></tr>
+          <tr><td class="ctr">R6</td><td><strong>与 <code>bondChart</code> 的整合</strong></td><td>现有图是公司放大舞台的一部分，走搜索命中路径；若急于替换会动 <code>FE-FOCUS</code> / <code>FE-SCENE</code> 的边（<code>FE-SCENE → FE-FOCUS</code> 已存在）</td><td>P2 并存并做逐点对照；P3 对照通过后再评估并入；并入前不删 <code>bondChartHtml</code></td></tr>
+          <tr><td class="ctr">R7</td><td><strong>导出通道</strong></td><td>壳无下载委托（§8.3）</td><td>Q6：剪贴板为主，后端窄口为退路，不改壳</td></tr>
+          <tr><td class="ctr">R8</td><td><strong>无 node</strong></td><td>本机 <code>which node</code> 无结果，P1 的纯函数无法用常规 JS 测试跑</td><td>浏览器内自检页 + 合成夹具；该页不进打包。若业主愿装 node，可改为命令行单测，但<strong>不应因此给产品加 npm 依赖</strong></td></tr>
+          <tr><td class="ctr">R9</td><td><strong>会话级钉住</strong></td><td>端口随机 → <code>localStorage</code> 不可靠</td><td>Q8；与 <code>ChartSpec</code> 持久化并案</td></tr>
+          <tr><td class="ctr">R10</td><td><strong>「同一三维空间」理念</strong></td><td>DESIGN §3：一二三维数据都在同一个三维空间（<code>DESIGN.md:63</code>）；平面预览像「拆出去的画面」（DESIGN 对照第 3 条，<code>:73-74</code>）</td><td>缓解：Φ2 读同一坐标、标记双向联动、哈希可分享、不引入独立数据源。远期选项（不进 P0–P4）：把预览当「投影墙」贴回立方体某一面，让投影真的落在空间里</td></tr>
+          <tr><td class="ctr">R11</td><td><strong>目录膨胀</strong></td><td>「非常多样」与「简洁是第一要务」（<code>DESIGN.md:49</code>）相冲</td><td>目录分家族折叠；每阶段只加有金融用途的；<code>PM-SIDE</code>、<code>PM-HEAT-RING</code> 等低信息量项默认不上</td></tr>
+          <tr><td class="ctr">R12</td><td><strong>样本偏差</strong></td><td>对手方样本不是市场，<code>PM-CONC</code>、<code>PM-TREEMAP</code> 的占比易被误读</td><td>描述符 <code>basis:"sample"</code>，图面固定「样本内」</td></tr>
+          <tr><td class="ctr">R13</td><td><strong>Φ1 并行改动</strong></td><td>若同期启动 <code>ChartSpec</code>，<code>ring/side</code> 的含义可能变</td><td>两轨只在 <code>MapInput</code> 相遇；<code>MapInput.v</code> 版本化；<code>ChartSpec</code> 轨变更 <code>placeMode</code> 语义须同步更新通道词表</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ============================ §11 ============================ -->
+    <h2 id="s11"><span class="num">11</span>待业主拍板</h2>
+    <p class="q-sub">阻塞 P0　Q1–Q5</p>
+    <div class="tbl">
+      <div class="tbl-cap"><span class="cap-no">表 11-1</span><span>阻塞 P0 的五项（均已给推荐）</span></div>
+      <table class="data">
+        <thead><tr><th class="ctr" style="width:6%">#</th><th>问题</th><th style="width:20%">选项</th><th style="width:30%">推荐</th></tr></thead>
+        <tbody>
+          <tr><td class="ctr">Q1</td><td>命名：二重映射 = Φ1 + Φ2；平面规约叫 <strong>PlotSpec</strong>（区别于 3D 的 <code>ChartSpec</code>）；映射 ID 前缀 <code>PM-</code>；新区「平面映射」</td><td>采纳 / 另议</td><td class="rec">采纳</td></tr>
+          <tr><td class="ctr">Q2</td><td>第一重（Φ1，今天写死在服务端排环）是否纳入本改革做成 <code>ChartSpec</code></td><td>纳入 / 不纳入，两轨独立</td><td class="rec">不纳入；本改革只做 Φ2，Φ1 保持现状，二者只在 <code>MapInput</code> 相遇</td></tr>
+          <tr><td class="ctr">Q3</td><td>P1–P2 映射的数据范围</td><td>仅载荷（立方体内元素）/ 允许取同 L4 的 cohort</td><td class="rec">仅载荷；cohort 留 P3 另议（R2）</td></tr>
+          <tr><td class="ctr">Q4</td><td>预览位置</td><td>右栏卡 / 底部横条 / 居中大面</td><td class="rec">右栏卡；「放大」在 P3 复用公司放大同款大面</td></tr>
+          <tr><td class="ctr">Q5</td><td>图表实现</td><td>手写 SVG / 内嵌 D3 子模块 / 整库（ECharts 类）</td><td class="rec">手写 SVG（P1–P3）；桑基、树图布局到 P3 再评估核过许可的 <code>d3-*</code> 子模块</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="q-sub">可随阶段再定　Q6–Q12</p>
+    <div class="tbl">
+      <div class="tbl-cap"><span class="cap-no">表 11-2</span><span>可随阶段再定的七项</span></div>
+      <table class="data">
+        <thead><tr><th class="ctr" style="width:6%">#</th><th>问题</th><th style="width:26%">选项</th><th style="width:30%">推荐</th></tr></thead>
+        <tbody>
+          <tr><td class="ctr">Q6</td><td>导出通道（壳无下载委托）</td><td>(a) 剪贴板 (b) 后端写 <code>SFC_DATA_DIR/exports</code> (c) 改壳加下载</td><td class="rec">(a) 为主，(b) 为退路，不选 (c)（保持「壳不注入桥」）</td></tr>
+          <tr><td class="ctr">Q7</td><td>每元素 CSV 与外发包导出</td><td>默认关闭、仅聚合；外发包默认只开 aggregate 与演示集</td><td class="rec">默认关闭，另令开启</td></tr>
+          <tr><td class="ctr">Q8</td><td>钉住成图是否持久</td><td>会话级 / 存 <code>SFC_DATA_DIR</code></td><td class="rec">P2 会话级；持久化与 <code>ChartSpec</code> 存档并案</td></tr>
+          <tr><td class="ctr">Q9</td><td>美工部介入 P2，并增 ≤6 个 plot 变量；AESTHETIC §3 补管辖行</td><td>是 / 否</td><td class="rec">是</td></tr>
+          <tr><td class="ctr">Q10</td><td>P4 是否允许云端模型（第一条出站）</td><td>不允许 / 逐项授权</td><td class="rec">P4 先做无模型命令栏；模型默认关，开启须逐项授权，出站包不含明细</td></tr>
+          <tr><td class="ctr">Q11</td><td>债务数据（<code>BE-DATA/ICBC C/928/googl_bond_full.xlsx</code> 等）是否与本改革同期摄入</td><td>同期 / 另令</td><td class="rec">另令（信息部 manage→clean→request，另立 <code>BE-DEBT</code>）；P2 先用 Demo Company 与 <code>bondChart</code> 对照</td></tr>
+          <tr><td class="ctr">Q12</td><td><code>bondChart</code> 去留</td><td>P3 对照通过后改调 <code>FE-MAPDRAW</code> / 长期并存</td><td class="rec">P3 对照通过后并入；P1–P2 不动</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout callout--warn">
+      <span class="callout-label">另请业主确认两点　ALSO CONFIRM</span>
+      <p>① §1.1 对「3 种交互」的理解；② R3 的 (i)（给 <code>BE-NVDA-LINKS</code> 加 <code>revBnBasis</code>）是否同意作为 P1 的唯一后端小改。</p>
+    </div>
+
+    <!-- ============================ §12 ============================ -->
+    <h2 id="s12"><span class="num">12</span>令文判断</h2>
+    <div class="callout">
+      <span class="callout-label">判断　DECISION</span>
+      <p><strong>本次不写令文。</strong>理由：Q1–Q5 是 P0 的前置，其中 Q2、Q3、Q5 决定模块边界与 P1 范围；在这几项未答之前写令，会把未决事项塞进总参任务单，违背「任务单用语须清楚、验收不得放宽」（<code>GS-20261014-modularization-M1-M4.md</code> 任务单用语约束）。</p>
+    </div>
+    <p><strong>建议的触发：</strong>业主答 Q1–Q5 后，内阁拟 <code>cabinet/orders/GS-20261016-DMAP-P0P1.md</code>（P0 冻结 + P1 实施，第 1 次 / 至多 5 次，据 <code>AUTHORITY.md</code> 多次下令权），并同令附：</p>
+    <ul>
+      <li>模块图重烘（<code>modules/graph.json</code> 增 4 模块 4 边，<code>bake_static.py</code> 增 <code>fe-map</code> 区并过硬检，目标 30 / 39）；</li>
+      <li>验收条款抄自 §9 P1；</li>
+      <li>明示「后端零改动」，R3 的 (i) 若业主同意则单列一条后端小改并声明 <code>--allow-changed</code>。</li>
+    </ul>
+    <p>届时按 <code>AUTHORITY.md</code>「模块跟踪展示义务」附当时模块清单与关系展示。</p>
+
+    <!-- ============================ §13 ============================ -->
+    <h2 id="s13"><span class="num">13</span>本次落盘与未动之物</h2>
+    <div class="tbl">
+      <div class="tbl-cap"><span class="cap-no">表 13-1</span><span>落盘路径与未动真源</span></div>
+      <table class="data">
+        <thead><tr><th style="width:22%">项</th><th>路径</th></tr></thead>
+        <tbody>
+          <tr><td>本方案（原文）</td><td><code>cabinet/notes/20261016-double-mapping-reform-plan.md</code></td></tr>
+          <tr><td>本册（可打印版）</td><td><code>cabinet/reports/SFC-double-mapping-reform-plan.html</code></td></tr>
+          <tr><td>真源（均未改）</td><td><code>modules/graph.json</code>、<code>modules/index.html</code>、<code>modules/bake_static.py</code>、<code>Ind-Chain/**</code>、<code>agent_tasklist/**</code>、<code>cabinet/AUTHORITY.md</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="small">不 <code>git add</code> / <code>commit</code>；不留截图；不动 <code>library/</code>。</p>
+
+
+  </div>
+</section>
+
+</body>
+</html>
