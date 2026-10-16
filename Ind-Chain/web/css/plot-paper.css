@@ -1,0 +1,127 @@
+/* Plot paper skin — the flat map figure's own design mode ([C-SKIN-PAPER]).
+ * Self-contained: this file defines every value it uses, reads nothing from the product theme, and every
+ * selector starts with .pm-skin-paper. White paper, black principal bars, grey coupon bars, ink on rule
+ * lines — same family as the secretary paper face (clerk-showable-report), with the reference figure
+ * cabinet/reports/figures/googl-ladder-paper-reference.png as the layout truth.
+ * Preview (dock), sheet (⤢) and a future export all lift the same root: <section class="pm-sheet pm-skin-paper">.
+ * No glass, no glow, no gradient, no accent hue: five neutral steps only (ink / muted / rule / band / fill).
+ * Layout differences between densities come from draw.js; the colors never differ. */
+
+.pm-skin-paper {
+  --plot-paper-bg: #f7f5f0;
+  --plot-paper-ink: #1a1f26;
+  --plot-paper-muted: #4a5560;
+  --plot-paper-rule: #c5ccd4;
+  --plot-paper-band: #efeae4;
+  --plot-paper-fill: #ece8e0;
+  --plot-paper-serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Songti SC", "Noto Serif SC", serif;
+  --plot-paper-sans: -apple-system, "SF Pro Text", "PingFang SC", "Helvetica Neue", system-ui, sans-serif;
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  margin: 0;
+  padding: 14px 18px 12px;
+  background: var(--plot-paper-bg);
+  color: var(--plot-paper-ink);
+  font: 400 12px/1.45 var(--plot-paper-sans);
+  opacity: 1;
+  text-align: left;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+.pm-skin-paper *, .pm-skin-paper *::before, .pm-skin-paper *::after { box-sizing: border-box; }
+.pm-skin-paper[data-density="compact"] { padding: 10px 10px 8px; }
+/* Dock stretch: host sets --map-paper-h on an ancestor (map-dock-paper). */
+.pm-skin-paper .pm-chart { min-height: 0; }
+.pm-skin-paper[data-density="compact"] .pm-chart { height: var(--map-paper-h, 178px); }
+.pm-skin-paper[data-density="sheet"] .pm-chart { height: var(--map-paper-h, 330px); }
+.pm-skin-paper .pm-svg { width: 100%; height: 100%; display: block; }
+
+/* title row: shown on the sheet / export, left to the dock shell in the compact preview */
+.pm-skin-paper .pm-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 2px 16px; margin: 0 0 10px; }
+.pm-skin-paper .pm-title { font: 600 16px/1.3 var(--plot-paper-serif); letter-spacing: 0.02em; color: var(--plot-paper-ink); }
+.pm-skin-paper .pm-sub { font: 400 11px/1.3 var(--plot-paper-sans); letter-spacing: 0.04em; color: var(--plot-paper-muted); }
+.pm-skin-paper[data-density="compact"] .pm-head { display: none; }
+
+/* KPI strip: one frame, hairline dividers, square corners */
+.pm-skin-paper .pm-kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); margin: 0 0 12px; border: 1px solid var(--plot-paper-rule); background: var(--plot-paper-bg); }
+.pm-skin-paper .pm-kpi { min-width: 0; padding: 8px 14px 10px; border-left: 1px solid var(--plot-paper-rule); }
+.pm-skin-paper .pm-kpi:first-child { border-left: 0; }
+.pm-skin-paper .pm-kpi-n { font: 600 24px/1.15 var(--plot-paper-serif); font-variant-numeric: tabular-nums; color: var(--plot-paper-ink); }
+.pm-skin-paper .pm-kpi-u { margin: 1px 0 0; font: 400 11px/1.4 var(--plot-paper-sans); font-variant-numeric: tabular-nums; color: var(--plot-paper-muted); }
+.pm-skin-paper .pm-kpi-t { margin: 4px 0 0; font: 400 11px/1.4 var(--plot-paper-sans); color: var(--plot-paper-muted); }
+
+.pm-skin-paper[data-density="compact"] .pm-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); margin-bottom: 8px; }
+.pm-skin-paper[data-density="compact"] .pm-kpi { padding: 5px 8px 6px; }
+.pm-skin-paper[data-density="compact"] .pm-kpi:nth-child(odd) { border-left: 0; }
+.pm-skin-paper[data-density="compact"] .pm-kpi:nth-child(n+3) { border-top: 1px solid var(--plot-paper-rule); }
+.pm-skin-paper[data-density="compact"] .pm-kpi-n { font-size: 19px; }
+.pm-skin-paper[data-density="compact"] .pm-kpi-u { font-size: 10px; line-height: 1.3; }
+.pm-skin-paper[data-density="compact"] .pm-kpi-t { display: none; }
+
+/* unit label top-left, legend top-right, both small */
+.pm-skin-paper .pm-meta { display: flex; align-items: baseline; justify-content: space-between; gap: 4px 16px; margin: 0 0 2px; font: 400 11px/1.4 var(--plot-paper-sans); color: var(--plot-paper-muted); }
+.pm-skin-paper .pm-unit { color: var(--plot-paper-muted); }
+.pm-skin-paper .pm-legend { display: inline-flex; flex-wrap: wrap; justify-content: flex-end; gap: 2px 16px; color: var(--plot-paper-ink); }
+.pm-skin-paper .pm-leg { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+.pm-skin-paper .pm-sw { display: inline-block; width: 10px; height: 10px; }
+.pm-skin-paper .pm-sw.pm-tone-neutral { background: var(--plot-paper-ink); }
+.pm-skin-paper .pm-sw.pm-tone-muted { background: var(--plot-paper-rule); border: 0.5px solid var(--plot-paper-muted); }
+.pm-skin-paper[data-density="compact"] .pm-meta { font-size: 10px; }
+.pm-skin-paper[data-density="compact"] .pm-unit { display: none; }
+.pm-skin-paper[data-density="compact"] .pm-legend { gap: 2px 12px; }
+
+/* the figure */
+.pm-skin-paper .pm-chart { margin: 0; }
+.pm-skin-paper .pm-svg { display: block; width: 100%; height: auto; overflow: visible; }
+.pm-skin-paper .pm-yband { fill: var(--plot-paper-band); }
+.pm-skin-paper .pm-line-grid { stroke: var(--plot-paper-rule); stroke-width: 0.5; }
+.pm-skin-paper .pm-line-axis { stroke: var(--plot-paper-ink); stroke-width: 0.8; }
+.pm-skin-paper .pm-ytick { stroke: var(--plot-paper-rule); stroke-width: 0.6; }
+.pm-skin-paper .pm-bar.pm-tone-neutral { fill: var(--plot-paper-ink); stroke: none; }
+.pm-skin-paper .pm-bar.pm-tone-muted { fill: var(--plot-paper-rule); stroke: var(--plot-paper-muted); stroke-width: 0.5; }
+.pm-skin-paper .pm-svg text { font-family: var(--plot-paper-sans); font-variant-numeric: tabular-nums; fill: var(--plot-paper-muted); }
+.pm-skin-paper .pm-tick { font-size: 9.5px; }
+.pm-skin-paper .pm-val, .pm-skin-paper .pm-qlabel { font-size: 8.4px; }
+.pm-skin-paper .pm-svg .pm-peak { font-size: 9.6px; font-weight: 700; fill: var(--plot-paper-ink); }
+.pm-skin-paper .pm-svg .pm-year { font-size: 10.5px; font-weight: 600; fill: var(--plot-paper-ink); }
+.pm-skin-paper[data-density="compact"] .pm-tick { font-size: 8px; }
+.pm-skin-paper[data-density="compact"] .pm-svg .pm-peak { font-size: 8.4px; }
+.pm-skin-paper[data-density="compact"] .pm-svg .pm-year { font-size: 8.2px; }
+
+/* footnote bottom-right; notes are visible text on the sheet (nothing foldable on a printable face) */
+.pm-skin-paper .pm-foot { margin: 6px 0 0; font: 400 10.5px/1.5 var(--plot-paper-sans); color: var(--plot-paper-muted); text-align: right; }
+.pm-skin-paper .pm-info { color: var(--plot-paper-ink); cursor: help; }
+.pm-skin-paper .pm-notes { margin: 8px 0 0; padding: 8px 0 0 16px; border-top: 1px solid var(--plot-paper-rule); font: 400 10.5px/1.5 var(--plot-paper-sans); color: var(--plot-paper-muted); }
+.pm-skin-paper .pm-notes li { margin: 0 0 2px; font: inherit; color: inherit; }
+.pm-skin-paper[data-density="compact"] .pm-foot { margin-top: 4px; font-size: 9.5px; line-height: 1.4; }
+
+/* Temporary PM-REV-LINK pair diagram (ink only; no product hues). */
+.pm-skin-paper .pm-pair-node { fill: var(--plot-paper-fill); stroke: var(--plot-paper-ink); stroke-width: 1.2; }
+.pm-skin-paper .pm-pair-edge { stroke: var(--plot-paper-ink); stroke-width: 3; }
+.pm-skin-paper .pm-pair-edge.pm-tone-muted { stroke: var(--plot-paper-muted); }
+.pm-skin-paper .pm-pair-label { font-size: 11px; fill: var(--plot-paper-ink); }
+.pm-skin-paper .pm-pair-mid { font-size: 10px; fill: var(--plot-paper-muted); }
+.pm-skin-paper[data-density="compact"] .pm-pair-label { font-size: 9px; }
+.pm-skin-paper[data-density="compact"] .pm-pair-mid { font-size: 9px; }
+
+/* PM-US-MAP — CONUS land + arcs + dual tables (ink tones only). */
+.pm-skin-paper .pm-us-land { fill: var(--plot-paper-band); stroke: var(--plot-paper-ink); stroke-width: 1; }
+.pm-skin-paper .pm-us-hub { fill: var(--plot-paper-ink); }
+.pm-skin-paper .pm-us-hub-label { font-size: 9px; font-weight: 600; fill: var(--plot-paper-ink); }
+.pm-skin-paper .pm-us-dot.pm-tone-neutral { fill: var(--plot-paper-ink); }
+.pm-skin-paper .pm-us-dot.pm-tone-muted { fill: var(--plot-paper-muted); }
+.pm-skin-paper .pm-us-arc.pm-tone-neutral { stroke: var(--plot-paper-ink); stroke-width: 1.2; opacity: 0.75; }
+.pm-skin-paper .pm-us-arc.pm-tone-muted { stroke: var(--plot-paper-muted); stroke-width: 1.2; opacity: 0.75; }
+.pm-skin-paper .pm-us-tables { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 14px; margin: 10px 0 0; }
+.pm-skin-paper .pm-us-h { margin: 0 0 4px; font: 600 11px/1.3 var(--plot-paper-serif); color: var(--plot-paper-ink); }
+.pm-skin-paper .pm-us-table { width: 100%; border-collapse: collapse; font: 400 10px/1.35 var(--plot-paper-sans); }
+.pm-skin-paper .pm-us-table th, .pm-skin-paper .pm-us-table td { border-bottom: 1px solid var(--plot-paper-rule); padding: 3px 4px; text-align: left; vertical-align: top; }
+.pm-skin-paper .pm-us-table th { color: var(--plot-paper-muted); font-weight: 600; }
+.pm-skin-paper[data-density="compact"] .pm-us-tables { gap: 6px 8px; margin-top: 6px; }
+.pm-skin-paper[data-density="compact"] .pm-us-table { font-size: 9px; }
+.pm-skin-paper[data-density="compact"] .pm-us-table td:nth-child(2) { display: none; }
+
+@media print {
+  .pm-skin-paper { break-inside: avoid; }
+}

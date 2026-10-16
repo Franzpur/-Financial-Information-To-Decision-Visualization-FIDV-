@@ -1,0 +1,256 @@
+{
+  "asOf": "2026-10-16",
+  "source": "public HQ city (approx)",
+  "crs": "WGS84",
+  "note": "Hand-baked US HQ approx for Shape Two / PM-US-MAP. Listing country US only; not legal domicile.",
+  "mapFrame": {
+    "s": 0,
+    "x0": 0,
+    "y0": 0,
+    "w": 20,
+    "h": 20,
+    "region": "CONUS"
+  },
+  "bounds": {
+    "lonMin": -125,
+    "lonMax": -66,
+    "latMin": 24,
+    "latMax": 50
+  },
+  "center": {
+    "ticker": "NVDA US Equity",
+    "name": "NVIDIA",
+    "city": "Santa Clara, CA",
+    "lat": 37.3707,
+    "lon": -121.967
+  },
+  "points": [
+    {
+      "ticker": "MU US Equity",
+      "name": "Micron",
+      "city": "Boise, ID",
+      "lat": 43.6006,
+      "lon": -116.2136,
+      "side": "supplier"
+    },
+    {
+      "ticker": "TER US Equity",
+      "name": "Teradyne",
+      "city": "North Reading, MA",
+      "lat": 42.5751,
+      "lon": -71.0784,
+      "side": "supplier"
+    },
+    {
+      "ticker": "KEYS US Equity",
+      "name": "Keysight",
+      "city": "Santa Rosa, CA",
+      "lat": 38.4404,
+      "lon": -122.7141,
+      "side": "supplier"
+    },
+    {
+      "ticker": "FN US Equity",
+      "name": "Fabrinet",
+      "city": "Bangkok/US listing \u2014 use San Jose proxy",
+      "lat": 37.3382,
+      "lon": -121.8863,
+      "side": "supplier"
+    },
+    {
+      "ticker": "AMKR US Equity",
+      "name": "Amkor",
+      "city": "Tempe, AZ",
+      "lat": 33.4255,
+      "lon": -111.94,
+      "side": "supplier"
+    },
+    {
+      "ticker": "CSCO US Equity",
+      "name": "Cisco Systems",
+      "city": "San Jose, CA",
+      "lat": 37.37,
+      "lon": -121.92,
+      "side": "supplier"
+    },
+    {
+      "ticker": "MPWR US Equity",
+      "name": "Monolithic Power Systems",
+      "city": "Kirkland, WA",
+      "lat": 47.6769,
+      "lon": -122.206,
+      "side": "supplier"
+    },
+    {
+      "ticker": "FLEX US Equity",
+      "name": "Flex",
+      "city": "San Jose, CA",
+      "lat": 37.3705,
+      "lon": -121.9205,
+      "side": "supplier"
+    },
+    {
+      "ticker": "SLB US Equity",
+      "name": "SLB",
+      "city": "Houston, TX",
+      "lat": 29.7604,
+      "lon": -95.3698,
+      "side": "supplier"
+    },
+    {
+      "ticker": "INTC US Equity",
+      "name": "Intel",
+      "city": "Santa Clara, CA",
+      "lat": 37.3875,
+      "lon": -121.963,
+      "side": "supplier"
+    },
+    {
+      "ticker": "COHR US Equity",
+      "name": "Coherent",
+      "city": "Saxonburg, PA",
+      "lat": 40.7501,
+      "lon": -79.8156,
+      "side": "supplier"
+    },
+    {
+      "ticker": "JBL US Equity",
+      "name": "Jabil",
+      "city": "St. Petersburg, FL",
+      "lat": 27.7676,
+      "lon": -82.6403,
+      "side": "supplier"
+    },
+    {
+      "ticker": "MSFT US Equity",
+      "name": "Microsoft",
+      "city": "Redmond, WA",
+      "lat": 47.6423,
+      "lon": -122.139,
+      "side": "customer",
+      "revPct": 22.05
+    },
+    {
+      "ticker": "AMZN US Equity",
+      "name": "Amazon",
+      "city": "Seattle, WA",
+      "lat": 47.6225,
+      "lon": -122.3365,
+      "side": "customer",
+      "revPct": 14.0
+    },
+    {
+      "ticker": "SMCI US Equity",
+      "name": "Super Micro",
+      "city": "San Jose, CA",
+      "lat": 37.3708,
+      "lon": -121.921,
+      "side": "customer",
+      "revPct": 9.5
+    },
+    {
+      "ticker": "GOOGL US Equity",
+      "name": "Alphabet",
+      "city": "Mountain View, CA",
+      "lat": 37.422,
+      "lon": -122.0841,
+      "side": "customer",
+      "revPct": 4.85
+    },
+    {
+      "ticker": "META US Equity",
+      "name": "Meta",
+      "city": "Menlo Park, CA",
+      "lat": 37.4848,
+      "lon": -122.148,
+      "side": "customer",
+      "revPct": 4.1
+    },
+    {
+      "ticker": "DELL US Equity",
+      "name": "Dell",
+      "city": "Round Rock, TX",
+      "lat": 30.5083,
+      "lon": -97.6789,
+      "side": "customer",
+      "revPct": 2.54
+    },
+    {
+      "ticker": "ORCL US Equity",
+      "name": "Oracle",
+      "city": "Austin, TX",
+      "lat": 30.2672,
+      "lon": -97.7431,
+      "side": "customer",
+      "revPct": 1.98
+    },
+    {
+      "ticker": "CRWV US Equity",
+      "name": "CoreWeave",
+      "city": "Roseland, NJ",
+      "lat": 40.8207,
+      "lon": -74.3132,
+      "side": "customer",
+      "revPct": 1.35
+    },
+    {
+      "ticker": "AVT US Equity",
+      "name": "Avnet",
+      "city": "Phoenix, AZ",
+      "lat": 33.4484,
+      "lon": -112.074,
+      "side": "customer",
+      "revPct": 0.74
+    },
+    {
+      "ticker": "HPE US Equity",
+      "name": "Hewlett Packard Enterprise",
+      "city": "Spring, TX",
+      "lat": 30.0799,
+      "lon": -95.4172,
+      "side": "customer"
+    },
+    {
+      "ticker": "CSCO US Equity",
+      "name": "Cisco Systems",
+      "city": "San Jose, CA",
+      "lat": 37.37,
+      "lon": -121.92,
+      "side": "customer"
+    },
+    {
+      "ticker": "HPQ US Equity",
+      "name": "HP Inc",
+      "city": "Palo Alto, CA",
+      "lat": 37.4419,
+      "lon": -122.143,
+      "side": "customer"
+    },
+    {
+      "ticker": "TSLA US Equity",
+      "name": "Tesla",
+      "city": "Austin, TX",
+      "lat": 30.2219,
+      "lon": -97.6178,
+      "side": "customer"
+    },
+    {
+      "ticker": "SNX US Equity",
+      "name": "TD SYNNEX",
+      "city": "Fremont, CA",
+      "lat": 37.5485,
+      "lon": -121.9886,
+      "side": "customer"
+    },
+    {
+      "ticker": "BBY US Equity",
+      "name": "Best Buy",
+      "city": "Richfield, MN",
+      "lat": 44.8631,
+      "lon": -93.2886,
+      "side": "customer"
+    }
+  ],
+  "intlOmitted": 21,
+  "intlNote": "INTL peers: 21 \u2014 not shown on US map (see data/nvda-revenue-links.json)"
+}

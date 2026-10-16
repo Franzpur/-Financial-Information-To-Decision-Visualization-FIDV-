@@ -90,9 +90,13 @@ ARCHS="$(lipo -archs "$APP/Contents/MacOS/Standard-Financial-Charting")"
 # 3. allow-list for Resources/sfc
 EXPECTED="$BUILD/expected.txt"
 {
-  for f in app db db_shadow bundle_dispatch chain_layout nvda_links bics_hier bics_entity listing; do echo "Ind-Chain/server/$f.py"; done
-  (cd "$ROOT/web" && find . -type f ! -name .DS_Store | sed 's#^\./#Ind-Chain/web/#')
+  for f in app db db_shadow bundle_dispatch chain_layout nvda_links debt_ladder bics_hier bics_entity listing; do echo "Ind-Chain/server/$f.py"; done
+  (cd "$ROOT/web" && find . -type f ! -name .DS_Store ! -name selfcheck-map.html | sed 's#^\./#Ind-Chain/web/#')
   for f in companies layers nvda-revenue-links; do echo "Ind-Chain/data/$f.json"; done
+  [[ -f "$ROOT/data/links/nvda-revenue-links.xlsx" ]] && echo "Ind-Chain/data/links/nvda-revenue-links.xlsx"
+  [[ -f "$ROOT/data/links/nvda-us-hq.json" ]] && echo "Ind-Chain/data/links/nvda-us-hq.json"
+  # Bloomberg-derived debt ladder aggregate: internal variant only, and only when it has been baked locally.
+  [[ $NO_ENTITIES -eq 0 && -f "$ROOT/data/debt-ladder-googl.json" ]] && echo "Ind-Chain/data/debt-ladder-googl.json"
   echo "BE-CLASS/BICS-Classification/bics-equity-hierarchy-2024.json"
   [[ $NO_ENTITIES -eq 0 ]] && echo "$ENT_REL"
   echo "modules/graph.json"
@@ -121,6 +125,7 @@ PY_MM="${PY_FULL%.*}"
   echo "SQLite: NOT bundled; Python uses the macOS system library (public domain)."
   echo "three.js 0.170.0 (Resources/sfc/Ind-Chain/web/vendor/three): MIT, full text in vendor/three/LICENSE."
   echo "Jost Light 300, caps subset (Resources/sfc/Ind-Chain/web/vendor/fonts/jost): SIL Open Font License 1.1, full text in vendor/fonts/jost/OFL.txt. Source: https://github.com/indestructible-type/Jost"
+  echo "Bloomberg-derived debt-ladder aggregate (Resources/sfc/Ind-Chain/data/debt-ladder-*.json, internal variant only, when present): third-party data derivative, internal use only; do not publish."
   echo
   echo "----- Python license (Python/LICENSE.txt, verbatim) -----"
   cat "$APP/Contents/Frameworks/Python.framework/Versions/Current/lib/python${PY_MM}/LICENSE.txt"

@@ -1,8 +1,8 @@
 {
   "version": 1,
-  "updated": "2026-10-14",
+  "updated": "2026-10-16",
   "title": "SFC module graph (W1 track)",
-  "note": "Machine source of truth for module inventory and edges. Edit this file, then run python3 modules/bake_static.py to refresh modules/index.html (static; file:// OK; no fetch). Architecture: FE two modules (fe-decision 决策路径 · fe-cube 立方体面) + BE one module; FE-API (region fe-api) sits outside both FE frames as contract hub. Optional module.region is consumed by bake with fallback. Edge colors by side pair (FE内翠绿 #00a86b / BE内天青 #5dade2 / 跨侧亮红 #e02020); dash by type. Routing: channel + edge-slot orthogonal polylines (no cross / no coincide). Cross-side data contract is only FE-API→BE-HTTP (plus BE-HTTP→MODULES-TRACK narrow mouth). Direct page→data-module contract edges (BOARD→BICS-HIER, LIST→ENTITY, OPENCUBE→BUNDLE) removed 2026-10-14: they duplicated the API path and read as if the browser opened library modules. Shell layer (2026-10-14, local app): SHELL-WINDOW + SHELL-PROC sit below both sides in their own zone; shell-internal edges use graphite; SHELL→BE-HTTP is cross-side (red). P2: SHELL-PACK (build-time packaging) joins the shell zone with two depends edges. Original 23 modules and 30 edges are unchanged.",
+  "note": "Machine source of truth for module inventory and edges. Edit this file, then run python3 modules/bake_static.py to refresh modules/index.html (static; file:// OK; no fetch). Architecture: FE two modules (fe-decision 决策路径 · fe-cube 立方体面) + BE one module; FE-API (region fe-api) sits outside both FE frames as contract hub. Optional module.region is consumed by bake with fallback. Edge colors by side pair (FE内翠绿 #00a86b / BE内天青 #5dade2 / 跨侧亮红 #e02020); dash by type. Routing: channel + edge-slot orthogonal polylines (no cross / no coincide). Cross-side data contract is only FE-API→BE-HTTP (plus BE-HTTP→MODULES-TRACK narrow mouth). Direct page→data-module contract edges (BOARD→BICS-HIER, LIST→ENTITY, OPENCUBE→BUNDLE) removed 2026-10-14: they duplicated the API path and read as if the browser opened library modules. Shell layer (2026-10-14, local app): SHELL-WINDOW + SHELL-PROC sit below both sides in their own zone; shell-internal edges use graphite; SHELL→BE-HTTP is cross-side (red). P2: SHELL-PACK (build-time packaging) joins the shell zone with two depends edges. Original 23 modules and 30 edges are unchanged. Second-mapping spot slice (2026-10-16, GS-20261016-DMAP-GOOGL-LADDER-Q): new region fe-map (平面映射) with FE-MAPPROJ and FE-MAPDRAW, plus BE-DEBT; Revised 2026-10-16 (GS-20261016-DMAP-UI-PAPER): the Map desk replaces the company-stage figure; fe-map now holds FE-MAPREG and FE-MAPDOCK too (31 modules / 44 edges). FE-FOCUS no longer reaches map/* or the API (its three edges removed), so FE-SCENE→FE-FOCUS no longer brings map/* into the scene. Added: OPENCUBE→MAPDOCK depends, PANEL→MAPDOCK calls (detail chip), AESTHETIC→MAPDOCK depends, MAPDOCK→MAPREG / MAPDRAW / API calls, MAPREG→MAPPROJ depends; kept AESTHETIC→MAPDRAW depends and HTTP→DEBT calls.",
   "modules": [
     {
       "id": "FE-NAV",
@@ -89,6 +89,41 @@
       "role": "Cross-cutting glass / paper tokens"
     },
     {
+      "id": "FE-MAPPROJ",
+      "zh": "映射投影",
+      "side": "FE",
+      "region": "fe-map",
+      "role": "Second mapping: element data to PlotSpec (pure projection, PM-LADDER-Q)"
+    },
+    {
+      "id": "FE-MAPDRAW",
+      "zh": "映射绘制",
+      "side": "FE",
+      "region": "fe-map",
+      "role": "PlotSpec to hand-written SVG (band/linear scales; rect/text/line marks)"
+    },
+    {
+      "id": "FE-MAPREG",
+      "zh": "映射注册",
+      "side": "FE",
+      "region": "fe-map",
+      "role": "Mapping catalog: list (available / unavailable + reason), get, run (validate + project, never throws)"
+    },
+    {
+      "id": "FE-MAPDOCK",
+      "zh": "映射台",
+      "side": "FE",
+      "region": "fe-map",
+      "role": "Map desk UI: Map ▾ face, right dock card, sheet (paper skin), pins; owns the debt-ladder fetch cache"
+    },
+    {
+      "id": "FE-MAPOUT",
+      "zh": "映射导出",
+      "side": "FE",
+      "region": "fe-map",
+      "role": "PNG export of the paper root (.pm-sheet.pm-skin-paper); Blob download; no redaction"
+    },
+    {
       "id": "SHELL-WINDOW",
       "zh": "壳窗口",
       "side": "SHELL",
@@ -149,6 +184,13 @@
       "side": "BE",
       "region": "be",
       "role": "NVDA revenue-link chain document"
+    },
+    {
+      "id": "BE-DEBT",
+      "zh": "偿债窄口",
+      "side": "BE",
+      "region": "be",
+      "role": "Read-only pre-baked quarterly debt-ladder aggregate (GET /api/debt/ladder)"
     },
     {
       "id": "BE-BICS-HIER",
@@ -360,6 +402,56 @@
     {
       "from": "SHELL-PACK",
       "to": "BE-HTTP",
+      "type": "depends"
+    },
+    {
+      "from": "FE-AESTHETIC",
+      "to": "FE-MAPDRAW",
+      "type": "depends"
+    },
+    {
+      "from": "BE-HTTP",
+      "to": "BE-DEBT",
+      "type": "calls"
+    },
+    {
+      "from": "FE-OPENCUBE",
+      "to": "FE-MAPDOCK",
+      "type": "depends"
+    },
+    {
+      "from": "FE-PANEL",
+      "to": "FE-MAPDOCK",
+      "type": "calls"
+    },
+    {
+      "from": "FE-AESTHETIC",
+      "to": "FE-MAPDOCK",
+      "type": "depends"
+    },
+    {
+      "from": "FE-MAPDOCK",
+      "to": "FE-MAPREG",
+      "type": "calls"
+    },
+    {
+      "from": "FE-MAPDOCK",
+      "to": "FE-MAPDRAW",
+      "type": "calls"
+    },
+    {
+      "from": "FE-MAPDOCK",
+      "to": "FE-MAPOUT",
+      "type": "calls"
+    },
+    {
+      "from": "FE-MAPDOCK",
+      "to": "FE-API",
+      "type": "calls"
+    },
+    {
+      "from": "FE-MAPREG",
+      "to": "FE-MAPPROJ",
       "type": "depends"
     }
   ]

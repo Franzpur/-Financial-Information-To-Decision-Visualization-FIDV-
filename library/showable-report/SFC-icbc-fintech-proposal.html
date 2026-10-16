@@ -631,7 +631,6 @@ table.sources td:first-child { width: 8%; }
 .toc--dense .toc-1 { margin-top: 3.4mm; font-size: 11pt; line-height: 1.4; }
 .toc--dense .toc-2 { font-size: 10pt; line-height: 1.5; }
 .toc--dense .toc-part { margin-top: 6mm; padding-top: 2.5mm; }
-.sheet--abstract .lede { margin-top: 0; }
 .keepnext { break-after: avoid; }
 .todo {                      /* 待填写占位：灰字 + 虚线底线 */
   color: var(--muted);
@@ -640,6 +639,16 @@ table.sources td:first-child { width: 8%; }
   letter-spacing: .12em;
   white-space: nowrap;
 }
+.fig-trio { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4mm; margin: 5mm 0; break-inside: avoid; }
+.fig-trio .fig { margin: 0; }
+.fig-trio .fig-ph { aspect-ratio: 3 / 4; }
+.fig-ph { flex-direction: column; gap: 2mm; }
+.fig-ph--table { aspect-ratio: 16 / 7; }
+.slot-name { font: 600 11pt var(--sans); letter-spacing: .16em; color: var(--ink); }
+.slot-tag { font: 8pt var(--sans); letter-spacing: .3em; color: var(--muted); }
+.cn-list { break-inside: avoid; list-style: none; margin: 0 0 .9em; padding-left: 2em; }
+.cn-list li { margin: .15em 0; }
+.motto { margin: 5mm 0; padding: 3mm 0; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); text-align: center; text-align-last: center; font-weight: 600; letter-spacing: .3em; }
 svg.dg { display: block; width: 100%; height: auto; font-family: var(--sans); overflow: visible; }
 .dg text { fill: #1a1f26; font-size: 10.5px; }
 .dg .b { font-weight: 600; }
@@ -673,7 +682,24 @@ svg.dg { display: block; width: 100%; height: auto; font-family: var(--sans); ov
 .dg .dot-c { fill: #1a1f26; stroke: #1a1f26; }
 .dg .rl-s { stroke: #1a1f26; stroke-width: 1.3; fill: none; }
 .dg .rl-c { stroke: #4a5560; stroke-width: 1.3; stroke-dasharray: 5 3; fill: none; }
-.dg-mod text { fill: inherit; }
+/* 模块图 / 组织图：文字色由内联 style 给出（CSS 的 .dg text 会压过 fill 属性，曾致深底黑字） */
+@page land { size: A4 landscape; margin: 22mm 18mm 20mm 18mm; }
+.fig--land { break-inside: avoid; }
+@media print { .fig--land { page: land; margin: 0; } .fig--land svg.dg { width: 100%; height: 146mm; } }
+.dg-org text, .dg-mod text { font-family: var(--sans); }
+
+/* ---------- 20 页版：章首并入正文页（仅追加） ---------- */
+.chap-head { display: flex; align-items: flex-end; gap: 7mm; margin: 0 0 7mm; padding-bottom: 4mm; border-bottom: 2pt solid var(--ink); text-align: left; text-align-last: left; }
+.chap-no { font: 200 44pt/0.9 var(--sans); letter-spacing: -.02em; color: var(--rule); font-variant-numeric: tabular-nums; }
+.chap-t h1 { margin: 0; font-size: 22pt; letter-spacing: .08em; line-height: 1.2; }
+.chap-en { margin: 1.5mm 0 0; font: 300 9.5pt/1.4 var(--sans); letter-spacing: .14em; color: var(--muted); }
+.chap-lede { margin: 0 0 6mm; font-size: 10.5pt; line-height: 1.8; color: var(--muted); text-align: left; }
+.chap-head + .chapter-body > h2:first-child, .chap-lede + .chapter-body > h2:first-child { margin-top: 0; }
+.fig-ph--text { aspect-ratio: auto; height: 24mm; margin: 0 0 4mm; }
+.sheet--toc .toc-head { margin-bottom: 7mm; }
+.sheet--toc .toc--dense .toc-1 { margin-top: 2.6mm; line-height: 1.3; }
+.sheet--toc .toc--dense .toc-2 { line-height: 1.4; }
+.sheet--toc .toc-note { margin-top: 5mm; }
 </style>
 </head>
 <body>
@@ -691,10 +717,10 @@ svg.dg { display: block; width: 100%; height: auto; font-family: var(--sans); ov
     </svg>
     <!-- 2. SFC（自制方角斜切字标：path，130 单位字高网格） -->
     <svg class="cover-word" viewBox="0 0 439 130" role="img" aria-label="SFC">
-      <path class="sfc-word" d="M30 0H145V30H30V50H115L145 80V100L115 130H0V100H115V80H30L0 50V30Z"/>
+      <path class="sfc-word" d="M22 0H145V30H35L30 35V45L35 50H123L145 72V108L123 130H0V100H110L115 95V85L110 80H22L0 58V22Z"/>
       <path class="sfc-word" d="M165 0H291V30H195Z M165 30H195V50H288V80H195V130H165Z"/>
       <path class="sfc-facet" d="M165 0V30H195Z"/>
-      <path class="sfc-word" d="M338 0H439V30H338V100H439L424 130H338L308 100V30Z"/>
+      <path class="sfc-word" d="M338 0H439V30H348L338 40V90L348 100H439L424 130H338L308 100V30Z"/>
       <path class="sfc-facet-dim" d="M439 100V130H424Z"/>
     </svg>
     <hr class="cover-rule" />
@@ -726,250 +752,137 @@ svg.dg { display: block; width: 100%; height: auto; font-family: var(--sans); ov
     <h1>目录</h1>
   </header>
   <ol class="toc toc--dense">
-    <li class="toc-1"><a href="#abstract"><span class="toc-no">—</span><span class="toc-t">摘要</span><span class="toc-dots"></span><span class="toc-pg">4</span></a></li>
+    <li class="toc-1"><a href="#ch1"><span class="toc-no">01</span><span class="toc-t">工程概述</span><span class="toc-dots"></span><span class="toc-pg">3</span></a></li>
+    <li class="toc-2"><a href="#s1-1"><span class="toc-no">1.1</span><span class="toc-t">项目定位</span><span class="toc-dots"></span><span class="toc-pg">3</span></a></li>
+    <li class="toc-2"><a href="#s1-2"><span class="toc-no">1.2</span><span class="toc-t">参赛方向</span><span class="toc-dots"></span><span class="toc-pg">3</span></a></li>
+    <li class="toc-2"><a href="#s1-3"><span class="toc-no">1.3</span><span class="toc-t">完成度</span><span class="toc-dots"></span><span class="toc-pg">3</span></a></li>
+    <li class="toc-2"><a href="#s1-4"><span class="toc-no">1.4</span><span class="toc-t">初步演示</span><span class="toc-dots"></span><span class="toc-pg">4</span></a></li>
 
-    <li class="toc-1"><a href="#ch1"><span class="toc-no">01</span><span class="toc-t">项目概述</span><span class="toc-dots"></span><span class="toc-pg">5</span></a></li>
-    <li class="toc-2"><a href="#s1-1"><span class="toc-no">1.1</span><span class="toc-t">项目定位</span><span class="toc-dots"></span><span class="toc-pg">6</span></a></li>
-    <li class="toc-2"><a href="#s1-2"><span class="toc-no">1.2</span><span class="toc-t">名称与含义</span><span class="toc-dots"></span><span class="toc-pg">6</span></a></li>
-    <li class="toc-2"><a href="#s1-3"><span class="toc-no">1.3</span><span class="toc-t">参赛方向与范围</span><span class="toc-dots"></span><span class="toc-pg">6</span></a></li>
-    <li class="toc-2"><a href="#s1-4"><span class="toc-no">1.4</span><span class="toc-t">当前完成度</span><span class="toc-dots"></span><span class="toc-pg">7</span></a></li>
+    <li class="toc-1"><a href="#ch2"><span class="toc-no">02</span><span class="toc-t">背景与机遇</span><span class="toc-dots"></span><span class="toc-pg">5</span></a></li>
+    <li class="toc-2"><a href="#s2-1"><span class="toc-no">2.1</span><span class="toc-t">从信息到决策</span><span class="toc-dots"></span><span class="toc-pg">5</span></a></li>
+    <li class="toc-2"><a href="#s2-2"><span class="toc-no">2.2</span><span class="toc-t">传统方法</span><span class="toc-dots"></span><span class="toc-pg">5</span></a></li>
+    <li class="toc-2"><a href="#s2-3"><span class="toc-no">2.3</span><span class="toc-t">简单 AI 运用</span><span class="toc-dots"></span><span class="toc-pg">5</span></a></li>
+    <li class="toc-2"><a href="#s2-4"><span class="toc-no">2.4</span><span class="toc-t">三个目标</span><span class="toc-dots"></span><span class="toc-pg">5</span></a></li>
+    <li class="toc-2"><a href="#s2-5"><span class="toc-no">2.5</span><span class="toc-t">三种交互</span><span class="toc-dots"></span><span class="toc-pg">6</span></a></li>
+    <li class="toc-2"><a href="#s2-6"><span class="toc-no">2.6</span><span class="toc-t">展望</span><span class="toc-dots"></span><span class="toc-pg">6</span></a></li>
 
-    <li class="toc-1"><a href="#ch2"><span class="toc-no">02</span><span class="toc-t">痛点与机会</span><span class="toc-dots"></span><span class="toc-pg">8</span></a></li>
-    <li class="toc-2"><a href="#s2-1"><span class="toc-no">2.1</span><span class="toc-t">大量信息下的判断困难</span><span class="toc-dots"></span><span class="toc-pg">9</span></a></li>
-    <li class="toc-2"><a href="#s2-2"><span class="toc-no">2.2</span><span class="toc-t">现有做法的缺口</span><span class="toc-dots"></span><span class="toc-pg">9</span></a></li>
-    <li class="toc-2"><a href="#s2-3"><span class="toc-no">2.3</span><span class="toc-t">为什么先做 AI 产业链债务风险</span><span class="toc-dots"></span><span class="toc-pg">9</span></a></li>
-    <li class="toc-2"><a href="#s2-4"><span class="toc-no">2.4</span><span class="toc-t">我们的切入点</span><span class="toc-dots"></span><span class="toc-pg">9</span></a></li>
+    <li class="toc-1"><a href="#ch3"><span class="toc-no">03</span><span class="toc-t">产品设计</span><span class="toc-dots"></span><span class="toc-pg">7</span></a></li>
+    <li class="toc-2"><a href="#s3-1"><span class="toc-no">3.1</span><span class="toc-t">设计三原则</span><span class="toc-dots"></span><span class="toc-pg">7</span></a></li>
+    <li class="toc-2"><a href="#s3-2"><span class="toc-no">3.2</span><span class="toc-t">三类坐标</span><span class="toc-dots"></span><span class="toc-pg">7</span></a></li>
+    <li class="toc-2"><a href="#s3-3"><span class="toc-no">3.3</span><span class="toc-t">决策路径：展板、名单、制图台</span><span class="toc-dots"></span><span class="toc-pg">8</span></a></li>
+    <li class="toc-2"><a href="#s3-4"><span class="toc-no">3.4</span><span class="toc-t">制图台的构件</span><span class="toc-dots"></span><span class="toc-pg">8</span></a></li>
+    <li class="toc-2"><a href="#s3-5"><span class="toc-no">3.5</span><span class="toc-t">已实现与规划</span><span class="toc-dots"></span><span class="toc-pg">10</span></a></li>
 
-    <li class="toc-1"><a href="#ch3"><span class="toc-no">03</span><span class="toc-t">产品与核心功能</span><span class="toc-dots"></span><span class="toc-pg">10</span></a></li>
-    <li class="toc-2"><a href="#s3-1"><span class="toc-no">3.1</span><span class="toc-t">设计三原则</span><span class="toc-dots"></span><span class="toc-pg">11</span></a></li>
-    <li class="toc-2"><a href="#s3-2"><span class="toc-no">3.2</span><span class="toc-t">三类坐标</span><span class="toc-dots"></span><span class="toc-pg">11</span></a></li>
-    <li class="toc-2"><a href="#s3-3"><span class="toc-no">3.3</span><span class="toc-t">决策路径：展板、名单、制图台</span><span class="toc-dots"></span><span class="toc-pg">12</span></a></li>
-    <li class="toc-2"><a href="#s3-4"><span class="toc-no">3.4</span><span class="toc-t">制图台的构件</span><span class="toc-dots"></span><span class="toc-pg">12</span></a></li>
-    <li class="toc-2"><a href="#s3-5"><span class="toc-no">3.5</span><span class="toc-t">已实现与规划</span><span class="toc-dots"></span><span class="toc-pg">13</span></a></li>
+    <li class="toc-1"><a href="#ch4"><span class="toc-no">04</span><span class="toc-t">技术架构</span><span class="toc-dots"></span><span class="toc-pg">11</span></a></li>
+    <li class="toc-2"><a href="#s4-1"><span class="toc-no">4.1</span><span class="toc-t">总体结构</span><span class="toc-dots"></span><span class="toc-pg">11</span></a></li>
+    <li class="toc-2"><a href="#s4-2"><span class="toc-no">4.2</span><span class="toc-t">模块化</span><span class="toc-dots"></span><span class="toc-pg">11</span></a></li>
+    <li class="toc-2"><a href="#s4-3"><span class="toc-no">4.3</span><span class="toc-t">本地应用</span><span class="toc-dots"></span><span class="toc-pg">14</span></a></li>
+    <li class="toc-2"><a href="#s4-4"><span class="toc-no">4.4</span><span class="toc-t">质量保障</span><span class="toc-dots"></span><span class="toc-pg">14</span></a></li>
+    <li class="toc-2"><a href="#s4-5"><span class="toc-no">4.5</span><span class="toc-t">第三方组件</span><span class="toc-dots"></span><span class="toc-pg">14</span></a></li>
 
-    <li class="toc-1"><a href="#ch4"><span class="toc-no">04</span><span class="toc-t">技术架构</span><span class="toc-dots"></span><span class="toc-pg">14</span></a></li>
-    <li class="toc-2"><a href="#s4-1"><span class="toc-no">4.1</span><span class="toc-t">总体结构</span><span class="toc-dots"></span><span class="toc-pg">15</span></a></li>
-    <li class="toc-2"><a href="#s4-2"><span class="toc-no">4.2</span><span class="toc-t">模块化</span><span class="toc-dots"></span><span class="toc-pg">15</span></a></li>
-    <li class="toc-2"><a href="#s4-3"><span class="toc-no">4.3</span><span class="toc-t">本地应用</span><span class="toc-dots"></span><span class="toc-pg">16</span></a></li>
-    <li class="toc-2"><a href="#s4-4"><span class="toc-no">4.4</span><span class="toc-t">质量保障</span><span class="toc-dots"></span><span class="toc-pg">17</span></a></li>
-    <li class="toc-2"><a href="#s4-5"><span class="toc-no">4.5</span><span class="toc-t">第三方组件</span><span class="toc-dots"></span><span class="toc-pg">17</span></a></li>
+    <li class="toc-1"><a href="#ch5"><span class="toc-no">05</span><span class="toc-t">安全与合规</span><span class="toc-dots"></span><span class="toc-pg">15</span></a></li>
+    <li class="toc-2"><a href="#s5-1"><span class="toc-no">5.1</span><span class="toc-t">数据来源分层</span><span class="toc-dots"></span><span class="toc-pg">15</span></a></li>
+    <li class="toc-2"><a href="#s5-2"><span class="toc-no">5.2</span><span class="toc-t">数据处理规则</span><span class="toc-dots"></span><span class="toc-pg">15</span></a></li>
+    <li class="toc-2"><a href="#s5-3"><span class="toc-no">5.3</span><span class="toc-t">内部包与外发包</span><span class="toc-dots"></span><span class="toc-pg">16</span></a></li>
+    <li class="toc-2"><a href="#s5-4"><span class="toc-no">5.4</span><span class="toc-t">隐私与安全</span><span class="toc-dots"></span><span class="toc-pg">16</span></a></li>
+    <li class="toc-2"><a href="#s5-5"><span class="toc-no">5.5</span><span class="toc-t">合规边界</span><span class="toc-dots"></span><span class="toc-pg">16</span></a></li>
 
-    <li class="toc-1"><a href="#ch5"><span class="toc-no">05</span><span class="toc-t">数据与合规</span><span class="toc-dots"></span><span class="toc-pg">18</span></a></li>
-    <li class="toc-2"><a href="#s5-1"><span class="toc-no">5.1</span><span class="toc-t">数据来源分层</span><span class="toc-dots"></span><span class="toc-pg">19</span></a></li>
-    <li class="toc-2"><a href="#s5-2"><span class="toc-no">5.2</span><span class="toc-t">数据处理规则</span><span class="toc-dots"></span><span class="toc-pg">19</span></a></li>
-    <li class="toc-2"><a href="#s5-3"><span class="toc-no">5.3</span><span class="toc-t">内部包与外发包</span><span class="toc-dots"></span><span class="toc-pg">20</span></a></li>
-    <li class="toc-2"><a href="#s5-4"><span class="toc-no">5.4</span><span class="toc-t">隐私与安全</span><span class="toc-dots"></span><span class="toc-pg">20</span></a></li>
-    <li class="toc-2"><a href="#s5-5"><span class="toc-no">5.5</span><span class="toc-t">合规边界</span><span class="toc-dots"></span><span class="toc-pg">20</span></a></li>
+    <li class="toc-1"><a href="#ch6"><span class="toc-no">06</span><span class="toc-t">我们是怎么做的</span><span class="toc-dots"></span><span class="toc-pg">17</span></a></li>
+    <li class="toc-2 is-todo"><a href="#s6-1"><span class="toc-no">6.1</span><span class="toc-t">开发过程（待填写）</span><span class="toc-dots"></span><span class="toc-pg">17</span></a></li>
+    <li class="toc-2"><a href="#s6-2"><span class="toc-no">6.2</span><span class="toc-t">人与 AI 如何协作</span><span class="toc-dots"></span><span class="toc-pg">17</span></a></li>
+    <li class="toc-2 is-todo"><a href="#s6-3"><span class="toc-no">6.3</span><span class="toc-t">自迭代与实习生策略（待填写）</span><span class="toc-dots"></span><span class="toc-pg">18</span></a></li>
   </ol>
-</section>
-
-<!-- ============================ 目录（二） ============================ -->
-<section class="sheet sheet--toc" id="toc2">
-  <div class="screen-run"><span>STANDARD FINANCIAL CHARTING</span><span>FIRST TEST · AI INDUSTRY FINANCIAL RISK</span></div>
-  <header class="toc-head">
-    <span class="kicker">CONTENTS</span>
-    <h1>目录（续）</h1>
-  </header>
-  <ol class="toc toc--dense">
-    <li class="toc-1" style="margin-top:0"><a href="#ch6"><span class="toc-no">06</span><span class="toc-t">AI 产业金融风险示范（First Test）</span><span class="toc-dots"></span><span class="toc-pg">21</span></a></li>
-    <li class="toc-2"><a href="#s6-1"><span class="toc-no">6.1</span><span class="toc-t">首测要回答的问题</span><span class="toc-dots"></span><span class="toc-pg">22</span></a></li>
-    <li class="toc-2"><a href="#s6-2"><span class="toc-no">6.2</span><span class="toc-t">方法立场</span><span class="toc-dots"></span><span class="toc-pg">22</span></a></li>
-    <li class="toc-2"><a href="#s6-3"><span class="toc-no">6.3</span><span class="toc-t">产业链框架</span><span class="toc-dots"></span><span class="toc-pg">23</span></a></li>
-    <li class="toc-2"><a href="#s6-4"><span class="toc-no">6.4</span><span class="toc-t">示范一：行业定位</span><span class="toc-dots"></span><span class="toc-pg">23</span></a></li>
-    <li class="toc-2"><a href="#s6-5"><span class="toc-no">6.5</span><span class="toc-t">示范二：以英伟达为中心的收入线</span><span class="toc-dots"></span><span class="toc-pg">23</span></a></li>
-    <li class="toc-2"><a href="#s6-6"><span class="toc-no">6.6</span><span class="toc-t">示范三：债务期限折线（演示）</span><span class="toc-dots"></span><span class="toc-pg">24</span></a></li>
-    <li class="toc-2"><a href="#s6-7"><span class="toc-no">6.7</span><span class="toc-t">风险落点的研究对照</span><span class="toc-dots"></span><span class="toc-pg">24</span></a></li>
-    <li class="toc-2"><a href="#s6-8"><span class="toc-no">6.8</span><span class="toc-t">尚未完成的部分</span><span class="toc-dots"></span><span class="toc-pg">25</span></a></li>
-
-    <li class="toc-1"><a href="#ch7"><span class="toc-no">07</span><span class="toc-t">对工行的应用价值</span><span class="toc-dots"></span><span class="toc-pg">26</span></a></li>
-    <li class="toc-2"><a href="#s7-1"><span class="toc-no">7.1</span><span class="toc-t">与大赛主题的关系</span><span class="toc-dots"></span><span class="toc-pg">27</span></a></li>
-    <li class="toc-2"><a href="#s7-2"><span class="toc-no">7.2</span><span class="toc-t">可对应的工作场景（设想）</span><span class="toc-dots"></span><span class="toc-pg">27</span></a></li>
-    <li class="toc-2"><a href="#s7-3"><span class="toc-no">7.3</span><span class="toc-t">与行内系统的距离</span><span class="toc-dots"></span><span class="toc-pg">27</span></a></li>
-    <li class="toc-2"><a href="#s7-4"><span class="toc-no">7.4</span><span class="toc-t">对接路径设想</span><span class="toc-dots"></span><span class="toc-pg">27</span></a></li>
-    <li class="toc-2"><a href="#s7-5"><span class="toc-no">7.5</span><span class="toc-t">价值边界</span><span class="toc-dots"></span><span class="toc-pg">27</span></a></li>
-
-    <li class="toc-1"><a href="#ch8"><span class="toc-no">08</span><span class="toc-t">团队与分工</span><span class="toc-dots"></span><span class="toc-pg">28</span></a></li>
-    <li class="toc-2"><a href="#s8-1"><span class="toc-no">8.1</span><span class="toc-t">团队构成</span><span class="toc-dots"></span><span class="toc-pg">29</span></a></li>
-    <li class="toc-2 is-todo"><a href="#s8-2"><span class="toc-no">8.2</span><span class="toc-t">分工（待填写）</span><span class="toc-dots"></span><span class="toc-pg">29</span></a></li>
-    <li class="toc-2"><a href="#s8-3"><span class="toc-no">8.3</span><span class="toc-t">协作方式</span><span class="toc-dots"></span><span class="toc-pg">29</span></a></li>
-
-    <li class="toc-1"><a href="#ch9"><span class="toc-no">09</span><span class="toc-t">里程碑与计划</span><span class="toc-dots"></span><span class="toc-pg">30</span></a></li>
-    <li class="toc-2"><a href="#s9-1"><span class="toc-no">9.1</span><span class="toc-t">已完成</span><span class="toc-dots"></span><span class="toc-pg">31</span></a></li>
-    <li class="toc-2 is-todo"><a href="#s9-2"><span class="toc-no">9.2</span><span class="toc-t">后续计划（时点待填写）</span><span class="toc-dots"></span><span class="toc-pg">32</span></a></li>
-    <li class="toc-2 is-todo"><a href="#s9-3"><span class="toc-no">9.3</span><span class="toc-t">提交前安排（日期待填写）</span><span class="toc-dots"></span><span class="toc-pg">32</span></a></li>
-
-    <li class="toc-1"><a href="#ch10"><span class="toc-no">10</span><span class="toc-t">风险与应对</span><span class="toc-dots"></span><span class="toc-pg">33</span></a></li>
-
-    <li class="toc-1 toc-part"><a href="#app-a"><span class="toc-no">A</span><span class="toc-t">附录　术语表</span><span class="toc-dots"></span><span class="toc-pg">35</span></a></li>
-    <li class="toc-1"><a href="#app-b"><span class="toc-no">B</span><span class="toc-t">附录　数据来源与许可说明</span><span class="toc-dots"></span><span class="toc-pg">36</span></a></li>
-    <li class="toc-1"><a href="#app-c"><span class="toc-no">C</span><span class="toc-t">附录　模块清单</span><span class="toc-dots"></span><span class="toc-pg">37</span></a></li>
-    <li class="toc-1"><a href="#app-d"><span class="toc-no">D</span><span class="toc-t">附录　工程里程碑时间线</span><span class="toc-dots"></span><span class="toc-pg">38</span></a></li>
-    <li class="toc-1"><a href="#app-e"><span class="toc-no">E</span><span class="toc-t">附录　图件与来源索引</span><span class="toc-dots"></span><span class="toc-pg">39</span></a></li>
-    <li class="toc-1"><a href="#app-f"><span class="toc-no">F</span><span class="toc-t">附录　赛事口径摘录</span><span class="toc-dots"></span><span class="toc-pg">40</span></a></li>
-  </ol>
-  <p class="toc-note">标记「待填写」的条目，其内容在团队补入后即成稿；版面已按完整篇幅排好。</p>
-</section>
-
-<!-- ============================ 摘要 ============================ -->
-<section class="sheet sheet--abstract" id="abstract">
-  <div class="screen-run"><span>STANDARD FINANCIAL CHARTING</span><span>FIRST TEST · AI INDUSTRY FINANCIAL RISK</span></div>
-  <header class="appendix-head">
-    <span class="kicker">ABSTRACT</span>
-    <h1>摘要</h1>
-  </header>
-  <p class="lede">SFC（Standard Financial Charting，标准金融制图）是一套给金融工作者使用的决策可视化工具：把大量行业与企业信息放进同一套标准化的坐标里，看、移、点，帮助在信息过载的情况下做判断。</p>
-  <p>第一版只做一件事：服务风险控制，尤其是债务风险，并以企业为节点观察风险如何沿产业链传导。本次首测（First Test）选取 AI 产业链作为示范对象，参赛方向为科技金融。</p>
-  <p>目前已经完成并可运行的部分：以彭博 BICS 行业分类为标准的行业展板与四级公司名单；一个三维的产业链制图台，其中公司是切片上的点，企业之间的收入关系是点到点的线；一个可以双击打开、数据与计算全部留在本机的 macOS 应用。后端与前端按 26 个模块、35 条关系组织，模块图与代码一一对应。</p>
-
-  <div class="callout callout--warn">
-    <span class="callout-label">如实说明　NOT YET DONE</span>
-    <p>债务风险沿企业节点传导的完整画面尚未画出；制图台上的 AI 产业链目前是一条演示链，公司与行业分类尚未统一到 BICS；三维图表导出与自制图表，理念已定，产品未做。本计划对未完成部分一律如实写明，不与已实现部分混写。</p>
-  </div>
-
-  <p>我们没有自造新的风险指标。判断风险的指标，与其说是被创造的，不如说是被广泛接受的。我们做的是让被广泛接受的指标和概念，在统一的坐标里被看见、被比较。</p>
-
-  <div class="kpi-row kpi-row--3">
-    <div class="kpi"><div class="kpi-label">模块 · 关系</div><div class="kpi-val">26<span class="kpi-unit">个 / 35 条</span></div><div class="kpi-note">模块图与代码一一对应</div></div>
-    <div class="kpi"><div class="kpi-label">首测产业链</div><div class="kpi-val">11<span class="kpi-unit">层</span></div><div class="kpi-note">从电力到模型的演示链</div></div>
-    <div class="kpi"><div class="kpi-label">坐标体系</div><div class="kpi-val">3<span class="kpi-unit">类</span></div><div class="kpi-note">位置、相对、行业</div></div>
-  </div>
+  <p class="toc-note">标记「待填写」的条目，其内容待团队补入。</p>
 </section>
 
 <!-- ============================ 第 1 章 ============================ -->
-<section class="sheet sheet--opener" id="ch1">
+<section class="sheet sheet--body sheet--chap" id="ch1">
   <div class="screen-run"><span>STANDARD FINANCIAL CHARTING</span><span>FIRST TEST · AI INDUSTRY FINANCIAL RISK</span></div>
-  <div class="chapter-opener">
-    <svg class="opener-mark" viewBox="7 13 48 46" aria-hidden="true"><rect x="8" y="14" width="18" height="44" rx="1.5" opacity="0.95"/><rect x="22" y="14" width="18" height="44" rx="1.5" opacity="0.55"/><rect x="36" y="14" width="18" height="44" rx="1.5" opacity="0.28"/></svg>
-    <p class="opener-kicker">CHAPTER</p>
-    <p class="opener-num">01</p>
-    <h1>项目概述</h1>
-    <p class="opener-en">Project Overview</p>
-    <p class="opener-lede">SFC 要解决的是一个具体问题：金融信息很多，如何容易地了解最重要的信息并做出决定。本章交代项目定位、名称含义与参赛方向，并用一张总表说明当前完成到哪一步。</p>
-    <ul class="opener-toc">
-      <li><span class="toc-no">1.1</span>项目定位</li>
-      <li><span class="toc-no">1.2</span>名称与含义</li>
-      <li><span class="toc-no">1.3</span>参赛方向与范围</li>
-      <li><span class="toc-no">1.4</span>当前完成度</li>
-    </ul>
-  </div>
-</section>
-
-<section class="sheet sheet--body">
-  <div class="screen-run"><span>STANDARD FINANCIAL CHARTING</span><span>FIRST TEST · AI INDUSTRY FINANCIAL RISK</span></div>
+  <header class="chap-head">
+    <span class="chap-no">01</span>
+    <div class="chap-t"><h1>工程概述</h1><p class="chap-en">Project Overview</p></div>
+  </header>
   <div class="chapter-body">
     <h2 id="s1-1"><span class="num">1.1</span>项目定位</h2>
-    <p class="lede">SFC 面向金融工作者，解决一个具体问题：金融信息如此之多，如何容易地了解最重要的信息，从而做出决定。我们的方法是可视化，并且是标准化的可视化。</p>
-    <p>第一版的取舍写得很窄：行业上，注重人工智能相关的科技行业；判断上，注重风险控制；风险类型上，注重债务风险；画面上，注重以企业为节点的风险扩散与传导。不服务于这个判断的装饰、泛资讯、无法追溯来源的数字，不算本产品的功能。</p>
+    <p class="lede">SFC(Standard Financial Charting)是一款面向金融工作者的标准化制图工作台。</p>
+    <p>在第一份测试版总，我们团队尝试从特定问题出发，探索制图工作台的可行性，同时挖掘其可能蕴藏的价值。这一特定问题就是如何可视化人工智能产业链中的风险。</p>
+    <p>可喜的是，通过不断地实践、试错，我们发现这一项目有着充分的可行性与巨大的潜力。</p>
 
-    <h2 id="s1-2"><span class="num">1.2</span>名称与含义</h2>
-    <p>SFC 是 Standard Financial Charting 的缩写，中文名「标准金融制图」。三个词各管一件事：</p>
-    <ul>
-      <li><strong>Standard（标准）</strong>：概念统一、分类有依据、视觉统一。同一概念全站只用一个名字。</li>
-      <li><strong>Financial（金融）</strong>：数据专业、来源可追溯，服务金融判断。</li>
-      <li><strong>Charting（制图）</strong>：不是静态图片，而是可以操作、可以移动、可以导出的图。</li>
-    </ul>
+    <h2 id="s1-2"><span class="num">1.2</span>参赛方向</h2>
+    <p>就远景目标来看，SFC 提供的是开放创新服务。对于客户经理，SFC 可以提供可视化贷款管理，也可以服务内部回报；对于投研人员，SFC 将提供轻便但专业的制图服务。配合团队的不断改进与开放的社区生态，SFC 也将致力于解决各种疑难制图问题，例如关系图、时序图等等。（关于其中一种改进方法——自迭代的介绍，见 6.3 节）</p>
 
-    <h2 id="s1-3"><span class="num">1.3</span>参赛方向与范围</h2>
-    <p>参赛方向为<strong>科技金融</strong>。理由全部来自第一版设计：服务金融工作者判断；行业上注重 AI 相关科技行业；判断上注重风险控制与债务风险；可视化以企业为节点。</p>
-    <p>本计划只写本团队已有的工程、已有的数据和设计里已经写明的下一步。大赛公布的其余方向不是本计划的工作内容。</p>
+    <h2 id="s1-3"><span class="num">1.3</span>完成度</h2>
+    <p>自 9 月 16 日收到比赛邀请，20 日召集团队，24 日敲定方向以来，开发过程仅仅不到 1 个月，然而，一个月内我们却取得了显著进展。这当然要部分归功于人工智能工具的辅助，但是通过头脑风暴不断迸发灵感，对人工智能工具不断开发，我想这才是至关重要的。</p>
 
-    <h2 id="s1-4"><span class="num">1.4</span>当前完成度</h2>
-    <p class="keepnext">下图与下表是全文的总览，后文各章逐项展开。图中实线框为已完成并可运行，虚线框为未完成或规划。</p>
-
-    <figure class="fig">
-      <svg class="dg" viewBox="0 0 600 280" role="img" aria-label="完成度总览"><rect x="118" y="6" width="9" height="9" fill="#1a1f26"/><text x="133" y="14.5" class="b">已完成（可运行）</text><rect x="396" y="6" width="9" height="9" fill="none" stroke="#8b96a3" stroke-width="1.2" stroke-dasharray="2 1.5"/><text x="411" y="14.5" class="b m">未完成（规划）</text><line class="ln-r" x1="0" y1="24" x2="600" y2="24"/><text x="0" y="69.0" class="b">行业分类</text><rect class="chip" x="118.0" y="42" width="99.0" height="20"/><text x="167.5" y="56" text-anchor="middle">BICS 七级层级库</text><rect class="chip" x="222.9" y="42" width="79.0" height="20"/><text x="262.4" y="56" text-anchor="middle">展板一至三级</text><rect class="chip" x="118.0" y="68" width="79.0" height="20"/><text x="157.5" y="82" text-anchor="middle">四级公司名单</text><rect class="chip-p" x="396.0" y="42" width="100.0" height="20"/><text x="446.0" y="56" class="m" text-anchor="middle">五至七级成员数据</text><line class="ln-r" x1="0" y1="96" x2="600" y2="96"/><text x="0" y="118.0" class="b">公司数据</text><rect class="chip" x="118.0" y="104" width="89.5" height="20"/><text x="162.8" y="118" text-anchor="middle">四级公司成员库</text><rect class="chip-p" x="396.0" y="104" width="89.5" height="20"/><text x="440.8" y="118" class="m" text-anchor="middle">政府类完整源表</text><line class="ln-r" x1="0" y1="132" x2="600" y2="132"/><text x="0" y="154.0" class="b">制图台</text><rect class="chip" x="118.0" y="140" width="89.5" height="20"/><text x="162.8" y="154" text-anchor="middle">三维切片制图台</text><rect class="chip" x="213.5" y="140" width="76.3" height="20"/><text x="251.6" y="154" text-anchor="middle">11 层演示链</text><rect class="chip" x="295.8" y="140" width="79.0" height="20"/><text x="335.3" y="154" text-anchor="middle">英伟达收入线</text><rect class="chip-p" x="396.0" y="140" width="79.0" height="20"/><text x="435.5" y="154" class="m" text-anchor="middle">债务传导画面</text><rect class="chip-p" x="481.0" y="140" width="115.5" height="20"/><text x="538.8" y="154" class="m" text-anchor="middle">接入 BICS 四级成员</text><line class="ln-r" x1="0" y1="168" x2="600" y2="168"/><text x="0" y="190.0" class="b">应用形态</text><rect class="chip" x="118.0" y="176" width="100.6" height="20"/><text x="168.3" y="190" text-anchor="middle">原生 macOS 应用</text><rect class="chip" x="224.6" y="176" width="58.0" height="20"/><text x="253.6" y="190" text-anchor="middle">离线运行</text><rect class="chip-p" x="396.0" y="176" width="68.5" height="20"/><text x="430.2" y="190" class="m" text-anchor="middle">签名与公证</text><line class="ln-r" x1="0" y1="204" x2="600" y2="204"/><text x="0" y="226.0" class="b">工程质量</text><rect class="chip" x="118.0" y="212" width="112.8" height="20"/><text x="174.4" y="226" text-anchor="middle">26 模块 · 35 关系</text><rect class="chip" x="236.8" y="212" width="58.0" height="20"/><text x="265.8" y="226" text-anchor="middle">回归脚本</text><text x="396" y="226" class="m">—</text><line class="ln-r" x1="0" y1="240" x2="600" y2="240"/><text x="0" y="262.0" class="b">导出与自制图表</text><rect class="chip" x="118.0" y="248" width="58.0" height="20"/><text x="147.0" y="262" text-anchor="middle">理念已定</text><rect class="chip-p" x="396.0" y="248" width="58.0" height="20"/><text x="425.0" y="262" class="m" text-anchor="middle">三维导出</text><rect class="chip-p" x="460.0" y="248" width="58.0" height="20"/><text x="489.0" y="262" class="m" text-anchor="middle">自制图表</text><line class="ln-r" x1="0" y1="276" x2="600" y2="276"/></svg>
-      <figcaption class="fig-cap"><span class="cap-no">图 1-1</span><span>完成度总览：已完成（实线框）与未完成（虚线框）。示意图，由表 1-1 重绘。</span></figcaption>
+    <figure class="fig fig--slot">
+      <div class="fig-ph fig-ph--table"><span class="slot-name">完成度表</span><span class="slot-tag">待补</span></div>
+      <figcaption class="fig-cap"><span class="cap-no">表 1-1</span><span>完成度表（待补）。</span></figcaption>
     </figure>
 
-    <div class="tbl tbl--long">
-      <div class="tbl-cap"><span class="cap-no">表 1-1</span><span>当前完成度</span></div>
-      <table class="data">
-        <thead><tr><th style="width:15%">方面</th><th>已完成（可运行）</th><th>未完成（规划）</th></tr></thead>
-        <tbody>
-          <tr><th scope="row">行业分类</th><td>彭博 BICS 2024 七级层级库；展板下钻一至三级，四级进入公司名单</td><td>第五至七级的公司成员数据未取得</td></tr>
-          <tr><th scope="row">公司数据</th><td>四级公司成员库（两批终端导出表），覆盖 BICS 全部行业层级的四级行业</td><td>政府类源表仍报截断，待完整源</td></tr>
-          <tr><th scope="row">制图台</th><td>三维切片制图台；11 层演示链；以英伟达为中心的收入线链</td><td>演示链公司尚未接到 BICS 四级成员；债务传导的完整画面未画</td></tr>
-          <tr><th scope="row">应用形态</th><td>原生 macOS 应用，内嵌后端与 Python 运行时，离线可运行，数据留本机</td><td>尚无 Developer ID 签名与苹果公证</td></tr>
-          <tr><th scope="row">工程质量</th><td>26 模块 / 35 关系；一模块一文件；回归脚本（快速档与完整档）</td><td>—</td></tr>
-          <tr><th scope="row">导出与自制图表</th><td>理念已定</td><td>产品未做</td></tr>
-        </tbody>
-      </table>
+    <h2 id="s1-4"><span class="num">1.4</span>初步演示</h2>
+    <div class="fig-trio">
+      <figure class="fig">
+        <div class="fig-ph"><span class="slot-name">GOOGL</span><span class="slot-tag">待补</span></div>
+        <figcaption class="fig-cap"><span class="cap-no">图 1-1</span><span>GOOGL（待补）。</span></figcaption>
+      </figure>
+      <figure class="fig">
+        <div class="fig-ph"><span class="slot-name">NVDA</span><span class="slot-tag">待补</span></div>
+        <figcaption class="fig-cap"><span class="cap-no">图 1-2</span><span>NVDA（待补）。</span></figcaption>
+      </figure>
+      <figure class="fig">
+        <div class="fig-ph"><span class="slot-name">AMAT</span><span class="slot-tag">待补</span></div>
+        <figcaption class="fig-cap"><span class="cap-no">图 1-3</span><span>AMAT（待补）。</span></figcaption>
+      </figure>
     </div>
   </div>
 </section>
 
 <!-- ============================ 第 2 章 ============================ -->
-<section class="sheet sheet--opener" id="ch2">
+<section class="sheet sheet--body sheet--chap" id="ch2">
   <div class="screen-run"><span>STANDARD FINANCIAL CHARTING</span><span>FIRST TEST · AI INDUSTRY FINANCIAL RISK</span></div>
-  <div class="chapter-opener">
-    <svg class="opener-mark" viewBox="7 13 48 46" aria-hidden="true"><rect x="8" y="14" width="18" height="44" rx="1.5" opacity="0.95"/><rect x="22" y="14" width="18" height="44" rx="1.5" opacity="0.55"/><rect x="36" y="14" width="18" height="44" rx="1.5" opacity="0.28"/></svg>
-    <p class="opener-kicker">CHAPTER</p>
-    <p class="opener-num">02</p>
-    <h1>痛点与机会</h1>
-    <p class="opener-en">Pain Points &amp; Opportunity</p>
-    <p class="opener-lede">本章说明信息过载下判断为何困难、现有做法有哪些缺口，以及我们为什么先从 AI 产业链债务风险切入。以下是团队对自身使用经验的归纳，不是市场调研结论。</p>
-    <ul class="opener-toc">
-      <li><span class="toc-no">2.1</span>大量信息下的判断困难</li>
-      <li><span class="toc-no">2.2</span>现有做法的缺口</li>
-      <li><span class="toc-no">2.3</span>为什么先做 AI 产业链债务风险</li>
-      <li><span class="toc-no">2.4</span>我们的切入点</li>
-    </ul>
-  </div>
-</section>
-
-<section class="sheet sheet--body">
-  <div class="screen-run"><span>STANDARD FINANCIAL CHARTING</span><span>FIRST TEST · AI INDUSTRY FINANCIAL RISK</span></div>
+  <header class="chap-head">
+    <span class="chap-no">02</span>
+    <div class="chap-t"><h1>背景与机遇</h1><p class="chap-en">Background &amp; Opportunity</p></div>
+  </header>
   <div class="chapter-body">
-    <h2 id="s2-1"><span class="num">2.1</span>大量信息下的判断困难</h2>
-    <p>金融工作者面对的不是一个已经收好的结论，而是大量公司、大量分类、大量指标。判断一家公司落在产业链的哪一段，先看什么，需要在分类、财务、关系之间来回翻查。信息越多，越需要一个统一的位置感：它在哪里，它和谁相连。</p>
+    <h2 id="s2-1"><span class="num">2.1</span>从信息到决策</h2>
+    <p class="lede">从信息到决策，是金融永恒的课题。</p>
+    <p>当信息过多，而我们只想快速了解其中一二条主要性质时，制图的需要就产生了。通过图表来透视信息固然高效，然而，制图的过程本身却远未达到高效，事实上，制图过程更像是一场个人的精彩演绎。</p>
 
-    <h2 id="s2-2"><span class="num">2.2</span>现有做法的缺口</h2>
-    <p>我们观察到的缺口有三类。本计划不提供市场规模或用户数据。</p>
-    <ol>
-      <li><strong>分类不统一</strong>：同一概念在不同材料里有不同叫法，同一公司在不同表里归属不一。</li>
-      <li><strong>图与图之间无法对照</strong>：静态图一图一用，换一个问题就要重做一张，且几张图之间没有共同的坐标。</li>
-      <li><strong>关系看不见</strong>：企业之间的收入关系、债务联系，通常存在于表格与文字里，没有被画成节点之间的线。</li>
-    </ol>
+    <h2 id="s2-2"><span class="num">2.2</span>传统方法</h2>
+    <p>一位逻辑严密的分析时，可能会用代码实现公式，进而实现制图；一位技艺精湛的职员，可能会堆叠、缩放图表，来使他们尽可能优美；一些人可能掌握独到的技巧；一些人可能使用精巧的插件。</p>
+    <p>传统方法大致如此，优点是灵活，对场景适应性强，然而缺点也很明显，代码学习成本高，办公软件的使用也依赖经验，做出来的图往往达不到统一标准，一到精细的地方就难以交互等等。</p>
 
-    <h2 id="s2-3"><span class="num">2.3</span>为什么先做 AI 产业链债务风险</h2>
-    <p>首测选 AI 产业链，是因为这条链上资金需求大、环节多、企业之间相互依存，关系密、链条长，适合检验「以企业为节点看传导」这个想法。选债务风险，是因为第一版设计把风险控制与债务风险定为重心。</p>
+    <h2 id="s2-3"><span class="num">2.3</span>简单 AI 运用</h2>
+    <p>运用 AI 制图又怎样呢？有时他们的结果真能让人眼前一亮，但 AI 就像一个老顽童，每次做事总有地方达不到人的标准，一旦重做，又有些地方喜爱自由发挥；他还喜欢藏着掖着，不告诉你制图过程，使你几乎无法调整他的作品，这部分就是人机协作的问题。</p>
 
-    <h2 id="s2-4"><span class="num">2.4</span>我们的切入点</h2>
-    <p>不做新的风险评分，不做预测。做三件事：</p>
-    <ol>
-      <li>把行业分类统一到一个公认标准（彭博 BICS）上。</li>
-      <li>把位置统一到一套标准坐标里，让不同的图可以在同一空间里叠放和比较。</li>
-      <li>以企业为节点，把企业之间的关系画成线，并保留数据来源，使每个数都可追溯。</li>
-    </ol>
-    <div class="callout">
-      <span class="callout-label">重点　KEY POINT</span>
-      <p><strong>不造新指标，只做统一的坐标。</strong>统一分类、统一位置、画出关系、保留来源，是 SFC 在首测中的全部主张。</p>
-    </div>
+    <h2 id="s2-4"><span class="num">2.4</span>三个目标</h2>
+    <p class="lede">使金融制图达到流水线般的速度，遵循法律般的标准，同时保证适应多种环境的自由度：这就是 SFC 正在解决的问题。</p>
+    <p>前 AI 时代，同时达成 3 个目标看起来是不可能的，但在 AI 时代，一条朦胧的前途就慢慢展现出来了。说朦胧，是因为 AI 受其自身性质的限制，注定要在人的灵感与指挥下才能更好的发挥效用，而人必须要在现有的成果上不断摸索，才能产生灵感。</p>
+
+    <h2 id="s2-5"><span class="num">2.5</span>三种交互</h2>
+    <p class="keepnext">我们为 SFC 制定了三条基础交互，如果三条基础交互能够实现，就可以说项目取得了里程碑式的进展。这三条交互分别是：</p>
+    <ul class="cn-list">
+      <li>一、简单自然语言指令</li>
+      <li>二、表类数据输入</li>
+      <li>三、手动制图操作</li>
+    </ul>
+    <p>可见，通过实现各个交互，再通过三种交互的配合，金融制图的质量与效率都将得到巨大提升。</p>
+    <p class="motto">三个目标，三种交互</p>
+
+    <h2 id="s2-6"><span class="num">2.6</span>展望</h2>
+    <p>而 SFC 将不止于此，它将通过[实习生策略]（见 6.3 节）构建个性化词典，个性化数据库，从而成为既能服务集体，又能服务个人；既能服务制图，又能服务 AI 环境数据存储读写的集成化工作台。</p>
   </div>
 </section>
 
 <!-- ============================ 第 3 章 ============================ -->
-<section class="sheet sheet--opener" id="ch3">
+<section class="sheet sheet--body sheet--chap" id="ch3">
   <div class="screen-run"><span>STANDARD FINANCIAL CHARTING</span><span>FIRST TEST · AI INDUSTRY FINANCIAL RISK</span></div>
-  <div class="chapter-opener">
-    <svg class="opener-mark" viewBox="7 13 48 46" aria-hidden="true"><rect x="8" y="14" width="18" height="44" rx="1.5" opacity="0.95"/><rect x="22" y="14" width="18" height="44" rx="1.5" opacity="0.55"/><rect x="36" y="14" width="18" height="44" rx="1.5" opacity="0.28"/></svg>
-    <p class="opener-kicker">CHAPTER</p>
-    <p class="opener-num">03</p>
-    <h1>产品与核心功能</h1>
-    <p class="opener-en">Product &amp; Core Features</p>
-    <p class="opener-lede">本章回答产品是什么、能做什么。先写三条设计原则，再讲三类坐标与展板—名单—制图台的决策路径，最后逐项区分已实现与规划。</p>
-    <ul class="opener-toc">
-      <li><span class="toc-no">3.1</span>设计三原则</li>
-      <li><span class="toc-no">3.2</span>三类坐标</li>
-      <li><span class="toc-no">3.3</span>决策路径：展板、名单、制图台</li>
-      <li><span class="toc-no">3.4</span>制图台的构件</li>
-      <li><span class="toc-no">3.5</span>已实现与规划</li>
-    </ul>
-  </div>
-</section>
-
-<section class="sheet sheet--body">
-  <div class="screen-run"><span>STANDARD FINANCIAL CHARTING</span><span>FIRST TEST · AI INDUSTRY FINANCIAL RISK</span></div>
+  <header class="chap-head">
+    <span class="chap-no">03</span>
+    <div class="chap-t"><h1>产品设计</h1><p class="chap-en">Product Design</p></div>
+  </header>
+  <p class="chap-lede">本章回答产品是什么、能做什么。先写三条设计原则，再讲三类坐标与展板—名单—制图台的决策路径，最后逐项区分已实现与规划。</p>
   <div class="chapter-body">
     <h2 id="s3-1"><span class="num">3.1</span>设计三原则</h2>
     <div class="tbl">
@@ -1046,7 +959,7 @@ svg.dg { display: block; width: 100%; height: auto; font-family: var(--sans); ov
         <tbody>
           <tr><td>行业展板、四级名单、搜索、上市地筛选、收入排序</td><td>已实现</td></tr>
           <tr><td>三维制图台、切片、公司点、同心环、聚焦与钉住、间距调节、标准视角</td><td>已实现</td></tr>
-          <tr><td>以英伟达为中心的收入线（点到点，两色）</td><td>已实现（占比披露不全，见 6.5）</td></tr>
+          <tr><td>以英伟达为中心的收入线（点到点，两色）</td><td>已实现（占比披露不全）</td></tr>
           <tr><td>演示公司的债务期限折线</td><td>已实现，仅演示公司，数据为示意</td></tr>
           <tr><td>债务沿企业节点传导的画面</td><td><strong>未做</strong>；设计已写明要做，连线规则、阈值、专用字段仍须先写入设计</td></tr>
           <tr><td>制图台公司与 BICS 四级成员统一</td><td><strong>未做</strong></td></tr>
@@ -1060,27 +973,13 @@ svg.dg { display: block; width: 100%; height: auto; font-family: var(--sans); ov
 </section>
 
 <!-- ============================ 第 4 章 ============================ -->
-<section class="sheet sheet--opener" id="ch4">
+<section class="sheet sheet--body sheet--chap" id="ch4">
   <div class="screen-run"><span>STANDARD FINANCIAL CHARTING</span><span>FIRST TEST · AI INDUSTRY FINANCIAL RISK</span></div>
-  <div class="chapter-opener">
-    <svg class="opener-mark" viewBox="7 13 48 46" aria-hidden="true"><rect x="8" y="14" width="18" height="44" rx="1.5" opacity="0.95"/><rect x="22" y="14" width="18" height="44" rx="1.5" opacity="0.55"/><rect x="36" y="14" width="18" height="44" rx="1.5" opacity="0.28"/></svg>
-    <p class="opener-kicker">CHAPTER</p>
-    <p class="opener-num">04</p>
-    <h1>技术架构</h1>
-    <p class="opener-en">Technical Architecture</p>
-    <p class="opener-lede">本章说明系统如何搭成：前后端分离、模块与代码一一对应、以本地应用形态交付，数据与计算全部留在本机。</p>
-    <ul class="opener-toc">
-      <li><span class="toc-no">4.1</span>总体结构</li>
-      <li><span class="toc-no">4.2</span>模块化</li>
-      <li><span class="toc-no">4.3</span>本地应用</li>
-      <li><span class="toc-no">4.4</span>质量保障</li>
-      <li><span class="toc-no">4.5</span>第三方组件</li>
-    </ul>
-  </div>
-</section>
-
-<section class="sheet sheet--body">
-  <div class="screen-run"><span>STANDARD FINANCIAL CHARTING</span><span>FIRST TEST · AI INDUSTRY FINANCIAL RISK</span></div>
+  <header class="chap-head">
+    <span class="chap-no">04</span>
+    <div class="chap-t"><h1>技术架构</h1><p class="chap-en">Technical Architecture</p></div>
+  </header>
+  <p class="chap-lede">本章说明系统如何搭成：前后端分离、模块与代码一一对应、以本地应用形态交付，数据与计算全部留在本机。</p>
   <div class="chapter-body">
     <h2 id="s4-1"><span class="num">4.1</span>总体结构</h2>
     <p>前端与后端分离：</p>
@@ -1096,20 +995,39 @@ svg.dg { display: block; width: 100%; height: auto; font-family: var(--sans); ov
     </figure>
 
     <h2 id="s4-2"><span class="num">4.2</span>模块化</h2>
-    <p>工程由 26 个模块、35 条关系构成。模块图的真源是一份结构化文件，由脚本生成静态图，几何检查为零交叉、零重合。</p>
+    <p>工程由 32 个模块、45 条关系构成。模块图的真源是一份结构化文件，由脚本生成静态图，几何检查为零交叉、零重合。</p>
     <div class="kpi-row">
-      <div class="kpi"><div class="kpi-label">前端</div><div class="kpi-val">12<span class="kpi-unit">个</span></div><div class="kpi-note">含前后端之间的接口模块</div></div>
-      <div class="kpi"><div class="kpi-label">后端</div><div class="kpi-val">10<span class="kpi-unit">个</span></div><div class="kpi-note">本机 Python 服务</div></div>
+      <div class="kpi"><div class="kpi-label">前端</div><div class="kpi-val">17<span class="kpi-unit">个</span></div><div class="kpi-note">含接口模块与 5 个映射模块</div></div>
+      <div class="kpi"><div class="kpi-label">后端</div><div class="kpi-val">11<span class="kpi-unit">个</span></div><div class="kpi-note">本机 Python 服务</div></div>
       <div class="kpi"><div class="kpi-label">外壳</div><div class="kpi-val">3<span class="kpi-unit">个</span></div><div class="kpi-note">窗口、内嵌后端、打包</div></div>
-      <div class="kpi"><div class="kpi-label">模块关系</div><div class="kpi-val">35<span class="kpi-unit">条</span></div><div class="kpi-note">另有静态模块跟踪 1 个</div></div>
+      <div class="kpi"><div class="kpi-label">模块关系</div><div class="kpi-val">45<span class="kpi-unit">条</span></div><div class="kpi-note">另有静态模块跟踪 1 个</div></div>
     </div>
 
     <p>2026-10-15 完成「模块与代码一一对应」：后端拆出 BICS 分类树、BICS 公司树、影集、英伟达关系集等独立文件，入口文件由 1,352 行降到 352 行，跨文件私有函数调用清零；前端新建导航模块统一三页路由。</p>
+    <p>2026-10-16 起，制图台新增第二重映射（立方体坐标与元素到平面图）：前端增设「平面映射」区，含映射投影、映射绘制、映射注册、映射台、映射导出共 5 个模块；后端增设偿债窄口，只读预烘的季度偿债聚合。它们均已列入图 4-2 与表 4-1。</p>
     <p>模块化的目的不是保证无缺陷，而是保证接口清晰：任何一个功能改动，影响面可以从模块图上读出来。</p>
-    <figure class="fig">
-      <svg class="dg dg-mod" id="graph-svg" viewBox="0 0 690 626" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="SFC module relation graph" font-family="'Helvetica Neue', Helvetica, Arial, 'PingFang SC', sans-serif"><defs><marker id="arrow-fe" viewBox="0 0 12 12" refX="11" refY="6" markerWidth="9" markerHeight="9" markerUnits="userSpaceOnUse" orient="auto"><path d="M0 1.2 L11 6 L0 10.8 z" fill="#1a1f26"/></marker><marker id="arrow-be" viewBox="0 0 12 12" refX="11" refY="6" markerWidth="9" markerHeight="9" markerUnits="userSpaceOnUse" orient="auto"><path d="M0 1.2 L11 6 L0 10.8 z" fill="#4a5560"/></marker><marker id="arrow-x" viewBox="0 0 12 12" refX="11" refY="6" markerWidth="9" markerHeight="9" markerUnits="userSpaceOnUse" orient="auto"><path d="M0 1.2 L11 6 L0 10.8 z" fill="#8b96a3"/></marker><marker id="arrow-shell" viewBox="0 0 12 12" refX="11" refY="6" markerWidth="9" markerHeight="9" markerUnits="userSpaceOnUse" orient="auto"><path d="M0 1.2 L11 6 L0 10.8 z" fill="#4a5560"/></marker></defs><rect x="8" y="22" width="312" height="390" rx="5" fill="#ece8e0" stroke="#4a5560" stroke-width="1.3"/><rect x="388" y="22" width="294" height="162" rx="5" fill="#ffffff" stroke="#4a5560" stroke-width="1.3"/><rect x="388" y="200" width="294" height="212" rx="5" fill="#f7f5f0" stroke="#4a5560" stroke-width="1.3"/><rect x="8" y="428" width="674" height="74" rx="5" fill="#ece8e0" stroke="#4a5560" stroke-width="1.3"/><rect x="18" y="14" width="56" height="16" rx="8" fill="#4a5560"/><text x="46" y="25.6" text-anchor="middle" font-family="'Iowan Old Style', 'Palatino Linotype', Palatino, 'Songti SC', 'Noto Serif SC', serif" font-size="10.5" font-weight="700" fill="#ffffff" letter-spacing="0.08em">后端</text><rect x="398" y="14" width="56" height="16" rx="8" fill="#4a5560"/><text x="426" y="25.6" text-anchor="middle" font-family="'Iowan Old Style', 'Palatino Linotype', Palatino, 'Songti SC', 'Noto Serif SC', serif" font-size="10.5" font-weight="700" fill="#ffffff" letter-spacing="0.08em">决策路径</text><rect x="398" y="192" width="56" height="16" rx="8" fill="#4a5560"/><text x="426" y="203.6" text-anchor="middle" font-family="'Iowan Old Style', 'Palatino Linotype', Palatino, 'Songti SC', 'Noto Serif SC', serif" font-size="10.5" font-weight="700" fill="#ffffff" letter-spacing="0.08em">立方体面</text><rect x="18" y="420" width="56" height="16" rx="8" fill="#4a5560"/><text x="46" y="431.6" text-anchor="middle" font-family="'Iowan Old Style', 'Palatino Linotype', Palatino, 'Songti SC', 'Noto Serif SC', serif" font-size="10.5" font-weight="700" fill="#ffffff" letter-spacing="0.08em">壳层</text><g><title>BE-HTTP — Loopback HTTP + static + modules narrow mouth</title><rect x="280" y="44" width="30" height="354" rx="4" fill="#ece8e0" stroke="#4a5560" stroke-width="1.6"/><text transform="translate(298.4 221) rotate(-90)" text-anchor="middle" font-size="10.5" font-weight="700" letter-spacing="0.06em" fill="#1a1f26">BE-HTTP</text></g><g><title>BE-BICS-HIER — BICS hierarchy JSON index</title><rect x="154" y="38" width="98" height="36" rx="3" fill="#ffffff" fill-opacity="0.94" stroke="#4a5560" stroke-width="1.1"/><text x="203" y="52.8" text-anchor="middle" font-size="9.4" fill="#1a1f26" letter-spacing="0.02em">BE-BICS-HIER</text><text x="203" y="65.2" text-anchor="middle" font-size="9" fill="#4a5560">BICS分类树</text></g><g><title>BE-BICS-ENTITY — Entity membership / counts DB</title><rect x="154" y="88" width="98" height="36" rx="3" fill="#ffffff" fill-opacity="0.94" stroke="#4a5560" stroke-width="1.1"/><text x="203" y="102.8" text-anchor="middle" font-size="9.4" fill="#1a1f26" letter-spacing="0.02em">BE-BICS-ENTITY</text><text x="203" y="115.2" text-anchor="middle" font-size="9" fill="#4a5560">BICS公司树</text></g><g><title>BE-BICS-INGEST — BE-DATA ingest scripts (offline)</title><rect x="20" y="88" width="98" height="36" rx="3" fill="#ffffff" fill-opacity="0.94" stroke="#4a5560" stroke-width="1.1"/><text x="69" y="102.8" text-anchor="middle" font-size="9.4" fill="#1a1f26" letter-spacing="0.02em">BE-BICS-INGEST</text><text x="69" y="115.2" text-anchor="middle" font-size="9" fill="#4a5560">BICS导入</text></g><g><title>BE-BICS-AREA — Listing-country from yellow-key</title><rect x="154" y="138" width="98" height="36" rx="3" fill="#ffffff" fill-opacity="0.94" stroke="#4a5560" stroke-width="1.1"/><text x="203" y="152.8" text-anchor="middle" font-size="9.4" fill="#1a1f26" letter-spacing="0.02em">BE-BICS-AREA</text><text x="203" y="165.2" text-anchor="middle" font-size="9" fill="#4a5560">BICS地区映射</text></g><g><title>BE-BUNDLE — mode-first bundle dispatch demo|shell|chain</title><rect x="154" y="287" width="98" height="36" rx="3" fill="#ffffff" fill-opacity="0.94" stroke="#4a5560" stroke-width="1.1"/><text x="203" y="301.8" text-anchor="middle" font-size="9.4" fill="#1a1f26" letter-spacing="0.02em">BE-BUNDLE</text><text x="203" y="314.2" text-anchor="middle" font-size="9" fill="#4a5560">捆绑编排</text></g><g><title>BE-DB-DEMO — Demo SQLite companies/layers</title><rect x="20" y="212" width="98" height="36" rx="3" fill="#ffffff" fill-opacity="0.94" stroke="#4a5560" stroke-width="1.1"/><text x="69" y="226.8" text-anchor="middle" font-size="9.4" fill="#1a1f26" letter-spacing="0.02em">BE-DB-DEMO</text><text x="69" y="239.2" text-anchor="middle" font-size="9" fill="#4a5560">演示集</text></g><g><title>BE-DB-SHADOW — Empty-wall shell for non-chain ticker</title><rect x="20" y="262" width="98" height="36" rx="3" fill="#ffffff" fill-opacity="0.94" stroke="#4a5560" stroke-width="1.1"/><text x="69" y="276.8" text-anchor="middle" font-size="9.4" fill="#1a1f26" letter-spacing="0.02em">BE-DB-SHADOW</text><text x="69" y="289.2" text-anchor="middle" font-size="9" fill="#4a5560">影集</text></g><g><title>BE-NVDA-LAYOUT — Server-side ring / slice layout</title><rect x="20" y="312" width="98" height="36" rx="3" fill="#ffffff" fill-opacity="0.94" stroke="#4a5560" stroke-width="1.1"/><text x="69" y="326.8" text-anchor="middle" font-size="9.4" fill="#1a1f26" letter-spacing="0.02em">BE-NVDA-LAYOUT</text><text x="69" y="339.2" text-anchor="middle" font-size="9" fill="#4a5560">N布局规划</text></g><g><title>BE-NVDA-LINKS — NVDA revenue-link chain document</title><rect x="20" y="362" width="98" height="36" rx="3" fill="#ffffff" fill-opacity="0.94" stroke="#4a5560" stroke-width="1.1"/><text x="69" y="376.8" text-anchor="middle" font-size="9.4" fill="#1a1f26" letter-spacing="0.02em">BE-NVDA-LINKS</text><text x="69" y="389.2" text-anchor="middle" font-size="9" fill="#4a5560">N关系集</text></g><g><title>MODULES-TRACK — Repo-root modules graph + paper HTML</title><rect x="154" y="362" width="98" height="36" rx="3" fill="#ffffff" fill-opacity="0.94" stroke="#4a5560" stroke-width="1.1"/><text x="203" y="376.8" text-anchor="middle" font-size="9.4" fill="#1a1f26" letter-spacing="0.02em">MODULES-TRACK</text><text x="203" y="389.2" text-anchor="middle" font-size="9" fill="#4a5560">静态模块跟踪</text></g><g><title>FE-API — Single HTTP base for gate / list / cube</title><rect x="344" y="88" width="30" height="156" rx="4" fill="#ece8e0" stroke="#1a1f26" stroke-width="1.6"/><text transform="translate(362.4 166) rotate(-90)" text-anchor="middle" font-size="10.5" font-weight="700" letter-spacing="0.06em" fill="#1a1f26">FE-API 接口</text></g><g><title>FE-NAV — Route assignment across home / list / cube</title><rect x="414" y="38" width="98" height="36" rx="3" fill="#ffffff" fill-opacity="0.94" stroke="#4a5560" stroke-width="1.1"/><text x="463" y="52.8" text-anchor="middle" font-size="9.4" fill="#1a1f26" letter-spacing="0.02em">FE-NAV</text><text x="463" y="65.2" text-anchor="middle" font-size="9" fill="#4a5560">导航</text></g><g><title>FE-BOARD — BICS L1–L3 gate board</title><rect x="414" y="88" width="98" height="36" rx="3" fill="#ffffff" fill-opacity="0.94" stroke="#4a5560" stroke-width="1.1"/><text x="463" y="102.8" text-anchor="middle" font-size="9.4" fill="#1a1f26" letter-spacing="0.02em">FE-BOARD</text><text x="463" y="115.2" text-anchor="middle" font-size="9" fill="#4a5560">展板</text></g><g><title>FE-LIST — L4 company list</title><rect x="414" y="138" width="98" height="36" rx="3" fill="#ffffff" fill-opacity="0.94" stroke="#4a5560" stroke-width="1.1"/><text x="463" y="152.8" text-anchor="middle" font-size="9.4" fill="#1a1f26" letter-spacing="0.02em">FE-LIST</text><text x="463" y="165.2" text-anchor="middle" font-size="9" fill="#4a5560">列表</text></g><g><title>FE-LISTAREA — Listing-country control UI</title><rect x="552" y="113" width="98" height="36" rx="3" fill="#ffffff" fill-opacity="0.94" stroke="#4a5560" stroke-width="1.1"/><text x="601" y="127.8" text-anchor="middle" font-size="9.4" fill="#1a1f26" letter-spacing="0.02em">FE-LISTAREA</text><text x="601" y="140.2" text-anchor="middle" font-size="9" fill="#4a5560">列表属地</text></g><g><title>FE-OPENCUBE — Cube page boot; consumes bundle</title><rect x="414" y="216" width="98" height="36" rx="3" fill="#ffffff" fill-opacity="0.94" stroke="#1a1f26" stroke-width="1.1"/><text x="463" y="230.8" text-anchor="middle" font-size="9.4" fill="#1a1f26" letter-spacing="0.02em">FE-OPENCUBE</text><text x="463" y="243.2" text-anchor="middle" font-size="9" fill="#1a1f26">跳转制图台</text></g><g><title>FE-AESTHETIC — Cross-cutting glass / paper tokens</title><rect x="552" y="216" width="98" height="36" rx="3" fill="#ffffff" fill-opacity="0.94" stroke="#1a1f26" stroke-width="1.1"/><text x="601" y="230.8" text-anchor="middle" font-size="9.4" fill="#1a1f26" letter-spacing="0.02em">FE-AESTHETIC</text><text x="601" y="243.2" text-anchor="middle" font-size="9" fill="#1a1f26">前端设计</text></g><g><title>FE-ACTION — Cube session state</title><rect x="414" y="266" width="98" height="36" rx="3" fill="#ffffff" fill-opacity="0.94" stroke="#1a1f26" stroke-width="1.1"/><text x="463" y="280.8" text-anchor="middle" font-size="9.4" fill="#1a1f26" letter-spacing="0.02em">FE-ACTION</text><text x="463" y="293.2" text-anchor="middle" font-size="9" fill="#1a1f26">操作</text></g><g><title>FE-PANEL — Floating cube chrome</title><rect x="552" y="266" width="98" height="36" rx="3" fill="#ffffff" fill-opacity="0.94" stroke="#1a1f26" stroke-width="1.1"/><text x="601" y="280.8" text-anchor="middle" font-size="9.4" fill="#1a1f26" letter-spacing="0.02em">FE-PANEL</text><text x="601" y="293.2" text-anchor="middle" font-size="9" fill="#1a1f26">面板</text></g><g><title>FE-SCENE — Three scene; consumes precomputed rings</title><rect x="414" y="316" width="98" height="36" rx="3" fill="#ffffff" fill-opacity="0.94" stroke="#1a1f26" stroke-width="1.1"/><text x="463" y="330.8" text-anchor="middle" font-size="9.4" fill="#1a1f26" letter-spacing="0.02em">FE-SCENE</text><text x="463" y="343.2" text-anchor="middle" font-size="9" fill="#1a1f26">场景</text></g><g><title>FE-COORDONE — Sole world placement from object/sxy</title><rect x="552" y="316" width="98" height="36" rx="3" fill="#ffffff" fill-opacity="0.94" stroke="#1a1f26" stroke-width="1.1"/><text x="601" y="330.8" text-anchor="middle" font-size="9.4" fill="#1a1f26" letter-spacing="0.02em">FE-COORDONE</text><text x="601" y="343.2" text-anchor="middle" font-size="9" fill="#1a1f26">摆放坐标</text></g><g><title>FE-FOCUS — Focus / staging overlays</title><rect x="414" y="366" width="98" height="36" rx="3" fill="#ffffff" fill-opacity="0.94" stroke="#1a1f26" stroke-width="1.1"/><text x="463" y="380.8" text-anchor="middle" font-size="9.4" fill="#1a1f26" letter-spacing="0.02em">FE-FOCUS</text><text x="463" y="393.2" text-anchor="middle" font-size="9" fill="#1a1f26">聚焦</text></g><g><title>SHELL-WINDOW — Native window (WKWebView) showing the front end; loopback only, no script bridge</title><rect x="414" y="444" width="98" height="36" rx="3" fill="#ffffff" fill-opacity="0.94" stroke="#4a5560" stroke-width="1.1"/><text x="463" y="458.8" text-anchor="middle" font-size="9.4" fill="#1a1f26" letter-spacing="0.02em">SHELL-WINDOW</text><text x="463" y="471.2" text-anchor="middle" font-size="9" fill="#4a5560">壳窗口</text></g><g><title>SHELL-PROC — Owns the embedded back-end child process: start, health wait, clean exit</title><rect x="246" y="444" width="98" height="36" rx="3" fill="#ffffff" fill-opacity="0.94" stroke="#4a5560" stroke-width="1.1"/><text x="295" y="458.8" text-anchor="middle" font-size="9.4" fill="#1a1f26" letter-spacing="0.02em">SHELL-PROC</text><text x="295" y="471.2" text-anchor="middle" font-size="9" fill="#4a5560">内嵌后端</text></g><g><title>SHELL-PACK — Build-time packaging: universal binary, allow-listed self-contained .app, zip; not shipped at runtime</title><rect x="20" y="444" width="98" height="36" rx="3" fill="#ffffff" fill-opacity="0.94" stroke="#4a5560" stroke-width="1.1"/><text x="69" y="458.8" text-anchor="middle" font-size="9.4" fill="#1a1f26" letter-spacing="0.02em">SHELL-PACK</text><text x="69" y="471.2" text-anchor="middle" font-size="9" fill="#4a5560">打包</text></g><path d="M463 74 L463 86.5" fill="none" stroke="#1a1f26" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-fe)"><title>FE-NAV → FE-BOARD (calls)</title></path><path d="M463 124 L463 136.5" fill="none" stroke="#1a1f26" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-fe)"><title>FE-BOARD → FE-LIST (calls)</title></path><path d="M463 174 L463 214.5" fill="none" stroke="#1a1f26" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-fe)"><title>FE-LIST → FE-OPENCUBE (calls)</title></path><path d="M414 106 L375.5 106" fill="none" stroke="#1a1f26" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-fe)"><title>FE-BOARD → FE-API (calls)</title></path><path d="M414 156 L375.5 156" fill="none" stroke="#1a1f26" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-fe)"><title>FE-LIST → FE-API (calls)</title></path><path d="M414 228 L375.5 228" fill="none" stroke="#1a1f26" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-fe)"><title>FE-OPENCUBE → FE-API (calls)</title></path><path d="M344 131 L311.5 131" fill="none" stroke="#8b96a3" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-x)" stroke-dasharray="1.6 3"><title>FE-API → BE-HTTP (contract)</title></path><path d="M512 112 L532 112 L532 126 L550.5 126" fill="none" stroke="#1a1f26" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-fe)" stroke-dasharray="5 3"><title>FE-BOARD → FE-LISTAREA (depends)</title></path><path d="M512 150 L532 150 L532 136 L550.5 136" fill="none" stroke="#1a1f26" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-fe)" stroke-dasharray="5 3"><title>FE-LIST → FE-LISTAREA (depends)</title></path><path d="M463 252 L463 264.5" fill="none" stroke="#1a1f26" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-fe)" stroke-dasharray="5 3"><title>FE-OPENCUBE → FE-ACTION (depends)</title></path><path d="M512 240 L524 240 L524 328 L550.5 328" fill="none" stroke="#1a1f26" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-fe)" stroke-dasharray="5 3"><title>FE-OPENCUBE → FE-COORDONE (depends)</title></path><path d="M414 240 L398 240 L398 334 L412.5 334" fill="none" stroke="#1a1f26" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-fe)" stroke-dasharray="5 3"><title>FE-OPENCUBE → FE-SCENE (depends)</title></path><path d="M512 228 L538 228 L538 284 L550.5 284" fill="none" stroke="#1a1f26" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-fe)" stroke-dasharray="5 3"><title>FE-OPENCUBE → FE-PANEL (depends)</title></path><path d="M512 340 L550.5 340" fill="none" stroke="#1a1f26" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-fe)"><title>FE-SCENE → FE-COORDONE (calls)</title></path><path d="M463 352 L463 364.5" fill="none" stroke="#1a1f26" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-fe)" stroke-dasharray="5 3"><title>FE-SCENE → FE-FOCUS (depends)</title></path><path d="M650 240 L672 240 L672 100 L513.5 100" fill="none" stroke="#1a1f26" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-fe)" stroke-dasharray="5 3"><title>FE-AESTHETIC → FE-BOARD (depends)</title></path><path d="M650 228 L662 228 L662 162 L513.5 162" fill="none" stroke="#1a1f26" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-fe)" stroke-dasharray="5 3"><title>FE-AESTHETIC → FE-LIST (depends)</title></path><path d="M601 252 L601 264.5" fill="none" stroke="#1a1f26" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-fe)" stroke-dasharray="5 3"><title>FE-AESTHETIC → FE-PANEL (depends)</title></path><path d="M280 305 L253.5 305" fill="none" stroke="#4a5560" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-be)"><title>BE-HTTP → BE-BUNDLE (calls)</title></path><path d="M280 56 L253.5 56" fill="none" stroke="#4a5560" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-be)"><title>BE-HTTP → BE-BICS-HIER (calls)</title></path><path d="M280 106 L253.5 106" fill="none" stroke="#4a5560" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-be)"><title>BE-HTTP → BE-BICS-ENTITY (calls)</title></path><path d="M280 156 L253.5 156" fill="none" stroke="#4a5560" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-be)"><title>BE-HTTP → BE-BICS-AREA (calls)</title></path><path d="M280 380 L253.5 380" fill="none" stroke="#8b96a3" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-x)" stroke-dasharray="1.6 3"><title>BE-HTTP → MODULES-TRACK (contract)</title></path><path d="M154 296 L144 296 L144 230 L119.5 230" fill="none" stroke="#4a5560" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-be)"><title>BE-BUNDLE → BE-DB-DEMO (calls)</title></path><path d="M154 302 L132 302 L132 280 L119.5 280" fill="none" stroke="#4a5560" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-be)"><title>BE-BUNDLE → BE-DB-SHADOW (calls)</title></path><path d="M154 308 L132 308 L132 330 L119.5 330" fill="none" stroke="#4a5560" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-be)"><title>BE-BUNDLE → BE-NVDA-LAYOUT (calls)</title></path><path d="M154 314 L144 314 L144 380 L119.5 380" fill="none" stroke="#4a5560" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-be)"><title>BE-BUNDLE → BE-NVDA-LINKS (calls)</title></path><path d="M69 348 L69 360.5" fill="none" stroke="#4a5560" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-be)" stroke-dasharray="5 3"><title>BE-NVDA-LAYOUT → BE-NVDA-LINKS (depends)</title></path><path d="M203 124 L203 136.5" fill="none" stroke="#4a5560" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-be)" stroke-dasharray="5 3"><title>BE-BICS-ENTITY → BE-BICS-AREA (depends)</title></path><path d="M118 106 L152.5 106" fill="none" stroke="#4a5560" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-be)" stroke-dasharray="5 3"><title>BE-BICS-INGEST → BE-BICS-ENTITY (depends)</title></path><path d="M414 462 L345.5 462" fill="none" stroke="#4a5560" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-shell)" stroke-dasharray="5 3"><title>SHELL-WINDOW → SHELL-PROC (depends)</title></path><path d="M295 444 L295 399.5" fill="none" stroke="#8b96a3" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-x)"><title>SHELL-PROC → BE-HTTP (calls)</title></path><path d="M463 444 L463 420 L305 420 L305 399.5" fill="none" stroke="#8b96a3" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-x)" stroke-dasharray="1.6 3"><title>SHELL-WINDOW → BE-HTTP (contract)</title></path><path d="M69 480 L69 494 L463 494 L463 481.5" fill="none" stroke="#4a5560" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-shell)" stroke-dasharray="5 3"><title>SHELL-PACK → SHELL-WINDOW (depends)</title></path><path d="M95 444 L95 416 L285 416 L285 399.5" fill="none" stroke="#8b96a3" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-x)" stroke-dasharray="5 3"><title>SHELL-PACK → BE-HTTP (depends)</title></path><line x1="8" y1="508" x2="682" y2="508" stroke="#c5ccd4" stroke-width="0.8"/><text x="16" y="524" font-family="'Iowan Old Style', 'Palatino Linotype', Palatino, 'Songti SC', 'Noto Serif SC', serif" font-size="10.5" font-weight="700" fill="#1a1f26" letter-spacing="0.1em">分区</text><rect x="16" y="535" width="20" height="11" rx="2.5" fill="#ffffff" stroke="#4a5560" stroke-width="1.2"/><text x="44" y="544" font-size="9.4" fill="#4a5560">决策路径 · NAV → LIST</text><rect x="16" y="552" width="20" height="11" rx="2.5" fill="#f7f5f0" stroke="#4a5560" stroke-width="1.2"/><text x="44" y="561" font-size="9.4" fill="#4a5560">立方体面 · OPENCUBE → AESTHETIC</text><rect x="16" y="569" width="20" height="11" rx="2.5" fill="#ece8e0" stroke="#4a5560" stroke-width="1.2"/><text x="44" y="578" font-size="9.4" fill="#4a5560">后端 · BE-HTTP 起</text><rect x="16" y="586" width="20" height="11" rx="2.5" fill="#ece8e0" stroke="#4a5560" stroke-width="1.2"/><text x="44" y="595" font-size="9.4" fill="#4a5560">壳层 · SHELL-*（本地应用）</text><rect x="16" y="603" width="20" height="11" rx="2.5" fill="#ece8e0" stroke="#1a1f26" stroke-width="1.5"/><text x="44" y="612" font-size="9.4" fill="#4a5560">枢纽条 · FE-API / BE-HTTP（框外 / 框缘）</text><text x="330" y="524" font-family="'Iowan Old Style', 'Palatino Linotype', Palatino, 'Songti SC', 'Noto Serif SC', serif" font-size="10.5" font-weight="700" fill="#1a1f26" letter-spacing="0.1em">边色</text><path d="M330 540.5 L364 540.5" stroke="#1a1f26" stroke-width="2" fill="none"/><text x="372" y="544" font-size="9.4" fill="#4a5560">墨黑 · 前端内部</text><path d="M330 557.5 L364 557.5" stroke="#4a5560" stroke-width="2" fill="none"/><text x="372" y="561" font-size="9.4" fill="#4a5560">深灰 · 后端内部</text><path d="M330 574.5 L364 574.5" stroke="#8b96a3" stroke-width="2" fill="none"/><text x="372" y="578" font-size="9.4" fill="#4a5560">浅灰 · 跨侧</text><path d="M330 591.5 L364 591.5" stroke="#4a5560" stroke-width="2" fill="none"/><text x="372" y="595" font-size="9.4" fill="#4a5560">深灰 · 壳层内部</text><text x="530" y="524" font-family="'Iowan Old Style', 'Palatino Linotype', Palatino, 'Songti SC', 'Noto Serif SC', serif" font-size="10.5" font-weight="700" fill="#1a1f26" letter-spacing="0.1em">线型</text><path d="M530 540.5 L564 540.5" stroke="#1a1f26" stroke-width="1.6" fill="none"/><text x="572" y="544" font-size="9.4" fill="#4a5560">calls · 实线</text><path d="M530 557.5 L564 557.5" stroke="#1a1f26" stroke-width="1.6" fill="none" stroke-dasharray="5 3"/><text x="572" y="561" font-size="9.4" fill="#4a5560">depends · 虚线</text><path d="M530 574.5 L564 574.5" stroke="#1a1f26" stroke-width="1.6" fill="none" stroke-dasharray="1.6 3"/><text x="572" y="578" font-size="9.4" fill="#4a5560">contract · 点线</text></svg>
-      <figcaption class="fig-cap"><span class="cap-no">图 4-2</span><span>模块关系图：26 个模块、35 条关系。左为后端，右为前端，中间的接口枢纽是前后端唯一契约口。由工程内的模块图导出并按纸面配色重着色。</span></figcaption>
+    <div class="tbl">
+      <div class="tbl-cap"><span class="cap-no">表 4-1</span><span>模块分区摘要（与图 4-2 同源）</span></div>
+      <table class="data">
+        <thead><tr><th style="width:18%">分区</th><th style="width:7%">个数</th><th>模块</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">前端 · 决策路径</th><td class="num">4</td><td><span style="white-space:nowrap"><span class="mono">FE-NAV</span> 导航</span>　 <span style="white-space:nowrap"><span class="mono">FE-BOARD</span> 展板</span>　 <span style="white-space:nowrap"><span class="mono">FE-LIST</span> 列表</span>　 <span style="white-space:nowrap"><span class="mono">FE-LISTAREA</span> 列表属地</span></td></tr>
+          <tr><th scope="row">前端 · 体空间</th><td class="num">7</td><td><span style="white-space:nowrap"><span class="mono">FE-OPENCUBE</span> 跳转制图台</span>　 <span style="white-space:nowrap"><span class="mono">FE-ACTION</span> 操作</span>　 <span style="white-space:nowrap"><span class="mono">FE-COORDONE</span> 摆放坐标</span>　 <span style="white-space:nowrap"><span class="mono">FE-SCENE</span> 场景</span>　 <span style="white-space:nowrap"><span class="mono">FE-PANEL</span> 面板</span>　 <span style="white-space:nowrap"><span class="mono">FE-FOCUS</span> 聚焦</span>　 <span style="white-space:nowrap"><span class="mono">FE-AESTHETIC</span> 前端设计</span></td></tr>
+          <tr><th scope="row">前端 · 平面映射</th><td class="num">5</td><td><span style="white-space:nowrap"><span class="mono">FE-MAPPROJ</span> 映射投影</span>　 <span style="white-space:nowrap"><span class="mono">FE-MAPDRAW</span> 映射绘制</span>　 <span style="white-space:nowrap"><span class="mono">FE-MAPREG</span> 映射注册</span>　 <span style="white-space:nowrap"><span class="mono">FE-MAPDOCK</span> 映射台</span>　 <span style="white-space:nowrap"><span class="mono">FE-MAPOUT</span> 映射导出</span></td></tr>
+          <tr><th scope="row">前端 · 接口枢纽</th><td class="num">1</td><td><span style="white-space:nowrap"><span class="mono">FE-API</span> 接口</span></td></tr>
+          <tr><th scope="row">后端</th><td class="num">11</td><td><span style="white-space:nowrap"><span class="mono">BE-HTTP</span></span>　 <span style="white-space:nowrap"><span class="mono">BE-BUNDLE</span> 捆绑编排</span>　 <span style="white-space:nowrap"><span class="mono">BE-DB-DEMO</span> 演示集</span>　 <span style="white-space:nowrap"><span class="mono">BE-DB-SHADOW</span> 影集</span>　 <span style="white-space:nowrap"><span class="mono">BE-NVDA-LAYOUT</span> N布局规划</span>　 <span style="white-space:nowrap"><span class="mono">BE-NVDA-LINKS</span> N关系集</span>　 <span style="white-space:nowrap"><span class="mono">BE-DEBT</span> 偿债窄口</span>　 <span style="white-space:nowrap"><span class="mono">BE-BICS-HIER</span> BICS分类树</span>　 <span style="white-space:nowrap"><span class="mono">BE-BICS-ENTITY</span> BICS公司树</span>　 <span style="white-space:nowrap"><span class="mono">BE-BICS-AREA</span> BICS地区映射</span>　 <span style="white-space:nowrap"><span class="mono">BE-BICS-INGEST</span> BICS导入</span></td></tr>
+          <tr><th scope="row">壳层（本地应用）</th><td class="num">3</td><td><span style="white-space:nowrap"><span class="mono">SHELL-WINDOW</span> 壳窗口</span>　 <span style="white-space:nowrap"><span class="mono">SHELL-PROC</span> 内嵌后端</span>　 <span style="white-space:nowrap"><span class="mono">SHELL-PACK</span> 打包</span></td></tr>
+          <tr><th scope="row">静态模块跟踪</th><td class="num">1</td><td><span style="white-space:nowrap"><span class="mono">MODULES-TRACK</span> 静态模块跟踪</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="keepnext">下页的图 4-2 把这些模块与关系画在一张图上。</p>
+    <!--FIG42-->
+    <figure class="fig fig--land">
+      <svg class="dg dg-mod" id="graph-svg" viewBox="0 0 858 594" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="SFC module relation graph" font-family="'Helvetica Neue', Helvetica, Arial, 'PingFang SC', sans-serif"><defs><marker id="arrow-fe" viewBox="0 0 12 12" refX="11" refY="6" markerWidth="9" markerHeight="9" markerUnits="userSpaceOnUse" orient="auto"><path d="M0 1.2 L11 6 L0 10.8 z" fill="#1a1f26"/></marker><marker id="arrow-be" viewBox="0 0 12 12" refX="11" refY="6" markerWidth="9" markerHeight="9" markerUnits="userSpaceOnUse" orient="auto"><path d="M0 1.2 L11 6 L0 10.8 z" fill="#4a5560"/></marker><marker id="arrow-x" viewBox="0 0 12 12" refX="11" refY="6" markerWidth="9" markerHeight="9" markerUnits="userSpaceOnUse" orient="auto"><path d="M0 1.2 L11 6 L0 10.8 z" fill="#8b96a3"/></marker><marker id="arrow-shell" viewBox="0 0 12 12" refX="11" refY="6" markerWidth="9" markerHeight="9" markerUnits="userSpaceOnUse" orient="auto"><path d="M0 1.2 L11 6 L0 10.8 z" fill="#4a5560"/></marker></defs><rect x="8" y="22" width="312" height="390" rx="5" fill="#ece8e0" stroke="#4a5560" stroke-width="1.3"/><rect x="388" y="22" width="294" height="162" rx="5" fill="#ffffff" stroke="#4a5560" stroke-width="1.3"/><rect x="388" y="200" width="294" height="212" rx="5" fill="#f7f5f0" stroke="#4a5560" stroke-width="1.3"/><rect x="716" y="155" width="126" height="257" rx="5" fill="#ffffff" stroke="#1a1f26" stroke-width="1.3"/><rect x="8" y="428" width="674" height="74" rx="5" fill="#ece8e0" stroke="#4a5560" stroke-width="1.3"/><rect x="18" y="14" width="56" height="16" rx="8" fill="#4a5560"/><text x="46" y="25.6" text-anchor="middle" font-family="'Iowan Old Style', 'Palatino Linotype', Palatino, 'Songti SC', 'Noto Serif SC', serif" font-size="10.5" font-weight="700" letter-spacing="0.08em" style="fill:#ffffff">后端</text><rect x="398" y="14" width="56" height="16" rx="8" fill="#4a5560"/><text x="426" y="25.6" text-anchor="middle" font-family="'Iowan Old Style', 'Palatino Linotype', Palatino, 'Songti SC', 'Noto Serif SC', serif" font-size="10.5" font-weight="700" letter-spacing="0.08em" style="fill:#ffffff">决策路径</text><rect x="398" y="192" width="56" height="16" rx="8" fill="#4a5560"/><text x="426" y="203.6" text-anchor="middle" font-family="'Iowan Old Style', 'Palatino Linotype', Palatino, 'Songti SC', 'Noto Serif SC', serif" font-size="10.5" font-weight="700" letter-spacing="0.08em" style="fill:#ffffff">体空间</text><rect x="726" y="147" width="56" height="16" rx="8" fill="#1a1f26"/><text x="754" y="158.6" text-anchor="middle" font-family="'Iowan Old Style', 'Palatino Linotype', Palatino, 'Songti SC', 'Noto Serif SC', serif" font-size="10.5" font-weight="700" letter-spacing="0.08em" style="fill:#ffffff">平面映射</text><rect x="18" y="420" width="56" height="16" rx="8" fill="#4a5560"/><text x="46" y="431.6" text-anchor="middle" font-family="'Iowan Old Style', 'Palatino Linotype', Palatino, 'Songti SC', 'Noto Serif SC', serif" font-size="10.5" font-weight="700" letter-spacing="0.08em" style="fill:#ffffff">壳层</text><g><title>BE-HTTP — Loopback HTTP + static + modules narrow mouth</title><rect x="280" y="44" width="30" height="354" rx="4" fill="#ece8e0" stroke="#4a5560" stroke-width="1.6"/><text transform="translate(298.4 221) rotate(-90)" text-anchor="middle" font-size="10.5" font-weight="700" letter-spacing="0.06em" style="fill:#1a1f26">BE-HTTP</text></g><g><title>BE-DEBT — Read-only pre-baked quarterly debt-ladder aggregate (GET /api/debt/ladder)</title><rect x="154" y="212" width="98" height="36" rx="3" fill="#ffffff" fill-opacity="0.94" stroke="#4a5560" stroke-width="1.1"/><text x="203" y="226.8" text-anchor="middle" font-size="9.4" letter-spacing="0.02em" style="fill:#1a1f26">BE-DEBT</text><text x="203" y="239.2" text-anchor="middle" font-size="9" style="fill:#4a5560">偿债窄口</text></g><g><title>BE-BICS-HIER — BICS hierarchy JSON index</title><rect x="154" y="38" width="98" height="36" rx="3" fill="#ffffff" fill-opacity="0.94" stroke="#4a5560" stroke-width="1.1"/><text x="203" y="52.8" text-anchor="middle" font-size="9.4" letter-spacing="0.02em" style="fill:#1a1f26">BE-BICS-HIER</text><text x="203" y="65.2" text-anchor="middle" font-size="9" style="fill:#4a5560">BICS分类树</text></g><g><title>BE-BICS-ENTITY — Entity membership / counts DB</title><rect x="154" y="88" width="98" height="36" rx="3" fill="#ffffff" fill-opacity="0.94" stroke="#4a5560" stroke-width="1.1"/><text x="203" y="102.8" text-anchor="middle" font-size="9.4" letter-spacing="0.02em" style="fill:#1a1f26">BE-BICS-ENTITY</text><text x="203" y="115.2" text-anchor="middle" font-size="9" style="fill:#4a5560">BICS公司树</text></g><g><title>BE-BICS-INGEST — BE-DATA ingest scripts (offline)</title><rect x="20" y="88" width="98" height="36" rx="3" fill="#ffffff" fill-opacity="0.94" stroke="#4a5560" stroke-width="1.1"/><text x="69" y="102.8" text-anchor="middle" font-size="9.4" letter-spacing="0.02em" style="fill:#1a1f26">BE-BICS-INGEST</text><text x="69" y="115.2" text-anchor="middle" font-size="9" style="fill:#4a5560">BICS导入</text></g><g><title>BE-BICS-AREA — Listing-country from yellow-key</title><rect x="154" y="138" width="98" height="36" rx="3" fill="#ffffff" fill-opacity="0.94" stroke="#4a5560" stroke-width="1.1"/><text x="203" y="152.8" text-anchor="middle" font-size="9.4" letter-spacing="0.02em" style="fill:#1a1f26">BE-BICS-AREA</text><text x="203" y="165.2" text-anchor="middle" font-size="9" style="fill:#4a5560">BICS地区映射</text></g><g><title>BE-BUNDLE — mode-first bundle dispatch demo|shell|chain</title><rect x="154" y="287" width="98" height="36" rx="3" fill="#ffffff" fill-opacity="0.94" stroke="#4a5560" stroke-width="1.1"/><text x="203" y="301.8" text-anchor="middle" font-size="9.4" letter-spacing="0.02em" style="fill:#1a1f26">BE-BUNDLE</text><text x="203" y="314.2" text-anchor="middle" font-size="9" style="fill:#4a5560">捆绑编排</text></g><g><title>BE-DB-DEMO — Demo SQLite companies/layers</title><rect x="20" y="212" width="98" height="36" rx="3" fill="#ffffff" fill-opacity="0.94" stroke="#4a5560" stroke-width="1.1"/><text x="69" y="226.8" text-anchor="middle" font-size="9.4" letter-spacing="0.02em" style="fill:#1a1f26">BE-DB-DEMO</text><text x="69" y="239.2" text-anchor="middle" font-size="9" style="fill:#4a5560">演示集</text></g><g><title>BE-DB-SHADOW — Empty-wall shell for non-chain ticker</title><rect x="20" y="262" width="98" height="36" rx="3" fill="#ffffff" fill-opacity="0.94" stroke="#4a5560" stroke-width="1.1"/><text x="69" y="276.8" text-anchor="middle" font-size="9.4" letter-spacing="0.02em" style="fill:#1a1f26">BE-DB-SHADOW</text><text x="69" y="289.2" text-anchor="middle" font-size="9" style="fill:#4a5560">影集</text></g><g><title>BE-NVDA-LAYOUT — Server-side ring / slice layout</title><rect x="20" y="312" width="98" height="36" rx="3" fill="#ffffff" fill-opacity="0.94" stroke="#4a5560" stroke-width="1.1"/><text x="69" y="326.8" text-anchor="middle" font-size="9.4" letter-spacing="0.02em" style="fill:#1a1f26">BE-NVDA-LAYOUT</text><text x="69" y="339.2" text-anchor="middle" font-size="9" style="fill:#4a5560">N布局规划</text></g><g><title>BE-NVDA-LINKS — NVDA revenue-link chain document</title><rect x="20" y="362" width="98" height="36" rx="3" fill="#ffffff" fill-opacity="0.94" stroke="#4a5560" stroke-width="1.1"/><text x="69" y="376.8" text-anchor="middle" font-size="9.4" letter-spacing="0.02em" style="fill:#1a1f26">BE-NVDA-LINKS</text><text x="69" y="389.2" text-anchor="middle" font-size="9" style="fill:#4a5560">N关系集</text></g><g><title>MODULES-TRACK — Repo-root modules graph + paper HTML</title><rect x="154" y="362" width="98" height="36" rx="3" fill="#ffffff" fill-opacity="0.94" stroke="#4a5560" stroke-width="1.1"/><text x="203" y="376.8" text-anchor="middle" font-size="9.4" letter-spacing="0.02em" style="fill:#1a1f26">MODULES-TRACK</text><text x="203" y="389.2" text-anchor="middle" font-size="9" style="fill:#4a5560">静态模块跟踪</text></g><g><title>FE-API — Single HTTP base for gate / list / cube</title><rect x="344" y="88" width="30" height="156" rx="4" fill="#ece8e0" stroke="#1a1f26" stroke-width="1.6"/><text transform="translate(362.4 166) rotate(-90)" text-anchor="middle" font-size="10.5" font-weight="700" letter-spacing="0.06em" style="fill:#1a1f26">FE-API 接口</text></g><g><title>FE-NAV — Route assignment across home / list / cube</title><rect x="414" y="38" width="98" height="36" rx="3" fill="#ffffff" fill-opacity="0.94" stroke="#4a5560" stroke-width="1.1"/><text x="463" y="52.8" text-anchor="middle" font-size="9.4" letter-spacing="0.02em" style="fill:#1a1f26">FE-NAV</text><text x="463" y="65.2" text-anchor="middle" font-size="9" style="fill:#4a5560">导航</text></g><g><title>FE-BOARD — BICS L1–L3 gate board</title><rect x="414" y="88" width="98" height="36" rx="3" fill="#ffffff" fill-opacity="0.94" stroke="#4a5560" stroke-width="1.1"/><text x="463" y="102.8" text-anchor="middle" font-size="9.4" letter-spacing="0.02em" style="fill:#1a1f26">FE-BOARD</text><text x="463" y="115.2" text-anchor="middle" font-size="9" style="fill:#4a5560">展板</text></g><g><title>FE-LIST — L4 company list</title><rect x="414" y="138" width="98" height="36" rx="3" fill="#ffffff" fill-opacity="0.94" stroke="#4a5560" stroke-width="1.1"/><text x="463" y="152.8" text-anchor="middle" font-size="9.4" letter-spacing="0.02em" style="fill:#1a1f26">FE-LIST</text><text x="463" y="165.2" text-anchor="middle" font-size="9" style="fill:#4a5560">列表</text></g><g><title>FE-LISTAREA — Listing-country control UI</title><rect x="552" y="113" width="98" height="36" rx="3" fill="#ffffff" fill-opacity="0.94" stroke="#4a5560" stroke-width="1.1"/><text x="601" y="127.8" text-anchor="middle" font-size="9.4" letter-spacing="0.02em" style="fill:#1a1f26">FE-LISTAREA</text><text x="601" y="140.2" text-anchor="middle" font-size="9" style="fill:#4a5560">列表属地</text></g><g><title>FE-OPENCUBE — Cube page boot; consumes bundle</title><rect x="414" y="216" width="98" height="36" rx="3" fill="#ffffff" fill-opacity="0.94" stroke="#1a1f26" stroke-width="1.1"/><text x="463" y="230.8" text-anchor="middle" font-size="9.4" letter-spacing="0.02em" style="fill:#1a1f26">FE-OPENCUBE</text><text x="463" y="243.2" text-anchor="middle" font-size="9" style="fill:#1a1f26">跳转制图台</text></g><g><title>FE-AESTHETIC — Cross-cutting glass / paper tokens</title><rect x="552" y="216" width="98" height="36" rx="3" fill="#ffffff" fill-opacity="0.94" stroke="#1a1f26" stroke-width="1.1"/><text x="601" y="230.8" text-anchor="middle" font-size="9.4" letter-spacing="0.02em" style="fill:#1a1f26">FE-AESTHETIC</text><text x="601" y="243.2" text-anchor="middle" font-size="9" style="fill:#1a1f26">前端设计</text></g><g><title>FE-ACTION — Cube session state</title><rect x="414" y="266" width="98" height="36" rx="3" fill="#ffffff" fill-opacity="0.94" stroke="#1a1f26" stroke-width="1.1"/><text x="463" y="280.8" text-anchor="middle" font-size="9.4" letter-spacing="0.02em" style="fill:#1a1f26">FE-ACTION</text><text x="463" y="293.2" text-anchor="middle" font-size="9" style="fill:#1a1f26">操作</text></g><g><title>FE-PANEL — Floating cube chrome</title><rect x="552" y="266" width="98" height="36" rx="3" fill="#ffffff" fill-opacity="0.94" stroke="#1a1f26" stroke-width="1.1"/><text x="601" y="280.8" text-anchor="middle" font-size="9.4" letter-spacing="0.02em" style="fill:#1a1f26">FE-PANEL</text><text x="601" y="293.2" text-anchor="middle" font-size="9" style="fill:#1a1f26">面板</text></g><g><title>FE-SCENE — Three scene; consumes precomputed rings</title><rect x="414" y="316" width="98" height="36" rx="3" fill="#ffffff" fill-opacity="0.94" stroke="#1a1f26" stroke-width="1.1"/><text x="463" y="330.8" text-anchor="middle" font-size="9.4" letter-spacing="0.02em" style="fill:#1a1f26">FE-SCENE</text><text x="463" y="343.2" text-anchor="middle" font-size="9" style="fill:#1a1f26">场景</text></g><g><title>FE-COORDONE — Sole world placement from object/sxy</title><rect x="552" y="316" width="98" height="36" rx="3" fill="#ffffff" fill-opacity="0.94" stroke="#1a1f26" stroke-width="1.1"/><text x="601" y="330.8" text-anchor="middle" font-size="9.4" letter-spacing="0.02em" style="fill:#1a1f26">FE-COORDONE</text><text x="601" y="343.2" text-anchor="middle" font-size="9" style="fill:#1a1f26">摆放坐标</text></g><g><title>FE-FOCUS — Focus / staging overlays</title><rect x="414" y="366" width="98" height="36" rx="3" fill="#ffffff" fill-opacity="0.94" stroke="#1a1f26" stroke-width="1.1"/><text x="463" y="380.8" text-anchor="middle" font-size="9.4" letter-spacing="0.02em" style="fill:#1a1f26">FE-FOCUS</text><text x="463" y="393.2" text-anchor="middle" font-size="9" style="fill:#1a1f26">聚焦</text></g><g><title>FE-MAPOUT — PNG export of the paper root (.pm-sheet.pm-skin-paper); Blob download; no redaction</title><rect x="726" y="162" width="98" height="36" rx="3" fill="#ffffff" fill-opacity="0.94" stroke="#1a1f26" stroke-width="1.1"/><text x="775" y="176.8" text-anchor="middle" font-size="9.4" letter-spacing="0.02em" style="fill:#1a1f26">FE-MAPOUT</text><text x="775" y="189.2" text-anchor="middle" font-size="9" style="fill:#1a1f26">映射导出</text></g><g><title>FE-MAPDRAW — PlotSpec to hand-written SVG (band/linear scales; rect/text/line marks)</title><rect x="726" y="216" width="98" height="36" rx="3" fill="#ffffff" fill-opacity="0.94" stroke="#1a1f26" stroke-width="1.1"/><text x="775" y="230.8" text-anchor="middle" font-size="9.4" letter-spacing="0.02em" style="fill:#1a1f26">FE-MAPDRAW</text><text x="775" y="243.2" text-anchor="middle" font-size="9" style="fill:#1a1f26">映射绘制</text></g><g><title>FE-MAPDOCK — Map desk UI: Map ▾ face, right dock card, sheet (paper skin), pins; owns the debt-ladder fetch cache</title><rect x="726" y="266" width="98" height="36" rx="3" fill="#ffffff" fill-opacity="0.94" stroke="#1a1f26" stroke-width="1.1"/><text x="775" y="280.8" text-anchor="middle" font-size="9.4" letter-spacing="0.02em" style="fill:#1a1f26">FE-MAPDOCK</text><text x="775" y="293.2" text-anchor="middle" font-size="9" style="fill:#1a1f26">映射台</text></g><g><title>FE-MAPREG — Mapping catalog: list (available / unavailable + reason), get, run (validate + project, never throws)</title><rect x="726" y="316" width="98" height="36" rx="3" fill="#ffffff" fill-opacity="0.94" stroke="#1a1f26" stroke-width="1.1"/><text x="775" y="330.8" text-anchor="middle" font-size="9.4" letter-spacing="0.02em" style="fill:#1a1f26">FE-MAPREG</text><text x="775" y="343.2" text-anchor="middle" font-size="9" style="fill:#1a1f26">映射注册</text></g><g><title>FE-MAPPROJ — Second mapping: element data to PlotSpec (pure projection, PM-LADDER-Q)</title><rect x="726" y="366" width="98" height="36" rx="3" fill="#ffffff" fill-opacity="0.94" stroke="#1a1f26" stroke-width="1.1"/><text x="775" y="380.8" text-anchor="middle" font-size="9.4" letter-spacing="0.02em" style="fill:#1a1f26">FE-MAPPROJ</text><text x="775" y="393.2" text-anchor="middle" font-size="9" style="fill:#1a1f26">映射投影</text></g><g><title>SHELL-WINDOW — Native window (WKWebView) showing the front end; loopback only, no script bridge</title><rect x="414" y="444" width="98" height="36" rx="3" fill="#ffffff" fill-opacity="0.94" stroke="#4a5560" stroke-width="1.1"/><text x="463" y="458.8" text-anchor="middle" font-size="9.4" letter-spacing="0.02em" style="fill:#1a1f26">SHELL-WINDOW</text><text x="463" y="471.2" text-anchor="middle" font-size="9" style="fill:#4a5560">壳窗口</text></g><g><title>SHELL-PROC — Owns the embedded back-end child process: start, health wait, clean exit</title><rect x="246" y="444" width="98" height="36" rx="3" fill="#ffffff" fill-opacity="0.94" stroke="#4a5560" stroke-width="1.1"/><text x="295" y="458.8" text-anchor="middle" font-size="9.4" letter-spacing="0.02em" style="fill:#1a1f26">SHELL-PROC</text><text x="295" y="471.2" text-anchor="middle" font-size="9" style="fill:#4a5560">内嵌后端</text></g><g><title>SHELL-PACK — Build-time packaging: universal binary, allow-listed self-contained .app, zip; not shipped at runtime</title><rect x="20" y="444" width="98" height="36" rx="3" fill="#ffffff" fill-opacity="0.94" stroke="#4a5560" stroke-width="1.1"/><text x="69" y="458.8" text-anchor="middle" font-size="9.4" letter-spacing="0.02em" style="fill:#1a1f26">SHELL-PACK</text><text x="69" y="471.2" text-anchor="middle" font-size="9" style="fill:#4a5560">打包</text></g><path d="M463 74 L463 86.5" fill="none" stroke="#1a1f26" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-fe)"><title>FE-NAV → FE-BOARD (calls)</title></path><path d="M463 124 L463 136.5" fill="none" stroke="#1a1f26" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-fe)"><title>FE-BOARD → FE-LIST (calls)</title></path><path d="M463 174 L463 214.5" fill="none" stroke="#1a1f26" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-fe)"><title>FE-LIST → FE-OPENCUBE (calls)</title></path><path d="M414 106 L375.5 106" fill="none" stroke="#1a1f26" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-fe)"><title>FE-BOARD → FE-API (calls)</title></path><path d="M414 156 L375.5 156" fill="none" stroke="#1a1f26" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-fe)"><title>FE-LIST → FE-API (calls)</title></path><path d="M414 222 L375.5 222" fill="none" stroke="#1a1f26" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-fe)"><title>FE-OPENCUBE → FE-API (calls)</title></path><path d="M344 131 L311.5 131" fill="none" stroke="#8b96a3" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-x)" stroke-dasharray="1.6 3"><title>FE-API → BE-HTTP (contract)</title></path><path d="M512 112 L532 112 L532 126 L550.5 126" fill="none" stroke="#1a1f26" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-fe)" stroke-dasharray="5 3"><title>FE-BOARD → FE-LISTAREA (depends)</title></path><path d="M512 150 L532 150 L532 136 L550.5 136" fill="none" stroke="#1a1f26" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-fe)" stroke-dasharray="5 3"><title>FE-LIST → FE-LISTAREA (depends)</title></path><path d="M463 252 L463 264.5" fill="none" stroke="#1a1f26" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-fe)" stroke-dasharray="5 3"><title>FE-OPENCUBE → FE-ACTION (depends)</title></path><path d="M512 240 L524 240 L524 328 L550.5 328" fill="none" stroke="#1a1f26" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-fe)" stroke-dasharray="5 3"><title>FE-OPENCUBE → FE-COORDONE (depends)</title></path><path d="M414 246 L400 246 L400 334 L412.5 334" fill="none" stroke="#1a1f26" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-fe)" stroke-dasharray="5 3"><title>FE-OPENCUBE → FE-SCENE (depends)</title></path><path d="M512 228 L538 228 L538 284 L550.5 284" fill="none" stroke="#1a1f26" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-fe)" stroke-dasharray="5 3"><title>FE-OPENCUBE → FE-PANEL (depends)</title></path><path d="M512 340 L550.5 340" fill="none" stroke="#1a1f26" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-fe)"><title>FE-SCENE → FE-COORDONE (calls)</title></path><path d="M463 352 L463 364.5" fill="none" stroke="#1a1f26" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-fe)" stroke-dasharray="5 3"><title>FE-SCENE → FE-FOCUS (depends)</title></path><path d="M650 240 L672 240 L672 100 L513.5 100" fill="none" stroke="#1a1f26" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-fe)" stroke-dasharray="5 3"><title>FE-AESTHETIC → FE-BOARD (depends)</title></path><path d="M650 228 L662 228 L662 162 L513.5 162" fill="none" stroke="#1a1f26" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-fe)" stroke-dasharray="5 3"><title>FE-AESTHETIC → FE-LIST (depends)</title></path><path d="M601 252 L601 264.5" fill="none" stroke="#1a1f26" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-fe)" stroke-dasharray="5 3"><title>FE-AESTHETIC → FE-PANEL (depends)</title></path><path d="M280 305 L253.5 305" fill="none" stroke="#4a5560" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-be)"><title>BE-HTTP → BE-BUNDLE (calls)</title></path><path d="M280 56 L253.5 56" fill="none" stroke="#4a5560" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-be)"><title>BE-HTTP → BE-BICS-HIER (calls)</title></path><path d="M280 106 L253.5 106" fill="none" stroke="#4a5560" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-be)"><title>BE-HTTP → BE-BICS-ENTITY (calls)</title></path><path d="M280 156 L253.5 156" fill="none" stroke="#4a5560" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-be)"><title>BE-HTTP → BE-BICS-AREA (calls)</title></path><path d="M280 380 L253.5 380" fill="none" stroke="#8b96a3" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-x)" stroke-dasharray="1.6 3"><title>BE-HTTP → MODULES-TRACK (contract)</title></path><path d="M154 296 L144 296 L144 230 L119.5 230" fill="none" stroke="#4a5560" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-be)"><title>BE-BUNDLE → BE-DB-DEMO (calls)</title></path><path d="M154 302 L132 302 L132 280 L119.5 280" fill="none" stroke="#4a5560" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-be)"><title>BE-BUNDLE → BE-DB-SHADOW (calls)</title></path><path d="M154 308 L132 308 L132 330 L119.5 330" fill="none" stroke="#4a5560" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-be)"><title>BE-BUNDLE → BE-NVDA-LAYOUT (calls)</title></path><path d="M154 314 L144 314 L144 380 L119.5 380" fill="none" stroke="#4a5560" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-be)"><title>BE-BUNDLE → BE-NVDA-LINKS (calls)</title></path><path d="M69 348 L69 360.5" fill="none" stroke="#4a5560" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-be)" stroke-dasharray="5 3"><title>BE-NVDA-LAYOUT → BE-NVDA-LINKS (depends)</title></path><path d="M203 124 L203 136.5" fill="none" stroke="#4a5560" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-be)" stroke-dasharray="5 3"><title>BE-BICS-ENTITY → BE-BICS-AREA (depends)</title></path><path d="M118 106 L152.5 106" fill="none" stroke="#4a5560" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-be)" stroke-dasharray="5 3"><title>BE-BICS-INGEST → BE-BICS-ENTITY (depends)</title></path><path d="M414 462 L345.5 462" fill="none" stroke="#4a5560" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-be)" stroke-dasharray="5 3"><title>SHELL-WINDOW → SHELL-PROC (depends)</title></path><path d="M295 444 L295 399.5" fill="none" stroke="#8b96a3" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-x)"><title>SHELL-PROC → BE-HTTP (calls)</title></path><path d="M463 444 L463 420 L305 420 L305 399.5" fill="none" stroke="#8b96a3" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-x)" stroke-dasharray="1.6 3"><title>SHELL-WINDOW → BE-HTTP (contract)</title></path><path d="M69 480 L69 494 L463 494 L463 481.5" fill="none" stroke="#4a5560" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-be)" stroke-dasharray="5 3"><title>SHELL-PACK → SHELL-WINDOW (depends)</title></path><path d="M95 444 L95 416 L285 416 L285 399.5" fill="none" stroke="#8b96a3" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-x)" stroke-dasharray="5 3"><title>SHELL-PACK → BE-HTTP (depends)</title></path><path d="M650 246 L724.5 246" fill="none" stroke="#1a1f26" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-fe)" stroke-dasharray="5 3"><title>FE-AESTHETIC → FE-MAPDRAW (depends)</title></path><path d="M280 230 L253.5 230" fill="none" stroke="#4a5560" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-be)"><title>BE-HTTP → BE-DEBT (calls)</title></path><path d="M414 234 L392 234 L392 407 L700 407 L700 296 L724.5 296" fill="none" stroke="#1a1f26" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-fe)" stroke-dasharray="5 3"><title>FE-OPENCUBE → FE-MAPDOCK (depends)</title></path><path d="M650 284 L724.5 284" fill="none" stroke="#1a1f26" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-fe)"><title>FE-PANEL → FE-MAPDOCK (calls)</title></path><path d="M631 252 L631 259 L690 259 L690 272 L724.5 272" fill="none" stroke="#1a1f26" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-fe)" stroke-dasharray="5 3"><title>FE-AESTHETIC → FE-MAPDOCK (depends)</title></path><path d="M775 302 L775 314.5" fill="none" stroke="#1a1f26" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-fe)"><title>FE-MAPDOCK → FE-MAPREG (calls)</title></path><path d="M775 266 L775 253.5" fill="none" stroke="#1a1f26" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-fe)"><title>FE-MAPDOCK → FE-MAPDRAW (calls)</title></path><path d="M824 274 L838 274 L838 180 L825.5 180" fill="none" stroke="#1a1f26" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-fe)"><title>FE-MAPDOCK → FE-MAPOUT (calls)</title></path><path d="M824 294 L852 294 L852 8 L359 8 L359 86.5" fill="none" stroke="#1a1f26" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-fe)"><title>FE-MAPDOCK → FE-API (calls)</title></path><path d="M775 352 L775 364.5" fill="none" stroke="#1a1f26" stroke-width="1.45" stroke-linejoin="round" marker-end="url(#arrow-fe)" stroke-dasharray="5 3"><title>FE-MAPREG → FE-MAPPROJ (depends)</title></path><line x1="8" y1="514" x2="850" y2="514" stroke="#c5ccd4" stroke-width=".8"/><text x="16" y="528" style="fill:#1a1f26;font-size:11px;font-weight:700;letter-spacing:.1em">边色</text><path d="M16 542.5 L50 542.5" stroke="#1a1f26" stroke-width="2" fill="none"/><text x="58" y="546" style="fill:#4a5560;font-size:10px">墨黑 · 前端内部</text><path d="M16 559.5 L50 559.5" stroke="#4a5560" stroke-width="2" fill="none"/><text x="58" y="563" style="fill:#4a5560;font-size:10px">深灰 · 后端 / 壳层内部</text><path d="M16 576.5 L50 576.5" stroke="#8b96a3" stroke-width="2" fill="none"/><text x="58" y="580" style="fill:#4a5560;font-size:10px">浅灰 · 跨侧</text><text x="250" y="528" style="fill:#1a1f26;font-size:11px;font-weight:700;letter-spacing:.1em">线型</text><path d="M250 542.5 L284 542.5" stroke="#1a1f26" stroke-width="1.6" fill="none"/><text x="292" y="546" style="fill:#4a5560;font-size:10px">calls · 实线</text><path d="M250 559.5 L284 559.5" stroke="#1a1f26" stroke-width="1.6" fill="none" stroke-dasharray="5 3"/><text x="292" y="563" style="fill:#4a5560;font-size:10px">depends · 虚线</text><path d="M250 576.5 L284 576.5" stroke="#1a1f26" stroke-width="1.6" fill="none" stroke-dasharray="1.6 3"/><text x="292" y="580" style="fill:#4a5560;font-size:10px">contract · 点线</text><text x="430" y="528" style="fill:#1a1f26;font-size:11px;font-weight:700;letter-spacing:.1em">标记</text><rect x="430" y="537" width="20" height="11" rx="2.5" fill="#ece8e0" stroke="#1a1f26" stroke-width="1.5"/><text x="458" y="546" style="fill:#4a5560;font-size:10px">枢纽条 · FE-API / BE-HTTP</text><text x="430" y="563" style="fill:#4a5560;font-size:10px">分区名在各区左上角；框内为模块 id 与中文名</text></svg>
+      <figcaption class="fig-cap"><span class="cap-no">图 4-2</span><span>模块关系图：32 个模块、45 条关系。左为后端，中间的接口枢纽是前后端唯一契约口，右为前端（决策路径、体空间、平面映射三区），最下为壳层。由工程内模块图的同一份真源重新导出并按纸面配色着色，文字一律在深色底上为白、浅色底上为墨黑。</span></figcaption>
     </figure>
+    <!--/FIG42-->
 
     <h2 id="s4-3"><span class="num">4.3</span>本地应用</h2>
     <p>2026-10-14 至 15 完成从网页到应用的改造，模块结构不变：</p>
@@ -1131,7 +1049,7 @@ svg.dg { display: block; width: 100%; height: auto; font-family: var(--sans); ov
 
     <h2 id="s4-5"><span class="num">4.5</span>第三方组件</h2>
     <div class="tbl">
-      <div class="tbl-cap"><span class="cap-no">表 4-1</span><span>第三方组件与许可</span></div>
+      <div class="tbl-cap"><span class="cap-no">表 4-2</span><span>第三方组件与许可</span></div>
       <table class="data">
         <thead><tr><th>组件</th><th>版本</th><th>许可</th><th>用途</th></tr></thead>
         <tbody>
@@ -1149,27 +1067,13 @@ svg.dg { display: block; width: 100%; height: auto; font-family: var(--sans); ov
 </section>
 
 <!-- ============================ 第 5 章 ============================ -->
-<section class="sheet sheet--opener" id="ch5">
+<section class="sheet sheet--body sheet--chap" id="ch5">
   <div class="screen-run"><span>STANDARD FINANCIAL CHARTING</span><span>FIRST TEST · AI INDUSTRY FINANCIAL RISK</span></div>
-  <div class="chapter-opener">
-    <svg class="opener-mark" viewBox="7 13 48 46" aria-hidden="true"><rect x="8" y="14" width="18" height="44" rx="1.5" opacity="0.95"/><rect x="22" y="14" width="18" height="44" rx="1.5" opacity="0.55"/><rect x="36" y="14" width="18" height="44" rx="1.5" opacity="0.28"/></svg>
-    <p class="opener-kicker">CHAPTER</p>
-    <p class="opener-num">05</p>
-    <h1>数据与合规</h1>
-    <p class="opener-en">Data &amp; Compliance</p>
-    <p class="opener-lede">本章交代数据从哪里来、按什么规则处理、哪些包可以外发，以及我们明确不做、也不声称的事。本计划对外只描述方法，不展示公司级明细。</p>
-    <ul class="opener-toc">
-      <li><span class="toc-no">5.1</span>数据来源分层</li>
-      <li><span class="toc-no">5.2</span>数据处理规则</li>
-      <li><span class="toc-no">5.3</span>内部包与外发包</li>
-      <li><span class="toc-no">5.4</span>隐私与安全</li>
-      <li><span class="toc-no">5.5</span>合规边界</li>
-    </ul>
-  </div>
-</section>
-
-<section class="sheet sheet--body">
-  <div class="screen-run"><span>STANDARD FINANCIAL CHARTING</span><span>FIRST TEST · AI INDUSTRY FINANCIAL RISK</span></div>
+  <header class="chap-head">
+    <span class="chap-no">05</span>
+    <div class="chap-t"><h1>安全与合规</h1><p class="chap-en">Security &amp; Compliance</p></div>
+  </header>
+  <p class="chap-lede">本章交代数据从哪里来、按什么规则处理、哪些包可以外发，以及我们明确不做、也不声称的事。本计划对外只描述方法，不展示公司级明细。</p>
   <div class="chapter-body">
     <h2 id="s5-1"><span class="num">5.1</span>数据来源分层</h2>
     <div class="tbl">
@@ -1228,7 +1132,7 @@ svg.dg { display: block; width: 100%; height: auto; font-family: var(--sans); ov
       <li>彭博数据只在许可范围内使用；本计划不展示彭博实体级原始数据明细，只描述方法。</li>
       <li>彭博 BICS 是彭博的分类标准，本计划不把它说成自创。</li>
       <li>第三方研究报告只作为内部阅读材料；本计划不转载其图表与原文。</li>
-      <li>方法论与代码为本队原创；演示产业链的最初搭建出自智能体按公开知识整理，数据口径并不标准，见 6.8。</li>
+      <li>方法论与代码为本队原创；演示产业链的最初搭建出自智能体按公开知识整理，数据口径并不标准。</li>
     </ul>
     <div class="callout callout--warn">
       <span class="callout-label">边界　BOUNDARY</span>
@@ -1238,563 +1142,37 @@ svg.dg { display: block; width: 100%; height: auto; font-family: var(--sans); ov
 </section>
 
 <!-- ============================ 第 6 章 ============================ -->
-<section class="sheet sheet--opener" id="ch6">
+<section class="sheet sheet--body sheet--chap" id="ch6">
   <div class="screen-run"><span>STANDARD FINANCIAL CHARTING</span><span>FIRST TEST · AI INDUSTRY FINANCIAL RISK</span></div>
-  <div class="chapter-opener">
-    <svg class="opener-mark" viewBox="7 13 48 46" aria-hidden="true"><rect x="8" y="14" width="18" height="44" rx="1.5" opacity="0.95"/><rect x="22" y="14" width="18" height="44" rx="1.5" opacity="0.55"/><rect x="36" y="14" width="18" height="44" rx="1.5" opacity="0.28"/></svg>
-    <p class="opener-kicker">CHAPTER</p>
-    <p class="opener-num">06</p>
-    <h1>AI 产业金融风险示范</h1>
-    <p class="opener-en">First Test · AI Industry Financial Risk</p>
-    <p class="opener-lede">首测只问一个问题：在 AI 产业链里，一家公司落在哪一段，它的上下游是谁，债务风险先看哪里。本章给出方法立场、产业链框架与三个示范，并如实写明尚未完成的部分。</p>
-    <ul class="opener-toc">
-      <li><span class="toc-no">6.1</span>首测要回答的问题</li>
-      <li><span class="toc-no">6.2</span>方法立场</li>
-      <li><span class="toc-no">6.3</span>产业链框架</li>
-      <li><span class="toc-no">6.4</span>示范一：行业定位</li>
-      <li><span class="toc-no">6.5</span>示范二：以英伟达为中心的收入线</li>
-      <li><span class="toc-no">6.6</span>示范三：债务期限折线（演示）</li>
-      <li><span class="toc-no">6.7</span>风险落点的研究对照</li>
-      <li><span class="toc-no">6.8</span>尚未完成的部分</li>
-    </ul>
-  </div>
-</section>
-
-<section class="sheet sheet--body">
-  <div class="screen-run"><span>STANDARD FINANCIAL CHARTING</span><span>FIRST TEST · AI INDUSTRY FINANCIAL RISK</span></div>
+  <header class="chap-head">
+    <span class="chap-no">06</span>
+    <div class="chap-t"><h1>我们是怎么做的</h1><p class="chap-en">How We Built It</p></div>
+  </header>
   <div class="chapter-body">
-    <h2 id="s6-1"><span class="num">6.1</span>首测要回答的问题</h2>
-    <p>首测只问一个问题：<strong>在 AI 产业链里，一家公司落在哪一段，它的上下游是谁，债务风险先看哪里。</strong></p>
-    <p>这个问题拆成能指认的三件事：这是哪一家；它在 BICS 里的行业坐标是哪一段；它在制图台里是哪一个节点、与谁相连。前三件已能演示；债务风险如何沿节点传导，是下一步，6.8 明写。</p>
+    <h2 id="s6-1"><span class="num">6.1</span>开发过程</h2>
+    <div class="fig-ph fig-ph--text"><span class="slot-name">6.1 正文</span><span class="slot-tag">待填写</span></div>
 
-    <h2 id="s6-2"><span class="num">6.2</span>方法立场</h2>
-    <p>团队曾设想自造一套基于企业间债务联系与收入构成的新财务指标，后来放弃了。理由有两条：好的风险指标既简洁又有逻辑，公信力来自被广泛接受；而我们不完全熟悉会计准则和风险评估体系，做不出能服众的新指标。</p>
-    <blockquote class="quote">
-      <p>判断风险的指标，与其说是被创造的，不如说是被广泛接受的。</p>
-      <cite>SFC 方法立场</cite>
-    </blockquote>
-    <p>因此，首测的方法立场是：</p>
-    <ol>
-      <li>指标与概念，采用金融领域已被广泛接受的口径，不自创评分。</li>
-      <li>我们的贡献在可视化的基础：统一分类、统一坐标、把企业之间的关系画出来，并保留数据来源。</li>
-      <li>哪些指标进入图中，由团队在 6.7 确定（定稿待填写）。</li>
-    </ol>
-
-    <h2 id="s6-3"><span class="num">6.3</span>产业链框架</h2>
-    <p class="keepnext">演示库把 AI 产业链分为 11 层，从能源到模型：电力在后端（小 s），模型在前端（大 s）。这是早期演示链，不是 BICS 展板里那张公司表，两者尚未统一。</p>
-
+    <h2 id="s6-2"><span class="num">6.2</span>人与 AI 如何协作</h2>
+    <p>我们没有把智能体当成一个万能助手，而是按部门拆开：每个角色只做一类事，权限与流程写成文件，由用户用「电」加角色名点名调用。图 6-1 是当前的组织。</p>
+    <!--FIG62-->
     <figure class="fig">
-      <svg class="dg" viewBox="0 0 600 360" role="img" aria-label="AI 产业链 11 层"><polygon class="box-e" points="154,26 324,26 300,44 130,44"/><line class="ln-dot" x1="321" y1="35" x2="352" y2="35"/><text x="150" y="39" class="m s">00</text><text x="362" y="34" class="b">电力与基荷发电</text><text x="362" y="46" class="m xs">Power &amp; baseload generation</text><polygon class="box" points="154,56 324,56 300,74 130,74"/><line class="ln-dot" x1="321" y1="65" x2="352" y2="65"/><text x="150" y="69" class="m s">01</text><text x="362" y="64" class="b">电网与电气设备</text><text x="362" y="76" class="m xs">Grid &amp; electrical gear</text><polygon class="box" points="154,86 324,86 300,104 130,104"/><line class="ln-dot" x1="321" y1="95" x2="352" y2="95"/><text x="150" y="99" class="m s">02</text><text x="362" y="94" class="b">冷却与数据中心外壳</text><text x="362" y="106" class="m xs">Cooling &amp; data-center shell</text><polygon class="box" points="154,116 324,116 300,134 130,134"/><line class="ln-dot" x1="321" y1="125" x2="352" y2="125"/><text x="150" y="129" class="m s">03</text><text x="362" y="124" class="b">半导体设备</text><text x="362" y="136" class="m xs">Semiconductor equipment</text><polygon class="box" points="154,146 324,146 300,164 130,164"/><line class="ln-dot" x1="321" y1="155" x2="352" y2="155"/><text x="150" y="159" class="m s">04</text><text x="362" y="154" class="b">存储</text><text x="362" y="166" class="m xs">Memory</text><polygon class="box" points="154,176 324,176 300,194 130,194"/><line class="ln-dot" x1="321" y1="185" x2="352" y2="185"/><text x="150" y="189" class="m s">05</text><text x="362" y="184" class="b">代工与先进封装</text><text x="362" y="196" class="m xs">Foundry &amp; advanced packaging</text><polygon class="box" points="154,206 324,206 300,224 130,224"/><line class="ln-dot" x1="321" y1="215" x2="352" y2="215"/><text x="150" y="219" class="m s">06</text><text x="362" y="214" class="b">AI 加速器与芯片设计</text><text x="362" y="226" class="m xs">AI accelerators &amp; chip design</text><polygon class="box" points="154,236 324,236 300,254 130,254"/><line class="ln-dot" x1="321" y1="245" x2="352" y2="245"/><text x="150" y="249" class="m s">07</text><text x="362" y="244" class="b">网络与光互连</text><text x="362" y="256" class="m xs">Networking &amp; optical</text><polygon class="box" points="154,266 324,266 300,284 130,284"/><line class="ln-dot" x1="321" y1="275" x2="352" y2="275"/><text x="150" y="279" class="m s">08</text><text x="362" y="274" class="b">服务器与代工制造</text><text x="362" y="286" class="m xs">Servers &amp; EMS / ODM</text><polygon class="box" points="154,296 324,296 300,314 130,314"/><line class="ln-dot" x1="321" y1="305" x2="352" y2="305"/><text x="150" y="309" class="m s">09</text><text x="362" y="304" class="b">云与 GPU 平台</text><text x="362" y="316" class="m xs">Cloud &amp; GPU platforms</text><polygon class="box-e" points="154,326 324,326 300,344 130,344"/><line class="ln-dot" x1="321" y1="335" x2="352" y2="335"/><text x="150" y="339" class="m s">10</text><text x="362" y="334" class="b">模型与客户界面</text><text x="362" y="346" class="m xs">Models &amp; customer interface</text><line class="ln" x1="12" y1="22" x2="12" y2="346"/><polygon class="ahead" points="12,346 9.4,340.6 14.6,340.6"/><text x="22" y="34" class="s">−s · 后 · 电力端</text><text x="22" y="338" class="s">+s · 前 · 模型端</text></svg>
-      <figcaption class="fig-cap"><span class="cap-no">图 6-1</span><span>AI 产业链 11 层：自绘示意，只画层名与顺序，不画公司。层名取自演示库层定义。</span></figcaption>
+      <svg class="dg dg-org" viewBox="0 0 700 420" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Agent 组织架构图"><defs><marker id="oa" viewBox="0 0 12 12" refX="11" refY="6" markerWidth="9" markerHeight="9" markerUnits="userSpaceOnUse" orient="auto"><path d="M0 1.2 L11 6 L0 10.8 z" fill="#1a1f26"/></marker></defs><rect x="100" y="6" width="200" height="40" rx="3" fill="#ffffff" stroke="#1a1f26" stroke-width="1.5"/><text x="200" y="24" text-anchor="middle" style="fill:#1a1f26;font-size:12px;font-weight:700;letter-spacing:0.08em">用户</text><text x="200" y="38" text-anchor="middle" style="fill:#4a5560;font-size:9.5px;font-weight:400">写出「电」+ 角色名，点名调用</text><rect x="400" y="6" width="200" height="40" rx="3" fill="#1a1f26" stroke="#1a1f26" stroke-width="1.1"/><text x="500" y="24" text-anchor="middle" style="fill:#ffffff;font-size:12px;font-weight:700;letter-spacing:0.08em">父代理</text><text x="500" y="38" text-anchor="middle" style="fill:#e6e9ed;font-size:9.5px;font-weight:400">送审口 · 实施产品代码</text><path d="M300 26 L398.5 26" fill="none" stroke="#1a1f26" stroke-width="1.3" marker-end="url(#oa)"/><text x="349" y="20" text-anchor="middle" style="fill:#4a5560;font-size:9px;font-weight:400">点名 · 任务</text><path d="M500 46 L500 78" fill="none" stroke="#1a1f26" stroke-width="1.1"/><path d="M92.0 78 L608.0 78" fill="none" stroke="#1a1f26" stroke-width="1.1"/><text x="20" y="72" text-anchor="start" style="fill:#4a5560;font-size:9.5px;font-weight:600;letter-spacing:0.06em">四席平级 · 互不统领</text><path d="M92.0 78 L92.0 96" fill="none" stroke="#1a1f26" stroke-width="1.1" marker-end="url(#oa)"/><rect x="20" y="98" width="144" height="44" rx="3" fill="#4a5560" stroke="#4a5560" stroke-width="1.1"/><text x="92.0" y="118" text-anchor="middle" style="fill:#ffffff;font-size:12.5px;font-weight:700;letter-spacing:0.08em">内阁</text><text x="92.0" y="133" text-anchor="middle" style="fill:#e6e9ed;font-size:9px;font-weight:400">整理 · 撰写 · 谏言</text><path d="M264.0 78 L264.0 96" fill="none" stroke="#1a1f26" stroke-width="1.1" marker-end="url(#oa)"/><rect x="192" y="98" width="144" height="44" rx="3" fill="#4a5560" stroke="#4a5560" stroke-width="1.1"/><text x="264.0" y="118" text-anchor="middle" style="fill:#ffffff;font-size:12.5px;font-weight:700;letter-spacing:0.08em">总参谋部</text><text x="264.0" y="133" text-anchor="middle" style="fill:#e6e9ed;font-size:9px;font-weight:400">规划：意志 + 任务单</text><path d="M436.0 78 L436.0 96" fill="none" stroke="#1a1f26" stroke-width="1.1" marker-end="url(#oa)"/><rect x="364" y="98" width="144" height="44" rx="3" fill="#4a5560" stroke="#4a5560" stroke-width="1.1"/><text x="436.0" y="118" text-anchor="middle" style="fill:#ffffff;font-size:12.5px;font-weight:700;letter-spacing:0.08em">监理部</text><text x="436.0" y="133" text-anchor="middle" style="fill:#e6e9ed;font-size:9px;font-weight:400">程序监理 · 三监报告</text><path d="M608.0 78 L608.0 96" fill="none" stroke="#1a1f26" stroke-width="1.1" marker-end="url(#oa)"/><rect x="536" y="98" width="144" height="44" rx="3" fill="#4a5560" stroke="#4a5560" stroke-width="1.1"/><text x="608.0" y="118" text-anchor="middle" style="fill:#ffffff;font-size:12.5px;font-weight:700;letter-spacing:0.08em">档案部</text><text x="608.0" y="133" text-anchor="middle" style="fill:#e6e9ed;font-size:9px;font-weight:400">工作日志 · 文稿 · 故障记录</text><path d="M164 120 L190.5 120" fill="none" stroke="#1a1f26" stroke-width="1.1" stroke-dasharray="5 3" marker-end="url(#oa)"/><text x="178.0" y="113" text-anchor="middle" style="fill:#4a5560;font-size:9px;font-weight:400">令</text><path d="M206 142 L206 271" fill="none" stroke="#1a1f26" stroke-width="1.1"/><path d="M206 169 L216 169" fill="none" stroke="#1a1f26" stroke-width="1.1"/><rect x="216" y="156" width="120" height="26" rx="3" fill="#ece8e0" stroke="#4a5560" stroke-width="1.0"/><text x="276.0" y="173" text-anchor="middle" style="fill:#1a1f26;font-size:10.5px;font-weight:400">美工部</text><path d="M206 203 L216 203" fill="none" stroke="#1a1f26" stroke-width="1.1"/><rect x="216" y="190" width="120" height="26" rx="3" fill="#ece8e0" stroke="#4a5560" stroke-width="1.0"/><text x="276.0" y="207" text-anchor="middle" style="fill:#1a1f26;font-size:10.5px;font-weight:400">信息部</text><path d="M206 237 L216 237" fill="none" stroke="#1a1f26" stroke-width="1.1"/><rect x="216" y="224" width="120" height="26" rx="3" fill="#ece8e0" stroke="#4a5560" stroke-width="1.0"/><text x="276.0" y="241" text-anchor="middle" style="fill:#1a1f26;font-size:10.5px;font-weight:400">参谋纪要官</text><path d="M206 271 L216 271" fill="none" stroke="#1a1f26" stroke-width="1.1"/><rect x="216" y="258" width="120" height="26" rx="3" fill="#ece8e0" stroke="#4a5560" stroke-width="1.0"/><text x="276.0" y="275" text-anchor="middle" style="fill:#1a1f26;font-size:10.5px;font-weight:400">交叉整合部</text><path d="M378 142 L378 237" fill="none" stroke="#1a1f26" stroke-width="1.1"/><path d="M378 169 L388 169" fill="none" stroke="#1a1f26" stroke-width="1.1"/><rect x="388" y="156" width="120" height="26" rx="3" fill="#ece8e0" stroke="#4a5560" stroke-width="1.0"/><text x="448.0" y="173" text-anchor="middle" style="fill:#1a1f26;font-size:10.5px;font-weight:400">工程测试属</text><path d="M378 203 L388 203" fill="none" stroke="#1a1f26" stroke-width="1.1"/><rect x="388" y="190" width="120" height="26" rx="3" fill="#ece8e0" stroke="#4a5560" stroke-width="1.0"/><text x="448.0" y="207" text-anchor="middle" style="fill:#1a1f26;font-size:10.5px;font-weight:400">代码质量属</text><path d="M378 237 L388 237" fill="none" stroke="#1a1f26" stroke-width="1.1"/><rect x="388" y="224" width="120" height="26" rx="3" fill="#ece8e0" stroke="#4a5560" stroke-width="1.0"/><text x="448.0" y="241" text-anchor="middle" style="fill:#1a1f26;font-size:10.5px;font-weight:400">理念贯彻属</text><path d="M550 142 L550 237" fill="none" stroke="#1a1f26" stroke-width="1.1"/><path d="M550 169 L560 169" fill="none" stroke="#1a1f26" stroke-width="1.1"/><rect x="560" y="156" width="120" height="26" rx="3" fill="#ece8e0" stroke="#4a5560" stroke-width="1.0"/><text x="620.0" y="173" text-anchor="middle" style="fill:#1a1f26;font-size:10.5px;font-weight:400">书记</text><path d="M550 203 L560 203" fill="none" stroke="#1a1f26" stroke-width="1.1"/><rect x="560" y="190" width="120" height="26" rx="3" fill="#ece8e0" stroke="#4a5560" stroke-width="1.0"/><text x="620.0" y="207" text-anchor="middle" style="fill:#1a1f26;font-size:10.5px;font-weight:400">秘书</text><path d="M550 237 L560 237" fill="none" stroke="#1a1f26" stroke-width="1.1"/><rect x="560" y="224" width="120" height="26" rx="3" fill="#ece8e0" stroke="#4a5560" stroke-width="1.0"/><text x="620.0" y="241" text-anchor="middle" style="fill:#1a1f26;font-size:10.5px;font-weight:400">运维</text><rect x="24" y="156" width="136" height="26" rx="3" fill="#ffffff" stroke="#4a5560" stroke-width="1.0" stroke-dasharray="3 2.2"/><text x="92.0" y="173" text-anchor="middle" style="fill:#1a1f26;font-size:10.5px;font-weight:400">整理数据与图件</text><rect x="24" y="190" width="136" height="26" rx="3" fill="#ffffff" stroke="#4a5560" stroke-width="1.0" stroke-dasharray="3 2.2"/><text x="92.0" y="207" text-anchor="middle" style="fill:#1a1f26;font-size:10.5px;font-weight:400">撰写可打印报告</text><rect x="24" y="224" width="136" height="26" rx="3" fill="#ffffff" stroke="#4a5560" stroke-width="1.0" stroke-dasharray="3 2.2"/><text x="92.0" y="241" text-anchor="middle" style="fill:#1a1f26;font-size:10.5px;font-weight:400">对话首尾谏言</text><path d="M8 316 L692 316" fill="none" stroke="#c5ccd4" stroke-width="0.8"/><text x="20" y="330" text-anchor="start" style="fill:#1a1f26;font-size:11px;font-weight:700;letter-spacing:0.06em">一次涉及产品代码的任务，常规流向</text><rect x="20.0" y="338" width="118" height="44" rx="3" fill="#ece8e0" stroke="#4a5560" stroke-width="1.1"/><text x="79.0" y="356" text-anchor="middle" style="fill:#1a1f26;font-size:11px;font-weight:700">「电」点名</text><text x="79.0" y="371" text-anchor="middle" style="fill:#4a5560;font-size:8.5px;font-weight:400">用户指定角色</text><path d="M138.0 360 L154.0 360" fill="none" stroke="#1a1f26" stroke-width="1.3" marker-end="url(#oa)"/><rect x="155.5" y="338" width="118" height="44" rx="3" fill="#ece8e0" stroke="#4a5560" stroke-width="1.1"/><text x="214.5" y="356" text-anchor="middle" style="fill:#1a1f26;font-size:11px;font-weight:700">总参谋部</text><text x="214.5" y="371" text-anchor="middle" style="fill:#4a5560;font-size:8.5px;font-weight:400">意志 + 任务单（点名时）</text><path d="M273.5 360 L289.5 360" fill="none" stroke="#1a1f26" stroke-width="1.3" marker-end="url(#oa)"/><rect x="291.0" y="338" width="118" height="44" rx="3" fill="#1a1f26" stroke="#1a1f26" stroke-width="1.1"/><text x="350.0" y="356" text-anchor="middle" style="fill:#ffffff;font-size:11px;font-weight:700">父代理</text><text x="350.0" y="371" text-anchor="middle" style="fill:#e6e9ed;font-size:8.5px;font-weight:400">实施，改产品代码</text><path d="M409.0 360 L425.0 360" fill="none" stroke="#1a1f26" stroke-width="1.3" marker-end="url(#oa)"/><rect x="426.5" y="338" width="118" height="44" rx="3" fill="#ece8e0" stroke="#4a5560" stroke-width="1.1"/><text x="485.5" y="356" text-anchor="middle" style="fill:#1a1f26;font-size:11px;font-weight:700">监理部</text><text x="485.5" y="371" text-anchor="middle" style="fill:#4a5560;font-size:8.5px;font-weight:400">三属并行 · 三监报告</text><path d="M544.5 360 L560.5 360" fill="none" stroke="#1a1f26" stroke-width="1.3" marker-end="url(#oa)"/><rect x="562.0" y="338" width="118" height="44" rx="3" fill="#ece8e0" stroke="#4a5560" stroke-width="1.1"/><text x="621.0" y="356" text-anchor="middle" style="fill:#1a1f26;font-size:11px;font-weight:700">书记</text><text x="621.0" y="371" text-anchor="middle" style="fill:#4a5560;font-size:8.5px;font-weight:400">收尾 · 记工作日志</text><path d="M485.5 382 L485.5 396 L350.0 396 L350.0 383.5" fill="none" stroke="#1a1f26" stroke-width="1.1" stroke-dasharray="5 3" marker-end="url(#oa)"/><text x="417.75" y="410" text-anchor="middle" style="fill:#4a5560;font-size:9px;font-weight:400">任一属不达标：整单打回，改后重审</text></svg>
+      <figcaption class="fig-cap"><span class="cap-no">图 6-1</span><span>Agent 组织架构：四席平级，各领自己的下属；下方为一次涉及产品代码的任务的常规流向。</span></figcaption>
     </figure>
-
-    <h2 id="s6-4"><span class="num">6.4</span>示范一：行业定位</h2>
-    <p>从展板进入，逐级下钻到某个四级行业，可看到该行业的公司家数与行业坐标；名单中的公司可按主要业务收入排序。以 AI 相关的科技行业为例，路径是：技术（Technology）→ 其下的子行业 → 四级。</p>
-    <p>公司库覆盖 BICS 全部行业层级，行业定位不是靠人工挑选，而是对全体做统一分类。展示时只用行业名称与汇总，不列任何单个公司。展板截图见图 3-3（待重拍）。</p>
-
-    <h2 id="s6-5"><span class="num">6.5</span>示范二：以英伟达为中心的收入线</h2>
-    <p>以英伟达为中心，制图台按其上下游建出切片：切片由各关联方主要业务所在的 BICS 四级行业动态生成，供应方向排在后（−s），中心排在中间，客户方向排在前（+s）。点到点的线表示收入关系：产品中供应方向用墨绿色，客户方向用暗红色。中心公司位于面心，关系越强越靠近圆心。</p>
-    <p class="keepnext">需要如实说明：占比数据披露并不完整，无披露占比的点放在外圈，不填补、不估算。本计划不列关联方名称与占比数值。</p>
-    <figure class="fig">
-      <svg class="dg" viewBox="0 0 612 240" role="img" aria-label="收入线示意"><polygon class="box-s" points="22,56 114,56 100,176 8,176"/><polygon class="box-s" points="132,56 224,56 210,176 118,176"/><polygon class="box-s" points="404,56 496,56 482,176 390,176"/><polygon class="box-s" points="514,56 606,56 592,176 500,176"/><polygon class="box-c" points="252,36 376,36 362,188 238,188"/><circle class="ring" cx="307.0" cy="112.0" r="22"/><circle class="ring" cx="307.0" cy="112.0" r="44"/><circle class="ring" cx="307.0" cy="112.0" r="66"/><line class="rl-s" x1="44" y1="100" x2="307.0" y2="112.0"/><line class="rl-s" x1="74" y1="138" x2="307.0" y2="112.0"/><line class="rl-s" x1="158" y1="92" x2="307.0" y2="112.0"/><line class="rl-s" x1="180" y1="142" x2="307.0" y2="112.0"/><line class="rl-c" x1="307.0" y1="112.0" x2="430" y2="96"/><line class="rl-c" x1="307.0" y1="112.0" x2="452" y2="144"/><line class="rl-c" x1="307.0" y1="112.0" x2="536" y2="90"/><line class="rl-c" x1="307.0" y1="112.0" x2="564" y2="136"/><circle class="dot" cx="44" cy="100" r="3.6"/><circle class="dot" cx="74" cy="138" r="3.6"/><circle class="dot" cx="158" cy="92" r="3.6"/><circle class="dot" cx="180" cy="142" r="3.6"/><circle class="dot" cx="430" cy="96" r="3.6"/><circle class="dot" cx="452" cy="144" r="3.6"/><circle class="dot" cx="536" cy="90" r="3.6"/><circle class="dot" cx="564" cy="136" r="3.6"/><circle class="dot-c" cx="307.0" cy="112.0" r="5.6"/><text x="110" y="202" class="s" text-anchor="middle">−s · 供应方向（排在后）</text><text x="307.0" y="202" class="b s" text-anchor="middle">面心 · 中心公司</text><text x="492" y="202" class="s" text-anchor="middle">+s · 客户方向（排在前）</text><text x="307.0" y="24" class="m xs" text-anchor="middle">关系越强越靠近圆心</text><line class="rl-s" x1="150" y1="226" x2="190" y2="226"/><text x="196" y="230" class="m s">供应方向（产品内为墨绿）</text><line class="rl-c" x1="344" y1="226" x2="384" y2="226"/><text x="390" y="230" class="m s">客户方向（产品内为暗红）</text></svg>
-      <figcaption class="fig-cap"><span class="cap-no">图 6-3</span><span>收入线示意：中心点居面心，供应方向在后、客户方向在前。示意图，不含真实公司与数值；实线为供应方向，虚线为客户方向。</span></figcaption>
-    </figure>
-
-    <h2 id="s6-6"><span class="num">6.6</span>示范三：债务期限折线（演示）</h2>
-    <p>聚焦某家公司时，若其有债务日程，聚焦页底部显示一条按时间排列、单位为十亿美元的折线。目前只有演示公司有这条数据，且数字为示意，用来验证「聚焦页能承载财务序列」这一路径，不是真实公司的债务数据。</p>
-    <p>债务图曾做过独立页并删除：第一版理念要求一个决策视图，债务可视化应回到同一立方体，不做拆出去的孤页。</p>
-
-    <h2 id="s6-7"><span class="num">6.7</span>风险落点的研究对照</h2>
-    <p>我们读过多家卖方研究机构对 AI 产业链的分析，仅用作方法对照，不转载其图表、原文与数字。读后的结构性印象是：</p>
+    <!--/FIG62-->
     <ul>
-      <li>风险的位置因环节而异。需求与订单环节的风险多被写成利润率与供给限制，而不是需求中断；云平台环节被写成资本开支的回报与自由现金流是否跟得上；电力与托管环节被写成交付与杠杆。</li>
-      <li>同一家公司，不同机构给出不同判断；因此一张图不应把分歧合成一个分数。</li>
-      <li>一张图只回答一个问题；比较并排而不相减；论点用路径，截面用于归档。</li>
+      <li><strong>四席平级</strong>：总参谋部做规划，立出意志与任务单；监理部审改动；档案部管记录与文稿；内阁整理材料、撰写报告并提出谏言。四席互不统领；内阁经用户授权，可向总参谋部下令（图中虚线），不指挥监理部与档案部。</li>
+      <li><strong>总参谋部</strong>可按任务单调度美工部、信息部、参谋纪要官、交叉整合部；任务单没写，就不派。</li>
+      <li><strong>监理部</strong>下设工程测试、代码质量、理念贯彻三属，并行取证；三属都过才算通过，任一不过整单打回。至多三次，第三次起改用高级模型（专家下场）。</li>
+      <li><strong>档案部</strong>下设书记、秘书、运维：书记记工作日志，是每次谈话的最后一项；秘书写报告与讲稿；运维记录故障与解法。</li>
+      <li><strong>用户</strong>用「电」点名；父代理是送审口，也是产品代码的实施者。产品代码一经改动，必须送监理部，不由改动者自评通过。</li>
     </ul>
-    <p>这些印象对制图台的约束是：营收环继续只表示营收；债务、资本开支、积压各自留名，作为另一条命名的线，不加进营收；传导是企业节点之间的线，线的名字是「债务」或「义务」，而不是把营收环涂成风险色。</p>
-    <p class="keepnext">首测图中可能使用的通用口径如下表。这些口径均为设想，选定哪几项、数据从何而来，由团队确定。</p>
-    <div class="tbl">
-      <div class="tbl-cap"><span class="cap-no">表 6-1</span><span>首测风险指标（候选口径；定稿待填写）</span></div>
-      <table class="data">
-        <thead><tr><th style="width:30%">候选口径</th><th>口径定义与数据来源</th><th style="width:16%">是否入选</th></tr></thead>
-        <tbody>
-          <tr><td>债务到期结构</td><td><span class="todo">待填写</span></td><td><span class="todo">待填写</span></td></tr>
-          <tr><td>资本开支与经营现金流的关系</td><td><span class="todo">待填写</span></td><td><span class="todo">待填写</span></td></tr>
-          <tr><td>表外承诺</td><td><span class="todo">待填写</span></td><td><span class="todo">待填写</span></td></tr>
-          <tr><td>客户集中度（已有收入占比数据）</td><td><span class="todo">待填写</span></td><td><span class="todo">待填写</span></td></tr>
-          <tr><td>供应商集中度</td><td><span class="todo">待填写</span></td><td><span class="todo">待填写</span></td></tr>
-        </tbody>
-      </table>
-    </div>
-    <p class="small">本计划不含任何关于 AI 公司的具体财务数字。如需引用，将改引公司公开披露的原文并注明出处。</p>
 
-    <h2 id="s6-8"><span class="num">6.8</span>尚未完成的部分</h2>
-    <ul>
-      <li><strong>债务传导</strong>：沿企业节点画出债务如何从一家传到另一家，尚未做。设计写明了要看的关系，没有写连线规则、阈值或专用数据字段，这些须先写入设计再实现。</li>
-      <li><strong>标准化</strong>：制图台里的产业链公司尚未接到 BICS 四级成员；演示链的分层与公司最初由智能体按公开知识搭建，其财务数据多来自网络，不是标准来源。要做到「同一信息同一来源、同一来源同一库」，仍需整理。</li>
-      <li><strong>数据获取</strong>：本月彭博接口调用额度已用完，需申请的数据暂时无法再导出；静态数据仍可取。本阶段不以数据广度与精确度为目标。</li>
-      <li><strong>关系数据</strong>：已有的英伟达关系占比披露不全（6.5）。</li>
-    </ul>
-    <div class="callout callout--warn">
-      <span class="callout-label">风险　RISK</span>
-      <p>首测展示的是「定位」与「关系」两件事；「传导」是下一步。评审时请按此口径看待演示。</p>
-    </div>
+    <h2 id="s6-3"><span class="num">6.3</span>自迭代与实习生策略</h2>
+    <div class="fig-ph fig-ph--text"><span class="slot-name">6.3 正文</span><span class="slot-tag">待填写</span></div>
   </div>
 </section>
 
-<!-- ============================ 第 7 章 ============================ -->
-<section class="sheet sheet--opener" id="ch7">
-  <div class="screen-run"><span>STANDARD FINANCIAL CHARTING</span><span>FIRST TEST · AI INDUSTRY FINANCIAL RISK</span></div>
-  <div class="chapter-opener">
-    <svg class="opener-mark" viewBox="7 13 48 46" aria-hidden="true"><rect x="8" y="14" width="18" height="44" rx="1.5" opacity="0.95"/><rect x="22" y="14" width="18" height="44" rx="1.5" opacity="0.55"/><rect x="36" y="14" width="18" height="44" rx="1.5" opacity="0.28"/></svg>
-    <p class="opener-kicker">CHAPTER</p>
-    <p class="opener-num">07</p>
-    <h1>对工行的应用价值</h1>
-    <p class="opener-en">Value to ICBC</p>
-    <p class="opener-lede">本章为团队设想。目前没有与工行用户的访谈、试点或验证记录，因此不写市场规模、用户数与收益预测，只写 SFC 可能在哪些场景里帮上忙，以及它与行内系统的距离。</p>
-    <ul class="opener-toc">
-      <li><span class="toc-no">7.1</span>与大赛主题的关系</li>
-      <li><span class="toc-no">7.2</span>可对应的工作场景（设想）</li>
-      <li><span class="toc-no">7.3</span>与行内系统的距离</li>
-      <li><span class="toc-no">7.4</span>对接路径设想</li>
-      <li><span class="toc-no">7.5</span>价值边界</li>
-    </ul>
-  </div>
-</section>
-
-<section class="sheet sheet--body">
-  <div class="screen-run"><span>STANDARD FINANCIAL CHARTING</span><span>FIRST TEST · AI INDUSTRY FINANCIAL RISK</span></div>
-  <div class="chapter-body">
-    <h2 id="s7-1"><span class="num">7.1</span>与大赛主题的关系</h2>
-    <p>大赛主题为「数智银行、创见未来」。SFC 关注的是银行风控场景里的一个基础问题：在大量企业与分类之中，快速、一致地看清一家企业在产业链里的位置与关系。它是一个观察与沟通的工具，不是决策系统。</p>
-
-    <h2 id="s7-2"><span class="num">7.2</span>可对应的工作场景（设想）</h2>
-    <div class="tbl">
-      <div class="tbl-cap"><span class="cap-no">表 7-1</span><span>可对应的工作场景（设想）</span></div>
-      <table class="data">
-        <thead><tr><th style="width:20%">场景</th><th>SFC 能提供的</th><th style="width:32%">现状</th></tr></thead>
-        <tbody>
-          <tr><td>行业授信前的产业链定位</td><td>统一分类下，一家企业所在行业、同业与上下游的位置</td><td>分类与定位已可演示；上下游关系目前仅一条链</td></tr>
-          <tr><td>贷后与风险例会</td><td>同一产业链内企业的集中度与关系，以统一图件呈现</td><td>集中度的占比数据已有（部分披露）；图件导出未做</td></tr>
-          <tr><td>风险传导的梳理</td><td>把企业间债务或义务关系画成节点之间的线</td><td>债务传导画面未做（6.8）</td></tr>
-          <tr><td>内部沟通材料</td><td>用同一套标准视图，替代每次重做的静态图</td><td>视图已统一；导出未做</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <h2 id="s7-3"><span class="num">7.3</span>与行内系统的距离</h2>
-    <p>SFC 目前停在本机：行业分类是彭博 BICS，公司数据是彭博导出的表；没有接入工行的客户、信贷、风险任何系统，也没有使用任何行内数据。不能代替行内的风险数据与模型。</p>
-
-    <h2 id="s7-4"><span class="num">7.4</span>对接路径设想</h2>
-    <p>模块结构使下面这条路径可行，但<strong>均未实现</strong>：</p>
-    <ol>
-      <li>数据入口已与功能分离：后端有独立的公司成员库模块。可以把一份行内的企业清单作为另一份「成员表」，与 BICS 分类左连接，使行内名单自动带上行业坐标。</li>
-      <li>前端只经单一接口取数，换数据源不触及前端。</li>
-      <li>全部在本机运行，数据不出机，便于在受控环境里评估。</li>
-    </ol>
-
-    <h2 id="s7-5"><span class="num">7.5</span>价值边界</h2>
-    <ul>
-      <li>不替代行内模型与评级，不预测违约；</li>
-      <li>不含行内数据；</li>
-      <li>图中每个数都应能追溯来源，不能追溯的不放进去。</li>
-    </ul>
-  </div>
-</section>
-
-<!-- ============================ 第 8 章 ============================ -->
-<section class="sheet sheet--opener" id="ch8">
-  <div class="screen-run"><span>STANDARD FINANCIAL CHARTING</span><span>FIRST TEST · AI INDUSTRY FINANCIAL RISK</span></div>
-  <div class="chapter-opener">
-    <svg class="opener-mark" viewBox="7 13 48 46" aria-hidden="true"><rect x="8" y="14" width="18" height="44" rx="1.5" opacity="0.95"/><rect x="22" y="14" width="18" height="44" rx="1.5" opacity="0.55"/><rect x="36" y="14" width="18" height="44" rx="1.5" opacity="0.28"/></svg>
-    <p class="opener-kicker">CHAPTER</p>
-    <p class="opener-num">08</p>
-    <h1>团队与分工</h1>
-    <p class="opener-en">Team &amp; Roles</p>
-    <p class="opener-lede">本章列出团队构成、分工与协作方式。尚未填写的信息以「待填写」标出，版面已排好，补入内容即可。</p>
-    <ul class="opener-toc">
-      <li><span class="toc-no">8.1</span>团队构成</li>
-      <li><span class="toc-no">8.2</span>分工</li>
-      <li><span class="toc-no">8.3</span>协作方式</li>
-    </ul>
-  </div>
-</section>
-
-<section class="sheet sheet--body">
-  <div class="screen-run"><span>STANDARD FINANCIAL CHARTING</span><span>FIRST TEST · AI INDUSTRY FINANCIAL RISK</span></div>
-  <div class="chapter-body">
-    <h2 id="s8-1"><span class="num">8.1</span>团队构成</h2>
-    <p>团队三人（大赛要求团队不超过 3 人，须指定队长）：</p>
-    <div class="tbl">
-      <div class="tbl-cap"><span class="cap-no">表 8-1</span><span>团队构成</span></div>
-      <table class="data">
-        <thead><tr><th style="width:12%">角色</th><th style="width:14%">姓名</th><th>学校</th><th>专业与年级</th><th>联系方式</th></tr></thead>
-        <tbody>
-          <tr><td>队长</td><td>隋宇博</td><td><span class="todo">待填写</span></td><td><span class="todo">待填写</span></td><td><span class="todo">待填写</span></td></tr>
-          <tr><td>队员</td><td>周晖</td><td><span class="todo">待填写</span></td><td><span class="todo">待填写</span></td><td><span class="todo">待填写</span></td></tr>
-          <tr><td>队员</td><td>徐国安</td><td><span class="todo">待填写</span></td><td><span class="todo">待填写</span></td><td><span class="todo">待填写</span></td></tr>
-        </tbody>
-      </table>
-    </div>
-    <div class="callout callout--note">
-      <span class="callout-label">待填写　TO FILL</span>
-      <p><strong>指导教师：</strong><span class="todo">待填写</span>（姓名、单位、职称）</p>
-    </div>
-
-    <h2 id="s8-2"><span class="num">8.2</span>分工</h2>
-    <p>各成员的负责事项与已完成事项，由团队逐人填写。</p>
-    <div class="tbl">
-      <div class="tbl-cap"><span class="cap-no">表 8-2</span><span>成员分工（待填写）</span></div>
-      <table class="data">
-        <thead><tr><th style="width:16%">成员</th><th>负责事项</th><th>已完成的事项</th></tr></thead>
-        <tbody>
-          <tr><td>隋宇博</td><td><span class="todo">待填写</span></td><td><span class="todo">待填写</span></td></tr>
-          <tr><td>周晖</td><td><span class="todo">待填写</span></td><td><span class="todo">待填写</span></td></tr>
-          <tr><td>徐国安</td><td><span class="todo">待填写</span></td><td><span class="todo">待填写</span></td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <h2 id="s8-3"><span class="num">8.3</span>协作方式</h2>
-    <ul>
-      <li>工程进仓库；工作工具（智能体角色与调度任务）留在各人本机，不随仓，免互相干扰。</li>
-      <li>上传前按显式路径提交，禁止全量添加；上传检查表见公私隔离协议。</li>
-      <li>设计由团队决定，改动由设计三原则审查；工程实现过程中使用了 AI 编程智能体协助。</li>
-    </ul>
-  </div>
-</section>
-
-<!-- ============================ 第 9 章 ============================ -->
-<section class="sheet sheet--opener" id="ch9">
-  <div class="screen-run"><span>STANDARD FINANCIAL CHARTING</span><span>FIRST TEST · AI INDUSTRY FINANCIAL RISK</span></div>
-  <div class="chapter-opener">
-    <svg class="opener-mark" viewBox="7 13 48 46" aria-hidden="true"><rect x="8" y="14" width="18" height="44" rx="1.5" opacity="0.95"/><rect x="22" y="14" width="18" height="44" rx="1.5" opacity="0.55"/><rect x="36" y="14" width="18" height="44" rx="1.5" opacity="0.28"/></svg>
-    <p class="opener-kicker">CHAPTER</p>
-    <p class="opener-num">09</p>
-    <h1>里程碑与计划</h1>
-    <p class="opener-en">Milestones &amp; Plan</p>
-    <p class="opener-lede">本章梳理已完成的工作与后续计划。后续事项均来自已写明的未完成项，具体时点与日期待团队确定后填入。</p>
-    <ul class="opener-toc">
-      <li><span class="toc-no">9.1</span>已完成</li>
-      <li><span class="toc-no">9.2</span>后续计划</li>
-      <li><span class="toc-no">9.3</span>提交前安排</li>
-    </ul>
-  </div>
-</section>
-
-<section class="sheet sheet--body">
-  <div class="screen-run"><span>STANDARD FINANCIAL CHARTING</span><span>FIRST TEST · AI INDUSTRY FINANCIAL RISK</span></div>
-  <div class="chapter-body">
-    <h2 id="s9-1"><span class="num">9.1</span>已完成</h2>
-    <p>时间线压缩如下，完整版见附录 D。</p>
-    <figure class="fig">
-      <svg class="dg" viewBox="0 0 600 206" role="img" aria-label="里程碑时间线"><line class="ln" x1="14" y1="104" x2="586" y2="104"/><rect x="39.5" y="99.5" width="9" height="9" fill="#1a1f26"/><line class="ln-r" x1="44.0" y1="96" x2="44.0" y2="78"/><text x="44.0" y="30" class="b xs" text-anchor="middle">09-25 至 26</text><text x="44.0" y="44" class="s" text-anchor="middle">立项</text><text x="44.0" y="56" class="s" text-anchor="middle">可互动三维立方体</text><rect x="97.5" y="99.5" width="9" height="9" fill="#1a1f26"/><line class="ln-r" x1="102.0" y1="112" x2="102.0" y2="130"/><text x="102.0" y="144" class="b xs" text-anchor="middle">09-27</text><text x="102.0" y="158" class="s" text-anchor="middle">概念库</text><text x="102.0" y="170" class="s" text-anchor="middle">与坐标语言</text><rect x="155.5" y="99.5" width="9" height="9" fill="#1a1f26"/><line class="ln-r" x1="160.0" y1="96" x2="160.0" y2="78"/><text x="160.0" y="30" class="b xs" text-anchor="middle">09-29</text><text x="160.0" y="44" class="s" text-anchor="middle">债券展开</text><text x="160.0" y="56" class="s" text-anchor="middle">随后收回</text><rect x="213.5" y="99.5" width="9" height="9" fill="#1a1f26"/><line class="ln-r" x1="218.0" y1="112" x2="218.0" y2="130"/><text x="218.0" y="144" class="b xs" text-anchor="middle">10-02 至 03</text><text x="218.0" y="158" class="s" text-anchor="middle">BICS 七级库</text><text x="218.0" y="170" class="s" text-anchor="middle">展板成为首页</text><rect x="271.5" y="99.5" width="9" height="9" fill="#1a1f26"/><line class="ln-r" x1="276.0" y1="96" x2="276.0" y2="78"/><text x="276.0" y="30" class="b xs" text-anchor="middle">10-04 至 05</text><text x="276.0" y="44" class="s" text-anchor="middle">四级公司名单</text><text x="276.0" y="56" class="s" text-anchor="middle">第二批成员表</text><rect x="329.5" y="99.5" width="9" height="9" fill="#1a1f26"/><line class="ln-r" x1="334.0" y1="112" x2="334.0" y2="130"/><text x="334.0" y="144" class="b xs" text-anchor="middle">10-06</text><text x="334.0" y="158" class="s" text-anchor="middle">队员会</text><rect x="387.5" y="99.5" width="9" height="9" fill="#1a1f26"/><line class="ln-r" x1="392.0" y1="96" x2="392.0" y2="78"/><text x="392.0" y="30" class="b xs" text-anchor="middle">10-09</text><text x="392.0" y="44" class="s" text-anchor="middle">首版计划书</text><text x="392.0" y="56" class="s" text-anchor="middle">制图展开</text><rect x="445.5" y="99.5" width="9" height="9" fill="#1a1f26"/><line class="ln-r" x1="450.0" y1="112" x2="450.0" y2="130"/><text x="450.0" y="144" class="b xs" text-anchor="middle">10-12 至 13</text><text x="450.0" y="158" class="s" text-anchor="middle">副本整合</text><text x="450.0" y="170" class="s" text-anchor="middle">英伟达收入线</text><rect x="503.5" y="99.5" width="9" height="9" fill="#1a1f26"/><line class="ln-r" x1="508.0" y1="96" x2="508.0" y2="78"/><text x="508.0" y="30" class="b xs" text-anchor="middle">10-14 至 15</text><text x="508.0" y="44" class="s" text-anchor="middle">模块化 · 本地应用</text><text x="508.0" y="56" class="s" text-anchor="middle">更名为 SFC</text><rect x="561.5" y="99.5" width="9" height="9" fill="#fff" stroke="#8b96a3" stroke-width="1.3" stroke-dasharray="2 1.6"/><line class="ln-r" x1="566.0" y1="112" x2="566.0" y2="130"/><text x="566.0" y="144" class="b xs m" text-anchor="middle">后续</text><text x="566.0" y="158" class="s m" text-anchor="middle">后续计划</text><text x="566.0" y="170" class="s m" text-anchor="middle">时点待填写</text></svg>
-      <figcaption class="fig-cap"><span class="cap-no">图 9-1</span><span>里程碑时间线（不按比例）：实心方块为已完成，虚线框为后续计划。</span></figcaption>
-    </figure>
-    <div class="tbl tbl--long">
-      <div class="tbl-cap"><span class="cap-no">表 9-1</span><span>已完成事项</span></div>
-      <table class="data">
-        <thead><tr><th style="width:22%">日期</th><th>事项</th></tr></thead>
-        <tbody>
-          <tr><td>2026-09-25 至 26</td><td>立项：读示例公司财务表；做出可互动三维立方体；拆成可运行的工程包</td></tr>
-          <tr><td>2026-09-27</td><td>建概念库与坐标语言</td></tr>
-          <tr><td>2026-09-29</td><td>债券展开做过，随后按「一个决策视图」收回</td></tr>
-          <tr><td>2026-10-02 至 03</td><td>建立分工机制；BICS 七级行业坐标；工程首页成为行业展板</td></tr>
-          <tr><td>2026-10-04</td><td>四级公司名单；数据管理分工</td></tr>
-          <tr><td>2026-10-05</td><td>摄入第二批四级表；按主业规则整理空占比</td></tr>
-          <tr><td>2026-10-06</td><td>队员会：交代已做、未来、认领</td></tr>
-          <tr><td>2026-10-09</td><td>首版计划书；制图展开</td></tr>
-          <tr><td>2026-10-12 至 13</td><td>与队员工作副本对比与整合；以英伟达为中心的收入线</td></tr>
-          <tr><td>2026-10-14 至 15</td><td>模块化（26 模块 / 35 关系）、本地应用化、内嵌 Python、更名为 SFC、字标</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <h2 id="s9-2"><span class="num">9.2</span>后续计划</h2>
-    <p class="keepnext">后续事项均出自已写明的未完成项；计划时点由团队填写，本稿不替团队排日期。</p>
-    <div class="tbl">
-      <div class="tbl-cap"><span class="cap-no">表 9-2</span><span>后续计划（时点待填写）</span></div>
-      <table class="data">
-        <thead><tr><th style="width:6%">序</th><th style="width:22%">事项</th><th>内容</th><th style="width:18%">计划时点</th></tr></thead>
-        <tbody>
-          <tr><td class="num">1</td><td>债务传导</td><td>先把连线规则、阈值、专用数据字段写入设计，再沿企业节点画出</td><td><span class="todo">待填写</span></td></tr>
-          <tr><td class="num">2</td><td>数据标准化</td><td>把制图台公司接到 BICS 四级成员，做到同一信息同一来源</td><td><span class="todo">待填写</span></td></tr>
-          <tr><td class="num">3</td><td>图的导出与自制</td><td>三维与二维导出、基于坐标的自制图表</td><td><span class="todo">待填写</span></td></tr>
-          <tr><td class="num">4</td><td>签名与公证</td><td>取得开发者证书后跑通公证流水线</td><td><span class="todo">待填写</span></td></tr>
-          <tr><td class="num">5</td><td>搜索并法</td><td>名单框与制图台搜索框的并法待定</td><td><span class="todo">待填写</span></td></tr>
-          <tr><td class="num">6</td><td>数据补全</td><td>政府类源表的完整版；第五至七级字段的取数</td><td><span class="todo">待填写</span></td></tr>
-          <tr><td class="num">7</td><td>协作流程</td><td>GitHub 提交与检查的流程方案</td><td><span class="todo">待填写</span></td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <h2 id="s9-3"><span class="num">9.3</span>提交前安排</h2>
-    <p>提交日期与赛程节点以主办方最新通知为准，团队核实后填写。</p>
-    <div class="tbl">
-      <div class="tbl-cap"><span class="cap-no">表 9-3</span><span>提交前安排（日期待填写）</span></div>
-      <table class="data">
-        <thead><tr><th>节点</th><th style="width:30%">日期</th></tr></thead>
-        <tbody>
-          <tr><td>计划书提交截止</td><td><span class="todo">待填写</span></td></tr>
-          <tr><td>计划书与图件定稿</td><td><span class="todo">待填写</span></td></tr>
-          <tr><td>演示录屏与截图备份完成</td><td><span class="todo">待填写</span></td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-</section>
-
-<!-- ============================ 第 10 章 ============================ -->
-<section class="sheet sheet--opener" id="ch10">
-  <div class="screen-run"><span>STANDARD FINANCIAL CHARTING</span><span>FIRST TEST · AI INDUSTRY FINANCIAL RISK</span></div>
-  <div class="chapter-opener">
-    <svg class="opener-mark" viewBox="7 13 48 46" aria-hidden="true"><rect x="8" y="14" width="18" height="44" rx="1.5" opacity="0.95"/><rect x="22" y="14" width="18" height="44" rx="1.5" opacity="0.55"/><rect x="36" y="14" width="18" height="44" rx="1.5" opacity="0.28"/></svg>
-    <p class="opener-kicker">CHAPTER</p>
-    <p class="opener-num">10</p>
-    <h1>风险与应对</h1>
-    <p class="opener-en">Risks &amp; Mitigation</p>
-    <p class="opener-lede">本章列出项目面临的主要风险与应对。风险来自数据许可、数据获取、未完成的核心画面与评审环境等，应对以「只描述方法、如实写明、按计划补齐」为原则。</p>
-  </div>
-</section>
-
-<section class="sheet sheet--body">
-  <div class="screen-run"><span>STANDARD FINANCIAL CHARTING</span><span>FIRST TEST · AI INDUSTRY FINANCIAL RISK</span></div>
-  <div class="chapter-body">
-    <div class="tbl tbl--long">
-      <div class="tbl-cap"><span class="cap-no">表 10-1</span><span>风险与应对</span></div>
-      <table class="data">
-        <thead><tr><th style="width:15%">风险</th><th style="width:38%">说明</th><th>应对</th></tr></thead>
-        <tbody>
-          <tr><th scope="row">数据许可</th><td>公司成员、关系数据来自彭博导出，许可边界由团队承担</td><td>对外只描述方法；内部包不外发；外发包仅含层级、演示与关系文件；提交前核对许可</td></tr>
-          <tr><th scope="row">数据获取受限</th><td>本月彭博接口额度已用完</td><td>本阶段不以数据广度为目标；静态数据仍可导出；已取得的数据足够演示</td></tr>
-          <tr><th scope="row">债务传导未完成</th><td>核心画面尚未做</td><td>计划书如实写明；先写设计规则，再实现；演示以已有的行业定位与收入线为主</td></tr>
-          <tr><th scope="row">指标公信力</th><td>团队不自造指标</td><td>只用被广泛接受的口径；每个数保留来源</td></tr>
-          <tr><th scope="row">数据标准不一</th><td>演示链来自公开知识，分类与公司未统一到 BICS</td><td>列入后续计划；不把演示链写成标准数据</td></tr>
-          <tr><th scope="row">评审环境</th><td>应用仅支持 macOS</td><td>备录屏、截图与本计划的图件；跨平台支持范围：<span class="todo">待填写</span></td></tr>
-          <tr><th scope="row">签名与公证</th><td>ad-hoc 签名，首次打开需手工放行</td><td>提供放行说明；取得开发者证书后公证</td></tr>
-          <tr><th scope="row">第三方版权</th><td>阅读过的卖方研究含版权内容</td><td>计划书不转载图表与原文；相关材料不进计划书</td></tr>
-          <tr><th scope="row">协作与维护</th><td>工程由少数人加智能体协作完成</td><td>模块化与接口清晰，使改动影响面可读；概念库、设计文档与工作日志保证续做</td></tr>
-          <tr><th scope="row">时限</th><td>提交窗口以官网为准</td><td>团队核实最新通知（见表 9-3）</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-</section>
-
-<!-- ============================ 附录 A ============================ -->
-<section class="sheet sheet--appendix" id="app-a">
-  <div class="screen-run"><span>STANDARD FINANCIAL CHARTING</span><span>FIRST TEST · AI INDUSTRY FINANCIAL RISK</span></div>
-  <header class="appendix-head">
-    <span class="kicker">APPENDIX A</span>
-    <h1><span class="num">附录 A</span>术语表</h1>
-  </header>
-  <p class="appendix-lede">本表集中列出本计划使用的术语，按首次出现的逻辑顺序排列。</p>
-  <table class="data gloss">
-    <thead><tr><th>术语</th><th>英文</th><th>释义</th></tr></thead>
-    <tbody>
-      <tr><td>SFC / 标准金融制图</td><td>Standard Financial Charting</td><td>本项目。</td></tr>
-      <tr><td>BICS</td><td>Bloomberg Industry Classification Standard</td><td>彭博行业分类标准，本项目使用 2024 年股票层级表，七级。</td></tr>
-      <tr><td>展板</td><td>Industry board</td><td>行业分类的前三级，同一块版面。</td></tr>
-      <tr><td>名单</td><td>Company list</td><td>某四级行业下的公司列表，一行一家。</td></tr>
-      <tr><td>制图台</td><td>Charting stage</td><td>三维制图页（原称立方体）。</td></tr>
-      <tr><td>切片</td><td>Slice</td><td>沿 s 轴堆叠的一张平面，代表产业链一个环节或一个行业。</td></tr>
-      <tr><td>公司点</td><td>Company point</td><td>切片上的一个环，代表一家公司。</td></tr>
-      <tr><td>同心环</td><td>Concentric ring</td><td>切片内按某个量大小排列的圆环，圆心为最大。</td></tr>
-      <tr><td>收入线</td><td>Revenue link</td><td>企业之间点到点的线，两色区分供应与客户方向。</td></tr>
-      <tr><td>位置坐标</td><td>Position coordinate</td><td><span class="mono">(s, x, y)</span>，制图台中唯一的摆放语言（1 类坐标）。</td></tr>
-      <tr><td>相对坐标</td><td>Relative coordinate</td><td>公司在面内的环上位置（2 类坐标）。</td></tr>
-      <tr><td>行业坐标</td><td>Industry coordinate</td><td>BICS 七段码（3 类坐标），展板与名单显示前四段。</td></tr>
-      <tr><td>主要业务</td><td>Primary business</td><td>同一公司下收入占比最大的一个行业归属。</td></tr>
-      <tr><td>空占比</td><td>Empty share</td><td>主要业务收入占比为空；仍进名单，坐标前加负号。</td></tr>
-      <tr><td>标准视角</td><td>Standard view</td><td>一键回到的规范相机位置。</td></tr>
-      <tr><td>聚焦 / 钉住</td><td>Focus / Pin</td><td>聚焦一张切片；钉住多张切片使其留在原位。</td></tr>
-      <tr><td>切片间距 d</td><td>Slice spacing</td><td>切片之间的距离因子，0% 到 200%。</td></tr>
-      <tr><td>外壳</td><td>Shell</td><td>原生应用窗口，承载页面并管理内嵌后端。</td></tr>
-      <tr><td>内部包 / 外发包</td><td>Internal / outbound package</td><td>含 / 不含公司成员库的两种发布包。</td></tr>
-      <tr><td>模块图</td><td>Module map</td><td>26 模块 / 35 关系的静态图。</td></tr>
-      <tr><td>公私隔离</td><td>Public / private separation</td><td>工程进仓，工作工具留本机的协议。</td></tr>
-      <tr><td>首测</td><td>First Test</td><td>本计划的首次示范，主题为 AI 产业链金融风险。</td></tr>
-    </tbody>
-  </table>
-</section>
-
-<!-- ============================ 附录 B ============================ -->
-<section class="sheet sheet--appendix" id="app-b">
-  <div class="screen-run"><span>STANDARD FINANCIAL CHARTING</span><span>FIRST TEST · AI INDUSTRY FINANCIAL RISK</span></div>
-  <header class="appendix-head">
-    <span class="kicker">APPENDIX B</span>
-    <h1><span class="num">附录 B</span>数据来源与许可说明</h1>
-  </header>
-  <p class="appendix-lede">数据、研究材料、开源组件与自有部分的出处与使用边界。本计划只描述方法，不展示彭博实体级原始数据明细。</p>
-
-  <h3>B.1　第三方数据</h3>
-  <table class="data">
-    <thead><tr><th style="width:24%">项</th><th>内容</th><th style="width:40%">许可与使用边界</th></tr></thead>
-    <tbody>
-      <tr><td>彭博 BICS 层级</td><td>七级层级</td><td>彭博的分类标准。外发包仍含该层级文件，外发由团队授权并承担许可责任</td></tr>
-      <tr><td>彭博公司成员表</td><td>2026-10-03（各一级行业表）、2026-10-05（必需消费品四级表）</td><td>仅限团队内部；含该库的包不外发；本计划不展示明细</td></tr>
-      <tr><td>彭博供应链汇总</td><td>2026-10-05 截图整理的英伟达上下游</td><td>彭博数据；对外展示须先核对</td></tr>
-      <tr><td>彭博供应商关系表</td><td>演示链中部分公司的供应值来源</td><td>同上</td></tr>
-      <tr><td>彭博查询语言手册</td><td>终端帮助（2026-10-03）</td><td>仅作内部取数参考；不属本产品说明书</td></tr>
-    </tbody>
-  </table>
-
-  <h3>B.2　第三方研究</h3>
-  <p>团队留有卖方研究机构的研究材料，仅作内部阅读。<strong>本计划不转载其中的图、表、原文与数字。</strong></p>
-
-  <h3>B.3　开源与第三方组件</h3>
-  <p>见表 4-1。three.js 为 MIT；Python 为 PSF 许可；字体 Jost 为 SIL OFL 1.1；OpenSSL 为 Apache-2.0；zstd 为 BSD-3-Clause；ncurses 为 X11/MIT 风格。完整声明在发布包内 <span class="mono">THIRD-PARTY-NOTICES.txt</span>。</p>
-
-  <h3>B.4　自有部分</h3>
-  <p>概念库、设计文档、界面与全部应用代码、模块图、工作日志为本队原创。</p>
-  <p class="src-note">本附录不构成对彭博条款的法律意见；许可文字以团队所属机构的实际许可为准。</p>
-</section>
-
-<!-- ============================ 附录 C ============================ -->
-<section class="sheet sheet--appendix" id="app-c">
-  <div class="screen-run"><span>STANDARD FINANCIAL CHARTING</span><span>FIRST TEST · AI INDUSTRY FINANCIAL RISK</span></div>
-  <header class="appendix-head">
-    <span class="kicker">APPENDIX C</span>
-    <h1><span class="num">附录 C</span>模块清单</h1>
-  </header>
-  <p class="appendix-lede">共 26 个模块、35 条关系；前端 12、后端 10、外壳 3，另有静态模块跟踪 1。模块图见图 4-2。</p>
-
-  <h3>C.1　前端（12）</h3>
-  <table class="data data--tight">
-    <thead><tr><th style="width:22%">模块</th><th style="width:20%">中文名</th><th>职责</th></tr></thead>
-    <tbody>
-      <tr><td>FE-NAV</td><td>导航</td><td>展板、名单、制图台之间的路由</td></tr>
-      <tr><td>FE-BOARD</td><td>展板</td><td>BICS 一至三级展板</td></tr>
-      <tr><td>FE-LIST</td><td>列表</td><td>四级公司名单</td></tr>
-      <tr><td>FE-LISTAREA</td><td>列表属地</td><td>上市地筛选控件</td></tr>
-      <tr><td>FE-OPENCUBE</td><td>跳转制图台</td><td>制图台启动，读取载荷</td></tr>
-      <tr><td>FE-ACTION</td><td>操作</td><td>制图台会话状态</td></tr>
-      <tr><td>FE-COORDONE</td><td>摆放坐标</td><td>唯一的摆放入口</td></tr>
-      <tr><td>FE-SCENE</td><td>场景</td><td>三维场景，使用服务端预算的环位置</td></tr>
-      <tr><td>FE-PANEL</td><td>面板</td><td>悬浮操作面板</td></tr>
-      <tr><td>FE-FOCUS</td><td>聚焦</td><td>聚焦与展开层</td></tr>
-      <tr><td>FE-API</td><td>接口</td><td>前端到后端的唯一 HTTP 口</td></tr>
-      <tr><td>FE-AESTHETIC</td><td>前端设计</td><td>跨页面的玻璃与纸面设计元素</td></tr>
-    </tbody>
-  </table>
-
-  <h3>C.2　后端（10，含静态模块跟踪 1）</h3>
-  <table class="data data--tight">
-    <thead><tr><th style="width:22%">模块</th><th style="width:20%">中文名</th><th>职责</th></tr></thead>
-    <tbody>
-      <tr><td>BE-HTTP</td><td>—</td><td>本机回环 HTTP、静态与模块图窄口</td></tr>
-      <tr><td>BE-BUNDLE</td><td>捆绑编排</td><td>按模式分发制图台载荷（演示、影集、链）</td></tr>
-      <tr><td>BE-DB-DEMO</td><td>演示集</td><td>演示库（公司与层）</td></tr>
-      <tr><td>BE-DB-SHADOW</td><td>影集</td><td>非链公司的空壳</td></tr>
-      <tr><td>BE-NVDA-LAYOUT</td><td>N 布局规划</td><td>服务端环与切片布局</td></tr>
-      <tr><td>BE-NVDA-LINKS</td><td>N 关系集</td><td>英伟达收入关系文档</td></tr>
-      <tr><td>BE-BICS-HIER</td><td>BICS 分类树</td><td>层级索引</td></tr>
-      <tr><td>BE-BICS-ENTITY</td><td>BICS 公司树</td><td>成员与计数</td></tr>
-      <tr><td>BE-BICS-AREA</td><td>BICS 地区映射</td><td>上市地映射</td></tr>
-      <tr><td>BE-BICS-INGEST</td><td>BICS 导入</td><td>离线导入脚本</td></tr>
-      <tr><td>MODULES-TRACK</td><td>静态模块跟踪</td><td>模块图与纸面页</td></tr>
-    </tbody>
-  </table>
-
-  <h3>C.3　外壳（3）</h3>
-  <table class="data data--tight">
-    <thead><tr><th style="width:22%">模块</th><th style="width:20%">中文名</th><th>职责</th></tr></thead>
-    <tbody>
-      <tr><td>SHELL-WINDOW</td><td>壳窗口</td><td>原生窗口，仅加载本机回环页面</td></tr>
-      <tr><td>SHELL-PROC</td><td>内嵌后端</td><td>起停后端子进程、健康检查</td></tr>
-      <tr><td>SHELL-PACK</td><td>打包</td><td>构建期打包，不随应用运行</td></tr>
-    </tbody>
-  </table>
-</section>
-
-<!-- ============================ 附录 D ============================ -->
-<section class="sheet sheet--appendix" id="app-d">
-  <div class="screen-run"><span>STANDARD FINANCIAL CHARTING</span><span>FIRST TEST · AI INDUSTRY FINANCIAL RISK</span></div>
-  <header class="appendix-head">
-    <span class="kicker">APPENDIX D</span>
-    <h1><span class="num">附录 D</span>工程里程碑时间线</h1>
-  </header>
-  <p class="appendix-lede">取自团队的工作日志与工程发展史。部分日期按区间或近似写，不作精确到日的断言。</p>
-  <div class="tbl tbl--long">
-    <table class="data">
-      <thead><tr><th style="width:23%">日期</th><th>事项</th></tr></thead>
-      <tbody>
-        <tr><td>2026-09-06</td><td>仓库建立（首次提交）</td></tr>
-        <tr><td>2026-09-25</td><td>读示例公司财务表，讨论盈利、风险与融资</td></tr>
-        <tr><td>2026-09-25 至 26</td><td>提出可互动三维：点为公司，层为产业链环节，美国与非美国分色；做出单文件立方体</td></tr>
-        <tr><td>2026-09-26</td><td>切片、同心环、共面标签；拆成可运行工程包（静态页、标准库服务、SQLite）；绑定 GitHub</td></tr>
-        <tr><td>2026-09-27</td><td>建概念库；用户轴固定为 <span class="mono">(s, x, y)</span></td></tr>
-        <tr><td>2026-09-29</td><td>债券展开：做过，又收回；一个决策视图</td></tr>
-        <tr><td>2026-10-02</td><td>建立审查、日志、规划三类职能；抽出与退开机制</td></tr>
-        <tr><td>2026-10-02 至 03</td><td>视空间、间距 d、全幅界面；美工分工；BICS 2024 七级库；展板成为首页</td></tr>
-        <tr><td>2026-10-04</td><td>四级公司名单；数据三分工；上市地筛选；展板与名单只显示前四段坐标</td></tr>
-        <tr><td>2026-10-05</td><td>摄入第二批四级表；空占比规则；各一级家数核对</td></tr>
-        <tr><td>2026-10-06</td><td>队员会</td></tr>
-        <tr><td>2026-10-06 至 09</td><td>制图台可读性修复；首页搜索与返回；公司点改为与切片共面的窄环</td></tr>
-        <tr><td>2026-10-09</td><td>首版计划书；研报阅读与制图展开</td></tr>
-        <tr><td>2026-10-09 至 12</td><td>以英伟达为中心的收入线（日志无精确日）</td></tr>
-        <tr><td>2026-10-12 至 13</td><td>队员工作副本对比、整合建议、整合实现</td></tr>
-        <tr><td>2026-10-13 前后</td><td>过滤与面板改版；英伟达链动态切片；公司环视觉；色彩方案；模块化方案</td></tr>
-        <tr><td>2026-10-14</td><td>模块化 M1–M4、前后端分离窄口、静态模块图、全局改名；本地化改造（外壳、内嵌后端、本地 three.js、打包、回归脚本）</td></tr>
-        <tr><td>2026-10-15</td><td>内嵌 Python、签名与公证流水线、两种发布包；模块与代码一一对应；总项目更名 SFC；字标</td></tr>
-      </tbody>
-    </table>
-  </div>
-</section>
-
-<!-- ============================ 附录 E ============================ -->
-<section class="sheet sheet--appendix" id="app-e">
-  <div class="screen-run"><span>STANDARD FINANCIAL CHARTING</span><span>FIRST TEST · AI INDUSTRY FINANCIAL RISK</span></div>
-  <header class="appendix-head">
-    <span class="kicker">APPENDIX E</span>
-    <h1><span class="num">附录 E</span>图件与来源索引</h1>
-  </header>
-  <p class="appendix-lede">本计划所有图件均为本队自绘示意或自有工程导出，不含第三方实体级数据，不转载第三方研究的图表。</p>
-  <table class="data">
-    <thead><tr><th style="width:13%">图</th><th style="width:26%">图名</th><th style="width:20%">类型</th><th>来源与说明</th></tr></thead>
-    <tbody>
-      <tr><td>封面</td><td>SFC logo 与字标</td><td>自有矢量</td><td>三框 logo 与方角斜切字标，内联矢量，无外链</td></tr>
-      <tr><td>图 1-1</td><td>完成度总览</td><td>自绘示意</td><td>由表 1-1 重绘</td></tr>
-      <tr><td>图 3-1</td><td>三类坐标示意</td><td>自绘示意</td><td>依据概念库中的坐标定义</td></tr>
-      <tr><td>图 3-2</td><td>决策路径</td><td>自绘示意</td><td>展板、名单、制图台的线框，不含公司明细</td></tr>
-      <tr><td>图 3-3</td><td>行业展板</td><td>待重拍</td><td>版面占位；待用新版白底重拍，仅含行业名称、坐标与家数汇总</td></tr>
-      <tr><td>图 3-4</td><td>制图台总览</td><td>待重拍</td><td>版面占位；待用新版白底重拍，使用演示库数据</td></tr>
-      <tr><td>图 4-1</td><td>总体结构</td><td>自绘示意</td><td>依据 4.1</td></tr>
-      <tr><td>图 4-2</td><td>模块关系图</td><td>自有工程导出</td><td>由工程内静态模块图导出，按纸面配色重着色；不含第三方数据</td></tr>
-      <tr><td>图 6-1</td><td>AI 产业链 11 层</td><td>自绘示意</td><td>层名取自演示库层定义，只画层名与顺序</td></tr>
-      <tr><td>图 6-3</td><td>收入线示意</td><td>自绘示意</td><td>不标真实公司与数值</td></tr>
-      <tr><td>图 9-1</td><td>里程碑时间线</td><td>自绘示意</td><td>依据附录 D</td></tr>
-    </tbody>
-  </table>
-  <p class="src-note">字体：Jost Light 300 大写子集（SIL OFL 1.1）内嵌；中文正文使用系统字体，未再分发。</p>
-</section>
-
-<!-- ============================ 附录 F ============================ -->
-<section class="sheet sheet--appendix" id="app-f">
-  <div class="screen-run"><span>STANDARD FINANCIAL CHARTING</span><span>FIRST TEST · AI INDUSTRY FINANCIAL RISK</span></div>
-  <header class="appendix-head">
-    <span class="kicker">APPENDIX F</span>
-    <h1><span class="num">附录 F</span>赛事口径摘录</h1>
-  </header>
-  <p class="appendix-lede">以下为 2026-10-09 所见的大赛官网信息，使用前请核实最新通知。</p>
-  <table class="data">
-    <thead><tr><th style="width:18%">项</th><th>内容</th></tr></thead>
-    <tbody>
-      <tr><th scope="row">名称</th><td>第十七届「工行杯」全国大学生金融科技创新大赛</td></tr>
-      <tr><th scope="row">主办</th><td>中国工商银行股份有限公司</td></tr>
-      <tr><th scope="row">承办</th><td>三人行未来科技集团股份有限公司</td></tr>
-      <tr><th scope="row">主题</th><td>「数智银行、创见未来」</td></tr>
-      <tr><th scope="row">公布的方向</th><td>科技金融、绿色金融、普惠金融、养老金融、数字金融，以及金融安全服务、特色金融服务、财富管理服务、青年群体服务、开放创新服务</td></tr>
-      <tr><th scope="row">参赛</th><td>境内外高校在校本科、硕士、博士；个人或团队，团队不超过 3 人，指定队长</td></tr>
-      <tr><th scope="row">公布赛程</th><td>2026 年 5 月启动；宣讲、报名及作品提交 5–9 月；省赛 10 月；全国半决赛 11 月；总决赛 12 月；细节以公众号为准</td></tr>
-      <tr><th scope="row">原创</th><td>作品须原创</td></tr>
-    </tbody>
-  </table>
-  <div class="callout callout--note">
-    <span class="callout-label">说明　NOTE</span>
-    <p>本计划的参赛方向为科技金融。上表为官网所见口径的摘录，不构成对赛程的确认；提交日期见表 9-3（待填写）。</p>
-  </div>
-</section>
 
 </body>
 </html>

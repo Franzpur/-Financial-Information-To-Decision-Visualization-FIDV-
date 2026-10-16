@@ -9,3 +9,5 @@ data/ai_chain.db-journal
 data/launcher-last.log
 # legacy: no longer written (P4)
 data/shell-last.log
+# Bloomberg-derived aggregates (internal only, PUBLIC-PRIVATE tier 1)
+data/debt-ladder-*.json

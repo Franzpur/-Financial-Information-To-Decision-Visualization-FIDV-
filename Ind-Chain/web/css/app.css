@@ -82,6 +82,8 @@ p { margin: 0 0 10px; }
 #viewport.company-zoom .cube-filter,
 #viewport.company-zoom .cube-alt,
 #viewport.company-zoom .cube-home,
+#viewport.company-zoom .map-dock,
+#viewport.company-zoom .map-sheet,
 #viewport.company-zoom .d-box,
 #viewport.company-zoom .hud,
 #viewport.company-zoom .help-toggle,
@@ -105,6 +107,16 @@ p { margin: 0 0 10px; }
   top: 56px;
   min-width: 118px;
   transition: top 0.16s ease;
+}
+/* [C-SHAPE-2] Shape 1|2 — under A/F on NVDA chain only (JS reveals). */
+.cube-shape {
+  top: 98px;
+  min-width: 118px;
+  transition: top 0.16s ease;
+}
+.cube-shape.is-shape2 .cube-filter-face {
+  border-color: var(--accent);
+  color: var(--text);
 }
 .cube-alt.is-active .cube-filter-face {
   border-color: var(--accent);
@@ -259,10 +271,10 @@ p { margin: 0 0 10px; }
 }
 
 .float-detail {
-  top: 64px;
+  top: 100px;
   right: 14px;
   width: min(300px, calc(100% - 28px));
-  max-height: calc(100% - 140px);
+  max-height: calc(100% - 176px);
   overflow: auto;
 }
 
@@ -442,6 +454,149 @@ p { margin: 0 0 10px; }
   stroke-width: 1;
   stroke-dasharray: 3 3;
   opacity: 0.9;
+}
+
+/* [C-MAPDOCK] Map desk shell (Map ▾ face, dock card, ⤢ sheet). Product glass chrome; the paper figure inside
+   is skinned only by css/plot-paper.css (the paper skin). Shell and paper stay 8px apart behind a 1px neutral edge. */
+.ladder-chip,
+.map-handoff {
+  margin-top: 12px;
+  padding: 3px 10px;
+  border: 1px solid var(--stroke);
+  border-radius: 0;
+  background: var(--glass);
+  color: var(--muted);
+  font: inherit;
+  font-size: 11.5px;
+  cursor: pointer;
+}
+.map-handoff { flex: none; align-self: flex-start; }
+.ladder-chip:hover, .map-handoff:hover { color: var(--text); border-color: #3d4a5c; }
+.ladder-chip:focus-visible, .map-handoff:focus-visible { outline: 1px solid var(--accent); }
+
+.cube-map { left: auto; right: 14px; top: 56px; min-width: 118px; }
+.cube-map.is-active .cube-filter-face { border-color: var(--accent); color: var(--text); }
+.cube-map-panel { left: auto; right: 0; min-width: 280px; max-height: 60vh; overflow: auto; }
+.map-group { padding: 6px 12px 4px; font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); border-bottom: 1px solid var(--stroke); }
+.map-opt { display: grid; grid-template-columns: 1fr auto; gap: 1px 12px; }
+.map-opt-name { color: var(--text); }
+.map-opt-id { color: var(--muted); font-size: 10.5px; letter-spacing: .04em; align-self: center; }
+.map-opt-why { grid-column: 1 / -1; font-size: 10.5px; color: var(--muted); }
+.map-opt.is-off { cursor: default; opacity: .55; }
+.map-opt.is-off:hover { background: transparent; outline: 0; }
+.map-opt.is-off .map-opt-name { color: var(--muted); }
+.map-search { display: block; width: 100%; padding: 7px 12px; border: 0; border-bottom: 1px solid var(--stroke); background: transparent; color: var(--text); font: inherit; font-size: 12px; }
+.map-search:focus { outline: 1px solid var(--accent); outline-offset: -1px; }
+
+.map-dock {
+  position: absolute;
+  top: 96px;
+  right: 14px;
+  z-index: 3;
+  width: min(420px, 36vw);
+  min-width: 300px;
+  max-height: calc(100% - 236px);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 12px 10px;
+  background: var(--glass-strong);
+  border: 1px solid rgba(42, 49, 60, 0.7);
+  border-radius: 0;
+  color: var(--text);
+  overflow: auto;
+  pointer-events: auto;
+}
+.map-dock[hidden], .map-sheet[hidden], .map-dock-params[hidden], .map-dock-pins[hidden] { display: none; }
+.map-dock-head { display: flex; align-items: baseline; gap: 8px; flex: none; }
+.map-dock-title { font-size: 13px; font-weight: 600; color: var(--text); }
+.map-dock-id { font-size: 10.5px; letter-spacing: .04em; color: var(--muted); }
+.map-dock-x { margin-left: auto; width: 24px; height: 24px; padding: 0; border: 1px solid transparent; background: transparent; color: var(--muted); font-size: 13px; line-height: 1; cursor: pointer; }
+.map-dock-x:hover { color: var(--text); border-color: var(--stroke); }
+.map-dock-params { display: flex; flex-wrap: wrap; gap: 6px 14px; flex: none; font-size: 11.5px; color: var(--muted); }
+.map-param { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); font-size: 11.5px; }
+.map-param select, .map-param input[type="range"] { font: inherit; font-size: 11.5px; color: var(--text); background: var(--glass); border: 1px solid var(--stroke); border-radius: 0; }
+.map-param output { min-width: 2ch; color: var(--text); font-variant-numeric: tabular-nums; }
+.map-dock-paper {
+  flex: none;
+  border: 1px solid var(--stroke);
+  position: relative;
+  cursor: default;
+  --map-paper-h: 178px;
+}
+.map-dock-paper::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 8px;
+  cursor: ew-resize;
+  z-index: 1;
+}
+.map-dock-paper::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 8px;
+  cursor: ns-resize;
+  z-index: 1;
+}
+.map-dock-foot { flex: none; margin: 0; font-size: 10.5px; line-height: 1.4; color: var(--muted); }
+.map-dock-ops { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; flex: none; }
+.map-btn, .map-pin { padding: 3px 10px; border: 1px solid var(--stroke); border-radius: 0; background: var(--glass); color: var(--muted); font: inherit; font-size: 11.5px; cursor: pointer; }
+.map-btn:hover, .map-pin:hover { color: var(--text); border-color: #3d4a5c; }
+.map-btn:disabled { opacity: .45; cursor: default; }
+.map-btn:focus-visible, .map-pin:focus-visible, .map-dock-x:focus-visible { outline: 1px solid var(--accent); }
+.map-dock-pins { display: inline-flex; flex-wrap: wrap; gap: 4px; margin-left: auto; }
+
+/* ⤢ sheet: dim veil over the product chrome; the sheet itself is paper */
+.map-sheet {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 0;
+  background: rgba(5, 7, 10, 0.68);
+  pointer-events: auto;
+}
+.map-sheet-card {
+  width: min(92%, 1100px);
+  max-height: 100%;
+  overflow: auto;
+  position: relative;
+  --map-paper-h: 330px;
+}
+.map-sheet-card::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 10px;
+  cursor: ns-resize;
+}
+.map-sheet-close { position: absolute; top: 14px; right: 14px; width: 32px; height: 32px; padding: 0; border: 1px solid rgba(42, 49, 60, 0.7); border-radius: 0; background: var(--glass-strong); color: var(--muted); font-size: 15px; line-height: 1; cursor: pointer; }
+.map-sheet-close:hover { color: var(--text); border-color: #3d4a5c; }
+.map-sheet-close:focus-visible { outline: 1px solid var(--accent); }
+
+/* detail folds to one line under the dock (js sets top / max-height); also when map drawer is open on narrow */
+.float-detail.is-docked #detail h3,
+.float-detail.is-map-open #detail h3 { cursor: pointer; }
+.float-detail.is-docked #detail h3::before,
+.float-detail.is-map-open:not(.is-folded) #detail h3::before { content: "▾ "; color: var(--muted); font-size: 11px; }
+.float-detail.is-folded { cursor: pointer; padding-top: 8px; padding-bottom: 8px; overflow: hidden; }
+.float-detail.is-folded #detail h3 { margin: 0; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.float-detail.is-folded #detail h3::before { content: "▸ "; }
+.float-detail.is-folded #detail > :not(h3), .float-detail.is-folded .note.foot { display: none; }
+.float-detail.is-map-open.is-folded {
+  top: 56px;
+  max-height: 40px;
+  width: min(200px, calc(100% - 28px));
 }
 
 .note { font-size: 11.5px; color: var(--muted); line-height: 1.5; }
@@ -1254,13 +1409,26 @@ a.list-row:focus-within {
   }
   /* Keep detail as a right card — full-bleed bottom panel covered the shell point. */
   .float-detail {
-    top: 64px;
+    top: 100px;
     bottom: auto;
     right: 14px;
     left: auto;
     width: min(280px, calc(100% - 28px));
-    max-height: calc(100% - 160px);
+    max-height: calc(100% - 176px);
   }
+  /* dock becomes a bottom drawer above the d box; the Map ▾ face stays top-right */
+  .map-dock {
+    top: auto;
+    left: 14px;
+    right: 14px;
+    bottom: 84px;
+    width: auto;
+    min-width: 0;
+    max-height: 45%;
+    background: var(--panel);
+    z-index: 4;
+  }
+  .map-dock-paper { width: min(100%, 440px); align-self: flex-start; }
   .nav-hint {
     max-width: calc(100% - 28px);
   }

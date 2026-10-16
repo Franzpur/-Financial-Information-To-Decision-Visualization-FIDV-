@@ -29,6 +29,7 @@ from bics_entity import (  # noqa: E402
 )
 from bics_hier import bics_ancestors, bics_children, bics_node, list_bics_l1  # noqa: E402
 from bundle_dispatch import build_bundle, register_chain, set_shell_builder  # noqa: E402
+from debt_ladder import ladder_for  # noqa: E402
 from db import connect, ensure_demo_db, get_company, list_companies, list_layers, meta  # noqa: E402
 from db_shadow import bundle_shell_ticker, configure_shadow_lookup  # noqa: E402
 from nvda_links import bundle_nvda_chain, configure_nvda_entity_lookup  # noqa: E402
@@ -239,6 +240,13 @@ class Handler(BaseHTTPRequestHandler):
         if path == "/api/bundle":
             self._api_bundle(qs)
             return
+        if path == "/api/debt/ladder":
+            doc = ladder_for(self._qs0(qs, "ticker"), self._qs0(qs, "name"))
+            if doc is None:
+                self._send_json(404, {"error": "no ladder"})  # No path, no hint of a file (W1 A2).
+            else:
+                self._send_json(200, doc)
+            return
         conn = connect()
         try:
             if path == "/api/meta":
@@ -341,7 +349,7 @@ def main() -> None:
     if from_env:
         print(f"[Ind-Chain] port {port}", flush=True)
     print(f"[Ind-Chain] homepage http://{HOST}:{port}/ · list /list · cube /cube · modules /modules/", flush=True)
-    print("[Ind-Chain] API: /api/bundle  /api/bics/children  /api/bics/entities  /api/bics/locate  /api/bics/node  /api/health", flush=True)
+    print("[Ind-Chain] API: /api/bundle  /api/bics/children  /api/bics/entities  /api/bics/locate  /api/bics/node  /api/debt/ladder  /api/health", flush=True)
     try:
         httpd.serve_forever()
     except KeyboardInterrupt:

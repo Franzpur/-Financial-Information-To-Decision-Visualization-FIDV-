@@ -6,6 +6,7 @@ Exhibition layout v3 (bus-style, short straight edges)
                        its children sit in two columns to its left.
   middle: FE-API      — a tall contract bar *outside* every frame, between BE and FE.
   right : 淡绿 决策路径 (NAV→LIST + LISTAREA) over 淡蓝 立方体面 (OPENCUBE→AESTHETIC).
+  far right: 淡紫 平面映射 (MAPDRAW / MAPDOCK / MAPREG / MAPPROJ, one column), right of the cube zone.
 
 Everything is routed from named ports on node sides; the geometry checker
 (hard) proves 0 cross, 0 overlap, 0 line-through-box, 0 tight-parallel, ports
@@ -30,12 +31,13 @@ BAR_W = 30               # hub bars (BE-HTTP, FE-API)
 TIP = 1.5                # arrow tip stops this far outside the target box
 CH_X = 450               # (documentation only)
 
-VB_W, VB_H = 690, 626
+VB_W, VB_H = 858, 650
 
 # column centres
 XC_C, XC_B = 69, 203               # BE: leaf column, mid column
 XC_L, XC_R = 463, 601              # FE: left column, right column
 X_HTTP, X_API = 295, 359           # bar centres
+X_MAP = 775                        # flat-map zone column (right of the cube zone)
 
 # rows
 R_NAV, R_GATE, R_LIST = 56, 106, 156
@@ -48,6 +50,7 @@ BE_BUNDLE = (BE_SHELL + BE_CHAIN) // 2   # 305
 NODES: dict[str, tuple[float, float, float, float]] = {
     # id: (cx, cy, w, h)
     "BE-HTTP": (X_HTTP, 221, BAR_W, 354),
+    "BE-DEBT": (XC_B, BE_DEMO, NW, NHF),
     "BE-BICS-HIER": (XC_B, R_NAV, NW, NHF),
     "BE-BICS-ENTITY": (XC_B, R_GATE, NW, NHF),
     "BE-BICS-INGEST": (XC_C, R_GATE, NW, NHF),
@@ -70,6 +73,12 @@ NODES: dict[str, tuple[float, float, float, float]] = {
     "FE-SCENE": (XC_L, R3, NW, NHF),
     "FE-COORDONE": (XC_R, R3, NW, NHF),
     "FE-FOCUS": (XC_L, R4, NW, NHF),
+    # flat-map zone (second mapping), right of the cube zone
+    "FE-MAPOUT": (X_MAP, 180, NW, NHF),
+    "FE-MAPDRAW": (X_MAP, R1, NW, NHF),
+    "FE-MAPDOCK": (X_MAP, R2, NW, NHF),
+    "FE-MAPREG": (X_MAP, R3, NW, NHF),
+    "FE-MAPPROJ": (X_MAP, R4, NW, NHF),
     # shell layer (own zone below FE/BE)
     "SHELL-WINDOW": (XC_L, R_SHELL, NW, NHF),
     "SHELL-PROC": (X_HTTP, R_SHELL, NW, NHF),
@@ -84,11 +93,14 @@ REGION_FALLBACK = {
     "FE-OPENCUBE": "fe-cube", "FE-ACTION": "fe-cube", "FE-COORDONE": "fe-cube",
     "FE-SCENE": "fe-cube", "FE-PANEL": "fe-cube", "FE-FOCUS": "fe-cube",
     "FE-AESTHETIC": "fe-cube",
+    "FE-MAPPROJ": "fe-map", "FE-MAPDRAW": "fe-map", "FE-MAPREG": "fe-map", "FE-MAPDOCK": "fe-map",
+    "FE-MAPOUT": "fe-map",
     "FE-API": "fe-api",
     "SHELL-WINDOW": "shell", "SHELL-PROC": "shell", "SHELL-PACK": "shell",
     "BE-HTTP": "be", "BE-BUNDLE": "be", "BE-DB-DEMO": "be", "BE-DB-SHADOW": "be",
     "BE-NVDA-LAYOUT": "be", "BE-NVDA-LINKS": "be", "BE-BICS-HIER": "be",
     "BE-BICS-ENTITY": "be", "BE-BICS-AREA": "be", "BE-BICS-INGEST": "be", "MODULES-TRACK": "be",
+    "BE-DEBT": "be",
 }
 
 # zone frames: id -> (x0, y0, x1, y1)
@@ -96,12 +108,14 @@ ZONES = {
     "be": (8, 22, 320, 412),
     "fe-decision": (388, 22, 682, 184),
     "fe-cube": (388, 200, 682, 412),
+    "fe-map": (716, 155, 842, 412),
     "shell": (8, 428, 682, 502),
 }
 ZONE_STYLE = {
     "be": dict(fill="#fbf4dd", stroke="#c2a557", node="#8c7326", chip="后端"),
     "fe-decision": dict(fill="#e9f5ec", stroke="#6fa77c", node="#3f7a4d", chip="决策路径"),
     "fe-cube": dict(fill="#e7f0f9", stroke="#6f94bb", node="#3d6896", chip="立方体面"),
+    "fe-map": dict(fill="#f0e9f5", stroke="#9b7bb8", node="#6b4a8a", chip="平面映射"),
     "shell": dict(fill="#eeede8", stroke="#9a968a", node="#5b574c", chip="壳层"),
 }
 CHIP_W, CHIP_H = 56, 16   # tab straddling the top border, left aligned at +10
@@ -169,7 +183,7 @@ def build_routes() -> dict[str, list[tuple[float, float]]]:
     for fe in ("FE-BOARD", "FE-LIST"):
         add(fe, "FE-API", "calls", [L(fe), tipR(R_pt_api(fe))])
     add("FE-OPENCUBE", "FE-API", "calls",
-        [L("FE-OPENCUBE", -6), tipR((box("FE-API")[2], NODES["FE-OPENCUBE"][1] - 6))])
+        [L("FE-OPENCUBE", -12), tipR((box("FE-API")[2], NODES["FE-OPENCUBE"][1] - 12))])
 
     # ── contract: API bar → HTTP bar ──
     y_c = (R_GATE + R_LIST) // 2
@@ -181,7 +195,7 @@ def build_routes() -> dict[str, list[tuple[float, float]]]:
     xr_r = XC_R + NW / 2          # right edge of FE right column
     gx = xl_r + 20                # LISTAREA channel
     ch_in, ch_out = xl_r + 12, xl_r + 26   # OPENCUBE gap channels (inner / outer)
-    ch_left = XC_L - NW / 2 - 16  # OPENCUBE→SCENE left channel
+    ch_left = XC_L - NW / 2 - 14  # OPENCUBE→SCENE left channel (inner); OPENCUBE→MAPDOCK runs outside it at x=392
     wrap_in, wrap_out = xr_r + 12, xr_r + 22   # AESTHETIC wrap channels
     add("FE-BOARD", "FE-LISTAREA", "depends",
         [R("FE-BOARD", 6), (gx, R_GATE + 6), (gx, R_LUI - 5), tipL(L("FE-LISTAREA", -5))])
@@ -197,7 +211,7 @@ def build_routes() -> dict[str, list[tuple[float, float]]]:
         [R("FE-OPENCUBE", 6), (ch_in, R1 + 6), (ch_in, R3 - 6), tipL(L("FE-COORDONE", -6))])
     # OPENCUBE → SCENE : left-hand channel, below the OPENCUBE→API line
     add("FE-OPENCUBE", "FE-SCENE", "depends",
-        [L("FE-OPENCUBE", 6), (ch_left, R1 + 6), (ch_left, R3), tipL(L("FE-SCENE"))])
+        [L("FE-OPENCUBE", 12), (ch_left, R1 + 12), (ch_left, R3), tipL(L("FE-SCENE"))])
     add("FE-SCENE", "FE-COORDONE", "calls", [R("FE-SCENE", 6), tipL(L("FE-COORDONE", 6))])
     add("FE-SCENE", "FE-FOCUS", "depends", [B("FE-SCENE"), tipT(T("FE-FOCUS"))])
 
@@ -208,12 +222,38 @@ def build_routes() -> dict[str, list[tuple[float, float]]]:
     add("FE-AESTHETIC", "FE-BOARD", "depends",
         [R("FE-AESTHETIC", 6), (wrap_out, R1 + 6), (wrap_out, R_GATE - 6), tipR(R("FE-BOARD", -6))])
 
+    # ── flat-map zone: one column DRAW / DOCK / REG / PROJ (top to bottom) right of the cube zone ──
+    # Inbound to DOCK's left side (dy -12 / 0 / +12): AESTHETIC (lane x=690), PANEL (straight), OPENCUBE (lane x=700,
+    # which arrives from below: it leaves OPENCUBE on the left outside the SCENE channel, runs under the cube zone).
+    lane_a, lane_o = 690, 700
+    y_below = 407                 # corridor between the FOCUS row (bottom 402) and the cube zone's bottom edge (412)
+    x_out = 392                   # outer left lane, beside the cube zone's left border (388)
+    add("FE-MAPDOCK", "FE-MAPDRAW", "calls", [T("FE-MAPDOCK"), tipB(B("FE-MAPDRAW"))])
+    # MAPOUT above MAPDRAW in the same column; mid-right gutter (API uses a further-right lane).
+    # Inside-frame lane x=838 (frame right edge 842; final leg >=12); the API line now runs *outside* the frame (lane_r below).
+    add("FE-MAPDOCK", "FE-MAPOUT", "calls",
+        [R("FE-MAPDOCK", -10), (838, R2 - 10), (838, 180), tipR(R("FE-MAPOUT"))])
+    add("FE-MAPDOCK", "FE-MAPREG", "calls", [B("FE-MAPDOCK"), tipT(T("FE-MAPREG"))])
+    add("FE-MAPREG", "FE-MAPPROJ", "depends", [B("FE-MAPREG"), tipT(T("FE-MAPPROJ"))])
+    add("FE-AESTHETIC", "FE-MAPDRAW", "depends", [R("FE-AESTHETIC", 12), tipL(L("FE-MAPDRAW", 12))])
+    add("FE-PANEL", "FE-MAPDOCK", "calls", [R("FE-PANEL"), tipL(L("FE-MAPDOCK"))])
+    add("FE-AESTHETIC", "FE-MAPDOCK", "depends",
+        [B("FE-AESTHETIC", 30), (box("FE-AESTHETIC")[2] - 19, (R1 + R2) // 2),
+         (lane_a, (R1 + R2) // 2), (lane_a, R2 - 12), tipL(L("FE-MAPDOCK", -12))])
+    add("FE-OPENCUBE", "FE-MAPDOCK", "depends",
+        [L("FE-OPENCUBE"), (x_out, R1), (x_out, y_below), (lane_o, y_below), (lane_o, R2 + 12),
+         tipL(L("FE-MAPDOCK", 12))])
+    lane_r = ZONES["fe-map"][2] + 10  # right gutter outside the fe-map frame (x1=842 -> 852), clear of MAPDOCK→MAPOUT
+    add("FE-MAPDOCK", "FE-API", "calls",
+        [R("FE-MAPDOCK", 10), (lane_r, R2 + 10), (lane_r, 8), (X_API, 8), tipT(T("FE-API"))])
+
     # ── BE: HTTP bar → children, all horizontal ──
     hx = box("BE-HTTP")[0]
     for child, y in (("BE-BICS-HIER", R_NAV), ("BE-BICS-ENTITY", R_GATE), ("BE-BICS-AREA", R_LIST),
                      ("BE-BUNDLE", BE_BUNDLE)):
         add("BE-HTTP", child, "calls", [(hx, y), tipR(R(child))])
     add("BE-HTTP", "MODULES-TRACK", "contract", [(hx, BE_NVDA), tipR(R("MODULES-TRACK"))])
+    add("BE-HTTP", "BE-DEBT", "calls", [(hx, BE_DEMO), tipR(R("BE-DEBT"))])
 
     add("BE-BICS-ENTITY", "BE-BICS-AREA", "depends", [B("BE-BICS-ENTITY"), tipT(T("BE-BICS-AREA"))])
     add("BE-BICS-INGEST", "BE-BICS-ENTITY", "depends", [R("BE-BICS-INGEST"), tipL(L("BE-BICS-ENTITY"))])
@@ -571,6 +611,7 @@ def _svg_legend() -> list[str]:
 
     out.append(head(16, "分区"))
     zone_items = [("fe-decision", "决策路径 · NAV → LIST"), ("fe-cube", "立方体面 · OPENCUBE → AESTHETIC"),
+                  ("fe-map", "平面映射 · MAPDRAW / MAPDOCK / MAPREG / MAPPROJ（第二重映射）"),
                   ("be", "后端 · BE-HTTP 起"), ("shell", "壳层 · SHELL-WINDOW / SHELL-PROC / SHELL-PACK（本地应用）")]
     for i, (zid, label) in enumerate(zone_items):
         st = ZONE_STYLE[zid]
@@ -578,7 +619,7 @@ def _svg_legend() -> list[str]:
         out.append(f'<rect x="16" y="{y - 9}" width="20" height="11" rx="2.5" fill="{st["fill"]}" '
                    f'stroke="{st["stroke"]}" stroke-width="1.2"/>'
                    f'<text x="44" y="{y}" font-size="9.4" fill="{MUTED}">{esc(label)}</text>')
-    y = item_y(4)
+    y = item_y(5)
     out.append(f'<rect x="16" y="{y - 9}" width="20" height="11" rx="2.5" fill="#e3e8ee" stroke="#3a4552" '
                f'stroke-width="1.5"/><text x="44" y="{y}" font-size="9.4" fill="{MUTED}">枢纽条 · FE-API / BE-HTTP（框外 / 框缘）</text>')
 
@@ -681,7 +722,7 @@ code { font-family: "SF Mono", ui-monospace, Menlo, Consolas, monospace; font-si
   <h1>SFC 模块关系图</h1>
   <p class="brand">MODULE MAP · __N_MODS__ 模块 · __N_EDGES__ 边</p>
 </header>
-<p class="lede">左后端、右前端；中间一根 <strong>FE-API</strong> 枢纽条立在所有框外，是前后端唯一契约口。右侧上淡绿＝决策路径（NAV → LIST），下淡蓝＝立方体面（OPENCUBE → AESTHETIC）；后端淡黄，<code>BE-HTTP</code> 为总线，分派至各子模块。</p>
+<p class="lede">左后端、右前端；中间一根 <strong>FE-API</strong> 枢纽条立在所有框外，是前后端唯一契约口。右侧上淡绿＝决策路径（NAV → LIST），下淡蓝＝立方体面（OPENCUBE → AESTHETIC）；后端淡黄，<code>BE-HTTP</code> 为总线，分派至各子模块；立方体面右侧淡紫＝平面映射（<code>FE-MAPDOCK</code> 映射台 → <code>FE-MAPREG</code> → <code>FE-MAPPROJ</code>，另调 <code>FE-MAPDRAW</code>；第二重映射）。</p>
 
 <div class="fig" id="fig">
 __SVG__
@@ -714,7 +755,7 @@ __GRAPH_JSON__
   const edgeBody = document.querySelector("#edge-table tbody");
   const data = JSON.parse(document.getElementById("graph-data").textContent);
   const REGION_FALLBACK = __REGION_FALLBACK_JSON__;
-  const REGION_LABEL = { "fe-decision": "决策路径", "fe-cube": "立方体面", "fe-api": "API 枢纽（框外）", "be": "后端", "shell": "壳层" };
+  const REGION_LABEL = { "fe-decision": "决策路径", "fe-cube": "立方体面", "fe-api": "API 枢纽（框外）", "fe-map": "平面映射", "be": "后端", "shell": "壳层" };
   function esc(s) {
     return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
   }

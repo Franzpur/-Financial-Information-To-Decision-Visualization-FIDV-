@@ -56,3 +56,18 @@ export async function fetchBicsEntities({ bics, listingCountry } = {}) {
   });
   return getJson(url, "/bics/entities");
 }
+
+/** Quarterly debt-ladder aggregate for a node, or null (404 / offline / bad payload). Never throws.
+ * Only door to /api/debt/ladder; the response is aggregate-only (no per-bond rows). */
+export async function fetchDebtLadder(ticker, name) {
+  const ctl = new AbortController();
+  const timer = setTimeout(() => ctl.abort(), 4000);
+  try {
+    const res = await fetch(apiUrl("/debt/ladder", { ticker, name }), { cache: "no-store", signal: ctl.signal });
+    return res.ok ? await res.json() : null;
+  } catch {
+    return null;
+  } finally {
+    clearTimeout(timer);
+  }
+}

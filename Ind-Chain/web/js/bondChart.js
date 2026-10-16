@@ -2,7 +2,7 @@
  * FE-FOCUS — Focus-stage transitions ([C-FOCUS], [C-COMPANY-ZOOM]), point focus targets,
  * and bond schedule sparkline ($bn, hidden when schedule is missing/empty).
  */
-import { state } from "./state.js?v=55";
+import { state } from "./state.js?v=58";
 
 const W = 560;
 const H = 140;
@@ -99,8 +99,9 @@ export function bondChartHtml(schedule) {
 /**
  * Compute target emissive, opacity, and hover scale for a company point under [C-FOCUS].
  */
-export function focusPointTargets({ shellCube, selected, hovered, lit, country }) {
-  const targetEmissive = shellCube
+export function focusPointTargets({ shellCube, selected, hovered, lit, country, whiteSphere }) {
+  const noEmissive = shellCube || whiteSphere;
+  const targetEmissive = noEmissive
     ? null
     : selected
       ? 2.2
@@ -113,7 +114,7 @@ export function focusPointTargets({ shellCube, selected, hovered, lit, country }
           : 0.06;
   const targetOpacity = lit ? 1 : 0;
   const targetHoverScale = selected
-    ? shellCube
+    ? whiteSphere || shellCube
       ? 1.45
       : 1.4
     : hovered

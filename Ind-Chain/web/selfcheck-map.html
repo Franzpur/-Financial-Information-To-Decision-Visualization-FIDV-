@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>map self-check (synthetic fixture)</title>
+<style>
+  body { font: 13px/1.5 ui-monospace, Menlo, monospace; margin: 16px; background: #0b0d10; color: #e8edf4; }
+  .pass { color: #8be0c0; } .fail { color: #ff8a8a; font-weight: 600; }
+  #stage { max-width: 1100px; margin-top: 14px; }
+  #dockStage { width: 372px; margin-top: 14px; border: 1px solid #2a313c; }
+  #standalone { display: block; width: 100%; max-width: 1100px; height: 560px; margin-top: 14px; border: 1px solid #2a313c; background: #fff; }
+</style>
+<link rel="stylesheet" href="/css/plot-paper.css" />
+</head>
+<body>
+<h3>FE-MAPPROJ / FE-MAPREG / FE-MAPDRAW / FE-MAPDOCK self-check · synthetic data only · dev page, excluded from the package</h3>
+<div id="out"></div>
+<div id="dockStage"></div>
+<div id="stage"></div>
+<iframe id="standalone" title="standalone paper (plot-paper.css only)"></iframe>
+<script type="module">
+import { desc, project } from "/js/map/proj.js";
+import { drawPlot } from "/js/map/draw.js";
+import { list, get, run, cleanParams } from "/js/map/reg.js";
+import { paramsHtml, readParams } from "/js/map/dock.js";
+
+// Synthetic fixture: invented numbers, not an issuer's real schedule.
+const quarters = [];
+for (let i = 0; i < 41; i++) {
+  const y = 2026 + Math.floor((i + 3) / 4);
+  const q = ((i + 3) % 4) + 1;
+  quarters.push({ q: `${y}Q${q}`, principalBn: i % 5 === 4 ? 1 + i / 20 : 0, interestBn: 0.4 + (i % 3) * 0.1, n: 1 + (i % 4) });
+}
+const input = {
+  v: 1, issuer: "TEST", asOf: "2000-01-01", unit: "USD bn-eq", quarters,
+  basis: { n: 10, parBn: 20, excluded: [{ reason: "synthetic", count: 1 }] },
+  notes: ["synthetic fixture"], provenance: { illustrative: true, thirdParty: false },
+};
+
+const rows = [];
+const check = (name, ok) => rows.push([name, Boolean(ok)]);
+const r1 = project(input);
+const r2 = project(input);
+check("project ok", r1.ok === true);
+check("deterministic (byte-identical)", JSON.stringify(r1) === JSON.stringify(r2));
+check("desc JSON round trip", JSON.stringify(JSON.parse(JSON.stringify(desc))) === JSON.stringify(desc));
+check("desc has only the six keys", Object.keys(desc).join() === "id,requires,params,disclosure,basis,dataTier");
+check("no throw on bad input", [null, {}, { v: 1 }, { v: 1, quarters: [{ q: "x" }] }].every((b) => { const r = project(b); return r.ok === false && r.reason && r.hint; }));
+const s = r1.spec;
+check("41 quarters x 2 rects", s.marks.filter((m) => m.type === "rect").length === 82);
+check("stack baseline: coupon y0 = principal y", s.marks.filter((m) => m.type === "rect").every((m, i, a) => m.y0 === (m.tone === "muted" ? a[i - 1].y : 0)));
+check("band scale carries label domain", s.scales[0].domain.length === 41 && s.scales[0].tickLabels.length === 41);
+check("no color in spec params", !/#|rgb|hsl/i.test(JSON.stringify(s.params)));
+check("no ref, nRef only", s.marks.every((m) => !("ref" in m)));
+check("four KPIs", s.kpis.length === 4 && s.kpis[0].value === 20);
+check("peak labels = 6", s.marks.filter((m) => m.type === "text").length === 6);
+// tie: two equal-looking peaks are reported once as a tie
+const tie = JSON.parse(JSON.stringify(input));
+tie.quarters.forEach((q) => { q.principalBn = 0; q.interestBn = 0.5; });
+tie.quarters[3].interestBn = 6.2359; tie.quarters[30].interestBn = 6.22;
+check("tie reported", /tie: /.test(project(tie).spec.kpis[2].unit));
+const html = drawPlot(s);
+check("draw is stable", html === drawPlot(project(input).spec));
+check("draw: svg + 4 kpis + tips", html.includes("<svg") && (html.match(/class="pm-kpi"/g) || []).length === 4 && html.includes("<title>"));
+check("draw: no external reference", !/https?:\/\//.test(html));
+check("draw: empty on bad spec", drawPlot(null) === "" && drawPlot({}) === "");
+
+// density: layout only, same root, no color anywhere in the markup
+const compact = drawPlot(s, { density: "compact" });
+const sheetHtml = drawPlot(s, { density: "sheet" });
+check("draw: root is .pm-sheet.pm-skin-paper with data-mapping + data-density", /^<section class="pm-sheet pm-skin-paper" data-mapping="PM-LADDER-Q" data-density="compact"/.test(compact) && /data-density="sheet"/.test(sheetHtml));
+check("draw: default density is compact", html === compact);
+check("draw: sheet labels every bar, compact only peaks", (sheetHtml.match(/class="pm-val/g) || []).length === 41 && (compact.match(/class="pm-val/g) || []).length === 6);
+check("draw: sheet shows Qn labels and notes as text, compact has neither", sheetHtml.includes("pm-qlabel") && sheetHtml.includes("pm-notes") && !compact.includes("pm-qlabel") && !compact.includes("pm-notes") && !/<details/.test(sheetHtml + compact));
+check("draw: no color literal in markup", !/#[0-9a-fA-F]{3,8}\b|rgb|hsl|style=/.test(compact + sheetHtml));
+
+// registry
+const lst = list({ selected: { id: 1 }, avail: { debtLadder: true } });
+check("reg: one entry, available when data is there", lst.length === 1 && lst[0].id === "PM-LADDER-Q" && lst[0].available === true);
+const off = list({ selected: null, avail: { debtLadder: false } })[0];
+check("reg: unavailable carries a reason", off.available === false && /GOOGL/.test(off.reason));
+check("reg: get / run", get("PM-LADDER-Q") && get("nope") === null && run("PM-LADDER-Q", input, {}).ok === true && run("nope", input, {}).ok === false);
+check("reg: run never throws", [null, {}, undefined].every((b) => run("PM-LADDER-Q", b, { peaks: "x" }).ok === false));
+check("reg: params are coerced into range", run("PM-LADDER-Q", input, { peaks: 99 }).spec.params.peaks === 12 && run("PM-LADDER-Q", input, { peaks: "x" }).spec.params.peaks === 6);
+
+// param row generator on a SYNTHETIC descriptor (enum / bool / number)
+const synth = { scale: { type: "enum", options: ["linear", "log"], default: "linear" }, labels: { type: "bool", default: true }, top: { type: "number", min: 0, max: 5, step: 0.5, default: 2 } };
+const box = document.createElement("div");
+box.innerHTML = paramsHtml(synth, {});
+check("dock: param row renders select + checkbox + range", box.querySelector("select[data-p=scale]") && box.querySelector("input[type=checkbox][data-p=labels]") && box.querySelector("input[type=range][data-p=top]"));
+box.querySelector("select").value = "log";
+box.querySelector("input[type=checkbox]").checked = false;
+box.querySelector("input[type=range]").value = "9";
+const read = readParams(box, synth);
+check("dock: param row reads back and clamps", read.scale === "log" && read.labels === false && read.top === 5 && JSON.stringify(cleanParams(synth, { scale: "x" })) === JSON.stringify({ scale: "linear", labels: true, top: 2 }));
+
+document.getElementById("dockStage").innerHTML = compact;
+document.getElementById("stage").innerHTML = sheetHtml;
+
+// plot-paper.css text rules (self-contained skin) + standalone render with ONLY that stylesheet
+const css = await (await fetch("/css/plot-paper.css")).text();
+const code = css.replace(/\/\*[\s\S]*?\*\//g, "");
+const banned = /var\(--(bg|text|muted|stroke|accent|glass[\w-]*|us|intl)\)|backdrop-filter|gradient|#3cf0ff|#ffb020|text-shadow|box-shadow/i;
+check("paper css: no product token, no backdrop-filter / gradient / glow / neon", !banned.test(code));
+const preludes = [...code.matchAll(/([^{}]+)\{/g)].map((m) => m[1].trim()).filter((p) => !p.startsWith("@"));
+const selectors = preludes.flatMap((p) => p.split(",").map((x) => x.trim()));
+check("paper css: every selector starts with .pm-skin-paper", selectors.length > 20 && selectors.every((x) => x.startsWith(".pm-skin-paper")));
+const frame = document.getElementById("standalone");
+frame.srcdoc = `<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="/css/plot-paper.css"></head><body style="margin:16px;background:#d8d5ce">${sheetHtml}</body></html>`;
+await new Promise((r) => frame.addEventListener("load", r, { once: true }));
+await new Promise((r) => setTimeout(r, 150));
+const fd = frame.contentDocument;
+const root = fd.querySelector(".pm-sheet");
+const cs = fd.defaultView.getComputedStyle(root);
+const bar = fd.defaultView.getComputedStyle(fd.querySelector(".pm-bar.pm-tone-neutral"));
+const bar2 = fd.defaultView.getComputedStyle(fd.querySelector(".pm-bar.pm-tone-muted"));
+check("standalone: paper colors resolve without app.css", cs.backgroundColor === "rgb(247, 245, 240)" && bar.fill === "rgb(26, 31, 38)" && bar2.fill === "rgb(197, 204, 212)");
+check("standalone: four KPI cells in one row, frame present", fd.defaultView.getComputedStyle(root.querySelector(".pm-kpis")).gridTemplateColumns.split(" ").length === 4);
+const out = document.getElementById("out");
+rows.forEach(([n, ok]) => { const d = document.createElement("div"); d.className = ok ? "pass" : "fail"; d.textContent = `${ok ? "PASS" : "FAIL"} · ${n}`; out.appendChild(d); });
+document.title = rows.every((r) => r[1]) ? "map self-check: ALL PASS" : "map self-check: FAIL";
+</script>
+</body>
+</html>

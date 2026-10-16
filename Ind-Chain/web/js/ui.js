@@ -4,12 +4,13 @@ import {
   passesFilter,
   writeHash,
   companyById,
-} from "./state.js?v=55";
+} from "./state.js?v=59";
 import { formatCoord } from "./coords.js?v=51";
-import { createCompanyFocusStage } from "./bondChart.js?v=2";
-import { STDVIEW_MS } from "./scene.js?v=71";
+import { createCompanyFocusStage } from "./bondChart.js?v=3";
+import { STDVIEW_MS } from "./scene.js?v=84";
 
-export function createUI(sceneApi) {
+/** @param {{dock?: {probe: (c:object)=>Promise<boolean>, open: (id?:string)=>void, refresh: ()=>void}}} [deps] FE-MAPDOCK handle (optional). */
+export function createUI(sceneApi, { dock } = {}) {
   const detail = document.getElementById("detail");
   const results = document.getElementById("results");
   const hoverTip = document.getElementById("hoverTip");
@@ -81,6 +82,25 @@ export function createUI(sceneApi) {
 
   function renderDetail(c) {
     detail.innerHTML = detailMarkup(c);
+    const h = detail.querySelector("h3");
+    if (h) h.dataset.cid = String(c.id);
+    // [PM-LADDER-Q] entry chip only once the ladder is known to exist; silent otherwise.
+    dock?.probe(c).then((ok) => {
+      if (!ok || state.selectedId !== c.id || state.focusLayer == null) return;
+      if (detail.querySelector("h3")?.dataset.cid !== String(c.id) || detail.querySelector(".ladder-chip")) return;
+      detail.insertAdjacentHTML(
+        "beforeend",
+        `<button type="button" class="ladder-chip" data-ladder-id="${c.id}">Debt ladder</button>`
+      );
+    });
+  }
+
+  /** [PM-LADDER-Q] company-zoom hand-off: one text row, only once the ladder is known to exist. */
+  function addHandoff(c) {
+    dock?.probe(c).then((ok) => {
+      if (!ok || state.selectedId !== c.id || companyFocus.hidden || companyFocusBody.querySelector(".map-handoff")) return;
+      companyFocusBody.insertAdjacentHTML("beforeend", `<button type="button" class="map-handoff">Debt ladder ▸ open in Map</button>`);
+    });
   }
 
   const { exitCompanyZoom, scheduleCompanyZoom } = createCompanyFocusStage({
@@ -89,8 +109,25 @@ export function createUI(sceneApi) {
     companyFocusBody,
     companyFocusClose,
     detailMarkup,
-    renderDetail,
+    renderDetail: (c) => {
+      renderDetail(c);
+      addHandoff(c);
+    },
     onRequestClearFocus: () => sceneApi.clearFocus(),
+  });
+
+  detail.addEventListener("click", (e) => {
+    const chip = e.target.closest(".ladder-chip");
+    if (!chip) return;
+    e.stopPropagation();
+    dock?.open("PM-LADDER-Q");
+  });
+  // Hand-off leaves the company-zoom overlay only (focus and camera untouched), then opens the dock.
+  companyFocusBody?.addEventListener("click", (e) => {
+    if (!e.target.closest(".map-handoff")) return;
+    e.stopPropagation();
+    exitCompanyZoom();
+    dock?.open("PM-LADDER-Q");
   });
 
   function renderLayerRoster(layerIdx) {
@@ -190,6 +227,7 @@ export function createUI(sceneApi) {
     sceneApi.applyVisibility();
     updateStatus();
     writeHash();
+    dock?.refresh();
     if (state.focusLayer != null) renderLayerRoster(state.focusLayer);
   }
 
@@ -267,6 +305,50 @@ export function createUI(sceneApi) {
     if (!opt) return;
     applyAltToggle(opt.dataset.alt);
   });
+
+  // [C-SHAPE-2] Shape 1|2 — NVDA chain only when usMap is present.
+  const cubeShape = document.getElementById("cubeShape");
+  const cubeShapeFace = document.getElementById("cubeShapeFace");
+  const cubeShapePanel = document.getElementById("cubeShapePanel");
+  const cubeShapeLabel = document.getElementById("cubeShapeLabel");
+
+  function syncShapeUI() {
+    const can = state.bundleMode === "chain" && Boolean(state.usMap);
+    if (cubeShape) cubeShape.hidden = !can;
+    if (!can) return;
+    const n = state.cubeShape === 2 ? 2 : 1;
+    if (cubeShapeLabel) cubeShapeLabel.textContent = `Shape ${n}`;
+    cubeShape?.classList.toggle("is-shape2", n === 2);
+    cubeShapePanel?.querySelectorAll(".cube-filter-opt").forEach((b) => {
+      b.classList.toggle("is-on", Number(b.dataset.shape) === n);
+    });
+  }
+
+  function setCubeShapeOpen(open) {
+    if (!cubeShape || !cubeShapeFace || !cubeShapePanel) return;
+    cubeShape.classList.toggle("is-open", open);
+    cubeShapeFace.setAttribute("aria-expanded", open ? "true" : "false");
+    cubeShapePanel.hidden = !open;
+  }
+
+  cubeShapeFace?.addEventListener("click", (e) => {
+    e.stopPropagation();
+    setCubeShapeOpen(cubeShapePanel?.hidden !== false);
+  });
+  cubeShapePanel?.addEventListener("click", (e) => {
+    const opt = e.target.closest(".cube-filter-opt");
+    if (!opt) return;
+    const n = Number(opt.dataset.shape) === 2 ? 2 : 1;
+    sceneApi.setCubeShape(n);
+    syncShapeUI();
+    setCubeShapeOpen(false);
+  });
+  document.addEventListener("pointerdown", (e) => {
+    if (cubeShape && cubeShapePanel && !cubeShapePanel.hidden && !cubeShape.contains(e.target)) {
+      setCubeShapeOpen(false);
+    }
+  });
+  syncShapeUI();
 
   const D_SNAPS = [25, 50, 75, 100, 125, 150, 175, 200];
   const D_SNAP_EPS = 4;

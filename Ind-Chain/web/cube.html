@@ -4,7 +4,8 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Standard-Financial-Charting</title>
-<link rel="stylesheet" href="/css/app.css?v=57" />
+<link rel="stylesheet" href="/css/app.css?v=63" />
+<link rel="stylesheet" href="/css/plot-paper.css?v=4" />
 <script type="importmap">
 {
   "imports": {
@@ -42,6 +43,25 @@
       </div>
     </div>
 
+    <div class="cube-filter cube-shape" id="cubeShape" hidden>
+      <button type="button" class="cube-filter-face" id="cubeShapeFace" aria-expanded="false" aria-controls="cubeShapePanel" title="Cube shape (NVDA)">
+        <span id="cubeShapeLabel">Shape 1</span>
+        <span class="cube-filter-caret" aria-hidden="true">▾</span>
+      </button>
+      <div class="cube-filter-panel" id="cubeShapePanel" hidden>
+        <button type="button" class="cube-filter-opt is-on" data-shape="1">Shape 1 · Slices</button>
+        <button type="button" class="cube-filter-opt" data-shape="2">Shape 2 · US map</button>
+      </div>
+    </div>
+
+    <div class="cube-filter cube-map" id="cubeMap">
+      <button type="button" class="cube-filter-face" id="cubeMapFace" aria-expanded="false" aria-controls="cubeMapPanel" title="Map desk: second mapping">
+        <span>Map</span>
+        <span class="cube-filter-caret" aria-hidden="true">▾</span>
+      </button>
+      <div class="cube-filter-panel cube-map-panel" id="cubeMapPanel" hidden></div>
+    </div>
+
     <div class="top-search">
       <label class="visually-hidden" for="search">Search company or ticker</label>
       <input id="search" type="search" placeholder="Search company or ticker…" autocomplete="off" />
@@ -57,6 +77,28 @@
       </div>
       <p class="note foot">Data via <code>/api/bundle</code>.</p>
     </aside>
+
+    <aside id="mapDock" class="map-dock" hidden aria-label="Map preview">
+      <div class="map-dock-head">
+        <span class="map-dock-title" id="mapDockTitle"></span>
+        <span class="map-dock-id" id="mapDockId"></span>
+        <button type="button" class="map-dock-x" id="mapDockClose" title="Close preview" aria-label="Close preview">✕</button>
+      </div>
+      <div class="map-dock-params" id="mapDockParams" hidden></div>
+      <div class="map-dock-paper" id="mapDockPaper"></div>
+      <p class="map-dock-foot" id="mapDockFoot"></p>
+      <div class="map-dock-ops">
+        <button type="button" class="map-btn" id="mapPin" title="Pin this view (session, up to 6)">Pin</button>
+        <button type="button" class="map-btn" id="mapExpand" title="Open full size" aria-label="Open full size">⤢</button>
+        <button type="button" class="map-btn" id="mapExport" title="Export paper as PNG">Export</button>
+        <span class="map-dock-pins" id="mapDockPins" hidden></span>
+      </div>
+    </aside>
+
+    <div id="mapSheet" class="map-sheet" hidden role="dialog" aria-modal="true" aria-label="Map sheet">
+      <button type="button" class="map-sheet-close" id="mapSheetClose" title="Close (Esc)" aria-label="Close">✕</button>
+      <div class="map-sheet-card" id="mapSheetBody"></div>
+    </div>
 
     <aside id="companyFocus" class="company-focus" hidden aria-hidden="true" aria-label="Company detail">
       <button type="button" id="companyFocusClose" class="company-focus-close" title="Close" aria-label="Close company detail">×</button>
@@ -93,6 +135,6 @@
   </div>
 </div>
 
-<script type="module" src="/js/main.js?v=85"></script>
+<script type="module" src="/js/main.js?v=90"></script>
 </body>
 </html>

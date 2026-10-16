@@ -36,6 +36,8 @@
 
 产品 splash / home 左标矢量真源：`Ind-Chain/web/index.html` 内 `#sfc-mark` / `#sfc-lockup`（隐藏 `.sfc-defs` 中定义；开屏 `<use>` 引用带全称的 `#sfc-lockup`，门厅 `<use>` 引用不带全称的 `#sfc-mark`）的 `.sfc-frames` 三框；`list.html` 页眉内联 `#sfc-mark` 同一份。纸面同族反相：`library/showable-report/assets/sfc-logo-frames-paper.svg`（封面 `SFC-plan-cover.html` 已对齐）。
 
+**字标内拐角（业主令，2026-10-16）：** S、C 的内凹直角一律改 45° 过渡，与外拐角的 45° 切角同族。S 每道内槽封口上下两端各切 5，中间留 10 单位竖线（上端向左下斜、下端向右下斜）；C 内拐角各切 10；S 外拐角今试切 22（曾试 20 嫌重、后定 30、又试 15；业主令不要 15，改回试 22；单位同字标坐标系 439×130）；C、F 外拐仍 30 / 原样。现行路径：S `M22 0H145V30H35L30 35V45L35 50H123L145 72V108L123 130H0V100H110L115 95V85L110 80H22L0 58V22Z`；C `M338 0H439V30H348L338 40V90L348 100H439L424 130H338L308 100V30Z`。F 未动。已同步 `index.html`、`list.html`、计划书（含模板）、双映射改革计划报告；`cabinet/notes/` 下的旧备份不动。
+
 **理念一句话：** 层次感来自三枚竖向圆角矩形**错位相套** + **递减透明度**（前实后虚），不是左右并排实心色块。
 
 | 量 | 值 | 说明 |
@@ -120,13 +122,24 @@
 - 封面自上而下：三框（Logo 标准）→ SFC 矢量字标（path，同 `#sfc-mark`）→ 与字标等宽 accent 线 → 英文 / 中文全称 → 题名 → 团队。mixed-case 英文用系统无衬线 Light（Jost 子集仅 A–Z）；页眉页脚全大写走内嵌 Jost。
 - 正文衬线 + 数据 / 标签无衬线；节题底边 `--rule`；提示框、KPI、时间线节点只用墨 / 灰层级，无圆角、无第二套色。时间线节点为**方形**（呼应方角字标）。
 
+### 平面映射纸面皮（C-SKIN-PAPER；业主令 GS-20261016-DMAP-UI-PAPER）
+
+可导出的平面映射图（预览 / ⤢ sheet / 将来导出）采**独立纸面设计模式**，不继承产品暗底荧光；这是业主令，**不按「第二套皮」处理**。
+
+- **隔离**：真源 `Ind-Chain/web/css/plot-paper.css`，根类 `.pm-skin-paper`（挂在 `<section class="pm-sheet pm-skin-paper">`），变量前缀 `--plot-paper-*`；文件自包含，**不得**使用 `--bg / --text / --muted / --stroke / --accent / --glass* / --us / --intl`，不得 `backdrop-filter`、渐变、发光、荧光色；选择器一律以 `.pm-skin-paper` 开头；`app.css` 不含任何 `.pm-*`。
+- **同族于秘书纸面**：纸底 `#f7f5f0`、主墨 `#1a1f26`、次墨 `#4a5560`、细线 `#c5ccd4`、年带 `#efeae4`、条带底 `#ece8e0`；serif 数字 / 标题、sans 小字，无外部字体。只有这五档中性与暖灰，**无新色相**；峰值靠粗体墨色，不用 `--accent`。
+- **版式真源**：附图 `cabinet/reports/figures/googl-ladder-paper-reference.png`（KPI 四格条带、左上单位、右上图例、本金黑 / 票息浅灰、柱顶小数、峰值粗标、季标 + 年带 + 隔年米色带、右下脚注；sheet 上 notes 为可见文字，不折叠）。
+- **共用**：预览、sheet、将来导出共用同一根节点与同一份 CSS；密度（`compact` / `sheet`）只改布局（`draw.js`），不改色。
+- **与产品壳的边界**：dock 卡外壳（标题行、参数行、操作行、`Map ▾` 面、detail 折叠行、sheet 暗色遮罩与关闭钮）仍是 §1 暗底玻璃；**只有预览区是纸**，纸区与外壳间 1px 中性细边（`--stroke`）、≥8px 间距，纸不透明、不入 opacity 动画。窄屏抽屉底改用 `--panel` 实底，免得下层 detail 字透出。
+- **场景内浮层禁纸面皮（业主令 GS-20261016-GOOGL-HOVER-CARD）：** 3D 里的文字卡、文件卡、标签一律走 cube 暗底玻璃 + 亮线框（`--glass-strong` / `--text` 线 / `--muted` 字 / `--accent` 点睛），禁用纸面皮；纸面皮只限平面映射预览 / sheet / 导出。
+
 ---
 
 ## 2. 延展原则（新功能 / 新分页）
 
 1. **先复用 token**：新面只用上表 CSS 变量，不引入第二套色名。
 2. **浮于工程区**：新面板默认玻璃浮层，不恢复实心双栏。
-3. **一字标族**：品牌露出用 **Logo 标准**三框（可加 SFC 字标 + accent 底线）；不另做吉祥物、不另起第二套皮。
+3. **一字标族**：品牌露出用 **Logo 标准**三框（可加 SFC 字标 + accent 底线）；不另做吉祥物、不另起第二套皮（**唯一业主令例外**：平面映射纸面皮，见 §1「平面映射纸面皮」，限预览区）。
 4. **动效克制**：以 opacity / 轻微 scale 为主；不为装饰加粒子或 3D logo。
 5. **语义色不动**：US / 非美 / 环导读色变更须同时过 CONCEPTS，不单走美工部。
 
@@ -148,6 +161,8 @@
 | 图标脚本 | `Ind-Chain/scripts/set-command-icon.sh` |
 | 启动器附着面 | 根 `Standard-Financial-Charting.app` 图标资源；原生壳错误面板色板（沿用本文，`Ind-Chain/shell/ErrorPanel.swift`） |
 | Logo 几何真源 | `Ind-Chain/web/index.html`（`.splash-logo` 三框）；纸面同族 `library/showable-report/assets/sfc-logo-frames-paper.svg`（秘书纸面附着；几何以本文 Logo 标准为准） |
+| 平面映射纸面皮 | `Ind-Chain/web/css/plot-paper.css`（`.pm-skin-paper` 与 `--plot-paper-*`）归美工部；`Ind-Chain/web/js/map/draw.js` 的类名层同归 |
+| 映射台外壳 | `Ind-Chain/web/js/map/dock.js`（类名层）；`app.css` 的 `.cube-map` / `.map-dock*` / `.map-sheet*` / `.map-handoff` 与 detail 折叠行 |
 | 概念续工指针 | `Ind-Chain/CONCEPTS.md` §10（美学细节回指本文） |
 
 **不独占：** `coords.js`、抽出/焦点几何、`scene.js` 中服务坐标可读性的材质逻辑；启动器进程与端口逻辑。

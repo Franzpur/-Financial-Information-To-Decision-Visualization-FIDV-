@@ -14,11 +14,17 @@ import {
   companyById,
   stayLayers,
   layerIsStay,
-} from "./state.js?v=55";
+  usesWhiteSpheres,
+  usesChainSpheres,
+  chainSphereColor,
+  revenueLinkKey,
+  revenueLinkByKey,
+} from "./state.js?v=59";
 import {
   FACE,
   FACE_SPAN,
   UNIT,
+  D_EPS,
   USER_X_SIGN,
   LAYOUT,
   gapMeters,
@@ -36,7 +42,9 @@ import {
   SHELL_ANCHOR,
   SHELL_SPAN_LAYERS,
 } from "./coords.js?v=51";
-import { focusPointTargets } from "./bondChart.js?v=2";
+import { focusPointTargets } from "./bondChart.js?v=3";
+import { googlFileEntries, isGooglTicker } from "./map/googlFiles.js?v=2";
+import { buildShape2UsMap } from "./shape2UsMap.js?v=3";
 
 /* ============================================================================
  * Section 1 · Geometry & Slices ([C-SLICE], [C-RING], [C-POINT], [C-REV-LINK])
@@ -140,17 +148,9 @@ export function createScene(viewport, hooks = {}) {
     lerpVisibility(ctx);
     lerpPullOut(ctx);
     controls.update();
-    // [C-POINT] Company rings stay coplanar with the slice (fixed YZ); do not billboard.
-    // [C-REV-LINK] Midpoint cards still face the camera.
-    for (const item of ctx.revenueLinkObjs || []) {
-      if (!item.label) continue;
-      faceQuat.copy(camera.quaternion);
-      if (item.label.parent) {
-        item.label.parent.getWorldQuaternion(parentQuat);
-        faceQuat.premultiply(parentQuat.invert());
-      }
-      item.label.quaternion.copy(faceQuat);
-    }
+    // [C-POINT] Disks / white spheres stay fixed in world; do not billboard.
+    // [C-REV-LINK] No midpoint relationship labels — hover source card only.
+    updateGooglFileCard(ctx, faceQuat, parentQuat);
     placeRevenueLinks(ctx);
     renderer.render(scene, camera);
   }
@@ -161,11 +161,42 @@ export function createScene(viewport, hooks = {}) {
     applyVisibility: () => queueVisibilityTargets(ctx),
     layoutPlanes: () => layoutPlanes(ctx),
     resetCamera: () => resetCamera(ctx),
-    goStandardView: () => goStandardView(ctx, true),
+    goStandardView: (animate = true) => goStandardView(ctx, animate !== false),
     focusSlice: (i) => focusSlice(ctx, i),
     clearFocus: () => clearFocus(ctx),
     selectCompany: (id, opts) => selectCompany(ctx, id, opts || {}),
+    /** Stills / tests: select revenue link by index into `state.revenueLinks`. */
+    selectRevenueLinkAt: (i) => {
+      const L = (state.revenueLinks || [])[i | 0];
+      if (!L) return false;
+      selectLink(ctx, revenueLinkKey(L));
+      return true;
+    },
+    hoverRevenueLinkAt: (i) => {
+      const L = (state.revenueLinks || [])[i | 0];
+      state.hoverLinkKey = L ? revenueLinkKey(L) : null;
+      queueVisibilityTargets(ctx);
+      return Boolean(L);
+    },
+    hoverCompany: (id) => {
+      state.hoverId = id;
+      queueVisibilityTargets(ctx);
+    },
     framingDistance: () => framingDistance(),
+    setCubeShape: (n) => {
+      const next = n === 2 ? 2 : 1;
+      if (state.bundleMode !== "chain" || !state.usMap) {
+        state.cubeShape = 1;
+      } else {
+        state.cubeShape = next;
+      }
+      if (state.cubeShape === 2) {
+        state.selectedLinkKey = null;
+        state.hoverLinkKey = null;
+      }
+      queueVisibilityTargets(ctx);
+      ctx.hooks.onShapeChange?.(state.cubeShape);
+    },
     /** Call after unhiding #app — resize while display:none yields a 1×1 canvas (cloud blur). */
     resize: () => resize(ctx, viewport),
   };
@@ -207,9 +238,9 @@ function placeSliceGroup(g, i) {
 }
 
 function pointRadius(_c) {
-  // Shell: sized for overview-ish framing (~8–12 m) so the firm reads as a clear ring.
+  // demo+shell white spheres: diameter = 1 class unit (UNIT meters).
+  if (usesWhiteSpheres()) return UNIT / 2;
   // Chain (C-REV-LINK): shrink as d→0 so stacked slices do not read as one blob.
-  if (state.shellCube) return 0.28;
   if ((state.revenueLinks || []).length) {
     const d = Number(state.d);
     const t = Number.isFinite(d) ? Math.max(0, Math.min(1, d)) : 1;
@@ -306,6 +337,80 @@ function shortName(c) {
   return c.name.length > 18 ? c.name.slice(0, 16) + "..." : c.name;
 }
 
+/** demo/shell white-sphere name plate (GS-20261016-GOOGL-HOVER-LABEL). */
+const WHITE_LABEL_ABOVE_UNITS = 0.5;
+
+function whiteLabelText(c) {
+  let t = String(c?.name || "")
+    .trim()
+    .replace(/\s+/g, " ")
+    .toLowerCase();
+  if (t.length > 28) t = `${t.slice(0, 27)}…`;
+  return t;
+}
+
+function whiteLabelCoord(base, gap) {
+  const g = Math.max(gap, D_EPS * UNIT);
+  return {
+    s: base.s + LAYOUT.companyLabel.liftMeters / g,
+    x: base.x,
+    y: base.y + WHITE_LABEL_ABOVE_UNITS,
+  };
+}
+
+function makeWhiteLabelTexture(text) {
+  const k = (6 * UNIT) / 512;
+  const scale = 2;
+  const font = "600 18px ui-sans-serif, system-ui, sans-serif";
+  const measure = document.createElement("canvas").getContext("2d");
+  measure.font = font;
+  const W = Math.max(72, Math.ceil(measure.measureText(text).width) + 24);
+  const H = 36;
+  const canvas = document.createElement("canvas");
+  canvas.width = W * scale;
+  canvas.height = H * scale;
+  const ctx2d = canvas.getContext("2d");
+  ctx2d.scale(scale, scale);
+  ctx2d.fillStyle = "rgba(11, 13, 16, 0.72)";
+  ctx2d.fillRect(0, 0, W, H);
+  ctx2d.strokeStyle = "rgba(232, 237, 244, 0.9)";
+  ctx2d.lineWidth = 1;
+  ctx2d.strokeRect(0.5, 0.5, W - 1, H - 1);
+  ctx2d.fillStyle = "#e8edf4";
+  ctx2d.font = font;
+  ctx2d.textAlign = "center";
+  ctx2d.textBaseline = "middle";
+  ctx2d.fillText(text, W / 2, H / 2);
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.needsUpdate = true;
+  tex.generateMipmaps = true;
+  tex.minFilter = THREE.LinearMipmapLinearFilter;
+  tex.magFilter = THREE.LinearFilter;
+  if ("SRGBColorSpace" in THREE) tex.colorSpace = THREE.SRGBColorSpace;
+  return { tex, w: W * k, h: H * k };
+}
+
+function makeWhiteLabelPlane(tex, w, h) {
+  const geo = new THREE.PlaneGeometry(w, h);
+  geo.translate(0, h / 2, 0);
+  const mesh = new THREE.Mesh(
+    geo,
+    new THREE.MeshBasicMaterial({
+      map: tex,
+      transparent: true,
+      depthTest: true,
+      depthWrite: false,
+      toneMapped: false,
+      side: THREE.DoubleSide,
+      opacity: 1,
+    })
+  );
+  mesh.rotation.y = Math.PI / 2;
+  mesh.userData.isWhiteLabel = true;
+  mesh.userData.baseRenderOrder = 7;
+  return mesh;
+}
+
 function shellCompanyCoord(c) {
   const a = state.shellAnchor || SHELL_ANCHOR;
   return {
@@ -316,41 +421,17 @@ function shellCompanyCoord(c) {
 }
 
 
-function makeRevenueCardTexture(name, pctLine) {
-  const canvas = document.createElement("canvas");
-  canvas.width = 1024;
-  canvas.height = 128;
-  const ctx2d = canvas.getContext("2d");
-  ctx2d.clearRect(0, 0, canvas.width, canvas.height);
-  ctx2d.font = "600 44px ui-sans-serif, system-ui, PingFang SC, sans-serif";
-  ctx2d.textAlign = "center";
-  ctx2d.textBaseline = "middle";
-  [String(name || ""), String(pctLine || "")].forEach((line, i) => {
-    const x = canvas.width / 2;
-    const y = 36 + i * 58;
-    ctx2d.lineJoin = "round";
-    ctx2d.lineWidth = 8;
-    ctx2d.strokeStyle = "rgba(8, 12, 18, 0.92)";
-    ctx2d.strokeText(line, x, y);
-    ctx2d.fillStyle = "rgba(245, 252, 255, 0.98)";
-    ctx2d.fillText(line, x, y);
-  });
-  const tex = new THREE.CanvasTexture(canvas);
-  tex.needsUpdate = true;
-  tex.colorSpace = THREE.SRGBColorSpace;
-  return tex;
-}
+const _linkY = new THREE.Vector3(0, 1, 0);
 
-function makeCameraTextPlane(map, width, height) {
-  return new THREE.Mesh(
-    new THREE.PlaneGeometry(width, height),
-    new THREE.MeshBasicMaterial({
-      map,
-      transparent: true,
-      depthWrite: false,
-      side: THREE.DoubleSide,
-    })
-  );
+function orientLinkCylinder(mesh, la, lb) {
+  if (!mesh) return;
+  const mid = la.clone().add(lb).multiplyScalar(0.5);
+  const dir = lb.clone().sub(la);
+  const len = Math.max(dir.length(), 1e-4);
+  dir.multiplyScalar(1 / len);
+  mesh.position.copy(mid);
+  mesh.scale.set(1, len, 1);
+  mesh.quaternion.setFromUnitVectors(_linkY, dir);
 }
 
 function placeRevenueLinks(ctx) {
@@ -359,72 +440,48 @@ function placeRevenueLinks(ctx) {
   ctx.root.updateMatrixWorld(true);
   const Wa = new THREE.Vector3();
   const Wb = new THREE.Vector3();
-  const mid = new THREE.Vector3();
-  const dir = new THREE.Vector3();
-  const perp = new THREE.Vector3();
-  const up = new THREE.Vector3(0, 1, 0);
-  const alt = new THREE.Vector3(1, 0, 0);
   items.forEach((item) => {
     const a = ctx.byId.get(item.fromId);
     const b = ctx.byId.get(item.toId);
-    if (!a || !b || !item.line) return;
+    if (!a || !b) return;
     a.getWorldPosition(Wa);
     b.getWorldPosition(Wb);
     const la = ctx.root.worldToLocal(Wa.clone());
     const lb = ctx.root.worldToLocal(Wb.clone());
-    dir.copy(lb).sub(la);
-    const len = dir.length();
-    if (len > 1e-6) {
-      dir.multiplyScalar(1 / len);
-      const ref = Math.abs(dir.y) < 0.9 ? up : alt;
-      perp.crossVectors(dir, ref).normalize().multiplyScalar(0.01);
-    } else {
-      perp.set(0, 0.01, 0);
-    }
-    const setSeg = (line, ox, oy, oz) => {
-      if (!line) return;
-      const pos = line.geometry.attributes.position;
-      pos.setXYZ(0, la.x + ox, la.y + oy, la.z + oz);
-      pos.setXYZ(1, lb.x + ox, lb.y + oy, lb.z + oz);
-      pos.needsUpdate = true;
-      line.geometry.computeBoundingSphere();
-    };
-    setSeg(item.line, perp.x, perp.y, perp.z);
-    setSeg(item.lineB, -perp.x, -perp.y, -perp.z);
-    if (item.label) {
-      mid.copy(la).add(lb).multiplyScalar(0.5);
-      item.label.position.copy(mid);
-      item.label.quaternion.copy(ctx.camera.quaternion);
+    orientLinkCylinder(item.tube, la, lb);
+    orientLinkCylinder(item.hit, la, lb);
+    const hot =
+      item.key === state.hoverLinkKey || item.key === state.selectedLinkKey;
+    if (item.tube && hot) {
+      item.tube.scale.x *= 1.25;
+      item.tube.scale.z *= 1.25;
     }
   });
+  updateLinkSourceCard(ctx);
 }
 
 function linkSideColor(side) {
   return side === "supplier" ? COLORS.LINK_SUPPLIER : COLORS.LINK_CUSTOMER;
 }
 
-function makeRevenueLinkStroke(side) {
-  const mat = new THREE.LineBasicMaterial({
+function makeRevenueLinkTube(side, radius, opts = {}) {
+  const mat = new THREE.MeshBasicMaterial({
     color: linkSideColor(side),
     transparent: true,
-    opacity: 0.92,
+    opacity: opts.opacity ?? 0.9,
     depthWrite: false,
-    linewidth: 2,
+    toneMapped: false,
+    visible: opts.visible !== false,
   });
-  const line = new THREE.Line(
-    new THREE.BufferGeometry().setFromPoints([
-      new THREE.Vector3(),
-      new THREE.Vector3(),
-    ]),
-    mat
-  );
-  line.userData.isRevenueLink = true;
-  line.renderOrder = 4;
-  return line;
+  const mesh = new THREE.Mesh(new THREE.CylinderGeometry(radius, radius, 1, 10), mat);
+  mesh.userData.isRevenueLink = true;
+  mesh.renderOrder = 4;
+  return mesh;
 }
 
 function buildRevenueLinks(ctx) {
   ctx.revenueLinkObjs = [];
+  ctx.revenueLinkHits = [];
   const links = state.revenueLinks;
   if (state.shellCube || !Array.isArray(links) || !links.length) return;
   links.forEach((link) => {
@@ -433,34 +490,23 @@ function buildRevenueLinks(ctx) {
     const toId = link.toId;
     if (fromId == null || toId == null) return;
     if (!ctx.byId.has(fromId) || !ctx.byId.has(toId)) return;
-    // Twin strokes approximate thicker lines (WebGL often ignores linewidth).
-    const line = makeRevenueLinkStroke(link.side);
-    const lineB = makeRevenueLinkStroke(link.side);
-    lineB.material.opacity = 0.55;
-    ctx.root.add(line);
-    ctx.root.add(lineB);
-    const pct = Number(link.pct);
-    const pctLine = Number.isFinite(pct)
-      ? pct.toFixed(2) + "% " + (link.side === "supplier" ? "NVDA spend" : "NVDA rev")
-      : link.side === "supplier"
-        ? "supplier"
-        : "customer";
-    const label = makeCameraTextPlane(
-      makeRevenueCardTexture(link.name || "", pctLine),
-      1.15,
-      0.18
-    );
-    label.userData.isRevenueLabel = true;
-    label.renderOrder = 7;
-    ctx.root.add(label);
-    ctx.revenueLinkObjs.push({
-      side: link.side,
-      fromId,
-      toId,
-      line,
-      lineB,
-      label,
-    });
+    const key = revenueLinkKey(link);
+    // Slim cylinder (WebGL ignores Line linewidth) + slightly larger invisible hit volume.
+    const tube = makeRevenueLinkTube(link.side, 0.016);
+    // Invisible but raycastable hit volume (visible:false meshes are skipped by Raycaster).
+    const hit = makeRevenueLinkTube(link.side, 0.055, { opacity: 0 });
+    hit.material.transparent = true;
+    hit.material.depthWrite = false;
+    hit.material.colorWrite = false;
+    tube.userData.linkKey = key;
+    hit.userData.linkKey = key;
+    hit.userData.isRevenueLinkHit = true;
+    ctx.root.add(tube);
+    ctx.root.add(hit);
+    // No midpoint relationship labels — hover source-file card only.
+    const item = { side: link.side, fromId, toId, key, tube, hit, link };
+    ctx.revenueLinkObjs.push(item);
+    ctx.revenueLinkHits.push(hit);
   });
 }
 
@@ -470,6 +516,8 @@ function buildCube(ctx) {
   ctx.planeGroups = [];
   ctx.meshes = [];
   ctx.revenueLinkObjs = [];
+  ctx.revenueLinkHits = [];
+  ctx.shape2 = null; // root children cleared above; drop stale handle
   ctx.byId.clear();
   // [C-CUBE] Shell: no C-SLICE walls, no C-RING guides, no thick bars — firm at (5,5,5). No outer wire cube.
   if (!state.shellCube) {
@@ -554,56 +602,70 @@ function buildCube(ctx) {
     const isUS = c.country === "US";
     const color = isUS ? COLORS.US : COLORS.INTL;
     const r = pointRadius(c);
-    // C-POINT: 米白实心盘 + US/INTL 色环边；整圆可拾取。共面 YZ，非 billboard。
-    const fillMat = new THREE.MeshBasicMaterial({
-      color: COLORS.RING_FILL,
-      transparent: false,
-      depthWrite: true,
-      opacity: 1,
-      toneMapped: false,
-      side: THREE.DoubleSide,
-    });
-    const rimMat = state.shellCube
-      ? new THREE.MeshBasicMaterial({
-          color,
-          transparent: false,
-          depthWrite: true,
-          opacity: 1,
-          toneMapped: false,
-          side: THREE.DoubleSide,
-        })
-      : new THREE.MeshStandardMaterial({
-          color,
-          roughness: 0.22,
-          metalness: 0.05,
-          emissive: color,
-          emissiveIntensity: isUS ? 0.75 : 0.7,
-          transparent: false,
-          depthWrite: true,
-          opacity: 1,
-          side: THREE.DoubleSide,
-        });
-    const fill = new THREE.Mesh(new THREE.CircleGeometry(r * 0.82, 64), fillMat);
-    fill.userData.companyId = c.id;
-    fill.userData.isRingFill = true;
-    fill.renderOrder = 5;
-    const rim = new THREE.Mesh(new THREE.RingGeometry(r * 0.78, r, 64), rimMat);
-    rim.userData.companyId = c.id;
-    rim.userData.isRingRim = true;
-    rim.renderOrder = 6;
     const mesh = new THREE.Group();
-    mesh.rotation.y = Math.PI / 2;
     mesh.userData.companyId = c.id;
     mesh.userData.basePointR = r;
     mesh.userData.dScale = 1;
     mesh.userData.targetHoverScale = 1;
-    mesh.userData.fill = fill;
-    mesh.userData.rim = rim;
     mesh.userData.isCompanyPoint = true;
     mesh.renderOrder = 5;
-    mesh.add(fill);
-    mesh.add(rim);
 
+    if (usesWhiteSpheres() || usesChainSpheres()) {
+      // C-POINT: unit spheres — demo/shell white; chain center white / supplier green / customer red.
+      const ballColor = usesChainSpheres() ? chainSphereColor(c) : 0xffffff;
+      const fillMat = new THREE.MeshBasicMaterial({
+        color: ballColor,
+        transparent: false,
+        depthWrite: true,
+        opacity: 1,
+        toneMapped: false,
+      });
+      const fill = new THREE.Mesh(new THREE.SphereGeometry(r, 32, 24), fillMat);
+      fill.userData.companyId = c.id;
+      fill.userData.isRingFill = true;
+      fill.renderOrder = 5;
+      mesh.userData.fill = fill;
+      mesh.userData.rim = null;
+      mesh.userData.isWhiteSphere = usesWhiteSpheres();
+      mesh.userData.isChainSphere = usesChainSpheres();
+      mesh.add(fill);
+    } else {
+      // Legacy disk path (unused while chain uses spheres).
+      const fillMat = new THREE.MeshBasicMaterial({
+        color: COLORS.RING_FILL,
+        transparent: false,
+        depthWrite: true,
+        opacity: 1,
+        toneMapped: false,
+        side: THREE.DoubleSide,
+      });
+      const rimMat = new THREE.MeshStandardMaterial({
+        color,
+        roughness: 0.22,
+        metalness: 0.05,
+        emissive: color,
+        emissiveIntensity: isUS ? 0.75 : 0.7,
+        transparent: false,
+        depthWrite: true,
+        opacity: 1,
+        side: THREE.DoubleSide,
+      });
+      const fill = new THREE.Mesh(new THREE.CircleGeometry(r * 0.82, 64), fillMat);
+      fill.userData.companyId = c.id;
+      fill.userData.isRingFill = true;
+      fill.renderOrder = 5;
+      const rim = new THREE.Mesh(new THREE.RingGeometry(r * 0.78, r, 64), rimMat);
+      rim.userData.companyId = c.id;
+      rim.userData.isRingRim = true;
+      rim.renderOrder = 6;
+      mesh.rotation.y = Math.PI / 2;
+      mesh.userData.fill = fill;
+      mesh.userData.rim = rim;
+      mesh.add(fill);
+      mesh.add(rim);
+    }
+
+    const sphereLabel = usesWhiteSpheres() || usesChainSpheres();
     const useShellPlace =
       state.shellCube || c.layer == null || !ctx.planeGroups[c.layer];
     if (useShellPlace) {
@@ -611,8 +673,15 @@ function buildCube(ctx) {
       c.coord = coord;
       applyCoord(mesh, coord);
       root.add(mesh);
-      const label = makeSliceTextPlane(makeCompanyLabelTexture(shortName(c), isUS), 0.72, 0.14);
-      applyCoord(label, companyLabelCoord(coord, r, gapNow()));
+      let label;
+      if (sphereLabel) {
+        const { tex, w, h } = makeWhiteLabelTexture(whiteLabelText(c));
+        label = makeWhiteLabelPlane(tex, w, h);
+        applyCoord(label, whiteLabelCoord(coord, gapNow()));
+      } else {
+        label = makeSliceTextPlane(makeCompanyLabelTexture(shortName(c), isUS), 0.72, 0.14);
+        applyCoord(label, companyLabelCoord(coord, r, gapNow()));
+      }
       label.visible = true;
       label.renderOrder = 7;
       label.userData.isCompanyLabel = true;
@@ -624,8 +693,15 @@ function buildCube(ctx) {
       c.coord = coord;
       applySliceCoord(mesh, c.layer, coord);
       ctx.planeGroups[c.layer].add(mesh);
-      const label = makeSliceTextPlane(makeCompanyLabelTexture(shortName(c), isUS), 0.72, 0.14);
-      applySliceCoord(label, c.layer, companyLabelCoord(coord, r, gapNow()));
+      let label;
+      if (sphereLabel) {
+        const { tex, w, h } = makeWhiteLabelTexture(whiteLabelText(c));
+        label = makeWhiteLabelPlane(tex, w, h);
+        applySliceCoord(label, c.layer, whiteLabelCoord(coord, gapNow()));
+      } else {
+        label = makeSliceTextPlane(makeCompanyLabelTexture(shortName(c), isUS), 0.72, 0.14);
+        applySliceCoord(label, c.layer, companyLabelCoord(coord, r, gapNow()));
+      }
       label.visible = false;
       label.renderOrder = 7;
       label.userData.isCompanyLabel = true;
@@ -638,8 +714,49 @@ function buildCube(ctx) {
   });
 
   buildRevenueLinks(ctx);
+  rebuildShape2(ctx);
   layoutPlanes(ctx);
   queueVisibilityTargets(ctx);
+  applyCubeShape(ctx);
+}
+
+function disposeShape2(ctx) {
+  if (ctx.shape2?.dispose) ctx.shape2.dispose();
+  if (ctx.shape2?.group?.parent) ctx.shape2.group.parent.remove(ctx.shape2.group);
+  ctx.shape2 = null;
+}
+
+function rebuildShape2(ctx) {
+  disposeShape2(ctx);
+  if (state.bundleMode !== "chain" || !state.usMap) return;
+  const built = buildShape2UsMap(state.usMap, { nLayers: N_LAYERS(), gap: gapNow() });
+  if (!built) return;
+  ctx.root.add(built.group);
+  built.group.visible = state.cubeShape === 2;
+  ctx.shape2 = built;
+}
+
+/** Shape 1 = slices + linear C-REV-LINK; Shape 2 = US map (NVDA chain). */
+function applyCubeShape(ctx) {
+  if (state.cubeShape === 2 && state.bundleMode === "chain" && !ctx.shape2) rebuildShape2(ctx);
+  const shape2 = state.cubeShape === 2 && state.bundleMode === "chain" && Boolean(ctx.shape2?.group);
+  if (ctx.shape2?.group) ctx.shape2.group.visible = shape2;
+  ctx.planeGroups.forEach((g) => {
+    g.visible = !shape2;
+  });
+  if (shape2) {
+    (ctx.revenueLinkObjs || []).forEach((item) => {
+      if (item.tube) item.tube.visible = false;
+      if (item.hit) item.hit.visible = false;
+    });
+    ctx.meshes.forEach((mesh) => {
+      mesh.visible = false;
+      if (mesh.userData.label) mesh.userData.label.visible = false;
+    });
+    if (ctx.googlCard) ctx.googlCard.visible = false;
+    if (ctx.linkSourceCard) ctx.linkSourceCard.visible = false;
+    if (ctx.axesGroup) ctx.axesGroup.visible = !state.altHideAxes;
+  }
 }
 
 function layoutPlanes(ctx) {
@@ -659,7 +776,11 @@ function layoutPlanes(ctx) {
       const r = pointRadius(c);
       applyCoord(mesh, coord);
       if (mesh.userData.label) {
-        applyCoord(mesh.userData.label, companyLabelCoord(coord, r, gapNow()));
+        const lc =
+          usesWhiteSpheres() || usesChainSpheres()
+            ? whiteLabelCoord(coord, gapNow())
+            : companyLabelCoord(coord, r, gapNow());
+        applyCoord(mesh.userData.label, lc);
       }
     });
   }
@@ -692,6 +813,8 @@ function layoutPlanes(ctx) {
   }
   rebuildAxes(ctx);
   placeRevenueLinks(ctx);
+  // Shape Two positions depend on gap (s-scale); rebuild when d changes.
+  if (state.usMap && state.bundleMode === "chain") rebuildShape2(ctx);
 }
 
 /**
@@ -984,6 +1107,8 @@ function resetCamera(ctx) {
   state.focusLayer = null;
   state.selectedId = null;
   state.hoverId = null;
+  state.selectedLinkKey = null;
+  state.hoverLinkKey = null;
   state.pinnedLayers = [];
   ctx.cubeExit = 0;
   ctx.exitStayLayer = null;
@@ -1008,13 +1133,16 @@ function focusSlice(ctx, i) {
   if (state.focusLayer === i) {
     state.focusLayer = null;
     state.selectedId = null;
+    state.selectedLinkKey = null;
     state.hoverId = null;
+    state.hoverLinkKey = null;
     queueVisibilityTargets(ctx);
     ctx.hooks.onClear?.();
     return;
   }
   state.focusLayer = i;
   state.selectedId = null;
+  state.selectedLinkKey = null;
   queueVisibilityTargets(ctx);
   ctx.hooks.onFocusChange?.();
 }
@@ -1036,6 +1164,13 @@ function togglePinLayer(ctx, i) {
 
 /** [C-ESC] Clear select → focus → all pins; camera unchanged. */
 function clearFocus(ctx) {
+  if (state.selectedLinkKey != null) {
+    state.selectedLinkKey = null;
+    state.hoverLinkKey = null;
+    queueVisibilityTargets(ctx);
+    ctx.hooks.onClear?.();
+    return;
+  }
   if (state.selectedId != null) {
     state.selectedId = null;
     queueVisibilityTargets(ctx);
@@ -1073,6 +1208,16 @@ function clearFocusKeepPins(ctx) {
 function selectCompany(ctx, id, opts = {}) {
   const c = companyById(id);
   if (!c) return;
+  // GOOGL white-sphere file ring: each click advances; wraps to first.
+  if (usesWhiteSpheres() && isGooglTicker(c.ticker)) {
+    const n = googlFileEntries().length;
+    if (n > 0) {
+      state.googlFileIndex = (Number(state.googlFileIndex) + 1) % n;
+      ctx.googlCardDirty = true;
+    }
+  }
+  state.selectedLinkKey = null;
+  state.hoverLinkKey = null;
   state.selectedId = id;
   if (!state.shellCube && c.layer != null) {
     state.focusLayer = c.layer;
@@ -1086,6 +1231,352 @@ function selectCompany(ctx, id, opts = {}) {
     return;
   }
   ctx.hooks.onSelect?.(c, {});
+}
+
+/** GOOGL file-card leader + screen-constant card (GS-20261016-GOOGL-HOVER-LEFT-SCALE). */
+const GOOGL_LEADER_UP = 3;
+const GOOGL_LEADER_DIAG = 2;
+const GOOGL_LEADER_NEAR_D0 = 9.7;
+const GOOGL_CARD_PX = 400;
+const GOOGL_CARD_PX_MIN = 240;
+/** Ball NDC x below this → fold right (card would crowd the left); hysteresis ±0.05. */
+const GOOGL_FOLD_BALL_NDC = -0.35;
+const GOOGL_FOLD_HYST = 0.05;
+
+function makeGooglCardTexture(entries, activeIndex) {
+  // Cube chrome on canvas (AESTHETIC §1 tokens as literals; no paper skin).
+  // Hover-only: always list all files (GS-20261016-GOOGL-HOVER-LABEL).
+  const W = 512;
+  const rowH = 28;
+  const pad = 16;
+  const lines = entries;
+  const H = Math.max(96, pad * 2 + 36 + lines.length * rowH + 8);
+  const scale = 2;
+  const canvas = document.createElement("canvas");
+  canvas.width = W * scale;
+  canvas.height = H * scale;
+  const ctx2d = canvas.getContext("2d");
+  ctx2d.scale(scale, scale);
+  // alpha 0.72: 0.55 washed out on #0b0d10 fog/bg (cabinet allows ≤0.72 with reason)
+  ctx2d.fillStyle = "rgba(11, 13, 16, 0.72)";
+  ctx2d.fillRect(0, 0, W, H);
+  ctx2d.strokeStyle = "rgba(232, 237, 244, 0.9)";
+  ctx2d.lineWidth = 1;
+  ctx2d.strokeRect(0.5, 0.5, W - 1, H - 1);
+  ctx2d.fillStyle = "#e8edf4";
+  ctx2d.font = "600 18px ui-sans-serif, system-ui, sans-serif";
+  const title = "GOOGL files";
+  ctx2d.fillText(title, pad, pad + 18);
+  const tw = ctx2d.measureText(title).width;
+  ctx2d.strokeStyle = "rgba(139, 224, 192, 0.55)";
+  ctx2d.beginPath();
+  ctx2d.moveTo(pad, pad + 24);
+  ctx2d.lineTo(pad + tw, pad + 24);
+  ctx2d.stroke();
+  ctx2d.font = "400 14px ui-monospace, Menlo, monospace";
+  lines.forEach((e, i) => {
+    const y = pad + 40 + i * rowH;
+    const on = i === activeIndex;
+    if (on) {
+      ctx2d.fillStyle = "rgba(232, 237, 244, 0.08)";
+      ctx2d.fillRect(pad - 6, y - 16, W - pad * 2 + 12, rowH - 4);
+      ctx2d.fillStyle = "#8be0c0";
+      ctx2d.fillRect(pad - 6, y - 16, 2, rowH - 4);
+    }
+    ctx2d.fillStyle = on ? "#e8edf4" : "#9aa6b5";
+    ctx2d.fillText(e.name, pad + 4, y);
+    ctx2d.fillStyle = "#9aa6b5";
+    ctx2d.font = "400 11px ui-sans-serif, system-ui, sans-serif";
+    const short = e.path.length > 56 ? `…${e.path.slice(-54)}` : e.path;
+    ctx2d.fillText(short, pad + 4, y + 12);
+    ctx2d.font = "400 14px ui-monospace, Menlo, monospace";
+  });
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.needsUpdate = true;
+  tex.generateMipmaps = true;
+  tex.minFilter = THREE.LinearMipmapLinearFilter;
+  tex.magFilter = THREE.LinearFilter;
+  if ("SRGBColorSpace" in THREE) tex.colorSpace = THREE.SRGBColorSpace;
+  return { tex, aspect: W / H };
+}
+
+function ensureGooglFileCard(ctx) {
+  if (ctx.googlCard) return ctx.googlCard;
+  const mat = new THREE.MeshBasicMaterial({
+    transparent: true,
+    depthTest: false,
+    depthWrite: false,
+    toneMapped: false,
+    side: THREE.DoubleSide,
+  });
+  const mesh = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), mat);
+  mesh.visible = false;
+  mesh.frustumCulled = false;
+  mesh.renderOrder = 30;
+  mesh.userData.isGooglCard = true;
+  ctx.root.add(mesh);
+  ctx.googlCard = mesh;
+  const leadGeo = new THREE.BufferGeometry().setFromPoints([
+    new THREE.Vector3(),
+    new THREE.Vector3(),
+    new THREE.Vector3(),
+  ]);
+  const leadMat = new THREE.LineBasicMaterial({
+    color: 0xe8edf4,
+    transparent: true,
+    opacity: 0.9,
+    depthTest: false,
+    depthWrite: false,
+    toneMapped: false,
+  });
+  const lead = new THREE.Line(leadGeo, leadMat);
+  lead.visible = false;
+  lead.frustumCulled = false;
+  lead.renderOrder = 29;
+  lead.userData.isGooglLeader = true;
+  ctx.root.add(lead);
+  ctx.googlLeader = lead;
+  ctx.googlLeaderFoldRight = false; // false = fold left (default)
+  ctx.googlCardDirty = true;
+  return mesh;
+}
+
+function linkSourcePaths(link) {
+  if (!link) return [];
+  if (Array.isArray(link.sourcePaths) && link.sourcePaths.length) {
+    return link.sourcePaths.map(String);
+  }
+  if (link.sourcePath) return [String(link.sourcePath)];
+  return [];
+}
+
+function makeLinkSourceCardTexture(link) {
+  const paths = linkSourcePaths(link);
+  const title = link.side === "supplier" ? "supplier link" : "customer link";
+  const lines = paths.length ? paths.map((p) => p.split("/").pop() || p) : ["(no source file)"];
+  const scale = 2;
+  const W = 320;
+  const rowH = 22;
+  const H = 36 + lines.length * rowH + 12;
+  const canvas = document.createElement("canvas");
+  canvas.width = W * scale;
+  canvas.height = H * scale;
+  const g = canvas.getContext("2d");
+  g.scale(scale, scale);
+  g.fillStyle = "rgba(11, 13, 16, 0.82)";
+  g.fillRect(0, 0, W, H);
+  g.strokeStyle = "rgba(232, 237, 244, 0.9)";
+  g.lineWidth = 1;
+  g.strokeRect(0.5, 0.5, W - 1, H - 1);
+  g.fillStyle = "#e8edf4";
+  g.font = "600 13px ui-sans-serif, system-ui, sans-serif";
+  g.fillText(title, 12, 22);
+  g.font = "12px ui-monospace, Menlo, monospace";
+  g.fillStyle = "rgba(232, 237, 244, 0.78)";
+  lines.forEach((t, i) => {
+    const s = t.length > 42 ? `${t.slice(0, 41)}…` : t;
+    g.fillText(s, 12, 42 + i * rowH);
+  });
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.needsUpdate = true;
+  if ("SRGBColorSpace" in THREE) tex.colorSpace = THREE.SRGBColorSpace;
+  return { tex, aspect: W / H };
+}
+
+function ensureLinkSourceCard(ctx) {
+  if (ctx.linkSourceCard) return ctx.linkSourceCard;
+  const mat = new THREE.MeshBasicMaterial({
+    transparent: true,
+    depthTest: false,
+    depthWrite: false,
+    toneMapped: false,
+    side: THREE.DoubleSide,
+  });
+  const mesh = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), mat);
+  mesh.visible = false;
+  mesh.frustumCulled = false;
+  mesh.renderOrder = 31;
+  mesh.userData.isLinkSourceCard = true;
+  ctx.root.add(mesh);
+  ctx.linkSourceCard = mesh;
+  return mesh;
+}
+
+function updateLinkSourceCard(ctx) {
+  const mesh = ensureLinkSourceCard(ctx);
+  const key = state.hoverLinkKey;
+  const link = key ? revenueLinkByKey(key) : null;
+  if (!link) {
+    mesh.visible = false;
+    return;
+  }
+  const item = (ctx.revenueLinkObjs || []).find((it) => it.key === key);
+  if (!item?.tube || !item.tube.visible) {
+    mesh.visible = false;
+    return;
+  }
+  if (ctx.linkSourceCardKey !== key) {
+    const { tex, aspect } = makeLinkSourceCardTexture(link);
+    if (mesh.material.map) mesh.material.map.dispose();
+    mesh.material.map = tex;
+    mesh.material.needsUpdate = true;
+    ctx.linkSourceCardAspect = aspect;
+    ctx.linkSourceCardKey = key;
+  }
+  const aspect = ctx.linkSourceCardAspect || 1.6;
+  const camPos = new THREE.Vector3();
+  ctx.camera.getWorldPosition(camPos);
+  const mid = new THREE.Vector3();
+  item.tube.getWorldPosition(mid);
+  const depth = Math.max(0.5, mid.distanceTo(camPos));
+  const size = ctx.renderer.getSize(new THREE.Vector2());
+  const k2 = 2 * Math.tan(THREE.MathUtils.degToRad(ctx.camera.fov) / 2);
+  const wPx = Math.min(280, 0.36 * size.x);
+  const wWorld = (wPx * k2 * depth) / size.y;
+  mesh.scale.set(wWorld, wWorld / aspect, 1);
+  const local = mid.clone();
+  ctx.root.worldToLocal(local);
+  mesh.position.copy(local);
+  mesh.position.y += 0.22;
+  mesh.quaternion.copy(ctx.camera.quaternion);
+  if (mesh.parent) {
+    const pq = new THREE.Quaternion();
+    mesh.parent.getWorldQuaternion(pq);
+    mesh.quaternion.premultiply(pq.invert());
+  }
+  mesh.visible = true;
+}
+
+function selectLink(ctx, key) {
+  if (!key || !revenueLinkByKey(key)) return;
+  state.selectedLinkKey = key;
+  state.selectedId = null;
+  state.hoverId = null;
+  queueVisibilityTargets(ctx);
+  ctx.hooks.onSelectLink?.(revenueLinkByKey(key));
+}
+
+function updateGooglFileCard(ctx, faceQuat, parentQuat) {
+  if (!usesWhiteSpheres()) {
+    if (ctx.googlCard) ctx.googlCard.visible = false;
+    if (ctx.googlLeader) ctx.googlLeader.visible = false;
+    return;
+  }
+  // Hover-only: selected-but-not-hovered shows nothing (GS-20261016-GOOGL-HOVER-LABEL).
+  const hover = state.hoverId != null ? companyById(state.hoverId) : null;
+  const c = hover && isGooglTicker(hover.ticker) ? hover : null;
+  const mesh = ensureGooglFileCard(ctx);
+  const lead = ctx.googlLeader;
+  if (!c) {
+    mesh.visible = false;
+    if (lead) lead.visible = false;
+    return;
+  }
+  const host = ctx.byId.get(c.id);
+  if (!host || !host.visible) {
+    mesh.visible = false;
+    if (lead) lead.visible = false;
+    return;
+  }
+  const entries = googlFileEntries();
+  if (!entries.length) {
+    mesh.visible = false;
+    if (lead) lead.visible = false;
+    return;
+  }
+  const idx = ((state.googlFileIndex % entries.length) + entries.length) % entries.length;
+  if (ctx.googlCardDirty || ctx.googlCardKey !== `${idx}:${entries.length}`) {
+    const { tex, aspect } = makeGooglCardTexture(entries, idx);
+    if (mesh.material.map) mesh.material.map.dispose();
+    mesh.material.map = tex;
+    mesh.material.needsUpdate = true;
+    const maxAniso = ctx.renderer?.capabilities?.getMaxAnisotropy?.() || 1;
+    tex.anisotropy = Math.max(1, Math.floor(maxAniso / 2));
+    ctx.googlCardAspect = aspect;
+    ctx.googlCardDirty = false;
+    ctx.googlCardKey = `${idx}:${entries.length}`;
+  }
+  const aspect = ctx.googlCardAspect || 1;
+  const center = new THREE.Vector3();
+  host.getWorldPosition(center);
+  ctx.root.worldToLocal(center);
+
+  // Billboard first so corner offset matches camera.
+  faceQuat.copy(ctx.camera.quaternion);
+  if (mesh.parent) {
+    mesh.parent.getWorldQuaternion(parentQuat);
+    faceQuat.premultiply(parentQuat.invert());
+  }
+  mesh.quaternion.copy(faceQuat);
+
+  const worldCenter = new THREE.Vector3();
+  host.getWorldPosition(worldCenter);
+  const camQ = new THREE.Quaternion();
+  ctx.camera.getWorldQuaternion(camQ);
+  const camPos = new THREE.Vector3();
+  ctx.camera.getWorldPosition(camPos);
+  const fwd = new THREE.Vector3(0, 0, -1).applyQuaternion(camQ);
+  const depthOf = (pWorld) => Math.max(0.5, pWorld.clone().sub(camPos).dot(fwd));
+
+  const rootQ = new THREE.Quaternion();
+  ctx.root.getWorldQuaternion(rootQ);
+  const localCam = rootQ.clone().invert().multiply(camQ);
+  const camRight = new THREE.Vector3(1, 0, 0).applyQuaternion(localCam).normalize();
+  const camUp = new THREE.Vector3(0, 1, 0).applyQuaternion(localCam).normalize();
+
+  const size = ctx.renderer.getSize(new THREE.Vector2());
+  const k2 = 2 * Math.tan(THREE.MathUtils.degToRad(ctx.camera.fov) / 2);
+  const wPx = THREE.MathUtils.clamp(
+    Math.min(GOOGL_CARD_PX, 0.42 * size.x, 0.3 * size.y * aspect),
+    GOOGL_CARD_PX_MIN,
+    GOOGL_CARD_PX
+  );
+
+  const lam = Math.min(1, depthOf(worldCenter) / GOOGL_LEADER_NEAR_D0);
+  const tipFor = (foldRight) => {
+    const dir = camRight
+      .clone()
+      .multiplyScalar(foldRight ? 1 : -1)
+      .add(camUp)
+      .normalize();
+    const elbow = center.clone().add(new THREE.Vector3(0, GOOGL_LEADER_UP * UNIT * lam, 0));
+    const tip = elbow.clone().add(dir.multiplyScalar(GOOGL_LEADER_DIAG * UNIT * lam));
+    return { elbow, tip };
+  };
+
+  // Default fold left; flip right only when the ball itself sits in the left of the view
+  // (a 400px card's left-edge test would flip immediately on typical viewports).
+  const ballNdc = worldCenter.clone().project(ctx.camera);
+  if (!ctx.googlLeaderFoldRight && ballNdc.x < GOOGL_FOLD_BALL_NDC - GOOGL_FOLD_HYST) {
+    ctx.googlLeaderFoldRight = true;
+  } else if (ctx.googlLeaderFoldRight && ballNdc.x > GOOGL_FOLD_BALL_NDC + GOOGL_FOLD_HYST) {
+    ctx.googlLeaderFoldRight = false;
+  }
+
+  const foldRight = ctx.googlLeaderFoldRight;
+  const { elbow, tip } = tipFor(foldRight);
+  const tipWorld = tip.clone();
+  ctx.root.localToWorld(tipWorld);
+  const wWorld = (wPx * k2 * depthOf(tipWorld)) / size.y;
+  mesh.scale.set(wWorld, wWorld / aspect, 1);
+
+  const halfW = wWorld * 0.5;
+  const halfH = mesh.scale.y * 0.5;
+  // Left fold → bottom-right corner on tip; right fold → bottom-left.
+  const cornerLocal = new THREE.Vector3(foldRight ? -halfW : halfW, -halfH, 0);
+  cornerLocal.applyQuaternion(faceQuat);
+  mesh.position.copy(tip).sub(cornerLocal);
+
+  if (lead) {
+    const pos = lead.geometry.attributes.position;
+    pos.setXYZ(0, center.x, center.y, center.z);
+    pos.setXYZ(1, elbow.x, elbow.y, elbow.z);
+    pos.setXYZ(2, tip.x, tip.y, tip.z);
+    pos.needsUpdate = true;
+    lead.geometry.computeBoundingSphere();
+    lead.visible = true;
+  }
+  mesh.visible = true;
 }
 
 function companyOnStay(c) {
@@ -1124,6 +1615,7 @@ function queueVisibilityTargets(ctx) {
       hovered,
       lit,
       country: c.country,
+      whiteSphere: Boolean(mesh.userData.isWhiteSphere || mesh.userData.isChainSphere),
     });
     mesh.userData.targetEmissive = targetEmissive;
     mesh.userData.targetOpacity = targetOpacity;
@@ -1139,7 +1631,17 @@ function queueVisibilityTargets(ctx) {
       fill.material.depthWrite = false;
     }
     mesh.renderOrder = lit ? 8 : 4;
-    if (mesh.userData.label) mesh.userData.label.renderOrder = lit ? 10 : 4;
+    if (mesh.userData.label) {
+      const label = mesh.userData.label;
+      const enlarged = (mesh.userData.targetHoverScale || 1) > 1.001;
+      if (label.userData.isWhiteLabel && enlarged) {
+        label.material.depthTest = false;
+        label.renderOrder = 31;
+      } else {
+        if (label.material) label.material.depthTest = true;
+        label.renderOrder = lit ? 10 : 4;
+      }
+    }
   });
 
   (ctx.revenueLinkObjs || []).forEach((item) => {
@@ -1153,9 +1655,13 @@ function queueVisibilityTargets(ctx) {
         companyOnStay(a) &&
         companyOnStay(b)
     );
-    if (item.line) item.line.visible = showLink;
-    if (item.lineB) item.lineB.visible = showLink;
-    if (item.label) item.label.visible = showLink;
+    const hot =
+      item.key === state.hoverLinkKey || item.key === state.selectedLinkKey;
+    if (item.tube) {
+      item.tube.visible = showLink;
+      if (item.tube.material) item.tube.material.opacity = hot ? 1 : 0.82;
+    }
+    if (item.hit) item.hit.visible = showLink;
   });
 
   ctx.planeGroups.forEach((g, i) => {
@@ -1187,6 +1693,7 @@ function queueVisibilityTargets(ctx) {
   });
 
   applyAltAxes(ctx);
+  applyCubeShape(ctx);
 }
 
 function lerpPointMaterial(mat, targetEmissive, targetOpacity, k) {
@@ -1370,6 +1877,7 @@ function wireInput(ctx, viewport) {
   });
   el.addEventListener("pointerleave", () => {
     state.hoverId = null;
+    state.hoverLinkKey = null;
     ctx.hooks.onHover?.(null, null);
     queueVisibilityTargets(ctx);
   });
@@ -1401,7 +1909,7 @@ function isPullFrameHit(ctx, hit) {
   return dx * dx + dy * dy > R * R;
 }
 
-/** [C-PICK] company first; else [C-FOCUS-ACT] only in [C-PULL-ZONE]. */
+/** [C-PICK] company first; else revenue-link; else [C-FOCUS-ACT] in [C-PULL-ZONE]. */
 function pick(ctx, event) {
   setPointer(ctx, event);
   const companyHits = ctx.raycaster.intersectObjects(
@@ -1414,6 +1922,15 @@ function pick(ctx, event) {
       id = companyHits[0].object.parent.userData.companyId;
     }
     if (id != null) selectCompany(ctx, id);
+    return;
+  }
+  const linkHits = ctx.raycaster.intersectObjects(
+    (ctx.revenueLinkHits || []).filter((m) => m.visible),
+    false
+  );
+  if (linkHits.length) {
+    const key = linkHits[0].object.userData.linkKey;
+    if (key) selectLink(ctx, key);
     return;
   }
   const planes = [];
@@ -1441,20 +1958,26 @@ function hover(ctx, event, viewport) {
   if (id == null && hits.length && hits[0].object.parent) {
     id = hits[0].object.parent.userData.companyId;
   }
-  if (id !== state.hoverId) {
+  let linkKey = null;
+  if (id == null) {
+    const linkHits = ctx.raycaster.intersectObjects(
+      (ctx.revenueLinkHits || []).filter((m) => m.visible),
+      false
+    );
+    if (linkHits.length) linkKey = linkHits[0].object.userData.linkKey || null;
+  }
+  const linkChanged = linkKey !== state.hoverLinkKey;
+  const idChanged = id !== state.hoverId;
+  if (linkChanged || idChanged) {
+    state.hoverLinkKey = linkKey;
     state.hoverId = id;
     queueVisibilityTargets(ctx);
-    const c = id != null ? companyById(id) : null;
-    const local = {
-      x: event.clientX - rect.left,
-      y: event.clientY - rect.top,
-    };
-    ctx.hooks.onHover?.(c, local);
-  } else if (id != null) {
-    ctx.hooks.onHover?.(companyById(id), {
-      x: event.clientX - rect.left,
-      y: event.clientY - rect.top,
-    });
+  }
+  if (id != null) {
+    const local = { x: event.clientX - rect.left, y: event.clientY - rect.top };
+    ctx.hooks.onHover?.(companyById(id), local);
+  } else if (idChanged || linkChanged) {
+    ctx.hooks.onHover?.(null, null);
   }
 }
 

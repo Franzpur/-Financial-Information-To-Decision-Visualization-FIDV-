@@ -2,7 +2,7 @@
 
 import { renderNations } from "./nations.js?v=33";
 import { displayIndustryCoord } from "./coords.js?v=35";
-import { fetchBicsChildren, fetchBicsLocate } from "./api.js?v=51";
+import { fetchBicsChildren, fetchBicsLocate } from "./api.js?v=52";
 import {
   currentBics,
   currentListing,

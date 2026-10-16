@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SFC · ICBC CUP 演示静帧素材</title>
+<style>
+  :root {
+    --ink: #1a1f26;
+    --muted: #4a5560;
+    --rule: #c5ccd4;
+    --paper: #f7f5f0;
+    --fill: #ece8e0;
+  }
+  * { box-sizing: border-box; }
+  html { font-size: 11pt; }
+  body {
+    margin: 0 auto;
+    max-width: 180mm;
+    padding: 16mm 16mm 22mm;
+    color: var(--ink);
+    background: var(--paper);
+    font-family: "Iowan Old Style", "Palatino Linotype", Palatino, "Songti SC", "Noto Serif SC", serif;
+    line-height: 1.45;
+  }
+  .brand {
+    letter-spacing: 0.07em;
+    font-size: 14pt;
+    font-weight: 600;
+    margin: 0 0 0.35em;
+  }
+  h1 {
+    font-size: 18pt;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    margin: 0 0 0.35em;
+  }
+  h2 {
+    font-size: 12.5pt;
+    margin: 1.35em 0 0.45em;
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 0.2em;
+  }
+  .lede { color: var(--muted); font-size: 10pt; margin: 0 0 0.6em; }
+  .cover-meta {
+    margin: 0.6em 0 1.2em;
+    font-size: 10pt;
+    color: var(--muted);
+  }
+  .cover-meta div { margin: 0.12em 0; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 9.5pt;
+    margin: 0.45em 0 0.9em;
+    page-break-inside: avoid;
+  }
+  th, td {
+    border: 1px solid var(--rule);
+    padding: 0.28em 0.45em;
+    text-align: left;
+    vertical-align: top;
+  }
+  th { background: var(--fill); font-weight: 600; }
+  .slot-yes { font-weight: 600; }
+  figure {
+    margin: 0 0 1.25em;
+    page-break-inside: avoid;
+  }
+  figure img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border: 1px solid var(--rule);
+  }
+  .fig-head {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35em 0.75em;
+    align-items: baseline;
+    margin: 0 0 0.28em;
+    font-size: 10pt;
+  }
+  .fig-id { font-weight: 600; letter-spacing: 0.03em; }
+  .fig-slot {
+    color: var(--muted);
+    font-size: 9.5pt;
+  }
+  .fig-slot.plan {
+    color: var(--ink);
+    font-weight: 600;
+  }
+  figcaption {
+    color: var(--muted);
+    font-size: 9.5pt;
+    margin-top: 0.32em;
+    line-height: 1.4;
+  }
+  code {
+    font-family: ui-monospace, Menlo, Consolas, monospace;
+    font-size: 0.88em;
+  }
+  .foot {
+    margin-top: 1.6em;
+    font-size: 9pt;
+    color: var(--muted);
+  }
+  .no-print { margin: 0 0 1em; font-size: 10pt; color: var(--muted); }
+  @media print {
+    body { max-width: none; padding: 12mm 14mm; background: white; }
+    .no-print { display: none; }
+    a { color: inherit; text-decoration: none; }
+  }
+  @page { size: A4; margin: 14mm 14mm 16mm; }
+</style>
+</head>
+<body>
+  <p class="no-print">浏览器打开本页 → 打印 → A4 纵向 → 存储为 PDF。关掉页眉网址。</p>
+
+  <p class="brand">SFC</p>
+  <h1>ICBC CUP 演示静帧素材</h1>
+  <p class="lede">GOOGL 壳体与 NVDA 收入链 · 计划书 §1.4 与附录备用镜</p>
+  <div class="cover-meta">
+    <div>2026-10-16 · 令 <code>GS-20261016-ICBC-DEMO-STILLS</code></div>
+    <div>用途：工行杯计划书素材积累；本页可展出、可打印。计划书六章正文本轮不改。</div>
+    <div>图源：<code>icbc-cup-assets/20261016/</code>（清单见同目录 <code>MANIFEST.md</code>）</div>
+  </div>
+
+  <h2>计划书图位对照</h2>
+  <p class="lede">下列两镜可直接充 <code>SFC-icbc-fintech-proposal.html</code> §1.4「初步演示」占位；其余为功能镜，宜附录或讲稿。</p>
+  <table>
+    <thead>
+      <tr>
+        <th>计划书</th>
+        <th>推荐镜</th>
+        <th>文件</th>
+        <th>说明</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="slot-yes">图 1-1</td>
+        <td>G1</td>
+        <td><code>G1-shell-overview.png</code></td>
+        <td>GOOGL 标准壳体总览</td>
+      </tr>
+      <tr>
+        <td class="slot-yes">图 1-2</td>
+        <td>N2（主推）</td>
+        <td><code>N2-links-full.png</code></td>
+        <td>NVDA 全链；N1 为局部候选</td>
+      </tr>
+      <tr>
+        <td>图 1-3</td>
+        <td>—</td>
+        <td>—</td>
+        <td>AMAT 本包未提供</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>镜表总览</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>计划槽</th>
+        <th>功能介绍</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>G1</td>
+        <td class="slot-yes">图 1-1</td>
+        <td>GOOGL 标准壳体：一家公司落在用户坐标，白球为公司点，上方暗玻璃小写名牌</td>
+      </tr>
+      <tr>
+        <td>G2</td>
+        <td>功能镜</td>
+        <td>悬停文件卡：仅悬停显示，列出本机 GOOGL 相关数据文件（xlsx / debt-ladder）</td>
+      </tr>
+      <tr>
+        <td>G3</td>
+        <td>功能镜</td>
+        <td>名牌与悬停卡分离：选中≠悬停，避免误读</td>
+      </tr>
+      <tr>
+        <td>G4</td>
+        <td>功能镜 / Map</td>
+        <td>第二重映射 PM-LADDER-Q：季度偿债压力纸面（聚合，无单券明细）</td>
+      </tr>
+      <tr>
+        <td>N1</td>
+        <td>图 1-2 候选</td>
+        <td>NVDA 链局部：中心白球 + 供方绿球与粗绿收入线</td>
+      </tr>
+      <tr>
+        <td>N2</td>
+        <td class="slot-yes">图 1-2 主推</td>
+        <td>NVDA 全链：多 BICS-L4 切片，白/绿/红三色球与红绿粗线</td>
+      </tr>
+      <tr>
+        <td>N3</td>
+        <td>功能镜</td>
+        <td>收入线悬停：来源文件卡（<code>nvda-revenue-links.xlsx</code> 路径展示）</td>
+      </tr>
+      <tr>
+        <td>N4</td>
+        <td>功能镜 / Map</td>
+        <td>选线 → Map PM-REV-LINK 关系纸面（NVIDIA–Microsoft · customer · 22.05%）</td>
+      </tr>
+      <tr>
+        <td>N5</td>
+        <td>功能镜</td>
+        <td>切片聚焦：留下当前 BICS L4，名单就地可读</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>GOOGL · 壳体四镜</h2>
+
+  <figure id="G1">
+    <div class="fig-head">
+      <span class="fig-id">G1</span>
+      <span class="fig-slot plan">可充计划书 §1.4 · 图 1-1</span>
+    </div>
+    <img src="icbc-cup-assets/20261016/G1-shell-overview.png" alt="G1 GOOGL 标准壳体总览" />
+    <figcaption>GOOGL 标准壳体：一家公司落在用户坐标，白球为公司点，上方暗玻璃小写名牌。</figcaption>
+  </figure>
+
+  <figure id="G2">
+    <div class="fig-head">
+      <span class="fig-id">G2</span>
+      <span class="fig-slot">功能镜</span>
+    </div>
+    <img src="icbc-cup-assets/20261016/G2-hover-files.png" alt="G2 悬停文件卡" />
+    <figcaption>悬停文件卡：仅悬停显示，列出本机 GOOGL 相关数据文件（xlsx / debt-ladder）。</figcaption>
+  </figure>
+
+  <figure id="G3">
+    <div class="fig-head">
+      <span class="fig-id">G3</span>
+      <span class="fig-slot">功能镜</span>
+    </div>
+    <img src="icbc-cup-assets/20261016/G3-selected-nameplate.png" alt="G3 名牌与悬停分离" />
+    <figcaption>名牌与悬停卡分离：选中≠悬停，避免误读。</figcaption>
+  </figure>
+
+  <figure id="G4">
+    <div class="fig-head">
+      <span class="fig-id">G4</span>
+      <span class="fig-slot">功能镜 / Map</span>
+    </div>
+    <img src="icbc-cup-assets/20261016/G4-map-ladder.png" alt="G4 偿债压力纸面" />
+    <figcaption>第二重映射 PM-LADDER-Q：季度偿债压力纸面（聚合，无单券明细）。</figcaption>
+  </figure>
+
+  <h2>NVDA · 收入链五镜</h2>
+
+  <figure id="N1">
+    <div class="fig-head">
+      <span class="fig-id">N1</span>
+      <span class="fig-slot">图 1-2 候选</span>
+    </div>
+    <img src="icbc-cup-assets/20261016/N1-chain-overview.png" alt="N1 NVDA 链局部" />
+    <figcaption>NVDA 链局部：中心白球 + 供方绿球与粗绿收入线。</figcaption>
+  </figure>
+
+  <figure id="N2">
+    <div class="fig-head">
+      <span class="fig-id">N2</span>
+      <span class="fig-slot plan">可充计划书 §1.4 · 图 1-2（主推）</span>
+    </div>
+    <img src="icbc-cup-assets/20261016/N2-links-full.png" alt="N2 NVDA 全链" />
+    <figcaption>NVDA 全链：多 BICS-L4 切片，白/绿/红三色球与红绿粗线。</figcaption>
+  </figure>
+
+  <figure id="N3">
+    <div class="fig-head">
+      <span class="fig-id">N3</span>
+      <span class="fig-slot">功能镜</span>
+    </div>
+    <img src="icbc-cup-assets/20261016/N3-link-hover-source.png" alt="N3 收入线悬停来源卡" />
+    <figcaption>收入线悬停：来源文件卡（nvda-revenue-links.xlsx 路径展示）。</figcaption>
+  </figure>
+
+  <figure id="N4">
+    <div class="fig-head">
+      <span class="fig-id">N4</span>
+      <span class="fig-slot">功能镜 / Map</span>
+    </div>
+    <img src="icbc-cup-assets/20261016/N4-revlink-map.png" alt="N4 PM-REV-LINK 关系纸面" />
+    <figcaption>选线 → Map PM-REV-LINK 关系纸面（NVIDIA–Microsoft · customer · 22.05%）。</figcaption>
+  </figure>
+
+  <figure id="N5">
+    <div class="fig-head">
+      <span class="fig-id">N5</span>
+      <span class="fig-slot">功能镜</span>
+    </div>
+    <img src="icbc-cup-assets/20261016/N5-slice-focus.png" alt="N5 切片聚焦" />
+    <figcaption>切片聚焦：留下当前 BICS L4，名单就地可读。</figcaption>
+  </figure>
+
+  <p class="foot">
+    Staging 副本：<code>cabinet/notes/icbc-demo-stills/raw/</code>。
+    插入 <code>SFC-icbc-fintech-proposal.html</code> §1.4 图位另令或下轮；本页只积累素材。
+    AMAT（图 1-3）未提供。
+  </p>
+</body>
+</html>

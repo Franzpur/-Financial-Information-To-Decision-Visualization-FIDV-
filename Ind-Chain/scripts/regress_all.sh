@@ -48,7 +48,7 @@ module_checks() {
 import json, subprocess, sys
 g = json.load(open("modules/graph.json"))
 mods, edges = g["modules"], g["edges"]
-assert (len(mods), len(edges)) == (26, 35), f"expected 26/35, got {len(mods)}/{len(edges)}"
+assert (len(mods), len(edges)) == (32, 45), f"expected 32/45, got {len(mods)}/{len(edges)}"
 assert {e["type"] for e in edges} <= {"depends", "calls", "contract"}
 old = json.loads(subprocess.check_output(["git", "show", "019af67:modules/graph.json"]))
 om = {m["id"]: m for m in old["modules"]}
@@ -57,12 +57,18 @@ assert all(om[i] == nm[i] for i in om), "an original module changed"
 key = lambda e: (e["from"], e["to"], e["type"])
 ne = {key(e) for e in edges}
 assert all(key(e) in ne for e in old["edges"]), "an original edge is missing"
-assert set(nm) - set(om) == {"SHELL-WINDOW", "SHELL-PROC", "SHELL-PACK"}, set(nm) - set(om)
+assert set(nm) - set(om) == {"SHELL-WINDOW", "SHELL-PROC", "SHELL-PACK", "FE-MAPPROJ", "FE-MAPDRAW", "FE-MAPREG", "FE-MAPDOCK", "FE-MAPOUT", "BE-DEBT"}, set(nm) - set(om)
 added = ne - {key(e) for e in old["edges"]}
 want = {("SHELL-WINDOW", "SHELL-PROC", "depends"), ("SHELL-PROC", "BE-HTTP", "calls"), ("SHELL-WINDOW", "BE-HTTP", "contract"),
-        ("SHELL-PACK", "SHELL-WINDOW", "depends"), ("SHELL-PACK", "BE-HTTP", "depends")}
+        ("SHELL-PACK", "SHELL-WINDOW", "depends"), ("SHELL-PACK", "BE-HTTP", "depends"),
+        ("FE-AESTHETIC", "FE-MAPDRAW", "depends"), ("BE-HTTP", "BE-DEBT", "calls"),
+        ("FE-OPENCUBE", "FE-MAPDOCK", "depends"), ("FE-PANEL", "FE-MAPDOCK", "calls"), ("FE-AESTHETIC", "FE-MAPDOCK", "depends"),
+        ("FE-MAPDOCK", "FE-MAPREG", "calls"), ("FE-MAPDOCK", "FE-MAPDRAW", "calls"), ("FE-MAPDOCK", "FE-MAPOUT", "calls"),
+        ("FE-MAPDOCK", "FE-API", "calls"),
+        ("FE-MAPREG", "FE-MAPPROJ", "depends")}
+assert not any(e["from"] == "FE-FOCUS" and e["to"].startswith(("FE-MAP", "FE-API")) for e in edges), "FE-FOCUS must not reach map/* or the API"
 assert added == want, added ^ want
-print("26 modules / 35 edges; original 23/30 identical to 019af67; added = SHELL-* + 5 edges")
+print("32 modules / 45 edges; original 23/30 identical to 019af67; added = SHELL-* + FE-MAP* + FE-MAPOUT + BE-DEBT")
 PY
   cp modules/index.html "$T/sfc-regress-index.$$"
   python3 modules/bake_static.py >/dev/null 2>&1 || { echo "bake_static.py failed (geometry check)"; cp "$T/sfc-regress-index.$$" modules/index.html; rm -f "$T/sfc-regress-index.$$"; return 1; }
@@ -79,8 +85,9 @@ static_checks() {
   ! rg -n 'https?://' Ind-Chain/web -g '!**/vendor/**' | rg -v 'www.w3.org' || { echo "external URL in web/"; return 1; }
   ! rg -n 'lsof|pkill|killall' Ind-Chain/shell || { echo "forbidden word in shell/"; return 1; }
   (cd Ind-Chain/web/vendor/three && awk '/^BEGIN SHA256$/{f=1;next}/^END SHA256$/{f=0}f' README.txt | shasum -a 256 -c - >/dev/null) || { echo "vendor/three checksum mismatch"; return 1; }
-  CHG=$(git status --short -uall -- Ind-Chain/web | rg -v 'cube\.html|web/vendor/three/|web/js/(api|bondChart|coords|home|list|main|nations|nav|scene|state|ui)\.js$' || true)
+  CHG=$(git status --short -uall -- Ind-Chain/web | rg -v 'cube\.html|web/vendor/three/|web/css/(app|plot-paper)\.css$|web/(index|list|selfcheck-map)\.html$|web/js/map/|web/js/(api|bondChart|coords|home|list|main|nations|nav|scene|state|ui)\.js$' || true)
   [ -z "$CHG" ] || { echo "unexpected web/ change: $CHG"; return 1; }
+  python3 Ind-Chain/scripts/check_map_purity.py >/dev/null || { echo "map purity / paper skin check failed (run Ind-Chain/scripts/check_map_purity.py)"; return 1; }
   echo "web/: no external URL; vendor checksums ok; web/ module scope clean"
 }
 golden_gate() {
@@ -113,7 +120,7 @@ if [ "$MODE" = capture ]; then
   exit $?
 fi
 
-STEP="module graph (26/35, original 23/30 == 019af67, bake idempotent)"; check module_checks
+STEP="module graph (32/45, original 23/30 == 019af67, bake idempotent)"; check module_checks
 STEP="static checks (no external URL, vendor sha, shell word gate, web/ scope)"; check static_checks
 STEP="API golden compare (dev back end, $GOLDEN)"; check golden_gate
 

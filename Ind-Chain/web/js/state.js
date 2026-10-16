@@ -2,7 +2,7 @@
  * Concepts: ../CONCEPTS.md — [C-FOCUS] focusLayer, [C-SELECT] selectedId, [C-FILTER] filterMode,
  * [C-ALT] altHide*, [C-PIN] pinnedLayers.
  */
-import { fetchBicsNode } from "./api.js?v=51";
+import { fetchBicsNode } from "./api.js?v=52";
 
 export const COLORS = {
   US: 0x3cf0ff,
@@ -58,11 +58,50 @@ export const state = {
   openTickerMiss: false,
   /** Standard shell mode (one firm at user (5,5,5); no slices/rings) */
   shellCube: false,
+  /** Bundle meta.mode: demo | shell | chain. White spheres when not chain. */
+  bundleMode: "demo",
   /** Shell user anchor from bundle.meta.shellAnchor */
   shellAnchor: null,
+  /** [C-SHAPE-2] 1 = slices+links (Shape One); 2 = US map on s=0 (NVDA chain only). */
+  cubeShape: 1,
+  /** US HQ map doc from bundle.usMap (Shape Two / PM-US-MAP). */
+  usMap: null,
   /** [C-REV-LINK] Point-to-point edges; peers are real C-POINT companies on demo slices. */
   revenueLinks: [],
+  /** Selected / hovered revenue-link key (`fromId:toId:side`) or null. */
+  selectedLinkKey: null,
+  hoverLinkKey: null,
+  /** GOOGL file-ring index (demo/shell white sphere). */
+  googlFileIndex: 0,
 };
+
+/** demo + shell use white unit spheres; chain uses colored unit spheres (not disks). */
+export function usesWhiteSpheres() {
+  return state.bundleMode !== "chain";
+}
+
+/** Chain (NVDA) colored unit spheres — same geometry family as white spheres. */
+export function usesChainSpheres() {
+  return state.bundleMode === "chain";
+}
+
+/** Sphere fill: chain center white, supplier green, customer(=consumer) red; else white. */
+export function chainSphereColor(c) {
+  if (!c) return 0xffffff;
+  if (c.side === "supplier") return COLORS.LINK_SUPPLIER;
+  if (c.side === "customer") return COLORS.LINK_CUSTOMER;
+  return 0xffffff;
+}
+
+export function revenueLinkKey(link) {
+  if (!link) return null;
+  return `${link.fromId}:${link.toId}:${link.side}`;
+}
+
+export function revenueLinkByKey(key) {
+  if (key == null) return null;
+  return (state.revenueLinks || []).find((L) => revenueLinkKey(L) === key) || null;
+}
 
 export function visibleCompanies() {
   return state.companies.filter(passesFilter);

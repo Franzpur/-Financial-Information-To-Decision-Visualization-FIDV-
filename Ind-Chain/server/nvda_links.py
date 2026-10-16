@@ -12,6 +12,7 @@ from chain_layout import assign_nvda_chain_rings
 
 ROOT = Path(__file__).resolve().parents[1]
 NVDA_REVENUE_LINKS = ROOT / "data" / "nvda-revenue-links.json"
+NVDA_US_HQ = ROOT / "data" / "links" / "nvda-us-hq.json"
 UNRESOLVED_L4 = "unresolved"
 CHAIN_COUNTRIES: dict[str, str] = {
     "US": "United States",
@@ -113,6 +114,13 @@ def _one_nvda_peer(row: dict[str, Any]) -> dict[str, Any] | None:
     key_fn = _PEER_L4_KEY or _default_peer_l4_key
     l4_code, l4_name = key_fn(ent)
     pct = row.get("spendPct") if side == "supplier" else row.get("revPct")
+    paths: list[str] = []
+    raw_paths = row.get("sourcePaths")
+    if isinstance(raw_paths, list):
+        paths.extend(str(p).strip() for p in raw_paths if str(p).strip())
+    one = str(row.get("sourcePath") or "").strip()
+    if one and one not in paths:
+        paths.append(one)
     return {
         "side": side,
         "name": name,
@@ -122,6 +130,7 @@ def _one_nvda_peer(row: dict[str, Any]) -> dict[str, Any] | None:
         "l4_code": l4_code,
         "l4_name": l4_name,
         "pct": pct,
+        "sourcePaths": paths,
     }
 
 
@@ -334,6 +343,10 @@ def _nvda_build_links(
         }
         if isinstance(pct, (int, float)):
             link["pct"] = float(pct)
+        paths = [str(p) for p in (row.get("sourcePaths") or []) if str(p).strip()]
+        if paths:
+            link["sourcePaths"] = paths
+            link["sourcePath"] = paths[0]
         revenue_links.append(link)
     return revenue_links
 
@@ -379,7 +392,15 @@ def bundle_nvda_chain(ticker_raw: str) -> dict[str, Any]:
         L["companyCount"] = counts.get(L["idx"], 0)
 
     resolved = center_ent["ticker"] if center_ent else center_ticker
-    return {
+    us_map = None
+    if NVDA_US_HQ.is_file():
+        try:
+            raw = json.loads(NVDA_US_HQ.read_text(encoding="utf-8"))
+            if isinstance(raw, dict) and raw.get("center") and isinstance(raw.get("points"), list):
+                us_map = raw
+        except (OSError, json.JSONDecodeError):
+            us_map = None
+    out: dict[str, Any] = {
         "meta": {
             "title": "NVIDIA — supply chain cube",
             "countries": dict(CHAIN_COUNTRIES),
@@ -392,8 +413,12 @@ def bundle_nvda_chain(ticker_raw: str) -> dict[str, Any]:
             "layerIds": [L["id"] for L in layers_meta],
             "sliceMode": "bics-l4",
             "placeMode": "link-hemisphere",
+            "shapes": [1, 2],
         },
         "layers": layers_meta,
         "companies": companies,
         "revenueLinks": revenue_links,
     }
+    if us_map is not None:
+        out["usMap"] = us_map
+    return out

@@ -51,7 +51,7 @@
 
 两档：
 
-1. **含实体库的包 / `BE-CLASS/BICS-Classification/bics_entities_*.db`**（`dist/internal/`）是彭博数据加工物，**仅限团队内部分发**。不得上传 GitHub（含 Release / Actions artifact）或任何公开网站。
+1. **含实体库的包 / `BE-CLASS/BICS-Classification/bics_entities_*.db`**（`dist/internal/`）是彭博数据加工物，**仅限团队内部分发**。不得上传 GitHub（含 Release / Actions artifact）或任何公开网站。同档：`Ind-Chain/data/debt-ladder-*.json`（彭博债券聚合，仅内部；已 `.gitignore`，不进 `-noentities` 包，只可能随 `dist/internal/` 出现；本机烘焙，不 `git add`）。
 2. **`-noentities` 外发包**（`dist/noentities/`，zip 名带 `-noentities`）：**业主 2026-10-15 授权可外发**，外发由业主承担许可责任；内阁与工程不替彭博条款或法务背书。该包**仍含**：彭博 BICS 行业层级 JSON（`bics-equity-hierarchy-2024.json`）；`companies.json`（96 家，其中 16 家的 `value_m` 在代码里标注为彭博 Alphabet 供应商关系 `GOOGL_SUPPLY.xlsx`，其余为公开行业图谱）；`nvda-revenue-links.json`（文件自注来源为 Bloomberg Supply Chain Summary 2026-10-05 截图整理 + 旧 json，即含彭博供应链数据）；`layers.json`（自拟层定义，无外部来源标注）；three.js（MIT）与内嵌 Python / OpenSSL 等（声明见包内 `THIRD-PARTY-NOTICES.txt`）。不得上传 GitHub Release，除非业主另令。
 
 API 黄金响应同理，只放仓外临时目录。

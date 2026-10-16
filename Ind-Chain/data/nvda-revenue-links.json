@@ -6,54 +6,389 @@
   "source": "Bloomberg Supply Chain Summary · 05-Oct-2026 screenshot + prior json",
   "note": "Peers only. Slice walls are built at runtime from each firm's primary BICS L4 (entity membership). Demo layerId bridge removed. Supplier pct = NVDA's Cost % when known.",
   "peers": [
-    {"side": "supplier", "name": "Taiwan Semiconductor", "ticker": "2330 TT Equity", "country": "INTL", "spendPct": 37.35},
-    {"side": "supplier", "name": "SK hynix", "ticker": "000660 KS Equity", "country": "INTL", "spendPct": null},
-    {"side": "supplier", "name": "Advantest", "ticker": "6857 JP Equity", "country": "INTL", "spendPct": null},
-    {"side": "supplier", "name": "Wistron", "ticker": "3231 TT Equity", "country": "INTL", "spendPct": null},
-    {"side": "supplier", "name": "Micron", "ticker": "MU US Equity", "country": "US", "spendPct": null},
-    {"side": "supplier", "name": "Teradyne", "ticker": "TER US Equity", "country": "US", "spendPct": null},
-    {"side": "supplier", "name": "Hon Hai Precision", "ticker": "2317 TT Equity", "country": "INTL", "spendPct": null},
-    {"side": "supplier", "name": "ASE Technology", "ticker": "3711 TT Equity", "country": "INTL", "spendPct": null},
-    {"side": "supplier", "name": "Pegatron", "ticker": "4938 TT Equity", "country": "INTL", "spendPct": null},
-    {"side": "supplier", "name": "Keysight", "ticker": "KEYS US Equity", "country": "US", "spendPct": null},
-    {"side": "supplier", "name": "Samsung Electronics", "ticker": "005930 KS Equity", "country": "INTL", "spendPct": null},
-    {"side": "supplier", "name": "Ibiden", "ticker": "4062 JP Equity", "country": "INTL", "spendPct": null},
-    {"side": "supplier", "name": "Fabrinet", "ticker": "FN US Equity", "country": "US", "spendPct": null},
-    {"side": "supplier", "name": "Amkor", "ticker": "AMKR US Equity", "country": "US", "spendPct": null},
-    {"side": "supplier", "name": "Cisco Systems", "ticker": "CSCO US Equity", "country": "US", "spendPct": null},
-    {"side": "supplier", "name": "Alibaba Group", "ticker": "BABA US Equity", "country": "INTL", "spendPct": null},
-    {"side": "supplier", "name": "King Yuan Electronics", "ticker": "2449 TT Equity", "country": "INTL", "spendPct": null},
-    {"side": "supplier", "name": "Monolithic Power Systems", "ticker": "MPWR US Equity", "country": "US", "spendPct": null},
-    {"side": "supplier", "name": "ASML", "ticker": "ASML NA Equity", "country": "INTL", "spendPct": null},
-    {"side": "supplier", "name": "Flex", "ticker": "FLEX US Equity", "country": "US", "spendPct": null},
-    {"side": "supplier", "name": "SLB", "ticker": "SLB US Equity", "country": "US", "spendPct": null},
-    {"side": "supplier", "name": "Intel", "ticker": "INTC US Equity", "country": "US", "spendPct": null},
-    {"side": "supplier", "name": "Coherent", "ticker": "COHR US Equity", "country": "US", "spendPct": null},
-    {"side": "supplier", "name": "Jabil", "ticker": "JBL US Equity", "country": "US", "spendPct": null},
-
-    {"side": "customer", "name": "Microsoft", "ticker": "MSFT US Equity", "country": "US", "revPct": 22.05},
-    {"side": "customer", "name": "Amazon", "ticker": "AMZN US Equity", "country": "US", "revPct": 14.00},
-    {"side": "customer", "name": "Super Micro", "ticker": "SMCI US Equity", "country": "US", "revPct": 9.50},
-    {"side": "customer", "name": "Alphabet", "ticker": "GOOGL US Equity", "country": "US", "revPct": 4.85},
-    {"side": "customer", "name": "Meta", "ticker": "META US Equity", "country": "US", "revPct": 4.10},
-    {"side": "customer", "name": "Foxconn Industrial Internet", "ticker": "601138 CH Equity", "country": "INTL", "revPct": 1.11},
-    {"side": "customer", "name": "Dell", "ticker": "DELL US Equity", "country": "US", "revPct": 2.54},
-    {"side": "customer", "name": "Wiwynn", "ticker": "6669 TT Equity", "country": "INTL", "revPct": 2.50},
-    {"side": "customer", "name": "Oracle", "ticker": "ORCL US Equity", "country": "US", "revPct": 1.98},
-    {"side": "customer", "name": "CoreWeave", "ticker": "CRWV US Equity", "country": "US", "revPct": 1.35},
-    {"side": "customer", "name": "Lenovo", "ticker": "0992 HK Equity", "country": "INTL", "revPct": 1.11},
-    {"side": "customer", "name": "Asustek", "ticker": "2357 TT Equity", "country": "INTL", "revPct": 0.98},
-    {"side": "customer", "name": "Gigabyte", "ticker": "2376 TT Equity", "country": "INTL", "revPct": 0.82},
-    {"side": "customer", "name": "Avnet", "ticker": "AVT US Equity", "country": "US", "revPct": 0.74},
-    {"side": "customer", "name": "IEIT Systems", "ticker": "IEIT", "country": "INTL", "revPct": null},
-    {"side": "customer", "name": "Quanta Computer", "ticker": "2382 TT Equity", "country": "INTL", "revPct": null},
-    {"side": "customer", "name": "Hewlett Packard Enterprise", "ticker": "HPE US Equity", "country": "US", "revPct": null},
-    {"side": "customer", "name": "Cisco Systems", "ticker": "CSCO US Equity", "country": "US", "revPct": null},
-    {"side": "customer", "name": "HP Inc", "ticker": "HPQ US Equity", "country": "US", "revPct": null},
-    {"side": "customer", "name": "Tesla", "ticker": "TSLA US Equity", "country": "US", "revPct": null},
-    {"side": "customer", "name": "TD SYNNEX", "ticker": "SNX US Equity", "country": "US", "revPct": null},
-    {"side": "customer", "name": "Best Buy", "ticker": "BBY US Equity", "country": "US", "revPct": null},
-    {"side": "customer", "name": "Nebius Group", "ticker": "NBIS US Equity", "country": "INTL", "revPct": null},
-    {"side": "customer", "name": "Atos Group", "ticker": "ATO FP Equity", "country": "INTL", "revPct": null}
+    {
+      "side": "supplier",
+      "name": "Taiwan Semiconductor",
+      "ticker": "2330 TT Equity",
+      "country": "INTL",
+      "spendPct": 37.35,
+      "sourcePath": "data/links/nvda-revenue-links.xlsx"
+    },
+    {
+      "side": "supplier",
+      "name": "SK hynix",
+      "ticker": "000660 KS Equity",
+      "country": "INTL",
+      "spendPct": null,
+      "sourcePath": "data/links/nvda-revenue-links.xlsx"
+    },
+    {
+      "side": "supplier",
+      "name": "Advantest",
+      "ticker": "6857 JP Equity",
+      "country": "INTL",
+      "spendPct": null,
+      "sourcePath": "data/links/nvda-revenue-links.xlsx"
+    },
+    {
+      "side": "supplier",
+      "name": "Wistron",
+      "ticker": "3231 TT Equity",
+      "country": "INTL",
+      "spendPct": null,
+      "sourcePath": "data/links/nvda-revenue-links.xlsx"
+    },
+    {
+      "side": "supplier",
+      "name": "Micron",
+      "ticker": "MU US Equity",
+      "country": "US",
+      "spendPct": null,
+      "sourcePath": "data/links/nvda-revenue-links.xlsx"
+    },
+    {
+      "side": "supplier",
+      "name": "Teradyne",
+      "ticker": "TER US Equity",
+      "country": "US",
+      "spendPct": null,
+      "sourcePath": "data/links/nvda-revenue-links.xlsx"
+    },
+    {
+      "side": "supplier",
+      "name": "Hon Hai Precision",
+      "ticker": "2317 TT Equity",
+      "country": "INTL",
+      "spendPct": null,
+      "sourcePath": "data/links/nvda-revenue-links.xlsx"
+    },
+    {
+      "side": "supplier",
+      "name": "ASE Technology",
+      "ticker": "3711 TT Equity",
+      "country": "INTL",
+      "spendPct": null,
+      "sourcePath": "data/links/nvda-revenue-links.xlsx"
+    },
+    {
+      "side": "supplier",
+      "name": "Pegatron",
+      "ticker": "4938 TT Equity",
+      "country": "INTL",
+      "spendPct": null,
+      "sourcePath": "data/links/nvda-revenue-links.xlsx"
+    },
+    {
+      "side": "supplier",
+      "name": "Keysight",
+      "ticker": "KEYS US Equity",
+      "country": "US",
+      "spendPct": null,
+      "sourcePath": "data/links/nvda-revenue-links.xlsx"
+    },
+    {
+      "side": "supplier",
+      "name": "Samsung Electronics",
+      "ticker": "005930 KS Equity",
+      "country": "INTL",
+      "spendPct": null,
+      "sourcePath": "data/links/nvda-revenue-links.xlsx"
+    },
+    {
+      "side": "supplier",
+      "name": "Ibiden",
+      "ticker": "4062 JP Equity",
+      "country": "INTL",
+      "spendPct": null,
+      "sourcePath": "data/links/nvda-revenue-links.xlsx"
+    },
+    {
+      "side": "supplier",
+      "name": "Fabrinet",
+      "ticker": "FN US Equity",
+      "country": "US",
+      "spendPct": null,
+      "sourcePath": "data/links/nvda-revenue-links.xlsx"
+    },
+    {
+      "side": "supplier",
+      "name": "Amkor",
+      "ticker": "AMKR US Equity",
+      "country": "US",
+      "spendPct": null,
+      "sourcePath": "data/links/nvda-revenue-links.xlsx"
+    },
+    {
+      "side": "supplier",
+      "name": "Cisco Systems",
+      "ticker": "CSCO US Equity",
+      "country": "US",
+      "spendPct": null,
+      "sourcePath": "data/links/nvda-revenue-links.xlsx"
+    },
+    {
+      "side": "supplier",
+      "name": "Alibaba Group",
+      "ticker": "BABA US Equity",
+      "country": "INTL",
+      "spendPct": null,
+      "sourcePath": "data/links/nvda-revenue-links.xlsx"
+    },
+    {
+      "side": "supplier",
+      "name": "King Yuan Electronics",
+      "ticker": "2449 TT Equity",
+      "country": "INTL",
+      "spendPct": null,
+      "sourcePath": "data/links/nvda-revenue-links.xlsx"
+    },
+    {
+      "side": "supplier",
+      "name": "Monolithic Power Systems",
+      "ticker": "MPWR US Equity",
+      "country": "US",
+      "spendPct": null,
+      "sourcePath": "data/links/nvda-revenue-links.xlsx"
+    },
+    {
+      "side": "supplier",
+      "name": "ASML",
+      "ticker": "ASML NA Equity",
+      "country": "INTL",
+      "spendPct": null,
+      "sourcePath": "data/links/nvda-revenue-links.xlsx"
+    },
+    {
+      "side": "supplier",
+      "name": "Flex",
+      "ticker": "FLEX US Equity",
+      "country": "US",
+      "spendPct": null,
+      "sourcePath": "data/links/nvda-revenue-links.xlsx"
+    },
+    {
+      "side": "supplier",
+      "name": "SLB",
+      "ticker": "SLB US Equity",
+      "country": "US",
+      "spendPct": null,
+      "sourcePath": "data/links/nvda-revenue-links.xlsx"
+    },
+    {
+      "side": "supplier",
+      "name": "Intel",
+      "ticker": "INTC US Equity",
+      "country": "US",
+      "spendPct": null,
+      "sourcePath": "data/links/nvda-revenue-links.xlsx"
+    },
+    {
+      "side": "supplier",
+      "name": "Coherent",
+      "ticker": "COHR US Equity",
+      "country": "US",
+      "spendPct": null,
+      "sourcePath": "data/links/nvda-revenue-links.xlsx"
+    },
+    {
+      "side": "supplier",
+      "name": "Jabil",
+      "ticker": "JBL US Equity",
+      "country": "US",
+      "spendPct": null,
+      "sourcePath": "data/links/nvda-revenue-links.xlsx"
+    },
+    {
+      "side": "customer",
+      "name": "Microsoft",
+      "ticker": "MSFT US Equity",
+      "country": "US",
+      "revPct": 22.05,
+      "sourcePath": "data/links/nvda-revenue-links.xlsx"
+    },
+    {
+      "side": "customer",
+      "name": "Amazon",
+      "ticker": "AMZN US Equity",
+      "country": "US",
+      "revPct": 14.0,
+      "sourcePath": "data/links/nvda-revenue-links.xlsx"
+    },
+    {
+      "side": "customer",
+      "name": "Super Micro",
+      "ticker": "SMCI US Equity",
+      "country": "US",
+      "revPct": 9.5,
+      "sourcePath": "data/links/nvda-revenue-links.xlsx"
+    },
+    {
+      "side": "customer",
+      "name": "Alphabet",
+      "ticker": "GOOGL US Equity",
+      "country": "US",
+      "revPct": 4.85,
+      "sourcePath": "data/links/nvda-revenue-links.xlsx"
+    },
+    {
+      "side": "customer",
+      "name": "Meta",
+      "ticker": "META US Equity",
+      "country": "US",
+      "revPct": 4.1,
+      "sourcePath": "data/links/nvda-revenue-links.xlsx"
+    },
+    {
+      "side": "customer",
+      "name": "Foxconn Industrial Internet",
+      "ticker": "601138 CH Equity",
+      "country": "INTL",
+      "revPct": 1.11,
+      "sourcePath": "data/links/nvda-revenue-links.xlsx"
+    },
+    {
+      "side": "customer",
+      "name": "Dell",
+      "ticker": "DELL US Equity",
+      "country": "US",
+      "revPct": 2.54,
+      "sourcePath": "data/links/nvda-revenue-links.xlsx"
+    },
+    {
+      "side": "customer",
+      "name": "Wiwynn",
+      "ticker": "6669 TT Equity",
+      "country": "INTL",
+      "revPct": 2.5,
+      "sourcePath": "data/links/nvda-revenue-links.xlsx"
+    },
+    {
+      "side": "customer",
+      "name": "Oracle",
+      "ticker": "ORCL US Equity",
+      "country": "US",
+      "revPct": 1.98,
+      "sourcePath": "data/links/nvda-revenue-links.xlsx"
+    },
+    {
+      "side": "customer",
+      "name": "CoreWeave",
+      "ticker": "CRWV US Equity",
+      "country": "US",
+      "revPct": 1.35,
+      "sourcePath": "data/links/nvda-revenue-links.xlsx"
+    },
+    {
+      "side": "customer",
+      "name": "Lenovo",
+      "ticker": "0992 HK Equity",
+      "country": "INTL",
+      "revPct": 1.11,
+      "sourcePath": "data/links/nvda-revenue-links.xlsx"
+    },
+    {
+      "side": "customer",
+      "name": "Asustek",
+      "ticker": "2357 TT Equity",
+      "country": "INTL",
+      "revPct": 0.98,
+      "sourcePath": "data/links/nvda-revenue-links.xlsx"
+    },
+    {
+      "side": "customer",
+      "name": "Gigabyte",
+      "ticker": "2376 TT Equity",
+      "country": "INTL",
+      "revPct": 0.82,
+      "sourcePath": "data/links/nvda-revenue-links.xlsx"
+    },
+    {
+      "side": "customer",
+      "name": "Avnet",
+      "ticker": "AVT US Equity",
+      "country": "US",
+      "revPct": 0.74,
+      "sourcePath": "data/links/nvda-revenue-links.xlsx"
+    },
+    {
+      "side": "customer",
+      "name": "IEIT Systems",
+      "ticker": "IEIT",
+      "country": "INTL",
+      "revPct": null,
+      "sourcePath": "data/links/nvda-revenue-links.xlsx"
+    },
+    {
+      "side": "customer",
+      "name": "Quanta Computer",
+      "ticker": "2382 TT Equity",
+      "country": "INTL",
+      "revPct": null,
+      "sourcePath": "data/links/nvda-revenue-links.xlsx"
+    },
+    {
+      "side": "customer",
+      "name": "Hewlett Packard Enterprise",
+      "ticker": "HPE US Equity",
+      "country": "US",
+      "revPct": null,
+      "sourcePath": "data/links/nvda-revenue-links.xlsx"
+    },
+    {
+      "side": "customer",
+      "name": "Cisco Systems",
+      "ticker": "CSCO US Equity",
+      "country": "US",
+      "revPct": null,
+      "sourcePath": "data/links/nvda-revenue-links.xlsx"
+    },
+    {
+      "side": "customer",
+      "name": "HP Inc",
+      "ticker": "HPQ US Equity",
+      "country": "US",
+      "revPct": null,
+      "sourcePath": "data/links/nvda-revenue-links.xlsx"
+    },
+    {
+      "side": "customer",
+      "name": "Tesla",
+      "ticker": "TSLA US Equity",
+      "country": "US",
+      "revPct": null,
+      "sourcePath": "data/links/nvda-revenue-links.xlsx"
+    },
+    {
+      "side": "customer",
+      "name": "TD SYNNEX",
+      "ticker": "SNX US Equity",
+      "country": "US",
+      "revPct": null,
+      "sourcePath": "data/links/nvda-revenue-links.xlsx"
+    },
+    {
+      "side": "customer",
+      "name": "Best Buy",
+      "ticker": "BBY US Equity",
+      "country": "US",
+      "revPct": null,
+      "sourcePath": "data/links/nvda-revenue-links.xlsx"
+    },
+    {
+      "side": "customer",
+      "name": "Nebius Group",
+      "ticker": "NBIS US Equity",
+      "country": "INTL",
+      "revPct": null,
+      "sourcePath": "data/links/nvda-revenue-links.xlsx"
+    },
+    {
+      "side": "customer",
+      "name": "Atos Group",
+      "ticker": "ATO FP Equity",
+      "country": "INTL",
+      "revPct": null,
+      "sourcePath": "data/links/nvda-revenue-links.xlsx"
+    }
   ]
 }
