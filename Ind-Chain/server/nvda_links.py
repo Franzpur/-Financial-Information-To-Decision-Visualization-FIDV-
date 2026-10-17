@@ -13,6 +13,7 @@ from chain_layout import assign_nvda_chain_rings
 ROOT = Path(__file__).resolve().parents[1]
 NVDA_REVENUE_LINKS = ROOT / "data" / "nvda-revenue-links.json"
 NVDA_US_HQ = ROOT / "data" / "links" / "nvda-us-hq.json"
+NVDA_US_OUTLINE = ROOT / "data" / "geo" / "us-conus-outline.json"
 UNRESOLVED_L4 = "unresolved"
 CHAIN_COUNTRIES: dict[str, str] = {
     "US": "United States",
@@ -398,6 +399,13 @@ def bundle_nvda_chain(ticker_raw: str) -> dict[str, Any]:
             raw = json.loads(NVDA_US_HQ.read_text(encoding="utf-8"))
             if isinstance(raw, dict) and raw.get("center") and isinstance(raw.get("points"), list):
                 us_map = raw
+                if NVDA_US_OUTLINE.is_file():
+                    try:
+                        outline = json.loads(NVDA_US_OUTLINE.read_text(encoding="utf-8"))
+                        if isinstance(outline, dict) and isinstance(outline.get("rings"), list):
+                            us_map = {**us_map, "outline": outline}
+                    except (OSError, json.JSONDecodeError):
+                        pass
         except (OSError, json.JSONDecodeError):
             us_map = None
     out: dict[str, Any] = {

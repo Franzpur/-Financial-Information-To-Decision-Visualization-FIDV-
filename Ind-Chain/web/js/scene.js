@@ -44,7 +44,7 @@ import {
 } from "./coords.js?v=51";
 import { focusPointTargets } from "./bondChart.js?v=3";
 import { googlFileEntries, isGooglTicker } from "./map/googlFiles.js?v=2";
-import { buildShape2UsMap } from "./shape2UsMap.js?v=3";
+import { buildShape2UsMap } from "./shape2UsMap.js?v=5";
 
 /* ============================================================================
  * Section 1 · Geometry & Slices ([C-SLICE], [C-RING], [C-POINT], [C-REV-LINK])
@@ -729,17 +729,49 @@ function disposeShape2(ctx) {
 function rebuildShape2(ctx) {
   disposeShape2(ctx);
   if (state.bundleMode !== "chain" || !state.usMap) return;
-  const built = buildShape2UsMap(state.usMap, { nLayers: N_LAYERS(), gap: gapNow() });
+  const built = buildShape2UsMap(state.usMap, { nLayers: N_LAYERS(), gap: gapNow() }, {
+    makeLabel: (company, coord) => {
+      const { tex, w, h } = makeWhiteLabelTexture(whiteLabelText(company));
+      const label = makeWhiteLabelPlane(tex, w, h);
+      applyCoord(label, whiteLabelCoord(coord, gapNow()));
+      label.renderOrder = 7;
+      label.userData.isCompanyLabel = true;
+      label.userData.baseOpacity = 1;
+      return label;
+    },
+  });
   if (!built) return;
   ctx.root.add(built.group);
   built.group.visible = state.cubeShape === 2;
   ctx.shape2 = built;
 }
 
+function isShape2Active(ctx) {
+  return state.cubeShape === 2 && state.bundleMode === "chain" && Boolean(ctx.shape2?.group);
+}
+
+function pickableCompanyMeshes(ctx) {
+  if (isShape2Active(ctx) && ctx.shape2.pickMeshes?.length) {
+    return ctx.shape2.pickMeshes.filter((m) => m.visible !== false);
+  }
+  return ctx.meshes.filter((m) => m.visible);
+}
+
+function pickableLinkHits(ctx) {
+  if (isShape2Active(ctx) && ctx.shape2.linkHits?.length) {
+    return ctx.shape2.linkHits.filter((m) => m.visible !== false);
+  }
+  return (ctx.revenueLinkHits || []).filter((m) => m.visible);
+}
+
+function shape2LinkItem(ctx, key) {
+  return (ctx.shape2?.linkObjs || []).find((it) => it.key === key) || null;
+}
+
 /** Shape 1 = slices + linear C-REV-LINK; Shape 2 = US map (NVDA chain). */
 function applyCubeShape(ctx) {
   if (state.cubeShape === 2 && state.bundleMode === "chain" && !ctx.shape2) rebuildShape2(ctx);
-  const shape2 = state.cubeShape === 2 && state.bundleMode === "chain" && Boolean(ctx.shape2?.group);
+  const shape2 = isShape2Active(ctx);
   if (ctx.shape2?.group) ctx.shape2.group.visible = shape2;
   ctx.planeGroups.forEach((g) => {
     g.visible = !shape2;
@@ -753,8 +785,19 @@ function applyCubeShape(ctx) {
       mesh.visible = false;
       if (mesh.userData.label) mesh.userData.label.visible = false;
     });
+    (ctx.shape2.pickMeshes || []).forEach((mesh) => {
+      mesh.visible = true;
+      if (mesh.userData.label) mesh.userData.label.visible = true;
+    });
+    (ctx.shape2.linkObjs || []).forEach((item) => {
+      (item.tubes || []).forEach((t) => {
+        if (t) t.visible = true;
+      });
+      (item.hits || []).forEach((h) => {
+        if (h) h.visible = true;
+      });
+    });
     if (ctx.googlCard) ctx.googlCard.visible = false;
-    if (ctx.linkSourceCard) ctx.linkSourceCard.visible = false;
     if (ctx.axesGroup) ctx.axesGroup.visible = !state.altHideAxes;
   }
 }
@@ -1410,8 +1453,15 @@ function updateLinkSourceCard(ctx) {
     mesh.visible = false;
     return;
   }
-  const item = (ctx.revenueLinkObjs || []).find((it) => it.key === key);
-  if (!item?.tube || !item.tube.visible) {
+  const item =
+    (isShape2Active(ctx) ? shape2LinkItem(ctx, key) : null) ||
+    (ctx.revenueLinkObjs || []).find((it) => it.key === key);
+  const tube =
+    item?.tube ||
+    (Array.isArray(item?.tubes) && item.tubes.length
+      ? item.tubes[Math.floor(item.tubes.length / 2)]
+      : null);
+  if (!tube || tube.visible === false) {
     mesh.visible = false;
     return;
   }
@@ -1427,7 +1477,7 @@ function updateLinkSourceCard(ctx) {
   const camPos = new THREE.Vector3();
   ctx.camera.getWorldPosition(camPos);
   const mid = new THREE.Vector3();
-  item.tube.getWorldPosition(mid);
+  tube.getWorldPosition(mid);
   const depth = Math.max(0.5, mid.distanceTo(camPos));
   const size = ctx.renderer.getSize(new THREE.Vector2());
   const k2 = 2 * Math.tan(THREE.MathUtils.degToRad(ctx.camera.fov) / 2);
@@ -1644,17 +1694,20 @@ function queueVisibilityTargets(ctx) {
     }
   });
 
+  const shape2 = isShape2Active(ctx);
   (ctx.revenueLinkObjs || []).forEach((item) => {
     const a = companyById(item.fromId);
     const b = companyById(item.toId);
-    const showLink = Boolean(
-      a &&
-        b &&
-        passesFilter(a) &&
-        passesFilter(b) &&
-        companyOnStay(a) &&
-        companyOnStay(b)
-    );
+    const showLink =
+      !shape2 &&
+      Boolean(
+        a &&
+          b &&
+          passesFilter(a) &&
+          passesFilter(b) &&
+          companyOnStay(a) &&
+          companyOnStay(b)
+      );
     const hot =
       item.key === state.hoverLinkKey || item.key === state.selectedLinkKey;
     if (item.tube) {
@@ -1663,6 +1716,42 @@ function queueVisibilityTargets(ctx) {
     }
     if (item.hit) item.hit.visible = showLink;
   });
+
+  if (shape2 && ctx.shape2) {
+    (ctx.shape2.pickMeshes || []).forEach((mesh) => {
+      const c = companyById(mesh.userData.companyId);
+      const show = Boolean(c && passesFilter(c));
+      mesh.visible = show;
+      if (mesh.userData.label) mesh.userData.label.visible = show;
+      const selected = c && c.id === state.selectedId;
+      const hovered = c && c.id === state.hoverId;
+      const { targetEmissive, targetOpacity, targetHoverScale } = focusPointTargets({
+        shellCube: false,
+        selected,
+        hovered,
+        lit: show,
+        country: c?.country,
+        whiteSphere: true,
+      });
+      mesh.userData.targetEmissive = targetEmissive;
+      mesh.userData.targetOpacity = targetOpacity;
+      mesh.userData.targetHoverScale = targetHoverScale;
+      mesh.renderOrder = show ? 8 : 4;
+    });
+    (ctx.shape2.linkObjs || []).forEach((item) => {
+      const hot =
+        item.key === state.hoverLinkKey || item.key === state.selectedLinkKey;
+      const op = hot ? 1 : 0.82;
+      (item.tubes || []).forEach((t) => {
+        if (!t) return;
+        t.visible = true;
+        if (t.material) t.material.opacity = op;
+      });
+      (item.hits || []).forEach((h) => {
+        if (h) h.visible = true;
+      });
+    });
+  }
 
   ctx.planeGroups.forEach((g, i) => {
     const onStay = layerIsStay(i);
@@ -1713,44 +1802,38 @@ function lerpPointMaterial(mat, targetEmissive, targetOpacity, k) {
   }
 }
 
+function lerpPointMesh(mesh, k) {
+  const targetOp = mesh.userData.targetOpacity;
+  if (!mesh.visible && !(targetOp > 0.01)) return;
+  if (targetOp > 0.01) mesh.visible = true;
+  const rim = mesh.userData.rim;
+  const fill = mesh.userData.fill;
+  if (rim || fill) {
+    lerpPointMaterial(rim?.material, mesh.userData.targetEmissive, targetOp, k);
+    lerpPointMaterial(fill?.material, null, targetOp, k);
+  } else if (mesh.material) {
+    lerpPointMaterial(mesh.material, mesh.userData.targetEmissive, targetOp, k);
+  }
+  const dScale = mesh.userData.dScale ?? 1;
+  const hover = mesh.userData.targetHoverScale ?? 1;
+  const desired = dScale * hover;
+  const s = mesh.scale.x + (desired - mesh.scale.x) * k;
+  mesh.scale.setScalar(s);
+  const op =
+    rim?.material?.opacity ?? mesh.material?.opacity ?? (targetOp == null ? 1 : targetOp);
+  if (targetOp != null && targetOp < 0.01 && op < 0.02) {
+    mesh.visible = false;
+    if (mesh.userData.label) mesh.userData.label.visible = false;
+  }
+}
+
 function lerpVisibility(ctx) {
   const k = 0.18;
-  ctx.meshes.forEach((mesh) => {
-    const targetOp = mesh.userData.targetOpacity;
-    if (!mesh.visible && !(targetOp > 0.01)) return;
-    if (targetOp > 0.01) mesh.visible = true;
-    const rim = mesh.userData.rim;
-    const fill = mesh.userData.fill;
-    if (rim || fill) {
-      lerpPointMaterial(
-        rim?.material,
-        mesh.userData.targetEmissive,
-        targetOp,
-        k
-      );
-      lerpPointMaterial(fill?.material, null, targetOp, k);
-    } else if (mesh.material) {
-      lerpPointMaterial(
-        mesh.material,
-        mesh.userData.targetEmissive,
-        targetOp,
-        k
-      );
-    }
-    const dScale = mesh.userData.dScale ?? 1;
-    const hover = mesh.userData.targetHoverScale ?? 1;
-    const desired = dScale * hover;
-    const s = mesh.scale.x + (desired - mesh.scale.x) * k;
-    mesh.scale.setScalar(s);
-    const op =
-      rim?.material?.opacity ??
-      mesh.material?.opacity ??
-      (targetOp == null ? 1 : targetOp);
-    if (targetOp != null && targetOp < 0.01 && op < 0.02) {
-      mesh.visible = false;
-      if (mesh.userData.label) mesh.userData.label.visible = false;
-    }
-  });
+  if (isShape2Active(ctx)) {
+    (ctx.shape2.pickMeshes || []).forEach((mesh) => lerpPointMesh(mesh, k));
+  } else {
+    ctx.meshes.forEach((mesh) => lerpPointMesh(mesh, k));
+  }
   ctx.planeGroups.forEach((g) => {
     g.children.forEach((ch) => {
       if (ch.userData.targetOpacity == null || !ch.material) return;
@@ -1863,10 +1946,7 @@ function wireInput(ctx, viewport) {
   });
   el.addEventListener("dblclick", (e) => {
     setPointer(ctx, e);
-    const companyHits = ctx.raycaster.intersectObjects(
-      ctx.meshes.filter((m) => m.visible),
-      true
-    );
+    const companyHits = ctx.raycaster.intersectObjects(pickableCompanyMeshes(ctx), true);
     if (!companyHits.length) clearFocusKeepPins(ctx);
   });
   el.addEventListener("pointermove", (e) => {
@@ -1912,10 +1992,7 @@ function isPullFrameHit(ctx, hit) {
 /** [C-PICK] company first; else revenue-link; else [C-FOCUS-ACT] in [C-PULL-ZONE]. */
 function pick(ctx, event) {
   setPointer(ctx, event);
-  const companyHits = ctx.raycaster.intersectObjects(
-    ctx.meshes.filter((m) => m.visible),
-    true
-  );
+  const companyHits = ctx.raycaster.intersectObjects(pickableCompanyMeshes(ctx), true);
   if (companyHits.length) {
     let id = companyHits[0].object.userData.companyId;
     if (id == null && companyHits[0].object.parent) {
@@ -1924,15 +2001,13 @@ function pick(ctx, event) {
     if (id != null) selectCompany(ctx, id);
     return;
   }
-  const linkHits = ctx.raycaster.intersectObjects(
-    (ctx.revenueLinkHits || []).filter((m) => m.visible),
-    false
-  );
+  const linkHits = ctx.raycaster.intersectObjects(pickableLinkHits(ctx), false);
   if (linkHits.length) {
     const key = linkHits[0].object.userData.linkKey;
     if (key) selectLink(ctx, key);
     return;
   }
+  if (isShape2Active(ctx)) return;
   const planes = [];
   ctx.planeGroups.forEach((g) => {
     g.children.forEach((ch) => {
@@ -1950,20 +2025,14 @@ function pick(ctx, event) {
 
 function hover(ctx, event, viewport) {
   const rect = setPointer(ctx, event);
-  const hits = ctx.raycaster.intersectObjects(
-    ctx.meshes.filter((m) => m.visible),
-    true
-  );
+  const hits = ctx.raycaster.intersectObjects(pickableCompanyMeshes(ctx), true);
   let id = hits.length ? hits[0].object.userData.companyId : null;
   if (id == null && hits.length && hits[0].object.parent) {
     id = hits[0].object.parent.userData.companyId;
   }
   let linkKey = null;
   if (id == null) {
-    const linkHits = ctx.raycaster.intersectObjects(
-      (ctx.revenueLinkHits || []).filter((m) => m.visible),
-      false
-    );
+    const linkHits = ctx.raycaster.intersectObjects(pickableLinkHits(ctx), false);
     if (linkHits.length) linkKey = linkHits[0].object.userData.linkKey || null;
   }
   const linkChanged = linkKey !== state.hoverLinkKey;

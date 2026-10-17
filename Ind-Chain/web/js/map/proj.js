@@ -244,6 +244,7 @@ export function projectUsMap(input) {
         bounds,
         center: input.center,
         points: input.points,
+        outline: input.outline || null,
         suppliers: suppliers.map(row),
         customers: customers.map(row),
       },

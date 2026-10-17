@@ -7,8 +7,8 @@
  * Must not import scene.
  */
 import { fetchDebtLadder } from "../api.js?v=52";
-import { list, get, run, cleanParams } from "./reg.js?v=4";
-import { drawPlot } from "./draw.js?v=4";
+import { list, get, run, cleanParams } from "./reg.js?v=5";
+import { drawPlot } from "./draw.js?v=5";
 import { exportPaperPng } from "./export.js?v=3";
 
 const PIN_MAX = 6;

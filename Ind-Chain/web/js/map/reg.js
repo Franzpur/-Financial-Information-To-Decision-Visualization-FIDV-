@@ -10,7 +10,7 @@ import {
   projectRevLink,
   usMapDesc,
   projectUsMap,
-} from "./proj.js?v=4";
+} from "./proj.js?v=5";
 
 const HINT = "Select a node with debt data, e.g. GOOGL";
 const HINT_LINK = "Select a supply-chain link on the cube";

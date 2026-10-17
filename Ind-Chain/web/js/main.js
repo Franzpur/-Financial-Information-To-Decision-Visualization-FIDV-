@@ -1,8 +1,8 @@
 import { fetchBundle } from "./api.js?v=52";
 import { state, readHash, resolveBicsLabel, companyById, revenueLinkByKey } from "./state.js?v=59";
-import { createScene } from "./scene.js?v=85";
+import { createScene } from "./scene.js?v=87";
 import { createUI } from "./ui.js?v=77";
-import { createDock } from "./map/dock.js?v=7";
+import { createDock } from "./map/dock.js?v=8";
 import { listHref, wireBackspaceNav } from "./nav.js?v=1";
 
 const bootError = document.getElementById("bootError");

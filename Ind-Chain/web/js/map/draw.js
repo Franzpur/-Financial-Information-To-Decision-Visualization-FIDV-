@@ -51,8 +51,8 @@ function pairSvg(spec, L) {
   );
 }
 
-/** Simplified CONUS [lon,lat] — semantic tones only (colors in plot-paper.css). */
-const US_RING = [
+/** Fallback CONUS if outline bake missing — semantic tones only (colors in plot-paper.css). */
+const US_RING_FALLBACK = [
   [-124.7, 48.4], [-117.0, 49.0], [-95.2, 49.0], [-83.0, 46.2], [-67.0, 44.8],
   [-70.8, 41.3], [-75.5, 36.6], [-81.5, 30.4], [-89.5, 29.0], [-97.4, 25.9],
   [-106.5, 31.8], [-117.1, 32.5], [-122.5, 37.0], [-124.7, 42.0], [-124.7, 48.4],
@@ -68,7 +68,17 @@ function usMapSvg(spec, L) {
   const ih = H - PAD.t - PAD.b;
   const px = (lon) => x0 + ((lon - b.lonMin) / (b.lonMax - b.lonMin)) * iw;
   const py = (lat) => y0 + ih - ((lat - b.latMin) / (b.latMax - b.latMin)) * ih;
-  const path = US_RING.map(([lon, lat], i) => `${i ? "L" : "M"}${f1(px(lon))} ${f1(py(lat))}`).join(" ") + " Z";
+  const rings =
+    Array.isArray(m.outline?.rings) && m.outline.rings.length
+      ? m.outline.rings
+      : [US_RING_FALLBACK];
+  const land = rings
+    .map((ring) => {
+      const d =
+        ring.map(([lon, lat], i) => `${i ? "L" : "M"}${f1(px(lon))} ${f1(py(lat))}`).join(" ") + " Z";
+      return `<path class="pm-us-land" d="${d}" />`;
+    })
+    .join("");
   const center = m.center || {};
   const cx = px(center.lon);
   const cy = py(center.lat);
@@ -85,7 +95,7 @@ function usMapSvg(spec, L) {
     .join("");
   return (
     `<svg class="pm-svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(spec.title)}">` +
-    `<path class="pm-us-land" d="${path}" />` +
+    land +
     arcs +
     `<circle class="pm-us-hub" cx="${f1(cx)}" cy="${f1(cy)}" r="5" />` +
     `<text class="pm-us-hub-label" x="${f1(cx)}" y="${f1(cy - 10)}" text-anchor="middle">NVDA</text>` +

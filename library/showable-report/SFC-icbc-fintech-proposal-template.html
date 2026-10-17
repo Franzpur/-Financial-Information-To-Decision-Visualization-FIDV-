@@ -499,6 +499,9 @@ table.data--tight th, table.data--tight td { padding: .18em .4em; font-size: 8.5
 .fig img { display: block; width: 100%; height: auto; border: 1px solid var(--rule); }
 .fig-cap { margin: 2.2mm 0 0; }
 .fig--narrow { width: 72%; margin-left: auto; margin-right: auto; }
+.fig--w150 { max-width: 150mm; margin-left: auto; margin-right: auto; }   /* 竖排整幅截图：两张叠放可共一页 */
+.fig--w140 { max-width: 140mm; margin-left: auto; margin-right: auto; }
+.fig--w100 { max-width: 100mm; margin-left: auto; margin-right: auto; }   /* 半幅居中 */
 .fig-ph {                  /* 图片占位 */
   display: flex; align-items: center; justify-content: center;
   aspect-ratio: 16 / 9;
@@ -872,6 +875,7 @@ COMPONENTS（秘书速查）
 提示框     .callout（重点） / .callout--note（说明） / .callout--warn（风险）＋ .callout-label
 表格       .tbl > .tbl-cap(.cap-no) + table.data(thead/tbody/tfoot；td.num 右对齐) + p.src ；变体 table.data--tight ；长表 .tbl.tbl--long
 图片       figure.fig > img|.fig-ph + figcaption.fig-cap(.cap-no) ；.fig--narrow ；成对 .fig-pair
+           截图宜竖排叠放而非并排：.fig--w150（整幅，两张共一页）/ .fig--w140 / .fig--w100（半幅居中）；每个 img 必带 alt
 指标卡片   .kpi-row[.kpi-row--3] > .kpi > .kpi-label .kpi-val(.kpi-unit) .kpi-note
 时间线     ol.timeline[.timeline--long 可跨页] > li.tl-item.is-done|is-now|is-next > .tl-date .tl-rail .tl-body(h4.tl-title + p)
 引文       blockquote.quote > p + cite

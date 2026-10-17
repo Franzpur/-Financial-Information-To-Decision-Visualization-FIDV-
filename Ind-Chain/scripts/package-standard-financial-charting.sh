@@ -95,6 +95,7 @@ EXPECTED="$BUILD/expected.txt"
   for f in companies layers nvda-revenue-links; do echo "Ind-Chain/data/$f.json"; done
   [[ -f "$ROOT/data/links/nvda-revenue-links.xlsx" ]] && echo "Ind-Chain/data/links/nvda-revenue-links.xlsx"
   [[ -f "$ROOT/data/links/nvda-us-hq.json" ]] && echo "Ind-Chain/data/links/nvda-us-hq.json"
+  [[ -f "$ROOT/data/geo/us-conus-outline.json" ]] && echo "Ind-Chain/data/geo/us-conus-outline.json"
   # Bloomberg-derived debt ladder aggregate: internal variant only, and only when it has been baked locally.
   [[ $NO_ENTITIES -eq 0 && -f "$ROOT/data/debt-ladder-googl.json" ]] && echo "Ind-Chain/data/debt-ladder-googl.json"
   echo "BE-CLASS/BICS-Classification/bics-equity-hierarchy-2024.json"

@@ -16,7 +16,8 @@
 - [`SFC-icbc-fintech-proposal.pdf`](./SFC-icbc-fintech-proposal.pdf) Chrome headless 打印所得，目录页码按实际分页回填
 - 版式模板（美工部）[`SFC-icbc-fintech-proposal-template.html`](./SFC-icbc-fintech-proposal-template.html)，文末 COMPONENTS 注释为类名速查
 - 内容稿（内阁）`cabinet/notes/20261015-icbc-fintech-proposal-content.md`
-- 留有「待填写」占位：队员信息与分工、风险指标定稿、后续计划时点、提交日期、跨平台范围；产品界面图 3-3、3-4 待用新版白底重拍
+- 留有「待填写」占位：队员信息与分工、风险指标定稿、后续计划时点、提交日期、跨平台范围
+- 截图资产 `icbc-cup-assets/<日期>/`，各带 `MANIFEST.md`；2026-10-17 一组为业主标注截图（图 1-1、1-2、3-3、3-4、4-3、6-2），原图在 `cabinet/screenshot/`
 
 队员入职 / 可打印发展史：
 
